@@ -2,6 +2,8 @@ $stdout.sync = true
 
 class Epics::Http::Worker
 
+
+
   def initialize
     @beanstalk  ||= Beaneater::Pool.new(['localhost:11300'])
     @redis  ||= Redis.new
@@ -11,19 +13,25 @@ class Epics::Http::Worker
   def process!
     @beanstalk.jobs.register('cdd') do |job|
       message = JSON.parse(job.body, symbolize_names: true)
-      @redis.set(message[:document], message[:callback])
+      pain = Nokogiri::XML(Base64.strict_decode64(message[:document]))
+
+      @redis.set(pain.at_xpath("//xmlns:EndToEndId").text, message[:callback])
       @logger.info("debit")
     end
 
     @beanstalk.jobs.register('cd1') do |job|
       message = JSON.parse(job.body, symbolize_names: true)
-      @redis.set(message[:document], message[:callback])
+      pain = Nokogiri::XML(Base64.strict_decode64(message[:document]))
+
+      @redis.set(pain.at_xpath("//xmlns:EndToEndId").text, message[:callback])
       @logger.info("debit")
     end
 
     @beanstalk.jobs.register('cct') do |job|
       message = JSON.parse(job.body, symbolize_names: true)
-      @redis.set(message[:document], message[:callback])
+      pain = Nokogiri::XML(Base64.strict_decode64(message[:document]))
+
+      @redis.set(pain.at_xpath("//xmlns:EndToEndId").text, message[:callback])
       @logger.info("credit")
     end
 

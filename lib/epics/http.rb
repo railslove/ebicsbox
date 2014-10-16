@@ -3,6 +3,8 @@ require 'grape'
 require 'redis'
 require 'httparty'
 require 'json'
+require 'nokogiri'
+require 'base64'
 
 require "epics/http/version"
 require "epics/http/server"
