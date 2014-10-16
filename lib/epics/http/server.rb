@@ -3,8 +3,8 @@ class Epics
     class Server < Grape::API
 
       helpers do
-        def beanstalk
-          @beanstalk  ||= Beaneater::Pool.new(['localhost:11300'])
+        def queue
+          @queue ||= Epics::Http::QUEUE.new
         end
         def redis
           @redis  ||= Redis.new
@@ -18,7 +18,7 @@ class Epics
       end
       desc "Return a public timeline."
       post :debits do
-        beanstalk.tubes[params[:order_type]].put params.slice(:document, :callback).to_json
+        queue.publish params[:order_type], params.slice(:document, :callback)
 
         {debit: 'ok'}
       end
@@ -29,7 +29,7 @@ class Epics
       end
       desc "Return a public timeline."
       post :credits do
-        beanstalk.tubes[params[:order_type]].put params.slice(:document, :callback).to_json
+        queue.publish params[:order_type], params.slice(:document, :callback)
 
         {credit: 'ok'}
       end
