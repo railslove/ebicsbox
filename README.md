@@ -1,26 +1,66 @@
-# Epics::Http
+# Epics::Box
 
-TODO: Write a gem description
+Epics Box is a selfcontained solution to handle SEPA credit/debits and bank statement
+reconcilliation.
+
+It offers a HTTP interface and can be integrated with different message queueing systems
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'epics-http'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
+Install it:
 
     $ gem install epics-http
 
-## Usage
+Run it:
 
-TODO: Write usage instructions here
+    $ foreman start
+
+## Configuration
+
+## Usage
+### HTTP
+
+  POST https://ebics.box/debits
+  {
+    "callback": "https://"
+    "document": "< a base64 encoded representation of a pain008 document >"
+    "creditor_identifier": ""
+    "transactions": [
+      {
+        "name": "Peter Pan",
+        "bic": "COLSDE33XXX",
+        "iban": "DE51370501981929807319",
+        "amount": "100.00",
+        "reference": "",
+        "remittance_information": "",
+        "mandate_id": "number",
+        "mandate_date_of_signature": "",
+        "local_instrument": "CORE",
+        "sequence_type": "FRST",
+        "requested_date": ""
+      }
+    ]
+    "order_type": "CDD"
+  }
+
+  POST https://ebics.box/credits
+  {
+    "callback": "https://"
+    "document": "< a base64 encoded representation of a pain001 document >"
+    "transactions": [
+      {
+        "name": "Peter Pan",
+        "bic": "COLSDE33XXX",
+        "iban": "DE51370501981929807319",
+        "amount": "100.00",
+        "reference": "",
+        "remittance_information": ""
+      }
+    ]
+  }
+
+### Message Queue
+
 
 ## Contributing
 
