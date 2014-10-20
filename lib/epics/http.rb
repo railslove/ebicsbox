@@ -11,7 +11,7 @@ require "epics/http/worker"
 require "epics/http/queue"
 require "epics/http/queue/beanstalk"
 
-class Epics
+module Epics
   module Http
 
     QUEUE = Epics::Http::Queue::Beanstalk

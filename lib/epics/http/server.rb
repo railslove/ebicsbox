@@ -1,4 +1,4 @@
-class Epics
+module Epics
   module Http
     class Server < Grape::API
 
