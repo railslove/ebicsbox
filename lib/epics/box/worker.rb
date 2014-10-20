@@ -1,9 +1,9 @@
 $stdout.sync = true
 
-class Epics::Http::Worker
+class Epics::Box::Worker
 
   def initialize
-    @queue  ||= Epics::Http::QUEUE.new
+    @queue  ||= Epics::Box::QUEUE.new
     @logger ||= Logger.new(STDOUT)
   end
 

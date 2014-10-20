@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'epics/http/version'
+require 'epics/box/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "epics-http"
-  spec.version       = Epics::Http::VERSION
+  spec.name          = "epics-box"
+  spec.version       = Epics::Box::VERSION
   spec.authors       = ["Lars Brillert"]
   spec.email         = ["lars@railslove.com"]
   spec.summary       = %q{Epics Http Endpoint}

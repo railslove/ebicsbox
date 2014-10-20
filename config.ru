@@ -4,6 +4,6 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 Bundler.require
 
 # Load and run the app
-require File.expand_path(File.dirname(__FILE__) + '/lib/epics/http.rb')
+require File.expand_path(File.dirname(__FILE__) + '/lib/epics/box.rb')
 
-run Epics::Http::Server
+run Epics::Box::Server

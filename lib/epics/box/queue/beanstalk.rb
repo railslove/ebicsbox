@@ -1,6 +1,6 @@
 require 'beaneater'
 
-class Epics::Http::Queue::Beanstalk
+class Epics::Box::Queue::Beanstalk
 
   def initialize
     @beanstalk   ||= Beaneater::Pool.new(['localhost:11300'])

@@ -1,5 +1,5 @@
 module Epics
-  module Http
+  module Box
     class Server < Grape::API
 
       helpers do
