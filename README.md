@@ -9,7 +9,7 @@ It offers a HTTP interface and can be integrated with different message queueing
 
 Install it:
 
-    $ gem install epics-http
+    $ gem install epics-box
 
 Run it:
 
@@ -20,6 +20,7 @@ Run it:
 ## Usage
 ### HTTP
 
+```ruby
   POST https://ebics.box/debits
   {
     "callback": "https://"
@@ -42,7 +43,10 @@ Run it:
     ]
     "order_type": "CDD"
   }
+```
 
+
+```ruby
   POST https://ebics.box/credits
   {
     "callback": "https://"
@@ -58,7 +62,7 @@ Run it:
       }
     ]
   }
-
+``
 ### Message Queue
 
 
