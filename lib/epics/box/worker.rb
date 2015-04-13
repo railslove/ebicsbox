@@ -3,7 +3,7 @@ $stdout.sync = true
 class Epics::Box::Worker
 
   def initialize
-    @queue  ||= Epics::Box::QUEUE.new
+     @queue  ||= Epics::Box::QUEUE.new
     @logger ||= Logger.new(STDOUT)
   end
 

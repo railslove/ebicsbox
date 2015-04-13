@@ -19,10 +19,14 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "grape"
   spec.add_dependency "clockwork"
-  spec.add_dependency "redis"
   spec.add_dependency "httparty"
   spec.add_dependency "beaneater"
   spec.add_dependency "nokogiri"
+  spec.add_dependency "pg"
+  spec.add_dependency "sequel"
+  spec.add_dependency "cmxl"
+  spec.add_dependency "epics"
+  spec.add_dependency "sepa_king"
   spec.add_development_dependency "bundler", "~> 1.7"
   spec.add_development_dependency "rake", "~> 10.0"
 end

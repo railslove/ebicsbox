@@ -6,7 +6,8 @@ require 'epics/box'
 
 module Clockwork
   QUEUE = Epics::Box::QUEUE.new
-  handler { |job| QUEUE.publish 'sta', job }
+  handler { |job| QUEUE.publish job, JSON.dump({do: :it}) }
 
-  every(30.seconds, JSON.dump({refresh: "now"}))
+  # every(5.minutes, "sta"))
+  every(30.seconds, "check.orders")
 end

@@ -13,3 +13,5 @@
 *.a
 mkmf.log
 .DS_Store
+.env
+Box Key Architecture.graffle
