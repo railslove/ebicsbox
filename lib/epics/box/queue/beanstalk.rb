@@ -10,17 +10,27 @@ class Epics::Box::Queue::Beanstalk
   end
 
   def publish(queue, payload, options = {})
-    @beanstalk.tubes[queue.to_s].put(JSON.dump(payload))
+    @beanstalk.tubes[queue.to_s].put(JSON.dump(payload), options)
   end
 
   def process!
     @beanstalk.jobs.register('debit') do |job|
-      message = JSON.parse(job.body, symbolize_names: true)
-      pain = Base64.strict_decode64(message[:payload])
+      begin
+        message = JSON.parse(job.body, symbolize_names: true)
+        pain = Base64.strict_decode64(message[:payload])
+
         transaction = Epics::Box::Transaction.create(type: "debit", payload: pain, eref: message[:eref], status: "created")
 
+        transaction_id, order_id = @client.CD1(pain)
 
-      @logger.info("debit #{transaction_id}")
+        transaction.update(ebics_order_id: order_id, ebics_transaction_id: transaction_id)
+
+        publish("check.orders", {do: :it}, {delay: 120} ) unless @beanstalk.tubes['check.orders'].peek(:delayed)
+
+        @logger.info("debit #{transaction.id}")
+      rescue Exception => e
+        @logger.error(e.message)
+      end
     end
 
     @beanstalk.jobs.register('credit') do |job|
@@ -28,6 +38,12 @@ class Epics::Box::Queue::Beanstalk
       pain = Base64.strict_decode64(message[:payload])
 
       transaction = Epics::Box::Transaction.create(type: "credit", payload: pain, eref: message[:eref], status: "created")
+
+      transaction_id, order_id = @client.CCT(pain)
+
+      transaction.update(ebics_order_id: order_id, ebics_transaction_id: transaction_id)
+
+      publish("check.orders", {do: :it}, {delay: 120} ) unless @beanstalk.tubes['check.orders'].peek(:delayed)
 
       @beanstalk.tubes["orders"].put(transaction_id)
       @logger.info("credit #{transaction_id}")
@@ -78,40 +94,30 @@ class Epics::Box::Queue::Beanstalk
           @logger.info("#{last_import[:date]} too likely #{to}")
         end
         @db[:imports].insert(date: to)
+      rescue Epics::Error::BusinessError => e
+        @logger.info(e.message)
       rescue Exception => e
-        @logger.error(e)
+        @logger.error(e.message)
       end
-
-      # File.open(File.expand_path("~/sta.mt940")).each do |line|
-      #   if trx = @persistence.get(line.gsub!(/\n/,''))
-      #     @logger.info("#{line} -> found")
-      #     @beanstalk.tubes['web'].put({callback: trx}.to_json)
-      #   else
-      #     @logger.debug("#{line} -> not found")
-      #   end
-      # end
     end
 
     @beanstalk.jobs.register('check.orders') do |job|
       begin
 
-        # if @beanstalk.tubes['orders'].peek(:ready)
-        #   @beanstalk.tubes.watch!('orders')
-        #   @beanstalk.tubes.reserve(1) { |j| @logger.debug(j) }
-        #   @logger.debug("ehh well...")
-        #   @beanstalk.tubes.ignore('orders')
-        # else
-        #   @logger.debug("ehh nooo...")
-        # end
-        Nokogiri::XML(File.open(File.expand_path("~/hac.xml"))).remove_namespaces!.xpath("//OrgnlPmtInfAndSts").each do |info|
-          reason_code = info.at_xpath("./StsRsnInf/Rsn/Cd") ? info.at_xpath("./StsRsnInf/Rsn/Cd").text : nil
-          action = info.at_xpath("./OrgnlPmtInfId") ? info.at_xpath("./OrgnlPmtInfId").text : nil
+        @logger.debug("reconciling orders by HAC")
+        file = @client.HAC(Date.today - 1, Date.today) #File.open(File.expand_path("~/hac.xml"))
+        Nokogiri::XML(file).remove_namespaces!.xpath("//OrgnlPmtInfAndSts").each do |info|
+          reason_code = info.xpath("./StsRsnInf/Rsn/Cd").text
+          action = info.xpath("./OrgnlPmtInfId").text
           ids    = info.xpath("./StsRsnInf/Orgtr/Id/OrgId/Othr").inject({}) {|memo, node| memo[node.at_xpath("./SchmeNm/Prtry").text] = node.at_xpath("./Id").text;memo }
 
           if ids["OrderID"]
-            if trx = @db[:transactions].where(ebics_order_id: ids["OrderID"]).first
-              @logger.info("#{trx[:id]} - #{action} for #{ids["OrderID"]} with #{reason_code}")
+            if trx = Epics::Box::Transaction[ebics_order_id: ids["OrderID"]]
+              trx.set_state_from(action.downcase, reason_code)
+              @logger.info("#{trx.pk} - #{action} for #{ids["OrderID"]} with #{reason_code}")
             end
+          else
+            @logger.debug("#{action} for #{ids} with reason: #{reason_code}")
           end
         end
       rescue Exception => e
