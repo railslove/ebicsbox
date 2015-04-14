@@ -17,6 +17,10 @@ module Epics
         def db
           @db ||= ::DB
         end
+
+        def account
+          OpenStruct.new(name: "Railslove GmbH", bic: "COLSDE33XXX", iban: "DE51370501981929807319", creditor_identifier: "DE92ZZZ00001490755" )
+        end
       end
 
       params do
@@ -31,12 +35,10 @@ module Epics
         optional :sequence_type, type: String, desc: "", values: ["FRST", "RCUR", "OOFF", "FNAL"], default: "FRST"
         optional :remittance_information ,  type: String, desc: "will apear on the customers bank statement"
         optional :instruction ,  type: String, desc: "instruction identification, will not be submitted to the debtor"
-        optional :requested_date,  type: Integer, desc: "requested execution date", default: ->{ Time.now.to_i } #TODO validate, future
+        optional :requested_date,  type: Integer, desc: "requested execution date", default: ->{ Time.now.to_i + 172800 } #TODO validate, future
       end
       desc "debits a customer account"
       post :debits do
-        account = OpenStruct.new(name: "Box Gmbh", bic: "BANKDEFFXXX", iban: "DE87200500001234567890", creditor_identifier: "DE98ZZZ09999999999" )
-
         begin
           sdd = SEPA::DirectDebit.new(account.to_h).tap do |credit|
             credit.add_transaction(
@@ -78,8 +80,6 @@ module Epics
       end
       desc "Credits a customer account"
       post :credits do
-        account = OpenStruct.new(name: "Box Gmbh", bic: "BANKDEFFXXX", iban: "DE87200500001234567890")
-
         begin
           sct = SEPA::CreditTransfer.new(account.to_h).tap do |credit|
             credit.add_transaction(
