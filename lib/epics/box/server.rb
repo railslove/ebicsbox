@@ -1,6 +1,6 @@
 class Unique < Grape::Validations::Base
   def validate_param!(attr_name, params)
-    unless Epics::Box::DB[:transactions].where(attr_name => params[attr_name]).count == 0
+    unless DB[:transactions].where(attr_name => params[attr_name]).count == 0
       raise Grape::Exceptions::Validation, params: [@scope.full_name(attr_name)], message: "must be unique"
     end
   end
@@ -15,7 +15,7 @@ module Epics
           @queue ||= Epics::Box::QUEUE.new
         end
         def db
-          @db ||= Epics::Box::DB
+          @db ||= ::DB
         end
       end
 

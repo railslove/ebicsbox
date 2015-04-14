@@ -3,9 +3,9 @@ require 'beaneater'
 class Epics::Box::Queue::Beanstalk
 
   def initialize
-    @beanstalk  ||= Beaneater::Pool.new(['localhost:11300'])
+    @beanstalk  ||= Beaneater::Pool.new
     @logger     ||= Logger.new(STDOUT)
-    @db         ||= Epics::Box::DB
+    @db         ||= ::DB
     @client     ||= Epics::Box::CLIENT
   end
 
@@ -17,8 +17,8 @@ class Epics::Box::Queue::Beanstalk
     @beanstalk.jobs.register('debit') do |job|
       message = JSON.parse(job.body, symbolize_names: true)
       pain = Base64.strict_decode64(message[:payload])
+        transaction = Epics::Box::Transaction.create(type: "debit", payload: pain, eref: message[:eref], status: "created")
 
-      transaction_id = @db[:transactions].insert(type: "debit", payload: pain, eref: message[:eref], status: "created")
 
       @logger.info("debit #{transaction_id}")
     end
@@ -27,7 +27,7 @@ class Epics::Box::Queue::Beanstalk
       message = JSON.parse(job.body, symbolize_names: true)
       pain = Base64.strict_decode64(message[:payload])
 
-      transaction_id = @db[:transactions].insert(type: "credit", payload: pain, eref: message[:eref], status: "created")
+      transaction = Epics::Box::Transaction.create(type: "credit", payload: pain, eref: message[:eref], status: "created")
 
       @beanstalk.tubes["orders"].put(transaction_id)
       @logger.info("credit #{transaction_id}")
