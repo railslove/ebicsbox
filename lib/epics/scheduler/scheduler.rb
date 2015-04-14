@@ -8,6 +8,6 @@ module Clockwork
   QUEUE = Epics::Box::QUEUE.new
   handler { |job| QUEUE.publish job, JSON.dump({do: :it}) }
 
-  # every(5.minutes, "sta"))
-  every(30.seconds, "check.orders")
+  every(5.minutes, "sta")
+  every(3.hours, "check.orders")
 end
