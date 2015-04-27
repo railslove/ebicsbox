@@ -66,8 +66,8 @@ class Epics::Box::Queue::Beanstalk
           to = Date.today
 
           if last_import[:date] < to
-            mt940 = File.read('/Users/kangguru/Downloads/spk.mt940')#account.client.STA("#{(last_import[:date])}" , "#{(to)}")
-
+            # mt940 = account.client.STA("#{(last_import[:date])}" , "#{(to)}") # File.read('/Users/kangguru/Downloads/spk.mt940')#
+            mt940 = File.read('/Users/kangguru/Downloads/spk.mt940')
             @logger.info(@db)
 
             Cmxl.parse(mt940).each do |s|
@@ -97,7 +97,11 @@ class Epics::Box::Queue::Beanstalk
                 if Epics::Box::Statement.where({sha: trx[:sha]}).first
                   @logger.debug("the sha #{t.sha} is already here")
                 else
-                  Epics::Box::Statement.create(trx)
+                  statement = Epics::Box::Statement.create(trx)
+
+                  if transaction = Epics::Box::Transaction.where({eref: statement.eref}).first
+                    transaction.add_statement(statement)
+                  end
                 end
               end
             end
