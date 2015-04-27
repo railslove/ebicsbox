@@ -17,12 +17,14 @@ require "epics/box/server"
 require "epics/box/worker"
 require "epics/box/queue"
 require "epics/box/queue/beanstalk"
+require "epics/box/models/account"
+require "epics/box/models/statement"
 require "epics/box/models/transaction"
 
 module Epics
   module Box
     QUEUE  = Epics::Box::Queue::Beanstalk
-    CLIENT = Epics::Client.new( File.open(ENV['KEYFILE']), ENV['PASSPHRASE'], ENV['EBICS_URL'], ENV['EBICS_HOST'], ENV['EBICS_USER'], ENV['EBICS_PARTNER'])
+    # CLIENT = Epics::Client.new( File.open(ENV['KEYFILE']), ENV['PASSPHRASE'], ENV['EBICS_URL'], ENV['EBICS_HOST'], ENV['EBICS_USER'], ENV['EBICS_PARTNER'])
     # Your code goes here...
   end
 end

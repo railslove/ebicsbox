@@ -10,7 +10,8 @@ Sequel.migration do
       String :host
       String :partner
       String :user
-      String :keys
+      String :passphrase
+      Text   :keys
     end
   end
 
