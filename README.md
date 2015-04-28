@@ -10,6 +10,11 @@ It offers a HTTP interface and can be integrated with different message queueing
 $ createdb ebicsbox
 $ sequel -m migrations postgres://localhost/ebicsbox
 
+## Prerequistes
+
+* beanstalkd
+* postgres
+
 ## Installation
 
 Install it:
