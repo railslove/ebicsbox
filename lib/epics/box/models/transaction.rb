@@ -22,6 +22,8 @@ class Ebics::Box::Transaction < Sequel::Model
     end
 
     self.save
+
+    self.status
   end
 
 end

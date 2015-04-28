@@ -107,7 +107,7 @@ class Epics::Box::Queue::Beanstalk
                       transaction.set_state_from("debit_received")
                     end
 
-                    @beanstalk.tubes["web"].put(JSON.dump(transaction_id: transaction.id))
+                    publish("web", account_id: account_id, payload: transaction.to_hash)
                   end
                 end
               end
@@ -127,6 +127,7 @@ class Epics::Box::Queue::Beanstalk
     @beanstalk.jobs.register('check.orders') do |job|
       begin
         message = JSON.parse(job.body, symbolize_names: true)
+        @logger.debug("check orders")
 
         message[:account_ids].each do |account_id|
           account = Epics::Box::Account[account_id]
@@ -139,7 +140,11 @@ class Epics::Box::Queue::Beanstalk
 
             if ids["OrderID"]
               if trx = Epics::Box::Transaction[ebics_order_id: ids["OrderID"]]
-                trx.set_state_from(action.downcase, reason_code)
+                status = trx.status
+                if status != trx.set_state_from(action.downcase, reason_code)
+                  @logger.debug("#{status} -> #{trx.status}")
+                  publish("web", account_id: account_id, payload: trx.to_hash)
+                end
                 @logger.info("#{trx.pk} - #{action} for #{ids["OrderID"]} with #{reason_code}")
               end
             else
@@ -155,9 +160,9 @@ class Epics::Box::Queue::Beanstalk
     @beanstalk.jobs.register('web') do |job|
       begin
         message = JSON.parse(job.body, symbolize_names: true)
-        transaction = Epics::Box::Transaction[message[:transaction_id]]
-        if transaction.account.callback_url
-          res = HTTParty.post(transaction.account.callback_url, body: transaction.to_hash)
+        account = Epics::Box::Account[message[:account_id]]
+        if account.callback_url
+          res = HTTParty.post(account.callback_url, body: message[:payload])
           @logger.info("callback triggered: #{res.code} #{res.parsed_response}")
         else
           @logger.info("no callback configured for #{transacion.account.name}")
