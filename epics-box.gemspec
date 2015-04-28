@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "grape"
   spec.add_dependency "clockwork"
   spec.add_dependency "httparty"
-  spec.add_dependency "beaneater"
+  spec.add_dependency "beaneater", "~> 0.3.3"
   spec.add_dependency "nokogiri"
   spec.add_dependency "pg"
   spec.add_dependency "sequel"
