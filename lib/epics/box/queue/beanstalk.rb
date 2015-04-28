@@ -38,7 +38,9 @@ class Epics::Box::Queue::Beanstalk
 
       transaction = Epics::Box::Transaction.create(account_id: message[:account_id], type: "credit", payload: pain, eref: message[:eref], status: "created")
 
-      transaction_id, order_id = transacion.account.client.CCT(pain)
+      # transaction_id, order_id = transacion.account.client.CCT(pain)
+      random_id = SecureRandom.hex(6)
+      transaction_id, order_id = ["TRX#{random_id}", "N#{random_id}"]
 
       transaction.update(ebics_order_id: order_id, ebics_transaction_id: transaction_id)
 

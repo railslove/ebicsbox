@@ -11,4 +11,8 @@ class Epics::Box::Account < Sequel::Model
     [:name, :bic, :iban, :creditor_identifier].inject({}) {|n, v| n[v]=public_send(v);n }
   end
 
+  def credit_pain_attributes_hash
+    [:name, :bic, :iban].inject({}) {|n, v| n[v]=public_send(v);n }
+  end
+
 end

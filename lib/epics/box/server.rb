@@ -83,7 +83,7 @@ module Epics
       desc "Credits a customer account"
       post ':account/credits' do
         begin
-          sct = SEPA::CreditTransfer.new(account.pain_attributes_hash).tap do |credit|
+          sct = SEPA::CreditTransfer.new(account.credit_pain_attributes_hash).tap do |credit|
             credit.add_transaction(
               name: params[:name],
               bic: params[:bic],
