@@ -67,7 +67,7 @@ class Epics::Box::Queue::Beanstalk
 
           if last_import[:date] < to
             # mt940 = account.client.STA("#{(last_import[:date])}" , "#{(to)}") # File.read('/Users/kangguru/Downloads/spk.mt940')#
-            mt940 = File.read('/Users/kangguru/Downloads/spk.mt940')
+            mt940 = File.read( File.expand_path("~/sta.mt940"))
             @logger.info(@db)
 
             Cmxl.parse(mt940).each do |s|
@@ -101,6 +101,13 @@ class Epics::Box::Queue::Beanstalk
 
                   if transaction = Epics::Box::Transaction.where({eref: statement.eref}).first
                     transaction.add_statement(statement)
+                    if statement.credit?
+                      transaction.set_state_from("credit_received")
+                    elsif statement.debit?
+                      transaction.set_state_from("debit_received")
+                    end
+
+                    @beanstalk.tubes["web"].put(JSON.dump(transaction_id: transaction.id))
                   end
                 end
               end
@@ -113,7 +120,7 @@ class Epics::Box::Queue::Beanstalk
       rescue Epics::Error::BusinessError => e
         @logger.info(e.message)
       rescue Exception => e
-        @logger.error(e.backtrace)
+        @logger.error(e.message)
       end
     end
 
@@ -146,9 +153,18 @@ class Epics::Box::Queue::Beanstalk
     end
 
     @beanstalk.jobs.register('web') do |job|
-      message = JSON.parse(job.body, symbolize_names: true)
-      HTTParty.post(message[:callback], body: Time.now.to_s)
-      @logger.info("callback")
+      begin
+        message = JSON.parse(job.body, symbolize_names: true)
+        transaction = Epics::Box::Transaction[message[:transaction_id]]
+        if transaction.account.callback_url
+          res = HTTParty.post(transaction.account.callback_url, body: transaction.to_hash)
+          @logger.info("callback triggered: #{res.code} #{res.parsed_response}")
+        else
+          @logger.info("no callback configured for #{transacion.account.name}")
+        end
+      rescue Exception => e
+        @logger.error(e.message)
+      end
     end
 
     @beanstalk.jobs.process!
