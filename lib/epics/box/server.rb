@@ -17,7 +17,6 @@ module Epics
 
         def account
           Epics::Box::Account.first!({iban: params[:account]})
-          # OpenStruct.new(name: "Railslove GmbH", bic: "COLSDE33XXX", iban: "DE51370501981929807319", creditor_identifier: "DE92ZZZ00001490755" )
         end
       end
 
