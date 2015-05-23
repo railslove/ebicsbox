@@ -18,6 +18,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "grape"
+  spec.add_dependency "grape-entity"
   spec.add_dependency "clockwork"
   spec.add_dependency "httparty"
   spec.add_dependency "beaneater", "~> 1.0.0"

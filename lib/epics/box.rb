@@ -1,4 +1,5 @@
 require 'grape'
+require 'grape-entity'
 require 'sequel'
 require 'cmxl'
 require 'pg'
@@ -20,6 +21,8 @@ require "epics/box/queue/beanstalk"
 require "epics/box/models/account"
 require "epics/box/models/statement"
 require "epics/box/models/transaction"
+require "epics/box/presenters/statement_presenter"
+
 Beaneater.configure do |config|
   config.job_parser          = lambda { |body| JSON.parse(body, symbolize_names: true) }
 end

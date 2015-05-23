@@ -118,7 +118,7 @@ module Epics
       desc "Returns statements for"
       get ':account/statements' do
         begin
-          DB[:statements].where(account_id: account.id).limit(params[:per_page]).offset((params[:page] -1) * params[:per_page]).all
+          present DB[:statements].where(account_id: account.id).limit(params[:per_page]).offset((params[:page] -1) * params[:per_page]).all, with: Epics::Box::StatementPresenter
         rescue Sequel::NoMatchingRow
           { errors: 'no account found' }
         end
