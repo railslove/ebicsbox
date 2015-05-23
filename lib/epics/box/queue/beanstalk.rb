@@ -3,7 +3,7 @@ require 'beaneater'
 class Epics::Box::Queue::Beanstalk
 
   def initialize
-    @beanstalk  ||= Beaneater::Pool.new
+    @beanstalk  ||= Beaneater.new(ENV['BEANSTALKD_URL'])
     @logger     ||= Logger.new(STDOUT)
     @db         ||= ::DB
   end
@@ -15,7 +15,7 @@ class Epics::Box::Queue::Beanstalk
   def process!
     @beanstalk.jobs.register('debit') do |job|
       begin
-        message = JSON.parse(job.body, symbolize_names: true)
+        message = job.body
         pain = Base64.strict_decode64(message[:payload])
 
         transaction = Epics::Box::Transaction.create(account_id: message[:account_id], type: "debit", payload: pain, eref: message[:eref], status: "created")
@@ -33,7 +33,7 @@ class Epics::Box::Queue::Beanstalk
     end
 
     @beanstalk.jobs.register('credit') do |job|
-      message = JSON.parse(job.body, symbolize_names: true)
+      message = job.body
       pain = Base64.strict_decode64(message[:payload])
 
       transaction = Epics::Box::Transaction.create(account_id: message[:account_id], type: "credit", payload: pain, eref: message[:eref], status: "created")
@@ -58,7 +58,7 @@ class Epics::Box::Queue::Beanstalk
 
     @beanstalk.jobs.register('sta') do |job|
       begin
-        message = JSON.parse(job.body, symbolize_names: true)
+        message = job.body
 
         message[:account_ids].each do |account_id|
           account = Epics::Box::Account[account_id]
@@ -128,7 +128,7 @@ class Epics::Box::Queue::Beanstalk
 
     @beanstalk.jobs.register('check.orders') do |job|
       begin
-        message = JSON.parse(job.body, symbolize_names: true)
+        message = job.body
         @logger.debug("check orders")
 
         message[:account_ids].each do |account_id|
@@ -161,7 +161,7 @@ class Epics::Box::Queue::Beanstalk
 
     @beanstalk.jobs.register('web') do |job|
       begin
-        message = JSON.parse(job.body, symbolize_names: true)
+        message = job.body
         account = Epics::Box::Account[message[:account_id]]
         if account.callback_url
           res = HTTParty.post(account.callback_url, body: message[:payload])

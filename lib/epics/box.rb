@@ -20,6 +20,9 @@ require "epics/box/queue/beanstalk"
 require "epics/box/models/account"
 require "epics/box/models/statement"
 require "epics/box/models/transaction"
+Beaneater.configure do |config|
+  config.job_parser          = lambda { |body| JSON.parse(body, symbolize_names: true) }
+end
 
 module Epics
   module Box
