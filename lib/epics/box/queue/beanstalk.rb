@@ -18,9 +18,9 @@ class Epics::Box::Queue::Beanstalk
         message = job.body
         pain = Base64.strict_decode64(message[:payload])
 
-        transaction = Epics::Box::Transaction.create(account_id: message[:account_id], type: "debit", payload: pain, eref: message[:eref], status: "created")
+        transaction = Epics::Box::Transaction.create(account_id: message[:account_id], type: "debit", payload: pain, eref: message[:eref], status: "created", order_type: Epics::Box::DEBIT_MAPPING[message[:instrument]])
 
-        transaction_id, order_id = ["TRX001","N00X"]#transacion.account.client.CD1(pain)
+        transaction_id, order_id = transaction.account.client.public_send(transaction.order_type, pain)
 
         transaction.update(ebics_order_id: order_id, ebics_transaction_id: transaction_id)
 
@@ -36,7 +36,7 @@ class Epics::Box::Queue::Beanstalk
       message = job.body
       pain = Base64.strict_decode64(message[:payload])
 
-      transaction = Epics::Box::Transaction.create(account_id: message[:account_id], type: "credit", payload: pain, eref: message[:eref], status: "created")
+      transaction = Epics::Box::Transaction.create(account_id: message[:account_id], type: "credit", payload: pain, eref: message[:eref], status: "created", order_type: :CCT)
 
       # transaction_id, order_id = transacion.account.client.CCT(pain)
       random_id = SecureRandom.hex(6)

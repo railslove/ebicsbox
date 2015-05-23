@@ -29,7 +29,7 @@ module Epics
         requires :eref,  type: String, desc: "end to end id", unique: true
         requires :mandate_id,  type: String, desc: "mandate id"
         requires :mandate_signature_date, type: Integer, desc: "mandate signature date"
-        optional :instrument, type: String, desc: "", values: ["CORE", "COR1", "B2B"], default: "COR1"
+        optional :instrument, type: String, desc: "", values: %w[CORE COR1 B2B], default: "COR1"
         optional :sequence_type, type: String, desc: "", values: ["FRST", "RCUR", "OOFF", "FNAL"], default: "FRST"
         optional :remittance_information ,  type: String, desc: "will apear on the customers bank statement"
         optional :instruction,  type: String, desc: "instruction identification, will not be submitted to the debtor"
