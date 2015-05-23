@@ -38,9 +38,7 @@ class Epics::Box::Queue::Beanstalk
 
       transaction = Epics::Box::Transaction.create(account_id: message[:account_id], type: "credit", payload: pain, eref: message[:eref], status: "created", order_type: :CCT)
 
-      # transaction_id, order_id = transacion.account.client.CCT(pain)
-      random_id = SecureRandom.hex(6)
-      transaction_id, order_id = ["TRX#{random_id}", "N#{random_id}"]
+      transaction_id, order_id = transacion.account.client.CCT(pain)
 
       transaction.update(ebics_order_id: order_id, ebics_transaction_id: transaction_id)
 
@@ -134,7 +132,8 @@ class Epics::Box::Queue::Beanstalk
         message[:account_ids].each do |account_id|
           account = Epics::Box::Account[account_id]
           @logger.debug("reconciling orders by HAC for #{account.name}")
-          file = File.open(File.expand_path("~/hac.xml")) # account.client.HAC(Date.today - 1, Date.today) #
+
+          file = account.client.HAC(Date.today - 1, Date.today)
           Nokogiri::XML(file).remove_namespaces!.xpath("//OrgnlPmtInfAndSts").each do |info|
             reason_code = info.xpath("./StsRsnInf/Rsn/Cd").text
             action = info.xpath("./OrgnlPmtInfId").text
