@@ -166,7 +166,7 @@ class Epics::Box::Queue::Beanstalk
           res = HTTParty.post(account.callback_url, body: message[:payload])
           @logger.info("callback triggered: #{res.code} #{res.parsed_response}")
         else
-          @logger.info("no callback configured for #{transacion.account.name}")
+          @logger.info("no callback configured for #{account.name}")
         end
       rescue Exception => e
         @logger.error(e.message)
