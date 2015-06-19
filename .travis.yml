@@ -1,0 +1,12 @@
+language: ruby
+rvm:
+  - 2.2.2
+addons:
+  postgresql: "9.4"
+install:
+  - bundle install
+before_script:
+  - createdb ebicsbox_test
+  - sequel -m migrations postgres://localhost/ebicsbox_test
+script:
+  - bundle exec rspec spec
