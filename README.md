@@ -76,6 +76,12 @@ Run it:
 ### Message Queue
 
 
+### Tests
+
+We are using RSpec to test this project. In order to execute all specs once, run ```bundle exec rspec```.
+If you are actively developing, you can execute specs automatically by running guard with ```bundle exec guard```.
+
+
 ## Contributing
 
 1. Fork it ( https://github.com/[my-github-username]/epics-http/fork )
