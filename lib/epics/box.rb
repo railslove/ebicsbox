@@ -10,22 +10,8 @@ require 'epics'
 require 'sepa_king'
 require 'base64'
 
-DB = Sequel.connect(ENV['DATABASE_URL'], max_connections: 10)
-DB.extension(:connection_validator)
-
-require "epics/box/version"
-require "epics/box/server"
-require "epics/box/worker"
-require "epics/box/queue"
-require "epics/box/queue/beanstalk"
-require "epics/box/models/account"
-require "epics/box/models/statement"
-require "epics/box/models/transaction"
-require "epics/box/presenters/statement_presenter"
-
-Beaneater.configure do |config|
-  config.job_parser          = lambda { |body| JSON.parse(body, symbolize_names: true) }
-end
+require 'epics/box/version'
+require 'epics/box/configuration'
 
 module Epics
   module Box
@@ -35,8 +21,25 @@ module Epics
       "B2B" =>  :CDB,
     }
 
-    QUEUE  = Epics::Box::Queue::Beanstalk
+    # QUEUE  = Epics::Box::Queue::Beanstalk
     # CLIENT = Epics::Client.new( File.open(ENV['KEYFILE']), ENV['PASSPHRASE'], ENV['EBICS_URL'], ENV['EBICS_HOST'], ENV['EBICS_USER'], ENV['EBICS_PARTNER'])
     # Your code goes here...
+
+    def self.configuration
+      @configuration ||= Configuration.new
+    end
   end
 end
+
+# Init database connection
+DB = Sequel.connect(Epics::Box.configuration.database_url, max_connections: 10)
+DB.extension(:connection_validator)
+
+require "epics/box/server"
+require "epics/box/worker"
+require "epics/box/queue"
+require "epics/box/queue/beanstalk"
+require "epics/box/models/account"
+require "epics/box/models/statement"
+require "epics/box/models/transaction"
+require "epics/box/presenters/statement_presenter"

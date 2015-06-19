@@ -1,5 +1,10 @@
 require 'beaneater'
 
+Beaneater.configure do |config|
+  config.job_parser = lambda { |body| JSON.parse(body, symbolize_names: true) }
+end
+
+
 class Epics::Box::Queue::Beanstalk
 
   def initialize
