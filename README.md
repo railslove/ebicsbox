@@ -1,5 +1,7 @@
 # Epics::Box
 
+[![Build Status](https://magnum.travis-ci.com/railslove/epics-box.svg?token=AM3M96RpNyP5z4TXrjkp)](https://magnum.travis-ci.com/railslove/epics-box)
+
 Epics Box is a selfcontained solution to handle SEPA credit/debits and bank statement
 reconcilliation.
 
