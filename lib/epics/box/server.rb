@@ -13,7 +13,7 @@ module Epics
 
       helpers do
         def queue
-          @queue ||= Epics::Box::QUEUE.new
+          @queue ||= Epics::Box::Queue.new
         end
 
         def account
