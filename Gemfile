@@ -7,6 +7,7 @@ gemspec
 
 group :development, :test do
   gem 'byebug'
+  gem 'database_cleaner'
   gem 'rspec'
   gem 'guard-rspec', require: false
   gem 'airborne'
