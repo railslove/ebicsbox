@@ -1,5 +1,7 @@
 require 'beaneater'
 
+require "epics/box/jobs/debit"
+
 Beaneater.configure do |config|
   config.job_parser = lambda { |body| JSON.parse(body, symbolize_names: true) }
   config.job_serializer  = lambda { |body| JSON.dump(body) }
@@ -41,20 +43,7 @@ module Epics
 
       def process!
         self.class.client.jobs.register('debit') do |job|
-          with_error_logging do
-            message = job.body
-            pain = Base64.strict_decode64(message[:payload])
-
-            transaction = Epics::Box::Transaction.create(account_id: message[:account_id], type: "debit", payload: pain, eref: message[:eref], status: "created", order_type: Epics::Box::DEBIT_MAPPING[message[:instrument]])
-
-            transaction_id, order_id = transaction.account.client.public_send(transaction.order_type, pain)
-
-            transaction.update(ebics_order_id: order_id, ebics_transaction_id: transaction_id)
-
-            Queue.check_accounts(message[:account_id])
-
-            @logger.info("debit #{transaction.id}")
-          end
+          with_error_logging { Jobs::Debit.process!(job.body) }
         end
 
         self.class.client.jobs.register('credit') do |job|
