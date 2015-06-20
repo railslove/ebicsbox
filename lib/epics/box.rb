@@ -28,6 +28,10 @@ module Epics
     def self.configuration
       @configuration ||= Configuration.new
     end
+
+    def self.logger
+      @logger ||= Logger.new(STDOUT)
+    end
   end
 end
 
