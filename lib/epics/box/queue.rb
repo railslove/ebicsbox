@@ -2,6 +2,7 @@ require 'beaneater'
 
 require "epics/box/jobs/debit"
 require "epics/box/jobs/credit"
+require "epics/box/jobs/fetch_statements"
 
 Beaneater.configure do |config|
   config.job_parser = lambda { |body| JSON.parse(body, symbolize_names: true) }
@@ -13,6 +14,7 @@ module Epics
     class Queue
       ORDER_TUBE = 'check.orders'
       STA_TUBE = 'sta'
+      WEBHOOK_TUBE = 'web'
 
       attr_accessor :logger
 
@@ -32,10 +34,13 @@ module Epics
         client.tubes[STA_TUBE].put(account_ids: Array.wrap(account_ids))
       end
 
+      def self.trigger_webhook(payload)
+        client.tubes[WEBHOOK_TUBE].put(payload)
+      end
+
 
       def initialize
         self.logger ||= Box.logger
-        @db ||= ::DB
       end
 
       def publish(queue, payload, options = {})
@@ -52,75 +57,7 @@ module Epics
         end
 
         self.class.client.jobs.register('sta') do |job|
-          begin
-            message = job.body
-
-            message[:account_ids].each do |account_id|
-              account = Epics::Box::Account[account_id]
-              @logger.info("STA import for #{account.name}")
-
-              last_import = @db[:imports].where(account_id: account_id).order(:date).last || {date: Date.today}
-              to = Date.today
-
-              if last_import[:date] < to
-                # mt940 = account.client.STA("#{(last_import[:date])}" , "#{(to)}") # File.read('/Users/kangguru/Downloads/spk.mt940')#
-                mt940 = File.read( File.expand_path("~/sta.mt940"))
-                @logger.info(@db)
-
-                Cmxl.parse(mt940).each do |s|
-                  s.transactions.each do |t|
-                    trx = {
-                      account_id: account.id,
-                      sha: Digest::SHA2.hexdigest(t.information),
-                      date: t.date,
-                      entry_date: t.entry_date,
-                      amount_cents: t.amount_in_cents,
-                      sign: t.sign,
-                      debit: t.debit?,
-                      swift_code: t.swift_code,
-                      reference: t.reference,
-                      bank_reference: t.bank_reference,
-                      bic: t.bic,
-                      iban: t.iban,
-                      name: t.name,
-                      information: t.information,
-                      description: t.description,
-                      eref: t.sepa["EREF"],
-                      mref: t.sepa["MREF"],
-                      svwz: t.sepa["SVWZ"],
-                      creditor_identifier: t.sepa["CRED"]
-                    }
-
-                    if Epics::Box::Statement.where({sha: trx[:sha]}).first
-                      @logger.debug("the sha #{t.sha} is already here")
-                    else
-                      statement = Epics::Box::Statement.create(trx)
-
-                      if transaction = Epics::Box::Transaction.where({eref: statement.eref}).first
-                        transaction.add_statement(statement)
-                        if statement.credit?
-                          transaction.set_state_from("credit_received")
-                        elsif statement.debit?
-                          transaction.set_state_from("debit_received")
-                        end
-
-                        publish("web", account_id: account_id, payload: transaction.to_hash)
-                      end
-                    end
-                  end
-                end
-              else
-                @logger.info("#{last_import[:date]} too likely #{to}")
-              end
-              @db[:imports].insert(date: to, account_id: account_id)
-            end
-          rescue Epics::Error::BusinessError => e
-            # Expected: Raised if no new statements are available
-            @logger.info(e.message)
-            job.delete
-          rescue Exception => e
-            @logger.error(e.message)
-          end
+          with_error_logging { Jobs::FetchStatements.process!(job.body) }
         end
 
         self.class.client.jobs.register('check.orders') do |job|
