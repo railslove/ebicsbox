@@ -11,5 +11,6 @@ install:
 before_script:
   - createdb ebicsbox_test
   - sequel -m migrations postgres://localhost/ebicsbox_test
+  - beanstalkd &
 script:
   - bundle exec rspec spec
