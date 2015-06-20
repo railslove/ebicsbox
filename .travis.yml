@@ -9,8 +9,8 @@ before_install:
 install:
   - bundle install
 before_script:
+  - sudo service beanstalkd start
   - createdb ebicsbox_test
   - sequel -m migrations postgres://localhost/ebicsbox_test
-  - beanstalkd &
 script:
   - bundle exec rspec spec
