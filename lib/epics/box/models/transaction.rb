@@ -26,4 +26,10 @@ class Ebics::Box::Transaction < Sequel::Model
     self.status
   end
 
+  def execute!
+    return if ebics_transaction_id.present?
+
+    transaction_id, order_id = account.client.public_send(order_type, payload)
+    update(ebics_order_id: order_id, ebics_transaction_id: transaction_id)
+  end
 end
