@@ -6,4 +6,9 @@ Bundler.require
 # Load and run the app
 require File.expand_path(File.dirname(__FILE__) + '/lib/epics/box.rb')
 
-run Epics::Box::Server
+box = Rack::Builder.app do
+  use Epics::Box::SequelConnectionValidator, DB
+  run Epics::Box::Server
+end
+
+run box

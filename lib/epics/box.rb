@@ -11,7 +11,6 @@ require 'sepa_king'
 require 'base64'
 
 DB = Sequel.connect(ENV['DATABASE_URL'], max_connections: 10)
-DB.extension(:connection_validator)
 
 require "epics/box/version"
 require "epics/box/server"

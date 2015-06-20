@@ -8,6 +8,22 @@ end
 
 module Epics
   module Box
+
+    class SequelConnectionValidator
+      def initialize(app, db)
+        @app = app
+        @db  = db
+
+        @db.extension(:connection_validator)
+        @db.pool.connection_validation_timeout = -1
+      end
+
+      def call(env)
+        @db.synchronize do
+          @app.call(env)
+        end
+      end
+    end
     class Server < Grape::API
 
       helpers do
