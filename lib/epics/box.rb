@@ -15,12 +15,6 @@ require 'epics/box/configuration'
 
 module Epics
   module Box
-    DEBIT_MAPPING = {
-      "CORE" => :CDD,
-      "COR1" => :CD1,
-      "B2B" =>  :CDB,
-    }
-
     # CLIENT = Epics::Client.new( File.open(ENV['KEYFILE']), ENV['PASSPHRASE'], ENV['EBICS_URL'], ENV['EBICS_HOST'], ENV['EBICS_USER'], ENV['EBICS_PARTNER'])
     # Your code goes here...
 
