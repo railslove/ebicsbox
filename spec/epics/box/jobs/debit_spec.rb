@@ -8,12 +8,16 @@ module Epics
             {
               instrument: 'CORE',
               eref: '123',
-              account_id: '321',
+              account_id: 321,
               payload: 'PAIN',
             }
           end
 
-          before { allow(Transaction).to receive(:create).and_return(transaction) }
+
+          before do
+            allow(Transaction).to receive(:create).and_return(transaction)
+            allow(Queue).to receive(:check_accounts)
+          end
 
           it 'creates a transaction' do
             described_class.process!(message)
@@ -37,8 +41,8 @@ module Epics
           end
 
           it 'tells the system to check for job processing status' do
-            expect(Queue).to receive(:check_accounts)
             described_class.process!(message)
+            expect(Queue).to have_received(:check_accounts).with(321)
           end
 
           it 'logs an info message' do
