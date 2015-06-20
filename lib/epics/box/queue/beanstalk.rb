@@ -66,8 +66,8 @@ class Epics::Box::Queue::Beanstalk
           to = Date.today
 
           if last_import[:date] < to
-            # mt940 = account.client.STA("#{(last_import[:date])}" , "#{(to)}") # File.read('/Users/kangguru/Downloads/spk.mt940')#
-            mt940 = File.read( File.expand_path("~/sta.mt940"))
+            mt940 = account.client.STA("#{(last_import[:date])}" , "#{(to)}") # File.read('/Users/kangguru/Downloads/spk.mt940')#
+
             @logger.info(@db)
 
             Cmxl.parse(mt940).each do |s|
