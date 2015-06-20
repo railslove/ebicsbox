@@ -15,7 +15,7 @@ module Epics
 
           before do
             allow(Transaction).to receive(:create).and_return(transaction)
-            allow(Queue).to receive(:check_accounts)
+            allow(Queue).to receive(:update_processing_status)
           end
 
           it 'creates a transaction' do
@@ -41,7 +41,7 @@ module Epics
 
           it 'tells the system to check for job processing status' do
             described_class.process!(message)
-            expect(Queue).to have_received(:check_accounts).with(321)
+            expect(Queue).to have_received(:update_processing_status).with(321)
           end
 
           it 'logs an info message' do

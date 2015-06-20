@@ -20,7 +20,7 @@ module Epics
         @client ||= Beaneater.new(Box.configuration.beanstalkd_url)
       end
 
-      def self.check_accounts(account_ids = nil)
+      def self.update_processing_status(account_ids = nil)
         account_ids ||= Account.all_ids
         unless client.tubes[ORDER_TUBE].peek(:delayed)
           client.tubes[ORDER_TUBE].put({ do: :it, account_ids: Array.wrap(account_ids) }, { delay: Epics::Box.configuration.hac_retrieval_interval })
