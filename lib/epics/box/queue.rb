@@ -27,7 +27,7 @@ module Epics
         end
       end
 
-      def self.check_processing_status(account_ids = nil)
+      def self.fetch_account_statements(account_ids = nil)
         account_ids ||= Account.all_ids
         client.tubes[STA_TUBE].put(account_ids: Array.wrap(account_ids))
       end

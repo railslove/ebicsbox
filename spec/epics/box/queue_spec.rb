@@ -10,28 +10,28 @@ module Epics
         end
       end
 
-      describe '.check_processing_status' do
+      describe '.fetch_account_statements' do
         let(:tube) { client.tubes[Queue::STA_TUBE] }
 
         before { tube.clear }
 
         it 'puts a new message onto the STA queue' do
-          expect { described_class.check_processing_status }.to change { tube.peek(:ready) }
+          expect { described_class.fetch_account_statements }.to change { tube.peek(:ready) }
         end
 
         it 'puts only the provided account id onto the job' do
-          described_class.check_processing_status(1)
+          described_class.fetch_account_statements(1)
           expect(tube.peek(:ready).body).to eq(account_ids: [1])
         end
 
         it 'puts all provided account ids onto the job' do
-          described_class.check_processing_status([1, 2])
+          described_class.fetch_account_statements([1, 2])
           expect(tube.peek(:ready).body).to eq(account_ids: [1, 2])
         end
 
         it 'puts all existing account ids onto the job if none is provided' do
           accounts = Array.new(3).map { Account.create }
-          described_class.check_processing_status
+          described_class.fetch_account_statements
           expect(tube.peek(:ready).body).to eq(account_ids: accounts.map(&:id))
         end
       end
