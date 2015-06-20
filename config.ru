@@ -12,6 +12,10 @@ box = Rack::Builder.app do
   end if ENV['USERNAME'] && ENV['PASSWORD']
 
   use Epics::Box::SequelConnectionValidator, DB
+
+  map "/admin" do
+    run Epics::Box::Admin
+  end
   run Epics::Box::Server
 end
 

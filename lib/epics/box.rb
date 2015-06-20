@@ -8,12 +8,14 @@ require 'json'
 require 'nokogiri'
 require 'epics'
 require 'sepa_king'
+require 'sinatra'
 require 'base64'
 
 DB = Sequel.connect(ENV['DATABASE_URL'], max_connections: 10)
 
 require "epics/box/version"
 require "epics/box/server"
+require "epics/box/admin"
 require "epics/box/worker"
 require "epics/box/queue"
 require "epics/box/queue/beanstalk"
