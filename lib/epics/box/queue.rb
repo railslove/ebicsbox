@@ -1,6 +1,7 @@
 require 'beaneater'
 
 require "epics/box/jobs/debit"
+require "epics/box/jobs/credit"
 
 Beaneater.configure do |config|
   config.job_parser = lambda { |body| JSON.parse(body, symbolize_names: true) }
@@ -47,19 +48,7 @@ module Epics
         end
 
         self.class.client.jobs.register('credit') do |job|
-          message = job.body
-          pain = Base64.strict_decode64(message[:payload])
-
-          transaction = Epics::Box::Transaction.create(account_id: message[:account_id], type: "credit", payload: pain, eref: message[:eref], status: "created", order_type: :CCT)
-
-          transaction_id, order_id = transacion.account.client.CCT(pain)
-
-          transaction.update(ebics_order_id: order_id, ebics_transaction_id: transaction_id)
-
-          Queue.check_accounts(message[:account_id])
-
-          self.class.client.tubes["orders"].put(transaction_id)
-          @logger.info("credit #{transaction_id}")
+          with_error_logging { Jobs::Credit.process!(job.body) }
         end
 
         self.class.client.jobs.register('sta') do |job|
