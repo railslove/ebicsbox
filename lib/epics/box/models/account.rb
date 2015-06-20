@@ -1,7 +1,10 @@
 class Epics::Box::Account < Sequel::Model
-
   one_to_many :statements
   one_to_many :transactions
+
+  def self.all_ids
+    select(:id).all.map(&:id)
+  end
 
   def client
     @client ||= client_adapter.new(key, passphrase, url, host, user, partner)
@@ -22,7 +25,6 @@ class Epics::Box::Account < Sequel::Model
   end
 
   class File
-
     def initialize(*args); end
 
     def STA(from, to)
@@ -39,8 +41,5 @@ class Epics::Box::Account < Sequel::Model
     alias :CDD :CD1
     alias :CDB :CD1
     alias :CCT :CD1
-
-
   end
-
 end
