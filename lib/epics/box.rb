@@ -2,12 +2,12 @@ require 'grape'
 require 'grape-entity'
 require 'sequel'
 require 'cmxl'
-require 'pg'
 require 'httparty'
 require 'json'
 require 'nokogiri'
 require 'epics'
 require 'sepa_king'
+require 'sinatra'
 require 'base64'
 
 require 'epics/box/version'
@@ -30,9 +30,9 @@ end
 
 # Init database connection
 DB = Sequel.connect(Epics::Box.configuration.database_url, max_connections: 10)
-DB.extension(:connection_validator)
 
 require "epics/box/server"
+require "epics/box/admin"
 require "epics/box/worker"
 require "epics/box/queue"
 require "epics/box/models/account"
