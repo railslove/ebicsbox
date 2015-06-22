@@ -15,5 +15,17 @@ module Epics
         expect(described_class.logger).to be_instance_of(Logger)
       end
     end
+
+    describe '.logger=' do
+      it 'allows to set the logger instance' do
+        default_logger = described_class.logger
+
+        logger = double('Logger')
+        described_class.logger = logger
+        expect(described_class.logger).to eq(logger)
+
+        described_class.logger = default_logger
+      end
+    end
   end
 end
