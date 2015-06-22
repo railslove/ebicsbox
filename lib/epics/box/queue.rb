@@ -3,6 +3,7 @@ require 'beaneater'
 require "epics/box/jobs/debit"
 require "epics/box/jobs/credit"
 require "epics/box/jobs/fetch_statements"
+require "epics/box/jobs/webhook"
 
 Beaneater.configure do |config|
   config.job_parser = lambda { |body| JSON.parse(body, symbolize_names: true) }
@@ -92,19 +93,10 @@ module Epics
           end
         end
 
-        self.class.client.jobs.register('web') do |job|
-          with_error_logging do
-            message = job.body
-            account = Epics::Box::Account[message[:account_id]]
-            if account.callback_url
-              res = HTTParty.post(account.callback_url, body: message[:payload])
-              @logger.info("callback triggered: #{res.code} #{res.parsed_response}")
-            else
-              @logger.info("no callback configured for #{account.name}")
-            end
-          end
+        self.class.client.jobs.register('sta') do |job|
+          with_error_logging { Jobs::Webhook.process!(job.body) }
         end
-
+        
         self.class.client.jobs.process!
       end
 
