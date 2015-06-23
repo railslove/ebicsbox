@@ -8,8 +8,8 @@ cache:
 addons:
   postgresql: "9.4"
 env:
-  - DATABASE_URL=postgres://localhost/ebicsbox_test
-  - DATABASE_URL=jdbc:postgresql://localhost/ebicsbox_test
+  - DATABASE_URL="postgres://localhost/ebicsbox_test"
+  - DATABASE_URL="jdbc:postgresql://localhost/ebicsbox_test"
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y beanstalkd
@@ -22,6 +22,6 @@ script:
 matrix:
   exclude:
     - rvm: 2.2.2
-      env: DATABASE_URL=postgres://localhost/ebicsbox_test
+      env: DATABASE_URL="postgres://localhost/ebicsbox_test"
     - rvm: jruby-19mode
-      env: DATABASE_URL=jdbc:postgresql://localhost/ebicsbox_test
+      env: DATABASE_URL="jdbc:postgresql://localhost/ebicsbox_test"
