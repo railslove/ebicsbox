@@ -18,7 +18,7 @@ before_install:
 before_script:
   - createdb ebicsbox_test
   - bundle exec sequel -m migrations $DATABASE_URL
-  - beanstalkd &
+  - ./beanstalkd &
 script:
   - bundle exec rspec spec
 matrix:
