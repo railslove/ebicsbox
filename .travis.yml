@@ -22,6 +22,6 @@ script:
 matrix:
   exclude:
     - rvm: 2.2.2
-      env: DATABASE_URL="postgres://localhost/ebicsbox_test"
-    - rvm: jruby-19mode
       env: DATABASE_URL="jdbc:postgresql://localhost/ebicsbox_test"
+    - rvm: jruby-19mode
+      env: DATABASE_URL="postgres://localhost/ebicsbox_test"
