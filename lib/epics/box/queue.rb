@@ -1,9 +1,10 @@
 require 'beaneater'
 
-require "epics/box/jobs/debit"
-require "epics/box/jobs/credit"
-require "epics/box/jobs/fetch_statements"
-require "epics/box/jobs/webhook"
+require 'epics/box/jobs/credit'
+require 'epics/box/jobs/debit'
+require 'epics/box/jobs/fetch_processing_status'
+require 'epics/box/jobs/fetch_statements'
+require 'epics/box/jobs/webhook'
 
 Beaneater.configure do |config|
   config.job_parser = lambda { |body| JSON.parse(body, symbolize_names: true) }
@@ -62,41 +63,13 @@ module Epics
         end
 
         self.class.client.jobs.register('check.orders') do |job|
-          with_error_logging do
-            message = job.body
-            @logger.debug("check orders")
-
-            message[:account_ids].each do |account_id|
-              account = Epics::Box::Account[account_id]
-              @logger.debug("reconciling orders by HAC for #{account.name}")
-
-              file = account.client.HAC(Date.today - 1, Date.today)
-              Nokogiri::XML(file).remove_namespaces!.xpath("//OrgnlPmtInfAndSts").each do |info|
-                reason_code = info.xpath("./StsRsnInf/Rsn/Cd").text
-                action = info.xpath("./OrgnlPmtInfId").text
-                ids    = info.xpath("./StsRsnInf/Orgtr/Id/OrgId/Othr").inject({}) {|memo, node| memo[node.at_xpath("./SchmeNm/Prtry").text] = node.at_xpath("./Id").text;memo }
-
-                if ids["OrderID"]
-                  if trx = Epics::Box::Transaction[ebics_order_id: ids["OrderID"]]
-                    status = trx.status
-                    if status != trx.set_state_from(action.downcase, reason_code)
-                      @logger.debug("#{status} -> #{trx.status}")
-                      publish("web", account_id: account_id, payload: trx.to_hash)
-                    end
-                    @logger.info("#{trx.pk} - #{action} for #{ids["OrderID"]} with #{reason_code}")
-                  end
-                else
-                  @logger.debug("#{action} for #{ids} with reason: #{reason_code}")
-                end
-              end
-            end
-          end
+          with_error_logging { Jobs::FetchProcessingStatus.process!(job.body) }
         end
 
         self.class.client.jobs.register('sta') do |job|
           with_error_logging { Jobs::Webhook.process!(job.body) }
         end
-        
+
         self.class.client.jobs.process!
       end
 
