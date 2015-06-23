@@ -18,7 +18,7 @@ module Epics
         end
 
         describe '.update_transaction' do
-          def do_action(order_id: '0001')
+          def do_action(order_id = '0001')
             described_class.update_transaction(1, { action: 'test', reason_code: 'none', ids: { 'OrderID' => order_id }})
           end
 
@@ -51,7 +51,7 @@ module Epics
 
           context 'no transaction with order id found' do
             it 'logs an info message' do
-              do_action(order_id: '0002')
+              do_action('0002')
               $box_logger.rewind
               expect($box_logger.read).to include('[Jobs::FetchProcessingStatus] No transactions with order id found. account_id=1 order_id=0002')
             end

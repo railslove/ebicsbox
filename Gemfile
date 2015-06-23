@@ -9,7 +9,7 @@ gem 'jdbc-postgres', platform: :jruby
 gem 'trinidad', platform: :jruby
 
 group :development, :test do
-  gem 'byebug'
+  gem 'byebug', platform: :mri
   gem 'database_cleaner'
   gem 'rspec'
   gem 'guard-rspec', require: false
