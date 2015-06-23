@@ -65,6 +65,8 @@ module Epics
         register(ORDER_TUBE, Jobs::FetchProcessingStatus)
         register(STA_TUBE, Jobs::FetchStatements)
         register(WEBHOOK_TUBE, Jobs::Webhook)
+        DB.extension(:connection_validator)
+        DB.pool.connection_validation_timeout = -1
         self.class.client.jobs.process!
       end
 
