@@ -57,16 +57,19 @@ module Epics
           end
 
           it 'puts only the provided account id onto the job' do
+            expect(tube.peek(:delayed)).to be_nil
             described_class.update_processing_status(1)
             expect(tube.peek(:delayed).body).to match hash_including(account_ids: [1])
           end
 
           it 'puts all provided account ids onto the job' do
+            expect(tube.peek(:delayed)).to be_nil
             described_class.update_processing_status([1, 2])
             expect(tube.peek(:delayed).body).to match hash_including(account_ids: [1, 2])
           end
 
           it 'puts all existing account ids onto the job if none is provided' do
+            expect(tube.peek(:delayed)).to be_nil
             accounts = Array.new(3).map { Account.create }
             described_class.update_processing_status
             expect(tube.peek(:delayed).body).to match hash_including(account_ids: accounts.map(&:id))
