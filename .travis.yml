@@ -1,0 +1,27 @@
+language: ruby
+rvm:
+  - 2.2.2
+  - jruby-19mode
+cache:
+  - bundler
+  - apt
+addons:
+  postgresql: "9.4"
+env:
+  - DATABASE_URL=postgres://localhost/ebicsbox_test
+  - DATABASE_URL=jdbc:postgresql://localhost/ebicsbox_test
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y beanstalkd
+before_script:
+  - createdb ebicsbox_test
+  - bundle exec sequel -m migrations $DATABASE_URL
+  - beanstalkd &
+script:
+  - bundle exec rspec spec
+matrix:
+  exclude:
+    - rvm: 2.2.2
+      env: DATABASE_URL=postgres://localhost/ebicsbox_test
+    - rvm: jruby-19mode
+      env: DATABASE_URL=jdbc:postgresql://localhost/ebicsbox_test

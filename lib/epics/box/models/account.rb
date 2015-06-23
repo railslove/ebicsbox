@@ -1,7 +1,10 @@
 class Epics::Box::Account < Sequel::Model
-
   one_to_many :statements
   one_to_many :transactions
+
+  def self.all_ids
+    select(:id).all.map(&:id)
+  end
 
   def client
     @client ||= client_adapter.new(key, passphrase, url, host, user, partner)
@@ -21,8 +24,15 @@ class Epics::Box::Account < Sequel::Model
     [:name, :bic, :iban].inject({}) {|n, v| n[v]=public_send(v);n }
   end
 
-  class File
+  def last_imported_at
+    DB[:imports].where(account_id: id).order(:date).last.try(:[], :date)
+  end
 
+  def imported_at!(date)
+    DB[:imports].insert(date: date, account_id: id)
+  end
+
+  class File
     def initialize(*args); end
 
     def STA(from, to)
@@ -39,8 +49,5 @@ class Epics::Box::Account < Sequel::Model
     alias :CDD :CD1
     alias :CDB :CD1
     alias :CCT :CD1
-
-
   end
-
 end

@@ -25,12 +25,9 @@ module Epics
       end
     end
     class Server < Grape::API
+      format :json
 
       helpers do
-        def queue
-          @queue ||= Epics::Box::QUEUE.new
-        end
-
         def account
           Epics::Box::Account.first!({iban: params[:account]})
         end
@@ -74,7 +71,7 @@ module Epics
 
           fail(RuntimeError.new(sdd.errors.full_messages.join(" "))) unless sdd.valid?
 
-          queue.publish 'debit', {account_id: account.id, payload: Base64.strict_encode64(sdd.to_xml), eref: params[:eref], instrument: params[:instrument]}
+          Queue.execute_debit account_id: account.id, payload: Base64.strict_encode64(sdd.to_xml), eref: params[:eref], instrument: params[:instrument]
 
           {debit: 'ok'}
         rescue RuntimeError, ArgumentError => e
@@ -114,7 +111,7 @@ module Epics
 
           fail(RuntimeError.new(sct.errors.full_messages.join(" "))) unless sct.valid?
 
-          queue.publish 'credit', {account_id: account.id, payload: Base64.strict_encode64(sct.to_xml), eref: params[:eref]}
+          Queue.execute_credit account_id: account.id, payload: Base64.strict_encode64(sct.to_xml), eref: params[:eref]
 
           {credit: 'ok'}
         rescue RuntimeError, ArgumentError => e
@@ -124,19 +121,21 @@ module Epics
         end
       end
 
+      desc "Returns statements for"
       params do
-        requires :account,  type: String, desc: "the account to use"
+        requires :account,  type: String, desc: "IBAN for an existing account"
         optional :from,  type: Integer, desc: "results starting at"
         optional :to,    type: Integer, desc: "results ending at"
         optional :page,  type: Integer, desc: "page through the results", default: 1
         optional :per_page,  type: Integer, desc: "how many results per page", values: 1..100, default: 10
       end
-      desc "Returns statements for"
       get ':account/statements' do
         begin
-          present DB[:statements].where(account_id: account.id).limit(params[:per_page]).offset((params[:page] -1) * params[:per_page]).all, with: Epics::Box::StatementPresenter
-        rescue Sequel::NoMatchingRow
-          { errors: 'no account found' }
+          statements = Statement.paginated_by_account(account.id, per_page: params[:per_page], page: params[:page]).all
+          # statements = Statement.where(account_id: account.id).limit(params[:per_page]).offset((params[:page] - 1) * params[:per_page]).all
+          present statements, with: Epics::Box::StatementPresenter
+        rescue Sequel::NoMatchingRow => ex
+          { errors: "no account found error: #{ex.message}" }
         end
       end
     end

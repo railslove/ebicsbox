@@ -5,8 +5,7 @@ require 'json'
 require 'epics/box'
 
 module Clockwork
-  QUEUE = Epics::Box::QUEUE.new
-
-  every(5.minutes, "sta") { QUEUE.publish('sta', {account_ids: Epics::Box::Account.all.map(&:id)} ) }
-  # every(3.hours, "check.orders") { QUEUE.publish('check.orders', {account_ids: Epics::Box::Account.all.map(&:id)} ) }
+  # TODO: Make these configurable
+  every(5.minutes, "sta") { Epics::Box::Queue.fetch_account_statements }
+  every(3.hours, "check.orders") { Epics::Box::Queue.update_processing_status }
 end

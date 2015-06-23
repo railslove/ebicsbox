@@ -1,5 +1,7 @@
 # Epics::Box
 
+[![Build Status](https://magnum.travis-ci.com/railslove/epics-box.svg?token=AM3M96RpNyP5z4TXrjkp&branch=master)](https://magnum.travis-ci.com/railslove/epics-box)
+
 Epics Box is a selfcontained solution to handle SEPA credit/debits and bank statement
 reconcilliation.
 
@@ -74,6 +76,12 @@ Run it:
   }
 ```
 ### Message Queue
+
+
+### Tests
+
+We are using RSpec to test this project. In order to execute all specs once, run ```bundle exec rspec```.
+If you are actively developing, you can execute specs automatically by running guard with ```bundle exec guard```.
 
 
 ## Contributing

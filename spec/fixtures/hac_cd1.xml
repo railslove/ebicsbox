@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.002.001.03" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:iso:std:iso:20022:tech:xsd:pain.002.001.03 pain.002.001.03.xsd">
+  <CstmrPmtStsRpt>
+    <GrpHdr>
+      <MsgId>u8NTBMERR0kBAABs6yEtFYQYCgAA</MsgId>
+      <CreDtTm>2015-04-28T08:47:18.138Z</CreDtTm>
+      <InitgPty>
+        <Id>
+          <OrgId>
+            <Othr>
+              <Id>EBICSSPK</Id>
+            </Othr>
+          </OrgId>
+        </Id>
+      </InitgPty>
+    </GrpHdr>
+    <OrgnlGrpInfAndSts>
+      <OrgnlMsgId>EBICS</OrgnlMsgId>
+      <OrgnlMsgNmId>EBICS</OrgnlMsgNmId>
+    </OrgnlGrpInfAndSts>
+    <OrgnlPmtInfAndSts>
+      <OrgnlPmtInfId>FILE_UPLOAD</OrgnlPmtInfId>
+      <StsRsnInf>
+        <Orgtr>
+          <Nm>Acme Inc</Nm>
+          <Id>
+            <OrgId>
+              <Othr>
+                <Id>1234560F</Id>
+                <SchmeNm>
+                  <Prtry>PartnerID</Prtry>
+                </SchmeNm>
+              </Othr>
+              <Othr>
+                <Id>CD1</Id>
+                <SchmeNm>
+                  <Prtry>OrderType</Prtry>
+                </SchmeNm>
+              </Othr>
+              <Othr>
+                <Id>N013</Id>
+                <SchmeNm>
+                  <Prtry>OrderID</Prtry>
+                </SchmeNm>
+              </Othr>
+              <Othr>
+                <Id>12345601</Id>
+                <SchmeNm>
+                  <Prtry>UserID</Prtry>
+                </SchmeNm>
+              </Othr>
+              <Othr>
+                <Id>2015-04-14T18:12:26.570Z</Id>
+                <SchmeNm>
+                  <Prtry>TimeStamp</Prtry>
+                </SchmeNm>
+              </Othr>
+            </OrgId>
+          </Id>
+        </Orgtr>
+        <Rsn>
+          <Cd>TS01</Cd>
+        </Rsn>
+      </StsRsnInf>
+    </OrgnlPmtInfAndSts>
+    <OrgnlPmtInfAndSts>
+      <OrgnlPmtInfId>ES_VERIFICATION</OrgnlPmtInfId>
+      <StsRsnInf>
+        <Orgtr>
+          <Nm>Acme Inc</Nm>
+          <Id>
+            <OrgId>
+              <Othr>
+                <Id>1234560F</Id>
+                <SchmeNm>
+                  <Prtry>PartnerID</Prtry>
+                </SchmeNm>
+              </Othr>
+              <Othr>
+                <Id>CD1</Id>
+                <SchmeNm>
+                  <Prtry>OrderType</Prtry>
+                </SchmeNm>
+              </Othr>
+              <Othr>
+                <Id>N013</Id>
+                <SchmeNm>
+                  <Prtry>OrderID</Prtry>
+                </SchmeNm>
+              </Othr>
+              <Othr>
+                <Id>12345601</Id>
+                <SchmeNm>
+                  <Prtry>UserID</Prtry>
+                </SchmeNm>
+              </Othr>
+              <Othr>
+                <Id>2015-04-14T18:12:29.310Z</Id>
+                <SchmeNm>
+                  <Prtry>TimeStamp</Prtry>
+                </SchmeNm>
+              </Othr>
+            </OrgId>
+          </Id>
+        </Orgtr>
+        <Rsn>
+          <Cd>DS01</Cd>
+        </Rsn>
+      </StsRsnInf>
+    </OrgnlPmtInfAndSts>
+    <OrgnlPmtInfAndSts>
+      <OrgnlPmtInfId>ORDER_HAC_FINAL_POS</OrgnlPmtInfId>
+      <StsRsnInf>
+        <Orgtr>
+          <Nm>Acme Inc</Nm>
+          <Id>
+            <OrgId>
+              <Othr>
+                <Id>1234560F</Id>
+                <SchmeNm>
+                  <Prtry>PartnerID</Prtry>
+                </SchmeNm>
+              </Othr>
+              <Othr>
+                <Id>CD1</Id>
+                <SchmeNm>
+                  <Prtry>OrderType</Prtry>
+                </SchmeNm>
+              </Othr>
+              <Othr>
+                <Id>N013</Id>
+                <SchmeNm>
+                  <Prtry>OrderID</Prtry>
+                </SchmeNm>
+              </Othr>
+              <Othr>
+                <Id>12345601</Id>
+                <SchmeNm>
+                  <Prtry>UserID</Prtry>
+                </SchmeNm>
+              </Othr>
+              <Othr>
+                <Id>2015-04-14T18:12:29.310Z</Id>
+                <SchmeNm>
+                  <Prtry>TimeStamp</Prtry>
+                </SchmeNm>
+              </Othr>
+            </OrgId>
+          </Id>
+        </Orgtr>
+        <AddtlInf>====================================================================</AddtlInf>
+        <AddtlInf>L A S T S C H R I F T E N</AddtlInf>
+        <AddtlInf>Datei-ID   : SEPA-KING/1234567890</AddtlInf>
+        <AddtlInf>Datum/Zeit : 14.04.2015/20:12:11+02:00</AddtlInf>
+        <AddtlInf>--------------------------------------------------------------------</AddtlInf>
+        <AddtlInf>Sammlerreferenz          : SEPA-KING/1234567890/1</AddtlInf>
+        <AddtlInf>Bank-Code                : INGDDEFFXXX</AddtlInf>
+        <AddtlInf>Kontonummer              : DE12500105170648489890</AddtlInf>
+        <AddtlInf>Auftraggeberdaten        : Acme Inc</AddtlInf>
+        <AddtlInf>Anzahl der Zahlungssaetze: 1</AddtlInf>
+        <AddtlInf>Summe der Betraege (EUR) : 1,50</AddtlInf>
+        <AddtlInf>Faelligkeitsdatum        : 16.04.2015</AddtlInf>
+        <AddtlInf>====================================================================</AddtlInf>
+      </StsRsnInf>
+    </OrgnlPmtInfAndSts>
+  </CstmrPmtStsRpt>
+</Document>
