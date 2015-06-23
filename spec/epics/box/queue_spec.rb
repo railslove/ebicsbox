@@ -4,6 +4,20 @@ module Epics
 
       let(:client) { described_class.client }
 
+      def clear_all_tubes
+        client.tubes[Queue::DEBIT_TUBE].clear
+        client.tubes[Queue::CREDIT_TUBE].clear
+        client.tubes[Queue::ORDER_TUBE].clear
+        client.tubes[Queue::STA_TUBE].clear
+        client.tubes[Queue::WEBHOOK_TUBE].clear
+      end
+
+      around do |example|
+        clear_all_tubes
+        example.run
+        clear_all_tubes
+      end
+
       describe '.client' do
         it 'returns an instance of a beanstalk client' do
           expect(described_class.client).to be_an_instance_of(Beaneater)
@@ -12,8 +26,6 @@ module Epics
 
       describe '.fetch_account_statements' do
         let(:tube) { client.tubes[Queue::STA_TUBE] }
-
-        before { tube.clear }
 
         it 'puts a new message onto the STA queue' do
           expect { described_class.fetch_account_statements }.to change { tube.peek(:ready) }
@@ -38,8 +50,6 @@ module Epics
 
       describe '.update_processing_status' do
         let(:tube) { client.tubes[Queue::ORDER_TUBE] }
-
-        before { tube.clear }
 
         context 'no job currently queued' do
           it 'puts a new message onto the check orders queue' do
@@ -68,6 +78,22 @@ module Epics
             described_class.update_processing_status
             expect { described_class.update_processing_status }.to_not change { tube.peek(:delayed).id }
           end
+        end
+      end
+
+      describe '#process!' do
+        let(:payload) { { some: 'data' } }
+
+        it 'registers debit jobs' do
+          expect(Jobs::Debit).to receive(:process!).with(payload) { raise Beaneater::AbortProcessingError }
+          described_class.execute_debit(payload)
+          subject.process!
+        end
+
+        it 'registers credit jobs' do
+          expect(Jobs::Credit).to receive(:process!).with(payload) { raise Beaneater::AbortProcessingError }
+          described_class.execute_credit(payload)
+          subject.process!
         end
       end
 

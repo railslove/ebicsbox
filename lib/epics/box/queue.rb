@@ -14,6 +14,8 @@ end
 module Epics
   module Box
     class Queue
+      DEBIT_TUBE = 'debit'
+      CREDIT_TUBE = 'credit'
       ORDER_TUBE = 'check.orders'
       STA_TUBE = 'sta'
       WEBHOOK_TUBE = 'web'
@@ -40,6 +42,14 @@ module Epics
         client.tubes[WEBHOOK_TUBE].put(payload)
       end
 
+      def self.execute_credit(payload)
+        client.tubes[CREDIT_TUBE].put(payload)
+      end
+
+      def self.execute_debit(payload)
+        client.tubes[DEBIT_TUBE].put(payload)
+      end
+
 
       def initialize
         self.logger ||= Box.logger
@@ -50,27 +60,20 @@ module Epics
       end
 
       def process!
-        self.class.client.jobs.register('debit') do |job|
-          with_error_logging { Jobs::Debit.process!(job.body) }
+        DB.synchronize do
+          register(DEBIT_TUBE, Jobs::Debit)
+          register(CREDIT_TUBE, Jobs::Credit)
+          register(ORDER_TUBE, Jobs::FetchProcessingStatus)
+          register(STA_TUBE, Jobs::FetchStatements)
+          register(WEBHOOK_TUBE, Jobs::Webhook)
         end
-
-        self.class.client.jobs.register('credit') do |job|
-          with_error_logging { Jobs::Credit.process!(job.body) }
-        end
-
-        self.class.client.jobs.register('sta') do |job|
-          with_error_logging { Jobs::FetchStatements.process!(job.body) }
-        end
-
-        self.class.client.jobs.register('check.orders') do |job|
-          with_error_logging { Jobs::FetchProcessingStatus.process!(job.body) }
-        end
-
-        self.class.client.jobs.register('sta') do |job|
-          with_error_logging { Jobs::Webhook.process!(job.body) }
-        end
-
         self.class.client.jobs.process!
+      end
+
+      def register(tube_name, klass)
+        self.class.client.jobs.register(tube_name) do |job|
+          with_error_logging { klass.process!(job.body) }
+        end
       end
 
       # Run any job within a block provided to this method to ensure that jobs are not only
