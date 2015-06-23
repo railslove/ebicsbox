@@ -60,19 +60,19 @@ module Epics
       end
 
       def process!
-        DB.synchronize do
-          register(DEBIT_TUBE, Jobs::Debit)
-          register(CREDIT_TUBE, Jobs::Credit)
-          register(ORDER_TUBE, Jobs::FetchProcessingStatus)
-          register(STA_TUBE, Jobs::FetchStatements)
-          register(WEBHOOK_TUBE, Jobs::Webhook)
-        end
+        register(DEBIT_TUBE, Jobs::Debit)
+        register(CREDIT_TUBE, Jobs::Credit)
+        register(ORDER_TUBE, Jobs::FetchProcessingStatus)
+        register(STA_TUBE, Jobs::FetchStatements)
+        register(WEBHOOK_TUBE, Jobs::Webhook)
         self.class.client.jobs.process!
       end
 
       def register(tube_name, klass)
         self.class.client.jobs.register(tube_name) do |job|
-          with_error_logging { klass.process!(job.body) }
+          with_error_logging do
+            DB.synchronize { klass.process!(job.body) }
+          end
         end
       end
 
