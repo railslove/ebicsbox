@@ -11,6 +11,7 @@ env:
   - DATABASE_URL="postgres://localhost/ebicsbox_test"
   - DATABASE_URL="jdbc:postgresql://localhost/ebicsbox_test"
 before_install:
+  - sudo apt-cache showpkg beanstalkd
   - sudo apt-get update -qq
   - sudo apt-get install -y beanstalkd
 before_script:
