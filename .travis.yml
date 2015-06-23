@@ -12,7 +12,13 @@ before_install:
   - sudo apt-get install -y beanstalkd
 before_script:
   - createdb ebicsbox_test
-  - sequel -m migrations postgres://localhost/ebicsbox_test
+  - sequel -m migrations $DATABASE_URL
   - beanstalkd &
 script:
   - bundle exec rspec spec
+matrix:
+  include:
+    - rvm: 2.2.2
+      env: DATABASE_URL=postgres://localhost/ebicsbox_test
+    - rvm: jruby-19mode
+      env: DATABASE_URL=jdbc:postgresql://localhost/ebicsbox_test
