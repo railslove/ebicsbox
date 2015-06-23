@@ -20,8 +20,8 @@ before_script:
 script:
   - bundle exec rspec spec
 matrix:
-  include:
+  exclude:
     - rvm: 2.2.2
-      env: DATABASE_URL=postgres://localhost/ebicsbox_test
-    - rvm: jruby-19mode
       env: DATABASE_URL=jdbc:postgresql://localhost/ebicsbox_test
+    - rvm: jruby-19mode
+      env: DATABASE_URL=postgres://localhost/ebicsbox_test
