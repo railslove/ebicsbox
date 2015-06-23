@@ -7,7 +7,7 @@ module Epics
       end
 
       get '/accounts' do
-        erb <<-FOO
+        <<-FOO
           <form action="/admin/accounts" method="POST">
             <label for="name"/>Name</label>
             <input type="text" name="name" id="name" required/>
