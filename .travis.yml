@@ -7,7 +7,7 @@ cache:
   - apt
 addons:
   postgresql: "9.4"
-end:
+env:
   - DATABASE_URL=postgres://localhost/ebicsbox_test
   - DATABASE_URL=jdbc:postgresql://localhost/ebicsbox_test
 before_install:
@@ -20,8 +20,8 @@ before_script:
 script:
   - bundle exec rspec spec
 matrix:
-  exclude:
+  include:
     - rvm: 2.2.2
-      env: DATABASE_URL=jdbc:postgresql://localhost/ebicsbox_test
-    - rvm: jruby-19mode
       env: DATABASE_URL=postgres://localhost/ebicsbox_test
+    - rvm: jruby-19mode
+      env: DATABASE_URL=jdbc:postgresql://localhost/ebicsbox_test
