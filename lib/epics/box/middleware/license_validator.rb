@@ -17,15 +17,15 @@ module Epics
         private
 
         def license_expired?
-          if license[:expiration_time]
-            DateTime.parse(license[:expiration_time]) < DateTime.now
+          if license["expiration_time"]
+            DateTime.parse(license["expiration_time"]) < DateTime.now
           else
             false
           end
         end
 
         def license
-          JSON.parse(HTTParty.get("#{ENV['REPLICATED_INTEGRATIONAPI']}/license/v1/license"), :symbolize_names => true)
+          HTTParty.get("#{ENV['REPLICATED_INTEGRATIONAPI']}/license/v1/license", verify: false).parsed_response
         rescue
           {}
         end
