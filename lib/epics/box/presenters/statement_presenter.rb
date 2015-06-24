@@ -6,6 +6,7 @@ class Epics::Box::StatementPresenter < Grape::Entity
   expose :eref
   expose :mref
   expose :debit
+  expose :date
   expose :remittance_information
   expose :creditor_identifier
   expose :object, as: :statement
