@@ -8,7 +8,7 @@ module Epics
 
         def call(env)
           if license_expired?
-            [431, {'Content-Type' => env["Content-Type"], "Content-Length" => "0", "X-Ebics-Box-License-Valid" => "false"}, []]
+            [402, {'Content-Type' => env["HTTP_ACCEPT"], "Content-Length" => "0", "X-Ebics-Box-License-Valid" => "false"}, []]
           else
             @app.call(env)
           end
