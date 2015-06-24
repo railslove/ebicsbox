@@ -45,35 +45,20 @@ module Epics
         FOO
       end
 
-      get '/accounts/setup/:id' do
-        @account = Epics::Box::Account.find(id: params[:id])
-        if @account.ini_letter.nil? || params[:reset]
-          erb :setup
-        else
-          redirect to("/accounts/ini_letter/#{@account.id}")
-        end
-      end
-
       post '/accounts/setup/:id' do
         @account = Epics::Box::Account.find(id: params[:id])
-        @account.passphrase = params[:passphrase]
-        epics = Epics::Client.setup(@account.passphrase, @account.url, @account.host, @account.user, @account.partner)
-        @account.key = epics.send(:dump_keys)
-        @account.save
-        epics.INI # sends the signature key
-        epcs.HIA # sends the encryption and authentication keys
-        @account.ini_letter = epics.ini_letter(params[:bankname])
-        @account.save
+        if @account.ini_letter.nil? || params[:reset]
+          @account.setup!
+        end
         redirect to("/accounts/ini_letter/#{@account.id}")
       end
-
 
       get '/accounts/ini_letter/:id' do
         @account = Epics::Box::Account.find(id: params[:id])
         if @account.ini_letter
           erb :ini_letter
         else
-          redirect to("/accounts/setup/#{@account.id}")
+          redirect to("/admin")
         end
       end
 
