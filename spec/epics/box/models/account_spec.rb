@@ -1,6 +1,12 @@
 module Epics
   module Box
     RSpec.describe Account do
+      describe 'acticated?' do
+        specify do
+          expect(Account.new(activated_at: Time.now)).to be_active
+        end
+      end
+
       describe '.all_ids' do
         it 'returns an empty array if no accounts are created yet' do
           expect(Account.all_ids).to eq([])
@@ -17,6 +23,59 @@ module Epics
 
         it 'adds a new import for the account and the given day' do
           expect{ account.imported_at!(Date.today) }.to change { DB[:imports].where(account_id: account.id).count }.by(1)
+        end
+      end
+
+      describe '#setup!' do
+        let(:account) { Account.create(mode: 'File') }
+
+        it 'generates a random passphrase' do
+          account.update(passphrase: nil)
+          account.setup!
+          expect(account.passphrase).to_not be_nil
+        end
+
+        it 'saves the keys' do
+          account.update(key: nil)
+          account.setup!
+          expect(account.reload.key).to eql(Epics::Box::Account::File.new.dump_keys)
+        end
+
+        it 'saves the ini letter' do
+          account.update(ini_letter: nil)
+          account.setup!
+          expect(account.reload.ini_letter).to eql(Epics::Box::Account::File.new.ini_letter(account.bankname))
+        end
+
+        it 'calls INI and HIA' do
+          expect_any_instance_of(Epics::Box::Account::File).to receive(:INI)
+          expect_any_instance_of(Epics::Box::Account::File).to receive(:HIA)
+          account.setup!
+        end
+      end
+
+      describe '#activate' do
+        let(:account) { Account.create(mode: 'File') }
+
+        it 'saves activation date' do
+          account.update(activated_at: nil)
+          account.activate!
+          expect(account.reload.activated_at).to be_instance_of(Time)
+        end
+
+        it 'exchanges the keys' do
+          expect(account.client).to receive(:HPB)
+          account.update(key: nil)
+          account.activate!
+          expect(account.reload.key).to eql(Epics::Box::Account::File.new.dump_keys)
+        end
+
+        context 'error case' do
+          let(:account) { Account.create(mode: 'File') }
+          it 'catches the epics error and returns false' do
+            expect(account.client).to receive(:HPB).and_raise(Epics::Error::BusinessError.new('nope'))
+            expect(account.activate!).to eql(false)
+          end
         end
       end
 

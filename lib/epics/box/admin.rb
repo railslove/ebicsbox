@@ -53,6 +53,13 @@ module Epics
         redirect to("/accounts/ini_letter/#{@account.id}")
       end
 
+      post '/accounts/activate/:id' do
+        @account = Epics::Box::Account.find(id: params[:id])
+        # TODO: handle the error case
+        @account.activate!
+        redirect to("/admin")
+      end
+
       get '/accounts/ini_letter/:id' do
         @account = Epics::Box::Account.find(id: params[:id])
         if @account.ini_letter
