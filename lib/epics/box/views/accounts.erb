@@ -1,0 +1,28 @@
+<table>
+<tr>
+  <th>Name</th>
+  <th>IBAN</th>
+  <th>BIC</th>
+  <th>Active?</th>
+  <th></th>
+</tr>
+<% @accounts.each do |account| %>
+<tr>
+  <td><%= account.name %> </td>
+  <td><%= account.iban %></td>
+  <td><%= account.bic %></td>
+  <td>
+    <% if account.active? %>
+      <%= account.active? %>
+    <% elsif account.ini_letter %>
+      <form action="/admin/accounts/activate/<%= account.id %>" method = "post">
+        <input type="submit" value="Activate" />
+      </form>
+    <% else %>
+      <a href="/admin/accounts/setup/<%= account.id %>">Setup</a>
+    <% end %>
+  </td>
+</tr>
+
+<% end %>
+</table>

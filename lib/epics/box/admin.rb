@@ -39,6 +39,12 @@ module Epics
             <label for="url"/>URL</label>
             <input type="text" name="url" id="url" required/>
             <br/>
+            <label for="mode"/>Mode</label>
+            <select name="mode" id="mode">
+              <option>File</option>
+              <option>Ebics</option>
+            </select>
+            <br/>
             <hr/>
             <input type="submit" value="Create"/>
           </form>
@@ -53,11 +59,17 @@ module Epics
         redirect to("/accounts/ini_letter/#{@account.id}")
       end
 
+      get '/accounts/setup/:id' do
+        @account = Epics::Box::Account.find(id: params[:id])
+
+        erb :setup
+      end
+
       post '/accounts/activate/:id' do
         @account = Epics::Box::Account.find(id: params[:id])
         # TODO: handle the error case
         @account.activate!
-        redirect to("/admin")
+        redirect to("/accounts")
       end
 
       get '/accounts/ini_letter/:id' do
@@ -65,7 +77,7 @@ module Epics
         if @account.ini_letter
           erb :ini_letter
         else
-          redirect to("/admin")
+          redirect to("/accounts")
         end
       end
 
@@ -75,11 +87,17 @@ module Epics
       end
 
       post '/accounts' do
-        if Epics::Box::Account.create(params.slice("name", "bankname", "iban", "bic", "creditor_identifier", "callback_url", "host", "partner", "user", "url"))
-          "Yeah"
+        if Epics::Box::Account.create(params.slice("name", "bankname", "iban", "bic", "creditor_identifier", "callback_url", "host", "partner", "user", "url", "mode"))
+          redirect to("/accounts")
         else
            "Nooo"
         end
+      end
+
+      get '/accounts' do
+        @accounts = Epics::Box::Account.all
+
+        erb :accounts
       end
     end
   end
