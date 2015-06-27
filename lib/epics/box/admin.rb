@@ -6,11 +6,14 @@ module Epics
         Sequel::Migrator.run(DB, File.join( File.dirname(__FILE__),  '../../../migrations/'), use_transactions: true)
       end
 
-      get '/accounts' do
+      get '/accounts/new' do
         <<-FOO
           <form action="/admin/accounts" method="POST">
             <label for="name"/>Name</label>
             <input type="text" name="name" id="name" required/>
+            <br/>
+            <label for="bankname"/>Bankname</label>
+            <input type="text" name="bankename" id="bankname" required/>
             <br/>
             <label for="iban"/>IBAN</label>
             <input type="text" name="iban" id="iban" required/>
@@ -24,9 +27,6 @@ module Epics
             <label for="callback_url"/>Callback URL</label>
             <input type="text" name="callback_url" id="callback_url" />
             <br/>
-            <label for="passphrase"/>Passphrase</label>
-            <input type="password" name="passphrase" id="passphrase" required/>
-            <br/>
             <label for="host"/>Host ID</label>
             <input type="text" name="host" id="host" required/>
             <br/>
@@ -39,17 +39,43 @@ module Epics
             <label for="url"/>URL</label>
             <input type="text" name="url" id="url" required/>
             <br/>
-            <label for="key"/>Key</label>
-            <textarea name="key" id="key" required></textarea>
-            <br/>
             <hr/>
             <input type="submit" value="Create"/>
           </form>
         FOO
       end
 
+      post '/accounts/setup/:id' do
+        @account = Epics::Box::Account.find(id: params[:id])
+        if @account.ini_letter.nil? || params[:reset]
+          @account.setup!
+        end
+        redirect to("/accounts/ini_letter/#{@account.id}")
+      end
+
+      post '/accounts/activate/:id' do
+        @account = Epics::Box::Account.find(id: params[:id])
+        # TODO: handle the error case
+        @account.activate!
+        redirect to("/admin")
+      end
+
+      get '/accounts/ini_letter/:id' do
+        @account = Epics::Box::Account.find(id: params[:id])
+        if @account.ini_letter
+          erb :ini_letter
+        else
+          redirect to("/admin")
+        end
+      end
+
+      get '/accounts/ini_letter/:id/letter' do
+        @account = Epics::Box::Account.find(id: params[:id])
+        @account.ini_letter #render the ini lette
+      end
+
       post '/accounts' do
-        if Epics::Box::Account.create(params.slice("name", "iban", "bic", "creditor_identifier", "callback_url", "passphrase", "host", "partner", "user", "url", "key"))
+        if Epics::Box::Account.create(params.slice("name", "bankname", "iban", "bic", "creditor_identifier", "callback_url", "host", "partner", "user", "url"))
           "Yeah"
         else
            "Nooo"
