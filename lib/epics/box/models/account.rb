@@ -54,7 +54,7 @@ class Epics::Box::Account < Sequel::Model
   end
 
   def activate!
-    Epics::Box.logger.error("activating account #{self.id}")
+    Epics::Box.logger.info("activating account #{self.id}")
     self.client.HPB
     self.key = self.client.send(:dump_keys)
     self.activated_at = Time.now
