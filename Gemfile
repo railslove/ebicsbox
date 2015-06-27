@@ -6,7 +6,7 @@ gemspec
 gem 'pg', platform: :mri
 gem 'thin', platform: :mri
 gem 'jdbc-postgres', platform: :jruby
-gem 'trinidad', platform: :jruby
+gem 'trinidad', "1.5.0.B1", platform: :jruby
 
 group :development, :test do
   gem 'byebug', platform: :mri
