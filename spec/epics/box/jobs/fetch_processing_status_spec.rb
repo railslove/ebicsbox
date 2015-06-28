@@ -51,9 +51,7 @@ module Epics
 
           context 'no transaction with order id found' do
             it 'logs an info message' do
-              do_action('0002')
-              $box_logger.rewind
-              expect($box_logger.read).to include('[Jobs::FetchProcessingStatus] No transactions with order id found. account_id=1 order_id=0002')
+              expect { do_action('0002') }.to have_logged_message('[Jobs::FetchProcessingStatus] No transactions with order id found. account_id=1 order_id=0002')
             end
           end
         end
