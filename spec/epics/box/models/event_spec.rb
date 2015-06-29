@@ -1,8 +1,12 @@
-require "epics/box/models/event"
+require 'epics/box/models/event'
 
 module Epics
   module Box
     RSpec.describe Event do
+      before do
+        allow(Queue).to receive(:trigger_webhook)
+      end
+
       describe 'supported types' do
         described_class::SUPPORTED_TYPES.each do |event|
           before do
@@ -25,7 +29,10 @@ module Epics
           expect { described_class.publish('some_event', some: 'payload') }.to change { Event.count }.by(1)
         end
 
-        it 'publishes it to the queue'
+        it 'publishes it to the queue' do
+          described_class.publish('some_event', some: 'payload')
+          expect(Queue).to have_received(:trigger_webhook).with(event_id: anything)
+        end
 
         it 'logs it to replicated audit log'
       end
@@ -66,6 +73,40 @@ module Epics
 
         it "sets webhook retry count to 0" do
           expect(subject.webhook_retries).to eq(0)
+        end
+      end
+
+      describe 'delivery_success!' do
+        it 'sets status to success' do
+          expect { subject.delivery_success! }.to change { subject.webhook_status }.to('success')
+        end
+      end
+
+      describe 'delivery_failure!' do
+        context 'below retry threshold' do
+          before { subject.webhook_retries = 3 }
+
+          it 'increases retry counter by one' do
+            expect { subject.delivery_failure! }.to change { subject.webhook_retries }.by(1)
+          end
+
+          it 'does not change status' do
+            subject.delivery_failure!
+            expect(subject.webhook_status).to eq('pending')
+          end
+
+          it 'schedules a delayed retry' do
+            expect(Queue).to receive(:trigger_webhook).with({ event_id: subject.id }, { delay: 30 })
+            subject.delivery_failure!
+          end
+        end
+
+        context 'above retry threshold' do
+          before { subject.webhook_retries = 10 }
+
+          it 'sets status to failed' do
+            expect { subject.delivery_failure! }.to change { subject.webhook_status }.to('failed')
+          end
         end
       end
     end

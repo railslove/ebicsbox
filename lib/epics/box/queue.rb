@@ -38,8 +38,8 @@ module Epics
         client.tubes[STA_TUBE].put(account_ids: Array.wrap(account_ids))
       end
 
-      def self.trigger_webhook(payload)
-        client.tubes[WEBHOOK_TUBE].put(payload)
+      def self.trigger_webhook(payload, options = {})
+        client.tubes[WEBHOOK_TUBE].put(payload, options)
       end
 
       def self.execute_credit(payload)
