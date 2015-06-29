@@ -4,7 +4,7 @@ module Epics
       RSpec.describe Transaction do
         describe '#set_state_from' do
           context 'status changed' do
-            it 'triggers a changed event' do
+            skip 'triggers a changed event' do
               subject.status = 'created'
               expect(Event).to receive(:transaction_updated)
               subject.set_state_from 'file_upload'

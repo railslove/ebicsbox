@@ -1,3 +1,5 @@
+require 'epics/box/models/event'
+
 class Ebics::Box::Transaction < Sequel::Model
 
   many_to_one :account
