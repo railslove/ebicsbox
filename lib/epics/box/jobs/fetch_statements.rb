@@ -16,7 +16,7 @@ module Epics
 
           account = Account[account_id]
 
-          from_date = account.last_imported_at || Date.today
+          from_date = account.last_imported_at || (Date.today - 30)
           to_date = Date.today
 
           if from_date < to_date
