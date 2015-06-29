@@ -20,7 +20,6 @@ module Epics
               old_status = trx.status
               new_status = trx.set_state_from(info[:action], info[:reason_code])
               if old_status != new_status
-                Queue.trigger_webhook(account_id: account_id, payload: trx.to_hash)
                 log(:debug, "Status changed. From #{old_status} to #{new_status}.", { account_id: account_id, ebics_order_id: order_id })
               end
               log(:info, "#{trx.pk} - #{info[:action]} for #{info[:ids]["OrderID"]} with #{info[:reason_code]}.", { account_id: account_id })

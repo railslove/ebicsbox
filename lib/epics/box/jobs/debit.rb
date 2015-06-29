@@ -19,6 +19,7 @@ module Epics
           )
 
           transaction.execute!
+          Event.debit_created(transaction.to_webhook_payload)
           Queue.update_processing_status(message[:account_id])
 
           Box.logger.info("[Jobs::Debit] Created debit! transaction_id=#{transaction.id}")

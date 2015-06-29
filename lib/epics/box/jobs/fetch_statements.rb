@@ -62,7 +62,7 @@ module Epics
         end
 
         def self.link_statement_to_transaction(account_id, statement)
-          if transaction = Transaction.where(eref: statement.eref).first
+          if transaction = Epics::Box::Transaction.where(eref: statement.eref).first
             transaction.add_statement(statement)
 
             if statement.credit?
@@ -71,7 +71,7 @@ module Epics
               transaction.set_state_from("debit_received")
             end
 
-            Queue.trigger_webhook(account_id: account_id, payload: transaction.to_hash)
+            Event.statement_created(statement.to_webhook_payload)
           end
         end
 

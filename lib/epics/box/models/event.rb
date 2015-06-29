@@ -6,7 +6,8 @@ module Epics
       SUPPORTED_TYPES = [
         :debit_created, :debit_failed, :debit_succeeded,
         :credit_created, :credit_failed, :credit_suceeded,
-        :statement_updated,
+        :statement_created, :statement_updated,
+        :transaction_updated,
       ]
       RETRY_THRESHOLD = 10
       DELAY = {
