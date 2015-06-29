@@ -23,6 +23,9 @@
   <label for="url"/>URL</label>
   <input type="text" name="url" id="url" value="<%= @account.url %>" required/>
   <br/>
+  <label for="passphrase"/>passphrase</label>
+  <input type="password" name="passphrase" id="passphrase" value="<%= @account.passphrase %>" required/>
+  <br/>
   <label for="key"/>key</label>
   <textarea name="key" id="key"> <%= @account.key %> </textarea>
   <br/>
