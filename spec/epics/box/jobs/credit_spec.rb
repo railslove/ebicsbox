@@ -6,6 +6,7 @@ module Epics
           let(:transaction) { double('Transaction', execute!: true, id: 1) }
           let(:message) do
             {
+              amount: 100,
               instrument: 'CORE',
               eref: '123',
               account_id: 321,
@@ -26,6 +27,11 @@ module Epics
           it 'sets correct order type' do
             described_class.process!(message)
             expect(Transaction).to have_received(:create).with(hash_including(order_type: :CCT))
+          end
+
+          it 'sets correct amount' do
+            described_class.process!(message)
+            expect(Transaction).to have_received(:create).with(hash_including(amount: 100))
           end
 
           it 'encodes the pain payload with base 64' do
