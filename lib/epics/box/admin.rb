@@ -6,6 +6,10 @@ module Epics
         Sequel::Migrator.run(DB, File.join( File.dirname(__FILE__),  '../../../migrations/'), use_transactions: true)
       end
 
+      get '/' do
+        erb :home
+      end
+
       get '/accounts/new' do
         erb :new
       end

@@ -1,3 +1,6 @@
+require("bootstrap-webpack");
+require("./styles/custom.css");
+
 var React = require('react');
 
 class TestApp extends React.Component {
