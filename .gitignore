@@ -17,3 +17,5 @@ mkmf.log
 .DS_Store
 .env
 Box Key Architecture.graffle
+node_modules
+application.js
