@@ -1,0 +1,13 @@
+{
+  "name": "ebics-box",
+  "version": "0.0.1",
+  "description": "Administrative interface for box",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/railslove/epics-box.git"
+  },
+  "bugs": {
+    "url": "https://github.com/railslove/epics-box/issues"
+  },
+  "homepage": "https://github.com/railslove/epics-box"
+}
