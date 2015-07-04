@@ -41,6 +41,16 @@ module Epics
           expect(subject.debit?).to eq(false)
         end
       end
+
+      describe '#transaction' do
+        let!(:statement) { Statement.create(eref: transaction.eref, transaction_id: transaction.id) }
+        let!(:transaction) { Transaction.create(eref: SecureRandom.uuid) }
+
+        it 'returns the connected transaction' do
+          expect(statement.transaction).to eq(transaction)
+        end
+
+      end
     end
   end
 end
