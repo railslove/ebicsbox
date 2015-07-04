@@ -18,10 +18,8 @@ class Navigation extends React.Component {
           </div>
           <div id="navbar" className="navbar-collapse collapse">
             <ul className="nav navbar-nav">
-              <li className="active"><a href="#">Dashboard</a></li>
-              <li><a href="#acounts">Accounts</a></li>
-              <li><a href="#statements">Statements</a></li>
-              <li><a href="#events">Events</a></li>
+              <li><a href="#">Dashboard</a></li>
+              <li><a href="#accounts">Accounts</a></li>
             </ul>
           </div>
         </div>

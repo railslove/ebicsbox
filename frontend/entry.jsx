@@ -2,25 +2,34 @@ require("bootstrap-webpack");
 require("./styles/custom.css");
 
 var React = require('react');
-import Navigation from './components/navigation.jsx';
 
-class TestApp extends React.Component {
+import Navigation from './components/navigation.jsx';
+import Dashboard from './components/dashboard.jsx';
+import AccountsIndex from './components/accounts_index.jsx';
+
+
+var Router = require('react-router');
+var Route = Router.Route;
+var RouteHandler = Router.RouteHandler;
+
+class App extends React.Component {
   render() {
     return(
       <div>
         <Navigation />
-        <div className="container" role="main">
-          <div className="row">
-            <div className="col-xs-6">Hello</div>
-            <div className="col-xs-6">World</div>
-          </div>
-        </div>
+        <RouteHandler/>
       </div>
     );
   }
 }
 
-React.render(
-  <TestApp />,
-  document.getElementById('application')
+var routes = (
+  <Route handler={App}>
+    <Route path="/" handler={Dashboard} />
+    <Route path="/accounts" handler={AccountsIndex} />
+  </Route>
 );
+
+Router.run(routes, Router.HashLocation, (Root) => {
+  React.render(<Root/>, document.getElementById('application'));
+});
