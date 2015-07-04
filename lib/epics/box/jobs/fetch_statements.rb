@@ -36,7 +36,7 @@ module Epics
             sha: Digest::SHA2.hexdigest(data.information),
             date: data.date,
             entry_date: data.entry_date,
-            amount_cents: data.amount_in_cents,
+            amount: data.amount_in_cents,
             sign: data.sign,
             debit: data.debit?,
             swift_code: data.swift_code,

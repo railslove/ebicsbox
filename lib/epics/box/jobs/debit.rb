@@ -10,6 +10,7 @@ module Epics
 
         def self.process!(message)
           transaction = Epics::Box::Transaction.create(
+            amount: message[:amount],
             type: "debit",
             order_type: INSTRUMENT_MAPPING[message[:instrument]],
             account_id: message[:account_id],

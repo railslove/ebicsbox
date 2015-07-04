@@ -5,6 +5,7 @@ module Epics
         def self.process!(message)
           transaction = Epics::Box::Transaction.create(
             account_id: message[:account_id],
+            amount: message[:amount],
             type: "credit",
             payload: Base64.strict_decode64(message[:payload]),
             eref: message[:eref],

@@ -2,7 +2,7 @@ class Epics::Box::StatementPresenter < Grape::Entity
   expose :name
   expose :bic
   expose :iban
-  expose :amount_cents, as: :amount
+  expose :amount
   expose :eref
   expose :mref
   expose :debit
