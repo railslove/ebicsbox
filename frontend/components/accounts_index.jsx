@@ -14,45 +14,46 @@ class AccountsIndex extends React.Component {
   }
 
   componentDidMount() {
-    $.getJSON("/core/accounts", function(result) {
-
+    $.getJSON("/core/accounts", (result) => {
       this.setState({accounts: result});
-
-    }.bind(this));
+    });
   }
 
   render() {
+    console.log(this.state.accounts);
     var accounts = this.state.accounts.map(function(account, i) {
+      var activated = (account.activated_at != undefined);
+      var cssClass = activated ? 'panel-default' : 'panel-danger';
+      var actionButton;
+      if(activated) {
+        actionButton = <Link to="account" params={{id: account.iban}} className="btn btn-primary btn-sm">Show details</Link>;
+      } else {
+        actionButton = <Link to="account" params={{id: account.iban}} className="btn btn-default btn-sm">Activate</Link>;
+      }
       return (
-        <tr key={account.iban}>
-          <td>{account.name}</td>
-          <td>{account.iban}</td>
-          <td>{account.bic}</td>
-          <td>{account.bankname}</td>
-          <td>
-            <Link to="account" params={{id: account.iban}} className="btn btn-primary btn-xs">Show</Link>
-          </td>
-        </tr>
+        <li key={account.iban} className={`panel ${cssClass}`}>
+          <div className="panel-heading">{account.name}</div>
+          <div className="panel-body">
+            <p>
+              {account.iban}<br />
+              {account.bankname}
+            </p>
+            {actionButton}
+          </div>
+        </li>
       );
-    }, this)
+    });
+
+    console.log(accounts);
 
     return (
       <div className="container" role="main">
         <div className="row">
-          <table className="table table-hover">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>IBAN</th>
-                <th>BIC</th>
-                <th>Bankname</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
+          <div className="col-sm-6 col-md-4">
+            <ul className="list-unstyled">
               {accounts}
-            </tbody>
-          </table>
+            </ul>
+          </div>
         </div>
       </div>
     );
