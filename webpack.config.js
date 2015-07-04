@@ -9,7 +9,7 @@ module.exports = {
     application: "./frontend/entry.jsx"
   },
   output: {
-    path: path.join(__dirname, 'public', 'assets'),
+    path: path.join(__dirname, 'public'),
     filename: "[name].js"
   },
   module: {
