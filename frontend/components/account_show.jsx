@@ -13,7 +13,7 @@ class StatementRow extends React.Component {
         <td className="no-wrap">{statement.date}</td>
         <td>
           <strong>{statement.name}</strong><br />
-          <small className="text-muted">{statement.iban}</small>
+          <small className="text-muted">{statement.remittance_information}</small>
         </td>
         <td className="text-right">{formattedAmount}</td>
       </tr>
@@ -23,39 +23,59 @@ class StatementRow extends React.Component {
 
 class AccountShow extends React.Component {
   constructor(props) {
-    super()
-    this.state = { data: [] };
+    super(props);
+    this.state = { account: null, statements: [] };
     this.loadData();
   }
 
   loadData() {
-    $.get('/DE10375700240868353400/statements', data => {
-      this.setState({ data: data });
+    var iban = this.props.params.id;
+    $.get(`/core/accounts/${iban}.json`, data => {
+      this.setState({ account: data });
+    });
+
+    $.get(`/${iban}/statements`, data => {
+      this.setState({ statements: data });
     });
   }
 
   render() {
-    var statements = this.state.data;
+    var account = this.state.account;
+    var statements = this.state.statements;
+
+    if(account == null) return <div>Loading…</div>;
+
     return (
       <div className="container">
+      <div className="page-header">
+        <h1>Account Details <small>{account.name}</small></h1>
+      </div>
         <div className="row">
           <div className="col-sm-4 col-md-3">
-            Filter
+            <dl>
+              <dt>Bank</dt>
+              <dd>{account.bank_name || 'unknown'}</dd>
+              <dt>IBAN</dt>
+              <dd>{account.iban}</dd>
+              <dt>BIC</dt>
+              <dd>{account.bic}</dd>
+            </dl>
           </div>
           <div className="col-sm-8 col-md-9">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Name</th>
-                <th className="text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {statements.map(statement => <StatementRow statement={statement} />)}
-            </tbody>
-          </table>
-        </div>
+            <h3>Most recent statements</h3>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Name</th>
+                  <th className="text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {statements.map(statement => <StatementRow statement={statement} />)}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     );

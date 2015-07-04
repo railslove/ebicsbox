@@ -70,6 +70,11 @@ module Epics
       get '/accounts' do
         present Epics::Box::Account.all, with: Epics::Box::AccountPresenter
       end
+
+      get '/accounts/:id' do
+        account = Epics::Box::Account.first!({iban: params[:id]})
+        present account, with: Epics::Box::AccountPresenter
+      end
     end
   end
 end
