@@ -32,9 +32,9 @@ module.exports = {
   },
   plugins: [
       new ExtractTextPlugin("application.css")
-  ]
-  // resolve: {
-  //   extensions: ['', '.js', '.json', '.jsx'],
-  //   root: path.resolve(__dirname, 'frontend')
-  // }
+  ],
+  resolve: {
+    extensions: ['', '.js', '.json', '.jsx'],
+    root: path.resolve(__dirname, 'frontend')
+  }
 };

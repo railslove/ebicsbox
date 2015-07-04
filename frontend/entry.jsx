@@ -3,9 +3,9 @@ require("./styles/custom.css");
 
 var React = require('react');
 
-import Navigation from './components/navigation.jsx';
-import Dashboard from './components/dashboard.jsx';
-import AccountsIndex from './components/accounts_index.jsx';
+import Navigation from './components/navigation';
+import Dashboard from './components/dashboard';
+import AccountsIndex from './components/accounts_index';
 
 
 var Router = require('react-router');
