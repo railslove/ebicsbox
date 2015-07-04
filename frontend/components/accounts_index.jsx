@@ -1,5 +1,6 @@
 import React from 'react';
 import $ from 'jquery';
+import {Link} from 'react-router';
 
 class AccountsIndex extends React.Component {
 
@@ -27,6 +28,9 @@ class AccountsIndex extends React.Component {
           <td>{account.iban}</td>
           <td>{account.bic}</td>
           <td>{account.bankname}</td>
+          <td>
+            <Link to="account" params={{id: account.iban}}>Show</Link>
+          </td>
         </tr>
       );
     }, this)
