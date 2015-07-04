@@ -44,12 +44,11 @@ class AccountsIndex extends React.Component {
       );
     });
 
-    console.log(accounts);
-
     return (
       <div className="container" role="main">
         <div className="row">
           <div className="col-sm-6 col-md-4">
+            <p><Link to="new-account" className="btn btn-default">Add account</Link></p>
             <ul className="list-unstyled">
               {accounts}
             </ul>

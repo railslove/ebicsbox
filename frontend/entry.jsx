@@ -7,6 +7,7 @@ import Navigation from './components/navigation';
 import Dashboard from './components/dashboard';
 import AccountsIndex from './components/accounts_index';
 import AccountShow from './components/account_show';
+import AccountForm from './components/account_form';
 
 
 var Router = require('react-router');
@@ -27,6 +28,7 @@ class App extends React.Component {
 var routes = (
   <Route handler={App}>
     <Route path="/" handler={Dashboard} />
+    <Route name="new-account" path="/accounts/new" handler={AccountForm} />
     <Route name="account" path="/accounts/:id" handler={AccountShow} />
     <Route path="/accounts" handler={AccountsIndex} />
   </Route>
