@@ -16,11 +16,14 @@ box = Rack::Builder.app do
   use Epics::Box::Middleware::LicenseValidator if ENV['REPLICATED_INTEGRATIONAPI']
   use Epics::Box::Middleware::ConnectionValidator, DB
 
-
-  use Rack::Static, :urls => ["/assets"], :root => "public"
   map "/admin" do
+    use Rack::Static, :urls => [""], :root => "public", index: "index.html"
+  end
+
+  map "/core" do
     run Epics::Box::Admin
   end
+
   run Epics::Box::Server
 end
 
