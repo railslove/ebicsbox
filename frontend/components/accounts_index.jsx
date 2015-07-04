@@ -25,11 +25,12 @@ class AccountsIndex extends React.Component {
     var accounts = this.state.accounts.map(function(account, i) {
       return (
         <tr key={account.iban}>
+          <td>{account.name}</td>
           <td>{account.iban}</td>
           <td>{account.bic}</td>
           <td>{account.bankname}</td>
           <td>
-            <Link to="account" params={{id: account.iban}}>Show</Link>
+            <Link to="account" params={{id: account.iban}} className="btn btn-primary btn-xs">Show</Link>
           </td>
         </tr>
       );
@@ -41,6 +42,7 @@ class AccountsIndex extends React.Component {
           <table className="table table-hover">
             <thead>
               <tr>
+                <th>Name</th>
                 <th>IBAN</th>
                 <th>BIC</th>
                 <th>Bankname</th>
