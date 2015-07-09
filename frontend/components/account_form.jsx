@@ -2,22 +2,49 @@ import React from 'react';
 import Api from '../models/api';
 
 class AccountForm extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     // Set initial state
-    this.state = { errorMessage: null };
+    this.state = { errorMessage: null, editing: false };
 
     // Bind local methods
-    this.saveAndContinue = this.saveAndContinue.bind(this);
+    this.createAndContinue = this.createAndContinue.bind(this);
+    this.updateAndContinue = this.updateAndContinue.bind(this);
     this.onError = this.onError.bind(this);
     this.onSuccess = this.onSuccess.bind(this);
+    this.setupForm = this.setupForm.bind(this);
+    this.formData = this.formData.bind(this);
   }
 
-  saveAndContinue(e) {
-    e.preventDefault();
+  componentWillMount() {
+    if(this.props.params && this.props.params.id) {
+      Api
+        .fetchAccount(this.props.params.id)
+        .then(this.setupForm);
+    }
+  }
 
-    var formData = {
+  setupForm(data) {
+    this.refs.bankname.getDOMNode().value = data.bankname;
+    this.refs.iban.getDOMNode().value = data.iban;
+    this.refs.bic.getDOMNode().value = data.bic;
+
+    this.refs.name.getDOMNode().value = data.name;
+    this.refs.callback_url.getDOMNode().value = data.callback_url;
+
+    this.refs.creditor_identifier.getDOMNode().value = data.creditor_identifier;
+    this.refs.host.getDOMNode().value = data.host;
+    this.refs.partner.getDOMNode().value = data.partner;
+    this.refs.user.getDOMNode().value = data.user;
+    this.refs.url.getDOMNode().value = data.url;
+    this.refs.mode.getDOMNode().value = data.mode;
+
+    this.setState({ editing: true });
+  }
+
+  formData() {
+    return {
       bankname: this.refs.bankname.getDOMNode().value,
       iban: this.refs.iban.getDOMNode().value,
       bic: this.refs.bic.getDOMNode().value,
@@ -29,9 +56,20 @@ class AccountForm extends React.Component {
       user: this.refs.user.getDOMNode().value,
       url: this.refs.url.getDOMNode().value,
       mode: this.refs.mode.getDOMNode().value,
-    };
+    }
+  }
 
-    Api.post('/accounts', formData)
+  createAndContinue(e) {
+    e.preventDefault();
+
+    Api.createAccount(this.formData())
+      .then(this.onSuccess)
+      .catch(this.onError);
+  }
+
+  updateAndContinue(e) {
+    e.preventDefault();
+    Api.updateAccount(this.props.params.id, this.formData())
       .then(this.onSuccess)
       .catch(this.onError);
   }
@@ -49,6 +87,14 @@ class AccountForm extends React.Component {
     if(this.state.errorMessage) {
       errorMessage = <div className="alert alert-danger" role="alert">{this.state.errorMessage}</div>;
     }
+
+    var actionButton;
+    if(this.state.editing) {
+      actionButton = <input type="submit" value="Save changes" onClick={this.updateAndContinue} className="btn btn-primary" />;
+    } else {
+      actionButton = <input type="submit" value="Create" onClick={this.createAndContinue} className="btn btn-primary" />;
+    }
+
     return (
       <div className="container">
         <div className="row">
@@ -110,7 +156,7 @@ class AccountForm extends React.Component {
                   <option>Epics::Client</option>
                 </select>
               </div>
-              <input type="submit" value="Create" onClick={this.saveAndContinue} className="btn btn-primary" />
+              {actionButton}
             </form>
           </div>
         </div>

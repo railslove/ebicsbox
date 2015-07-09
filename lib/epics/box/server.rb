@@ -45,10 +45,23 @@ module Epics
         end
         desc 'Add a new account'
         post do
-          if account = Epics::Box::Account.create(params)
-            { account: account }
+          if account = Account.create(params)
+            account
           else
             error!({ message: 'Failed to create account', errors: account.errors }, 400)
+          end
+        end
+
+        get ':id' do
+          Account.first!({ iban: params[:id] })
+        end
+
+        put ':id' do
+          account = Account.find(iban: params[:id])
+          if account.update(params.slice("name", "bankname", "creditor_identifier", "callback_url", "host", "partner", "user", "url", "key", "passphrase", "mode", "ini_letter"))
+            account
+          else
+             error!({ message: 'Failed to update account', errors: account.errors }, 400)
           end
         end
       end
