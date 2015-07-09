@@ -9,6 +9,14 @@ module Epics
         end
       end
 
+      class UniqueAccount < Grape::Validations::Base
+        def validate_param!(attr_name, params)
+          unless DB[:accounts].where(attr_name => params[attr_name]).count == 0
+            raise Grape::Exceptions::Validation, params: [@scope.full_name(attr_name)], message: "must be unique"
+          end
+        end
+      end
+
       format :json
 
       helpers do
@@ -24,7 +32,7 @@ module Epics
       resource :accounts do
         params do
           requires :name, type: String, allow_blank: false, desc: 'Internal description of account'
-          requires :iban, type: String, allow_blank: false, desc: 'IBAN'
+          requires :iban, type: String, unique_account: true, allow_blank: false, desc: 'IBAN'
           requires :bic, type: String, allow_blank: false, desc: 'BIC'
           optional :bankname, type: String, desc: 'Name of bank (for internal purposes)'
           optional :creditor_identifier, type: String, desc: 'creditor_identifier'
