@@ -15,6 +15,34 @@ module Epics
         def account
           Epics::Box::Account.first!({iban: params[:account]})
         end
+
+        def logger
+          Server.logger
+        end
+      end
+
+      resource :accounts do
+        params do
+          requires :name, type: String, allow_blank: false, desc: 'Internal description of account'
+          requires :iban, type: String, allow_blank: false, desc: 'IBAN'
+          requires :bic, type: String, allow_blank: false, desc: 'BIC'
+          optional :bankname, type: String, desc: 'Name of bank (for internal purposes)'
+          optional :creditor_identifier, type: String, desc: 'creditor_identifier'
+          optional :callback_url, type: String, desc: 'callback_url'
+          optional :host, type: String, desc: 'host'
+          optional :partner, type: String, desc: 'partner'
+          optional :user, type: String, desc: 'user'
+          optional :url, type: String, desc: 'url'
+          optional :mode, type: String, desc: 'mode'
+        end
+        desc 'Add a new account'
+        post do
+          if account = Epics::Box::Account.create(params)
+            { account: account }
+          else
+            error!({ message: 'Failed to create account', errors: account.errors }, 400)
+          end
+        end
       end
 
       params do

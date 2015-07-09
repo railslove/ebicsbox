@@ -23,6 +23,28 @@ module Epics
 
         it 'allows to filter results by a date range'
       end
+
+      describe 'POST /accounts' do
+        context 'invalid body' do
+          before { post 'accounts', {} }
+
+          it 'rejects empty posts' do
+            expect_status 400
+          end
+
+          it 'rejects empty posts' do
+            expect_json_types error: :string
+          end
+        end
+
+        it 'stores new minimal accounts' do
+          expect {
+            post 'accounts', { name: 'Test account', iban: 'my-iban', bic: 'my-iban' }
+          }.to change {
+            Account.count
+          }
+        end
+      end
     end
   end
 end
