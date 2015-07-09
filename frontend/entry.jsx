@@ -30,7 +30,7 @@ var routes = (
     <Route path="/" handler={Dashboard} />
     <Route name="new-account" path="/accounts/new" handler={AccountForm} />
     <Route name="account" path="/accounts/:id" handler={AccountShow} />
-    <Route path="/accounts" handler={AccountsIndex} />
+    <Route name="account-index" path="/accounts" handler={AccountsIndex} />
   </Route>
 );
 
