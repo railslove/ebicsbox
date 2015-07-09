@@ -68,12 +68,13 @@ module Epics
       # end
 
       get '/accounts' do
-        present Epics::Box::Account.all, with: Epics::Box::AccountPresenter
+        accounts = Account.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
+        present accounts, with: AccountPresenter
       end
 
       get '/accounts/:id' do
-        account = Epics::Box::Account.first!({iban: params[:id]})
-        present account, with: Epics::Box::AccountPresenter
+        account = Account.first!({iban: params[:id]})
+        present account, with: AccountPresenter
       end
     end
   end

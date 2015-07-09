@@ -20,7 +20,6 @@ class AccountsIndex extends React.Component {
   }
 
   render() {
-    console.log(this.state.accounts);
     var accounts = this.state.accounts.map(function(account, i) {
       var activated = (account.activated_at != undefined);
       var cssClass = activated ? 'panel-default' : 'panel-danger';
@@ -31,14 +30,18 @@ class AccountsIndex extends React.Component {
         actionButton = <Link to="account" params={{id: account.iban}} className="btn btn-default btn-sm">Activate</Link>;
       }
       return (
-        <li key={account.iban} className={`panel ${cssClass}`}>
-          <div className="panel-heading">{account.name}</div>
-          <div className="panel-body">
-            <p>
-              {account.iban}<br />
-              {account.bankname}
-            </p>
-            {actionButton}
+        <li key={account.iban} className="col-xs-12 col-sm-6 col-lg-4">
+          <div className={`panel ${cssClass}`}>
+            <div className="panel-heading">{account.name || <em className="text-muted">No account name</em>}</div>
+            <div className="panel-body">
+              <p>
+                {account.iban}<br />
+                {account.bankname || <em className="text-muted">No bank name</em>}
+              </p>
+              {actionButton}
+              {' '}
+              <Link to="edit-account" params={{id: account.iban}} className="btn btn-sm">Edit</Link>
+            </div>
           </div>
         </li>
       );
@@ -46,14 +49,10 @@ class AccountsIndex extends React.Component {
 
     return (
       <div className="container" role="main">
-        <div className="row">
-          <div className="col-sm-6 col-md-4">
-            <p><Link to="new-account" className="btn btn-default">Add account</Link></p>
-            <ul className="list-unstyled">
-              {accounts}
-            </ul>
-          </div>
-        </div>
+        <p><Link to="new-account" className="btn btn-default">Add account</Link></p>
+        <ul className="list-unstyled row">
+          {accounts}
+        </ul>
       </div>
     );
   }

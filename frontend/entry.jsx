@@ -29,6 +29,7 @@ var routes = (
   <Route handler={App}>
     <Route path="/" handler={Dashboard} />
     <Route name="new-account" path="/accounts/new" handler={AccountForm} />
+    <Route name="edit-account" path="/accounts/:id/edit" handler={AccountForm} />
     <Route name="account" path="/accounts/:id" handler={AccountShow} />
     <Route name="account-index" path="/accounts" handler={AccountsIndex} />
   </Route>
