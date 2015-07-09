@@ -28,7 +28,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "epics"
   spec.add_dependency "sepa_king"
   spec.add_dependency "sinatra"
-  spec.add_dependency "rack-slashenforce"
   spec.add_development_dependency "bundler", "~> 1.7"
   spec.add_development_dependency "rake", "~> 10.0"
 end

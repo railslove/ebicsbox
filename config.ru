@@ -7,7 +7,6 @@ Bundler.require
 require File.expand_path(File.dirname(__FILE__) + '/lib/epics/box.rb')
 require File.expand_path(File.dirname(__FILE__) + '/lib/epics/box/middleware/license_validator.rb')
 require File.expand_path(File.dirname(__FILE__) + '/lib/epics/box/middleware/connection_validator.rb')
-require 'rack-slashenforce'
 
 box = Rack::Builder.app do
   use Rack::Auth::Basic, "Protected Area" do |username, password|
@@ -16,7 +15,6 @@ box = Rack::Builder.app do
 
   use Epics::Box::Middleware::LicenseValidator if ENV['REPLICATED_INTEGRATIONAPI']
   use Epics::Box::Middleware::ConnectionValidator, DB
-  use Rack::AppendTrailingSlash
 
   map "/admin" do
     use Rack::Static, urls: [""], root: "public", index: "index.html"
