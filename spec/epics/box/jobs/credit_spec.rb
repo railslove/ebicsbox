@@ -3,7 +3,7 @@ module Epics
     module Jobs
       RSpec.describe Credit do
         describe '.process!' do
-          let(:transaction) { double('Transaction', execute!: true, id: 1) }
+          let(:transaction) { double('Transaction', execute!: true, id: 1, to_webhook_payload: {}) }
           let(:message) do
             {
               amount: 100,

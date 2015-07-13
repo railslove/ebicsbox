@@ -13,4 +13,12 @@ class Epics::Box::Statement < Sequel::Model
   def debit?
     self.debit
   end
+
+  def to_webhook_payload
+    transaction = Epics::Box::Transaction.where(eref: eref).first
+    {
+      statement: self.to_hash,
+      transaction: transaction.nil? ? nil : transaction.to_hash
+    }
+  end
 end

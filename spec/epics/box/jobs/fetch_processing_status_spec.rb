@@ -31,10 +31,8 @@ module Epics
             end
 
             context 'transaction status changed' do
-              before { allow_any_instance_of(Transaction).to receive(:set_state_from).and_return('changed') }
-
-              it 'triggers a webhook' do
-                expect(Queue).to receive(:trigger_webhook)
+              it 'updates the transaction status' do
+                expect_any_instance_of(Transaction).to receive(:set_state_from).and_return('changed')
                 do_action
               end
             end
@@ -43,7 +41,7 @@ module Epics
               before { allow_any_instance_of(Transaction).to receive(:set_state_from).and_return('new') }
 
               it 'does not trigger a webhook' do
-                expect(Queue).to_not receive(:trigger_webhook)
+                expect(Event).to_not receive(:transaction_updated)
                 do_action
               end
             end
@@ -51,9 +49,7 @@ module Epics
 
           context 'no transaction with order id found' do
             it 'logs an info message' do
-              do_action('0002')
-              $box_logger.rewind
-              expect($box_logger.read).to include('[Jobs::FetchProcessingStatus] No transactions with order id found. account_id=1 order_id=0002')
+              expect { do_action('0002') }.to have_logged_message('[Jobs::FetchProcessingStatus] No transactions with order id found. account_id=1 order_id=0002')
             end
           end
         end

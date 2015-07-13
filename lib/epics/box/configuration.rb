@@ -12,6 +12,14 @@ module Epics
       def hac_retrieval_interval
         120 # seconds
       end
+
+      def secret_token
+        if token = ENV['SECRET_TOKEN']
+          token
+        else
+          raise 'Please set a secure token'
+        end
+      end
     end
   end
 end

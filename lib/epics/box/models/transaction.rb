@@ -1,9 +1,12 @@
+require 'epics/box/models/event'
+
 class Ebics::Box::Transaction < Sequel::Model
 
   many_to_one :account
   one_to_many :statements
 
   def set_state_from(action, reason_code = nil)
+    old_status = status
     case
     when action == "file_upload" && status == "created"
       self.set(status: "file_upload")
@@ -23,6 +26,10 @@ class Ebics::Box::Transaction < Sequel::Model
 
     self.save
 
+    if old_status != status
+      Ebics::Box::Event.transaction_updated(self.to_webhook_payload)
+    end
+
     self.status
   end
 
@@ -31,5 +38,17 @@ class Ebics::Box::Transaction < Sequel::Model
 
     transaction_id, order_id = account.client.public_send(order_type, payload)
     update(ebics_order_id: order_id, ebics_transaction_id: transaction_id)
+  end
+
+  def to_webhook_payload
+    {
+      transaction: {
+        id: id,
+        eref: eref,
+        type: type,
+        ebics_order_id: ebics_order_id,
+        ebics_transaction_id: ebics_transaction_id,
+      }
+    }
   end
 end
