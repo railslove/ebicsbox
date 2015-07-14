@@ -1,75 +1,43 @@
 import React from 'react';
 import Api from '../models/api';
+import TextInput from '../common/text_input';
 
 class AccountForm extends React.Component {
   constructor(props) {
     super(props);
 
     // Set initial state
-    this.state = { errorMessage: null, editing: false };
+    this.state = { errorMessage: null, editing: false, account: {} };
 
     // Bind local methods
     this.createAndContinue = this.createAndContinue.bind(this);
     this.updateAndContinue = this.updateAndContinue.bind(this);
     this.onError = this.onError.bind(this);
     this.onSuccess = this.onSuccess.bind(this);
-    this.setupForm = this.setupForm.bind(this);
-    this.formData = this.formData.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
 
   componentWillMount() {
-    if(this.props.params && this.props.params.id) {
+    if(this.props.params.id) {
+
       Api
         .fetchAccount(this.props.params.id)
-        .then(this.setupForm);
-    }
-  }
-
-  setupForm(data) {
-    this.refs.bankname.getDOMNode().value = data.bankname;
-    this.refs.iban.getDOMNode().value = data.iban;
-    this.refs.bic.getDOMNode().value = data.bic;
-
-    this.refs.name.getDOMNode().value = data.name;
-    this.refs.callback_url.getDOMNode().value = data.callback_url;
-
-    this.refs.creditor_identifier.getDOMNode().value = data.creditor_identifier;
-    this.refs.host.getDOMNode().value = data.host;
-    this.refs.partner.getDOMNode().value = data.partner;
-    this.refs.user.getDOMNode().value = data.user;
-    this.refs.url.getDOMNode().value = data.url;
-    this.refs.mode.getDOMNode().value = data.mode;
-
-    this.setState({ editing: true });
-  }
-
-  formData() {
-    return {
-      bankname: this.refs.bankname.getDOMNode().value,
-      iban: this.refs.iban.getDOMNode().value,
-      bic: this.refs.bic.getDOMNode().value,
-      name: this.refs.name.getDOMNode().value,
-      callback_url: this.refs.callback_url.getDOMNode().value,
-      creditor_identifier: this.refs.creditor_identifier.getDOMNode().value,
-      host: this.refs.host.getDOMNode().value,
-      partner: this.refs.partner.getDOMNode().value,
-      user: this.refs.user.getDOMNode().value,
-      url: this.refs.url.getDOMNode().value,
-      mode: this.refs.mode.getDOMNode().value,
+        .then((data) => this.setState({ editing: true, account: data }));
     }
   }
 
   createAndContinue(e) {
     e.preventDefault();
-
-    Api.createAccount(this.formData())
+    console.log(this.state.account);
+    Api.createAccount(this.state.account)
       .then(this.onSuccess)
       .catch(this.onError);
   }
 
   updateAndContinue(e) {
     e.preventDefault();
-    Api.updateAccount(this.props.params.id, this.formData())
+    console.log(this.state.account);
+    Api.updateAccount(this.props.params.id, this.state.account)
       .then(this.onSuccess)
       .catch(this.onError);
   }
@@ -80,6 +48,12 @@ class AccountForm extends React.Component {
 
   onSuccess(responseData) {
     this.context.router.transitionTo('account-index');
+  }
+
+  handleChange(event) {
+    var account = this.state.account;
+    account[event.target.name] = event.target.value;
+    this.setState({ account: account });
   }
 
   render() {
@@ -95,6 +69,7 @@ class AccountForm extends React.Component {
       actionButton = <input type="submit" value="Create" onClick={this.createAndContinue} className="btn btn-primary" />;
     }
 
+    var data = this.state.account;
     return (
       <div className="container">
         <div className="row">
@@ -102,56 +77,25 @@ class AccountForm extends React.Component {
             <p>{errorMessage}</p>
             <form>
               <h3>General Information</h3>
-              <div className="form-group">
-                <label htmlFor="bankname">Name of bank</label>
-                <input type="text" ref="bankname" placeholder="Name of bank" required className="form-control" />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="iban">IBAN</label>
-                <input type="text" ref="iban" required className="form-control" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="bic">BIC</label>
-                <input type="text" ref="bic" required className="form-control" />
-              </div>
+              <TextInput for="bankname" label="Name of bank" value={data.bankname} onChange={this.handleChange} />
+              <TextInput for="iban" label="IBAN" value={data.iban} onChange={this.handleChange} />
+              <TextInput for="bic" label="BIC" value={data.bic} onChange={this.handleChange} />
 
               <hr />
               <h3>Box Configuartion</h3>
-              <div className="form-group">
-                <label htmlFor="name">Name</label>
-                <input type="text" ref="name" placeholder="Descriptive internal name" className="form-control" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="callback_url">Callback URL</label>
-                <input type="text" ref="callback_url" placeholder="Endpoint to receive webhooks" className="form-control" />
-              </div>
+              <TextInput for="name" label="Internal name" value={data.name} onChange={this.handleChange} />
+              <TextInput for="callback_url" label="Callback URL" value={data.callback_url} onChange={this.handleChange} />
 
               <hr />
               <h3>EBICS Setup</h3>
-              <div className="form-group">
-                <label htmlFor="creditor_identifier">Creditor ID</label>
-                <input type="text" ref="creditor_identifier" className="form-control" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="host">Host ID</label>
-                <input type="text" ref="host" className="form-control" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="partner">Partner ID</label>
-                <input type="text" ref="partner" className="form-control" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="user">User ID</label>
-                <input type="text" ref="user" className="form-control" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="url">URL</label>
-                <input type="text" ref="url" className="form-control" />
-              </div>
+              <TextInput for="creditor_identifier" label="Creditor ID" value={data.creditor_identifier} onChange={this.handleChange} />
+              <TextInput for="host" label="Host ID" value={data.host} onChange={this.handleChange} />
+              <TextInput for="partner" label="Partner" value={data.partner} onChange={this.handleChange} />
+              <TextInput for="user" label="User ID" value={data.user} onChange={this.handleChange} />
+              <TextInput for="url" label="Url" value={data.url} onChange={this.handleChange} />
               <div className="form-group">
                 <label htmlFor="mode">Mode</label>
-                <select ref="mode" id="mode" className="form-control">
+                <select ref="mode" name="mode" className="form-control" value={data.mode} onChange={this.handleChange}>
                   <option>File</option>
                   <option>Epics::Client</option>
                 </select>
