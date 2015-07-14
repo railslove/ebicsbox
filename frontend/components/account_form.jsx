@@ -44,7 +44,6 @@ class AccountForm extends React.Component {
 
   updateAndReturn(e) {
     e.preventDefault();
-    console.log(this.state.account);
     Api.updateAccount(this.props.params.id, this.state.account)
       .then(this.onSuccess)
       .catch(this.onError);
