@@ -1,6 +1,10 @@
 class Api {
   // Account api
 
+  static fetchAllAccounts() {
+    return this.get(`/accounts`)
+  }
+
   static fetchAccount(id) {
     return this.get(`/accounts/${id}`)
   }

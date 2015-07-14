@@ -1,6 +1,6 @@
 import React from 'react';
-import $ from 'jquery';
 import {Link} from 'react-router';
+import Api from '../models/api';
 
 class AccountsIndex extends React.Component {
 
@@ -14,9 +14,10 @@ class AccountsIndex extends React.Component {
   }
 
   componentDidMount() {
-    $.getJSON("/core/accounts", (result) => {
-      this.setState({accounts: result});
-    });
+    Api
+      .fetchAllAccounts()
+      .then((accounts) => this.setState({ accounts: accounts }))
+      .catch((error) => alert(`Could not load account! (${error.message})`))
   }
 
   render() {
