@@ -13,6 +13,6 @@ group :development, :test do
   gem 'database_cleaner'
   gem 'rspec'
   gem 'guard-rspec', require: false
-  gem 'airborne'
+  gem 'airborne', '0.1.15'
   gem 'webmock'
 end

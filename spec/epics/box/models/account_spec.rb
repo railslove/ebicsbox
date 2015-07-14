@@ -29,12 +29,6 @@ module Epics
       describe '#setup!' do
         let(:account) { Account.create(mode: 'File') }
 
-        it 'generates a random passphrase' do
-          account.update(passphrase: nil)
-          account.setup!
-          expect(account.passphrase).to_not be_nil
-        end
-
         it 'saves the keys' do
           account.update(key: nil)
           account.setup!

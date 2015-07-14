@@ -56,7 +56,7 @@ module Epics
 
         describe '.remote_records' do
           let(:keys) { JSON.parse(File.read('spec/fixtures/account.key')) }
-          let!(:account) { Account.create(key: JSON.dump(keys), passphrase: 'secret', user: 'EBIX', partner: 'EBICS', url: 'https://194.180.18.30/ebicsweb/ebicsweb', host: 'SIZBN001') }
+          let!(:account) { Account.create(key: JSON.dump(keys), user: 'EBIX', partner: 'EBICS', url: 'https://194.180.18.30/ebicsweb/ebicsweb', host: 'SIZBN001') }
 
           before do
             allow_any_instance_of(Epics::Client).to receive(:HAC).and_return(File.read('spec/fixtures/hac_cd1.xml'))
