@@ -37,12 +37,19 @@ module Epics
           end
         end
 
-        it 'stores new minimal accounts' do
-          expect {
+        context 'valid body' do
+          def do_request
             post 'accounts', { name: 'Test account', iban: 'my-iban', bic: 'my-iban' }
-          }.to change {
-            Account.count
-          }
+          end
+
+          it 'stores new minimal accounts' do
+            expect { do_request }.to change { Account.count }
+          end
+
+          it 'returns a 201 status' do
+            do_request
+            expect(response.status).to eq(201)
+          end
         end
       end
 

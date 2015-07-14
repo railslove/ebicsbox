@@ -61,6 +61,7 @@ module Epics
         post do
           if account = Account.create(params)
             account
+          else
             error!({ message: 'Failed to create account' }, 400)
           end
         end
