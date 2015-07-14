@@ -36,7 +36,6 @@ end
 DB = Sequel.connect(Epics::Box.configuration.database_url, max_connections: 10)
 
 require "epics/box/server"
-require "epics/box/admin"
 require "epics/box/worker"
 require "epics/box/queue"
 require "epics/box/models/account"

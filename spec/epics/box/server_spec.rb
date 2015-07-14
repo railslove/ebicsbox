@@ -45,6 +45,38 @@ module Epics
           }
         end
       end
+
+      describe 'PUT /accounts/:id' do
+        let(:account) { Account.create(name: 'name', iban: 'old-iban', bic: 'old-bic') }
+
+        context 'activated account' do
+          before { account.update(activated_at: 1.hour.ago) }
+
+          it 'cannot change iban' do
+            expect { put "accounts/#{account.iban}", { iban: 'new-iban' } }.to_not change { account.reload.iban }
+          end
+
+          it 'cannot change bic' do
+            expect { put "accounts/#{account.iban}", { bic: 'new-bic' } }.to_not change { account.reload.bic }
+          end
+
+          it 'ignores iban if it did not change' do
+            expect { put "accounts/#{account.iban}", { iban: 'old-iban', name: 'new name' } }.to change { account.reload.name }
+          end
+        end
+
+        context 'inactive account' do
+          before { account.update(activated_at: nil) }
+
+          it 'can change iban' do
+            expect { put "accounts/#{account.iban}", { iban: 'new-iban' } }.to change { account.reload.iban }
+          end
+
+          it 'can change iban' do
+            expect { put "accounts/#{account.iban}", { bic: 'new-bic' } }.to change { account.reload.bic }
+          end
+        end
+      end
     end
   end
 end

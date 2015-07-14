@@ -20,10 +20,6 @@ box = Rack::Builder.app do
     use Rack::Static, urls: [""], root: "public", index: "index.html"
   end
 
-  map "/core" do
-    run Epics::Box::Admin
-  end
-
   run Epics::Box::Server
 end
 

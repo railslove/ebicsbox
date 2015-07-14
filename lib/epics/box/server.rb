@@ -11,8 +11,22 @@ module Epics
 
       class UniqueAccount < Grape::Validations::Base
         def validate_param!(attr_name, params)
-          unless DB[:accounts].where(attr_name => params[attr_name]).count == 0
+          account = Account.first(attr_name => params[attr_name])
+
+          adding_duplicate_iban = account.present? && params[:id].blank?
+          changing_to_duplicate_iban = account.present? && params[:id].present? && params[:id] != account.iban
+
+          if adding_duplicate_iban || changing_to_duplicate_iban
             raise Grape::Exceptions::Validation, params: [@scope.full_name(attr_name)], message: "must be unique"
+          end
+        end
+      end
+
+      class ActiveAccount < Grape::Validations::Base
+        def validate_param!(attr_name, params)
+          account = Account.first!(iban: params[:id])
+          if account.iban != params[:iban] && account.active?
+            raise Grape::Exceptions::Validation, params: [@scope.full_name(attr_name)], message: "cannot be changed on active account"
           end
         end
       end
@@ -31,7 +45,7 @@ module Epics
 
       resource :accounts do
         params do
-          requires :name, type: String, allow_blank: false, desc: 'Internal description of account'
+          requires :name, type: String, unique_account: true, allow_blank: false, desc: 'Internal description of account'
           requires :iban, type: String, unique_account: true, allow_blank: false, desc: 'IBAN'
           requires :bic, type: String, allow_blank: false, desc: 'BIC'
           optional :bankname, type: String, desc: 'Name of bank (for internal purposes)'
@@ -47,21 +61,37 @@ module Epics
         post do
           if account = Account.create(params)
             account
-          else
-            error!({ message: 'Failed to create account', errors: account.errors }, 400)
+            error!({ message: 'Failed to create account' }, 400)
           end
+        end
+
+        get do
+          Account.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
         end
 
         get ':id' do
           Account.first!({ iban: params[:id] })
         end
 
+        params do
+          optional :name, type: String, unique_account: true, allow_blank: false, desc: 'Internal description of account'
+          optional :iban, type: String, unique_account: true, active_account: false, allow_blank: false, desc: 'IBAN'
+          optional :bic, type: String, active_account: false, allow_blank: false, desc: 'BIC'
+          optional :bankname, type: String, desc: 'Name of bank (for internal purposes)'
+          optional :creditor_identifier, type: String, desc: 'creditor_identifier'
+          optional :callback_url, type: String, desc: 'callback_url'
+          optional :host, type: String, desc: 'host'
+          optional :partner, type: String, desc: 'partner'
+          optional :user, type: String, desc: 'user'
+          optional :url, type: String, desc: 'url'
+          optional :mode, type: String, desc: 'mode'
+        end
         put ':id' do
           account = Account.find(iban: params[:id])
-          if account.update(params.slice("name", "bankname", "creditor_identifier", "callback_url", "host", "partner", "user", "url", "key", "passphrase", "mode", "ini_letter"))
+          if account.save(params.except('id'))
             account
           else
-             error!({ message: 'Failed to update account', errors: account.errors }, 400)
+            error!({ message: 'Failed to update account' }, 400)
           end
         end
       end

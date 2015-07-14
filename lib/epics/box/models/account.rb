@@ -1,5 +1,7 @@
 require 'securerandom'
 class Epics::Box::Account < Sequel::Model
+  self.raise_on_save_failure = true
+
   one_to_many :statements
   one_to_many :transactions
 
