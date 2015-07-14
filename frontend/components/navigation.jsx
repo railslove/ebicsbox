@@ -18,7 +18,6 @@ class Navigation extends React.Component {
           </div>
           <div id="navbar" className="navbar-collapse collapse">
             <ul className="nav navbar-nav">
-              <li><a href="#">Dashboard</a></li>
               <li><a href="#accounts">Accounts</a></li>
             </ul>
           </div>

@@ -12,7 +12,7 @@ import AccountEbics from './components/account_ebics';
 
 
 var Router = require('react-router');
-var Route = Router.Route;
+var {Route, Redirect} = Router;
 var RouteHandler = Router.RouteHandler;
 
 class App extends React.Component {
@@ -28,7 +28,7 @@ class App extends React.Component {
 
 var routes = (
   <Route handler={App}>
-    <Route path="/" handler={Dashboard} />
+    <Redirect from="/" to="account-index" />
     <Route name="new-account" path="/accounts/new" handler={AccountForm} />
     <Route name="edit-account" path="/accounts/:id/edit" handler={AccountForm} />
     <Route name="edit-account-ebics" path="/accounts/:id/edit/ebics" handler={AccountEbics} />
