@@ -19,6 +19,10 @@ class Api {
       .then(this.json);
   }
 
+  static fetchAccountStatements(id) {
+    return this.get(`/${id}/statements`)
+  }
+
   // generic api methods
 
   static post(path, data) {

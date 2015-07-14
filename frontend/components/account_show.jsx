@@ -1,5 +1,6 @@
 import React from 'react';
 import $ from 'jquery';
+import Api from '../models/api';
 
 class StatementRow extends React.Component {
   render() {
@@ -29,14 +30,13 @@ class AccountShow extends React.Component {
   }
 
   loadData() {
-    var iban = this.props.params.id;
-    $.get(`/core/accounts/${iban}.json`, data => {
-      this.setState({ account: data });
-    });
+    var id = this.props.params.id;
+    Api
+      .fetchAccount(id)
+      .then((data) => { this.setState({ account: data }) });
 
-    $.get(`/${iban}/statements`, data => {
-      this.setState({ statements: data });
-    });
+    Api.fetchAccountStatements(id)
+      .then((data) => { this.setState({ statements: data }) });
   }
 
   render() {
