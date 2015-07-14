@@ -11,6 +11,10 @@ class AccountEbics extends React.Component {
     this.state = { errorMessage: null, loading: true, account: {} };
 
     this.cancel = this.cancel.bind(this);
+    this.updateAndReturn = this.updateAndReturn.bind(this);
+    this.onError = this.onError.bind(this);
+    this.onSuccess = this.onSuccess.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
 
   componentWillMount() {
@@ -19,6 +23,12 @@ class AccountEbics extends React.Component {
         .fetchAccount(this.props.params.id)
         .then((data) => this.setState({ loading: false, account: data }));
     }
+  }
+
+  handleChange(event) {
+    var account = this.state.account;
+    account[event.target.name] = event.target.value;
+    this.setState({ account: account });
   }
 
   renderLoading() {
@@ -30,6 +40,22 @@ class AccountEbics extends React.Component {
   cancel(e) {
     e.preventDefault();
     this.context.router.transitionTo('account-index');
+  }
+
+  updateAndReturn(e) {
+    e.preventDefault();
+    Api
+      .updateAccount(this.props.params.id, this.state.account)
+      .then(this.onSuccess)
+      .catch(this.onError);
+  }
+
+  onError(errorMessage) {
+    this.setState({ errorMessage: errorMessage.message });
+  }
+
+  onSuccess(responseData) {
+    this.context.router.transitionTo('submit-account', { id: this.props.params.id });
   }
 
   renderForm() {
@@ -47,7 +73,7 @@ class AccountEbics extends React.Component {
               <TextInput for="partner" label="Partner ID" value={data.partner} onChange={this.handleChange} />
               <TextInput for="host" label="Host ID" value={data.host} onChange={this.handleChange} help="Unique identifier for your bank" />
               <TextInput for="url" label="Server Url" value={data.url} onChange={this.handleChange} help="Your bank's EBICS server URL" />
-              <input type="submit" className="btn btn-primary" value="Save and continue" />
+              <input type="submit" className="btn btn-primary" value="Save and continue" onClick={this.updateAndReturn} />
               {' or '}
               <a href="#" onClick={this.cancel}>cancel</a>
             </form>

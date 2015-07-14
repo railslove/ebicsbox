@@ -22,13 +22,19 @@ class AccountsIndex extends React.Component {
 
   render() {
     var accounts = this.state.accounts.map(function(account, i) {
-      var activated = (account.activated_at != undefined);
-      var cssClass = activated ? 'panel-default' : 'panel-danger';
+      var cssClass = 'panel-danger';
       var actionButton;
-      if(activated) {
-        actionButton = <Link to="account" params={{id: account.iban}} className="btn btn-primary btn-sm">Show details</Link>;
-      } else {
-        actionButton = <Link to="edit-account-ebics" params={{id: account.iban}} className="btn btn-default btn-sm">Setup</Link>;
+      switch(account.state){
+        case 'active':
+          cssClass = 'panel-default';
+          actionButton = <Link to="account" params={{id: account.iban}} className="btn btn-primary btn-sm">Show details</Link>;
+          break;
+        case 'ready_to_submit':
+          actionButton = <Link to="submit-account" params={{id: account.iban}} className="btn btn-default btn-sm">Submit INI Letter</Link>;
+          break;
+        case 'needs_ebics_data':
+          actionButton = <Link to="edit-account-ebics" params={{id: account.iban}} className="btn btn-default btn-sm">Enter EBICS config</Link>;
+          break;
       }
       return (
         <li key={account.iban} className="col-xs-12 col-sm-6 col-lg-4">
