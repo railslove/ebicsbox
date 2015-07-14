@@ -14,9 +14,7 @@ class Api {
   }
 
   static updateAccount(id, data) {
-    return fetch(`/accounts/${id}`, { method: 'put', headers: this.headers, body: JSON.stringify(data) })
-      .then(this.status)
-      .then(this.json);
+    return this.put(`/accounts/${id}`, data)
   }
 
   static fetchAccountStatements(id) {
@@ -27,6 +25,12 @@ class Api {
 
   static post(path, data) {
     return fetch(path, { method: 'post', headers: this.headers, body: JSON.stringify(data) })
+      .then(this.status)
+      .then(this.json);
+  }
+
+  static put(path, data) {
+    return fetch(path, { method: 'put', headers: this.headers, body: JSON.stringify(data) })
       .then(this.status)
       .then(this.json);
   }
