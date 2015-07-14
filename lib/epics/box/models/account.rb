@@ -7,6 +7,10 @@ class Epics::Box::Account < Sequel::Model
     select(:id).all.map(&:id)
   end
 
+  def passphrase
+    Epics::Box.configuration.db_passphrase
+  end
+
   def client
     @client ||= client_adapter.new(key, passphrase, url, host, user, partner)
   end
@@ -41,7 +45,6 @@ class Epics::Box::Account < Sequel::Model
     # TODO: validate all fields are present
     # TODO: handle exceptions
     Epics::Box.logger.info("setting up EBICS keys for account #{self.id}")
-    self.passphrase ||= SecureRandom.hex(16)
     epics = client_adapter.setup(self.passphrase, self.url, self.host, self.user, self.partner)
     self.key = epics.send(:dump_keys)
     self.save
