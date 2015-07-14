@@ -104,7 +104,7 @@ module Epics
 
           context 'no transaction could be found' do
             it 'does not trigger a webhook' do
-              expect(Queue).to_not receive(:trigger_webhook)
+              expect(Event).to_not receive(:statement_created)
               exec_link_action
             end
           end
@@ -120,8 +120,8 @@ module Epics
                 exec_link_action
               end
 
-              it 'triggers a webhook' do
-                expect(Queue).to receive(:trigger_webhook)
+              skip 'triggers a webhook' do
+                expect(Event).to receive(:statement_created)
                 exec_link_action
               end
             end
@@ -135,7 +135,7 @@ module Epics
               end
 
               it 'triggers a webhook' do
-                expect(Queue).to receive(:trigger_webhook)
+                expect(Queue).to receive(:trigger_webhook).at_least(:once)
                 exec_link_action
               end
             end

@@ -3,9 +3,10 @@ module Epics
     module Jobs
       RSpec.describe Debit do
         describe '.process!' do
-          let(:transaction) { double('Transaction', execute!: true, id: 1) }
+          let(:transaction) { double('Transaction', execute!: true, id: 1, to_webhook_payload: {}) }
           let(:message) do
             {
+              amount: 100,
               instrument: 'CORE',
               eref: '123',
               account_id: 321,
@@ -22,6 +23,11 @@ module Epics
           it 'creates a transaction' do
             described_class.process!(message)
             expect(Transaction).to have_received(:create)
+          end
+
+          it 'sets correct amount' do
+            described_class.process!(message)
+            expect(Transaction).to have_received(:create).with(hash_including(amount: 100))
           end
 
           it 'sets valid order type based on used instrument' do

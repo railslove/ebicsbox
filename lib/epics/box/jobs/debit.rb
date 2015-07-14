@@ -10,6 +10,7 @@ module Epics
 
         def self.process!(message)
           transaction = Epics::Box::Transaction.create(
+            amount: message[:amount],
             type: "debit",
             order_type: INSTRUMENT_MAPPING[message[:instrument]],
             account_id: message[:account_id],
@@ -19,6 +20,7 @@ module Epics
           )
 
           transaction.execute!
+          Event.debit_created(transaction.to_webhook_payload)
           Queue.update_processing_status(message[:account_id])
 
           Box.logger.info("[Jobs::Debit] Created debit! transaction_id=#{transaction.id}")

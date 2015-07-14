@@ -33,6 +33,16 @@ In development, run it with
 
 ## Configuration
 
+### Generate a secret token
+
+In order to ensure that webhooks are originating from your EbicsBox and have not been modified, we
+sign each webhook with a predefined secret. Each box should have a unique secret key. In order to
+generate one, you can use the following command:
+
+```bash
+  ruby -rsecurerandom -e 'puts SecureRandom.hex(20)'
+```
+
 ## Usage
 ### HTTP
 

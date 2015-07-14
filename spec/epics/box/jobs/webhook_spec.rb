@@ -2,34 +2,20 @@ module Epics
   module Box
     module Jobs
       RSpec.describe Webhook do
-        let(:account) { Account.create name: 'Testaccount' }
+        let(:event) { Event.create }
 
         describe '.process!' do
-          context 'webhook url configured for account' do
-            before do
-              account.update callback_url: 'http://localhost/test_me'
-              @webhook_request = stub_request(:any, "http://localhost/test_me").to_return(status: 200, body: 'ok')
-            end
-
-            it 'triggers a webhook request with provided payload' do
-              payload = 'Some data'
-              described_class.process!(account_id: account.id, payload: payload)
-              expect(@webhook_request.with(body: payload)).to have_been_requested
-            end
-
-            it 'logs an info message with response code' do
-              expect(Box.logger).to receive(:info).with("[Jobs::Webhook] Callback triggered: 200 ok account_id=#{account.id}")
-              described_class.process!(account_id: account.id)
-            end
+          before do
+            allow(WebhookDelivery).to receive(:deliver).with(instance_of(Event)).and_call_original
           end
 
-          context 'no webhook url configured' do
-            before { account.update callback_url: nil }
+          it 'triggers a webhook request for given event' do
+            described_class.process!(event_id: event.id)
+            expect(WebhookDelivery).to have_received(:deliver).with(instance_of(Event))
+          end
 
-            it 'logs an info message about missing url' do
-              expect(Box.logger).to receive(:info).with("[Jobs::Webhook] No callback configured for Testaccount. account_id=#{account.id}")
-              described_class.process!(account_id: account.id)
-            end
+          it 'logs an info message with response code' do
+            expect { described_class.process!(event_id: event.id) }.to have_logged_message("Attempt to deliver a webhook")
           end
         end
       end

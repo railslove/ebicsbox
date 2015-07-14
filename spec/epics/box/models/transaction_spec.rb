@@ -2,6 +2,24 @@ module Epics
   module Box
     module Models
       RSpec.describe Transaction do
+        describe '#set_state_from' do
+          context 'status changed' do
+            skip 'triggers a changed event' do
+              subject.status = 'created'
+              expect(Event).to receive(:transaction_updated)
+              subject.set_state_from 'file_upload'
+            end
+          end
+
+          context 'status did not change' do
+            it 'does not trigger a changed event' do
+              subject.status = 'created'
+              expect(Event).to_not receive(:transaction_updated)
+              subject.set_state_from 'test'
+            end
+          end
+        end
+
         describe '#execute!' do
           subject(:account) { Account.create }
           subject(:transaction) { described_class.create(account_id: account.id, order_type: 'test', payload: 'my-pain') }
