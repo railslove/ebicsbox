@@ -88,7 +88,8 @@ module Epics
         end
         put ':id' do
           account = Account.find(iban: params[:id])
-          if account.save(params.except('id'))
+          account.set(params.except('id'))
+          if !account.modified? || account.save
             account
           else
             error!({ message: 'Failed to update account' }, 400)
