@@ -51,6 +51,16 @@ class Epics::Box::Account < Sequel::Model
     [user, url, partner, host].all?(&:present?)
   end
 
+  def state
+    if active?
+      'active'
+    elsif ebics_data?
+      'ready_to_submit'
+    else
+      'needs_ebics_data'
+    end
+  end
+
   def setup!(reset = false)
     fail(AlreadyActivated) if !ini_letter.nil? && !reset
     fail(IncompleteEbicsData) unless ebics_data?

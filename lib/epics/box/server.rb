@@ -1,3 +1,5 @@
+require 'epics/box/presenters/manage_account_presenter'
+
 module Epics
   module Box
     class Server < Grape::API
@@ -60,18 +62,20 @@ module Epics
         desc 'Add a new account'
         post do
           if account = Account.create(params)
-            account
+            present account, with: ManageAccountPresenter
           else
             error!({ message: 'Failed to create account' }, 400)
           end
         end
 
         get do
-          Account.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
+          accounts = Account.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
+          present accounts, with: ManageAccountPresenter
         end
 
         get ':id' do
-          Account.first!({ iban: params[:id] })
+          account = Account.first!({ iban: params[:id] })
+          present account, with: ManageAccountPresenter
         end
 
         params do
@@ -89,9 +93,9 @@ module Epics
         end
         put ':id' do
           account = Account.find(iban: params[:id])
-          account.set(params.except('id'))
+          account.set(params.except('id', 'state'))
           if !account.modified? || account.save
-            account
+            present account, with: ManageAccountPresenter
           else
             error!({ message: 'Failed to update account' }, 400)
           end
