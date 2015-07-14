@@ -27,7 +27,23 @@ module Epics
       end
 
       describe '#setup!' do
-        let(:account) { Account.create(mode: 'File') }
+        let(:account) { Account.create(mode: 'File', user: 'user', host: 'host', url: 'url', partner: 'partner') }
+
+        context 'incomplete ebics data' do
+          before { account.update(user: nil) }
+
+          it 'fails to submit' do
+            expect { account.setup! }.to raise_error(Account::IncompleteEbicsData)
+          end
+        end
+
+        context 'ini already sent' do
+          before { account.update(ini_letter: 'some data') }
+
+          it 'fails if reset flag is not set' do
+            expect { account.setup! }.to raise_error(Account::AlreadyActivated)
+          end
+        end
 
         it 'saves the keys' do
           account.update(key: nil)
