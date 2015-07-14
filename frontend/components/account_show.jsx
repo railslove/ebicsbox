@@ -47,9 +47,9 @@ class AccountShow extends React.Component {
 
     return (
       <div className="container">
-      <div className="page-header">
-        <h1>Account Details <small>{account.name}</small></h1>
-      </div>
+        <div className="page-header">
+          <h1>Account Details <small>{account.name}</small></h1>
+        </div>
         <div className="row">
           <div className="col-sm-4 col-md-3">
             <dl>
