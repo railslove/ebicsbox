@@ -17,6 +17,10 @@ class Api {
     return this.put(`/accounts/${id}`, data)
   }
 
+  static submitAccount(id) {
+    return this.put(`/accounts/${id}/submit`)
+  }
+
   static fetchAccountStatements(id) {
     return this.get(`/${id}/statements`)
   }
@@ -45,7 +49,7 @@ class Api {
     if (response.status >= 200 && response.status < 300) {
       return response
     }
-    return response.json().then((data) => { throw new Error(data.error) });
+    return response.json().then((data) => { throw new Error(data.error || data.message) });
   }
 
   static json(response) {

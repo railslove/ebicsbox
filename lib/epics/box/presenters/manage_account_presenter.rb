@@ -21,6 +21,7 @@ module Epics
 
       # Meta data
       expose :activated_at
+      expose :submitted_at
       expose :state
     end
   end

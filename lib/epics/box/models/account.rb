@@ -54,6 +54,8 @@ class Epics::Box::Account < Sequel::Model
   def state
     if active?
       'active'
+    elsif submitted_at.present?
+      'submitted'
     elsif ebics_data?
       'ready_to_submit'
     else

@@ -78,6 +78,19 @@ module Epics
           present account, with: ManageAccountPresenter
         end
 
+        put ':id/submit' do
+          begin
+            account = Account.first!({ iban: params[:id] })
+            account.setup!
+          rescue Account::AlreadyActivated => ex
+            error!({ message: "Account is already activated" }, 400)
+          rescue Account::IncompleteEbicsData => ex
+            error!({ message: "Incomplete EBICS setup" }, 400)
+          rescue => ex
+            error!({ message: "unknown failure" }, 400)
+          end
+        end
+
         params do
           optional :name, type: String, unique_account: true, allow_blank: false, desc: 'Internal description of account'
           optional :iban, type: String, unique_account: true, active_account: false, allow_blank: false, desc: 'IBAN'

@@ -29,6 +29,10 @@ class AccountsIndex extends React.Component {
           cssClass = 'panel-default';
           actionButton = <Link to="account" params={{id: account.iban}} className="btn btn-primary btn-sm">Show details</Link>;
           break;
+        case 'submitted':
+          cssClass = 'panel-warning';
+          actionButton = <Link to="submit-account" params={{id: account.iban}} className="btn btn-warning btn-sm">Waiting</Link>;
+          break;
         case 'ready_to_submit':
           actionButton = <Link to="submit-account" params={{id: account.iban}} className="btn btn-default btn-sm">Submit INI Letter</Link>;
           break;
