@@ -28,7 +28,7 @@ class AccountsIndex extends React.Component {
       if(activated) {
         actionButton = <Link to="account" params={{id: account.iban}} className="btn btn-primary btn-sm">Show details</Link>;
       } else {
-        actionButton = <Link to="account" params={{id: account.iban}} className="btn btn-default btn-sm">Activate</Link>;
+        actionButton = <Link to="edit-account-ebics" params={{id: account.iban}} className="btn btn-default btn-sm">Setup</Link>;
       }
       return (
         <li key={account.iban} className="col-xs-12 col-sm-6 col-lg-4">

@@ -8,6 +8,7 @@ import Dashboard from './components/dashboard';
 import AccountsIndex from './components/accounts_index';
 import AccountShow from './components/account_show';
 import AccountForm from './components/account_form';
+import AccountEbics from './components/account_ebics';
 
 
 var Router = require('react-router');
@@ -30,6 +31,7 @@ var routes = (
     <Route path="/" handler={Dashboard} />
     <Route name="new-account" path="/accounts/new" handler={AccountForm} />
     <Route name="edit-account" path="/accounts/:id/edit" handler={AccountForm} />
+    <Route name="edit-account-ebics" path="/accounts/:id/edit/ebics" handler={AccountEbics} />
     <Route name="account" path="/accounts/:id" handler={AccountShow} />
     <Route name="account-index" path="/accounts" handler={AccountsIndex} />
   </Route>
