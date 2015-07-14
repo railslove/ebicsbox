@@ -1,0 +1,17 @@
+#!/bin/bash
+
+bin/migrate
+
+if [ "$1" = "server" ]; then
+  /usr/local/bundle/bin/bundle exec trinidad --config config/trinidad.yml
+fi
+
+if [ "$1" = "clock" ]; then
+  /usr/local/bundle/bin/bundle exec clockwork lib/epics/scheduler/scheduler.rb
+fi
+
+if [ "$1" = "worker" ]; then
+  /usr/local/bin/ruby -Ilib -repics/box -eEpics::Box::Worker.new.process!
+fi
+
+exit 1

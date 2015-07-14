@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+
+require 'sequel'
+
+tries = 10
+
+while(true) do
+  begin
+    DB ||= Sequel.connect(ENV['DATABASE_URL'], max_connections: 10)
+    Sequel.extension :migration, :core_extensions
+
+    version = Sequel::Migrator.run(DB, File.join( File.dirname(__FILE__),  '../migrations/'), use_transactions: true)
+    puts "migrated to: #{version}"
+
+    break
+  rescue Exception => e
+    puts e.message
+    tries -= 1
+    if tries > 0
+      sleep 2
+      retry
+    else
+      puts "Oh Noes! Waited too long"
+      exit(1)
+    end
+  end
+end
