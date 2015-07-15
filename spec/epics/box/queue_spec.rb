@@ -69,16 +69,16 @@ module Epics
 
         context 'can schedule immidiate check' do
           it 'puts a new message onto the activation queue' do
-            expect { described_class.check_account_activation(1, delayed: false) }.to change { tube.peek(:ready) }
+            expect { described_class.check_account_activation(1, false) }.to change { tube.peek(:ready) }
           end
 
           it 'puts only provided account id onto job' do
-            described_class.check_account_activation(1, delayed: false)
+            described_class.check_account_activation(1, false)
             expect(tube.peek(:ready).body).to eq(account_id: 1)
           end
 
           it 'does not put anything on delayed execution tube' do
-            expect { described_class.check_account_activation(1, delayed: false) }.to_not change { tube.peek(:delayed) }
+            expect { described_class.check_account_activation(1, false) }.to_not change { tube.peek(:delayed) }
           end
         end
       end

@@ -52,7 +52,7 @@ module Epics
         client.tubes[DEBIT_TUBE].put(payload)
       end
 
-      def self.check_account_activation(account_id, delayed: true)
+      def self.check_account_activation(account_id, delayed = true)
         options = delayed ? { delay: Epics::Box.configuration.activation_check_interval } : {}
         client.tubes[ACTIVATION_TUBE].put({ account_id: account_id }, options)
       end
