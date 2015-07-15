@@ -23,16 +23,13 @@
   <label for="url"/>URL</label>
   <input type="text" name="url" id="url" value="<%= @account.url %>" required/>
   <br/>
-  <label for="passphrase"/>passphrase</label>
-  <input type="password" name="passphrase" id="passphrase" value="<%= @account.passphrase %>" required/>
-  <br/>
   <label for="key"/>key</label>
   <textarea name="key" id="key"> <%= @account.key %> </textarea>
   <br/>
   <label for="mode"/>Mode</label>
   <select name="mode" id="mode">
-    <option>File</option>
-    <option>Epics::Client</option>
+    <option <%= @account.mode == 'File' ? 'selected' : '' %> >Test</option>
+    <option <%= @account.mode == 'Epics::Client' ? 'selected' : '' %> >Epics::Client</option>
   </select>
   <br/>
   <hr/>

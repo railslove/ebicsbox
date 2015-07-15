@@ -1,4 +1,5 @@
 <h1>a letter for your bank</h1>
 
-<button onclick="window.frames['letter-frame'].print()">print</button>
 <iframe src="/admin/accounts/ini_letter/<%= @account.id %>/letter" id="letter-frame" name="letter-frame"></iframe>
+<button onclick="window.frames['letter-frame'].print()">print</button>
+| <a href="/admin/accounts">back</a>

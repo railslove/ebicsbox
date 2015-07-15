@@ -15,11 +15,13 @@
     <% if account.active? %>
       <%= account.active? %>
     <% elsif account.ini_letter %>
-      <form action="/admin/accounts/activate/<%= account.id %>" method = "post">
+      <form style="display:initial;" action="/admin/accounts/activate/<%= account.id %>" method="post">
         <input type="submit" value="Activate" />
       </form>
     <% else %>
-      <a href="/admin/accounts/setup/<%= account.id %>">Setup</a>
+      <form style="display:initial;" action="/admin/accounts/setup/<%= account.id %>" method="post">
+        <input type="submit" value="Setup" />
+      </form>
     <% end %>
     |
     <a href="/admin/accounts/edit/<%= account.id %>">Edit</a>
