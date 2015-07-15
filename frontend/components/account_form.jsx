@@ -7,7 +7,14 @@ class AccountForm extends React.Component {
     super(props);
 
     // Set initial state
-    this.state = { errorMessage: null, editing: false, account: {}, continueToEbics: false, running: false };
+    this.state = {
+      errorMessage: null,
+      editing: false,
+      account: {},
+      continueToEbics: false,
+      running: false,
+      fakeAccount: false
+    };
 
     // Bind local methods
     this.create = this.create.bind(this);
@@ -16,6 +23,7 @@ class AccountForm extends React.Component {
     this.onSuccess = this.onSuccess.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.changeReturn = this.changeReturn.bind(this);
+    this.changeFake = this.changeFake.bind(this);
   }
 
   componentWillMount() {
@@ -30,7 +38,9 @@ class AccountForm extends React.Component {
   create(e) {
     e.preventDefault();
     this.setState({ running: true });
-    Api.createAccount(this.state.account)
+    var data = this.state.account;
+    if(this.state.fakeAccount) { data.mode = 'File' }
+    Api.createAccount(data)
       .then(this.onSuccess)
       .catch(this.onError);
   }
@@ -65,6 +75,10 @@ class AccountForm extends React.Component {
     this.setState({ continueToEbics: event.target.value == '1' });
   }
 
+  changeFake() {
+    this.setState({ fakeAccount: event.target.value == '1' })
+  }
+
   render() {
     var data = this.state.account;
     var header = this.state.editing ? `Edit account „${data.name}”` : 'Add a new account';
@@ -81,10 +95,26 @@ class AccountForm extends React.Component {
           <label>Did you already receive your EBICS credentials?</label>
           <br/>
           <label className="radio-inline">
-            <input type="radio" name="inlineRadioOptions" value="0" checked={this.state.continueToEbics == false} onChange={this.changeReturn} /> no
+            <input type="radio" name="continueToEbics" value="0" checked={this.state.continueToEbics == false} onChange={this.changeReturn} /> no
           </label>
           <label className="radio-inline">
-            <input type="radio" name="inlineRadioOptions" value="1" checked={this.state.continueToEbics == true} onChange={this.changeReturn} /> yes
+            <input type="radio" name="continueToEbics" value="1" checked={this.state.continueToEbics == true} onChange={this.changeReturn} /> yes
+          </label>
+        </div>
+      )
+    }
+
+    var fakeAccount;
+    if(!this.state.editing) {
+      fakeAccount = (
+        <div className="form-group">
+          <label>Should we create fake account for testing purposes?</label>
+          <br/>
+          <label className="radio-inline">
+            <input type="radio" name="fakeAccount" value="0" checked={this.state.fakeAccount == false} onChange={this.changeFake} /> no
+          </label>
+          <label className="radio-inline">
+            <input type="radio" name="fakeAccount" value="1" checked={this.state.fakeAccount == true} onChange={this.changeFake} /> yes
           </label>
         </div>
       )
@@ -111,6 +141,7 @@ class AccountForm extends React.Component {
               <TextInput for="creditor_identifier" label="Creditor ID" value={data.creditor_identifier} onChange={this.handleChange} help="(Optional) Add if you want to perform direct debits." />
               <TextInput for="callback_url" label="WebHooks URL" value={data.callback_url} onChange={this.handleChange} help="The URL to which the box delivers update notifications." />
               {continueBlock}
+              {fakeAccount}
               {actionButtons}
             </form>
           </div>
