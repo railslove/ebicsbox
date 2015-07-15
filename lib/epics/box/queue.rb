@@ -5,6 +5,7 @@ require 'epics/box/jobs/debit'
 require 'epics/box/jobs/fetch_processing_status'
 require 'epics/box/jobs/fetch_statements'
 require 'epics/box/jobs/webhook'
+require 'epics/box/jobs/check_activation'
 
 Beaneater.configure do |config|
   config.job_parser = lambda { |body| JSON.parse(body, symbolize_names: true) }
@@ -19,6 +20,7 @@ module Epics
       ORDER_TUBE = 'check.orders'
       STA_TUBE = 'sta'
       WEBHOOK_TUBE = 'web'
+      ACTIVATION_TUBE = 'check.activation'
 
       attr_accessor :logger
 
@@ -50,6 +52,11 @@ module Epics
         client.tubes[DEBIT_TUBE].put(payload)
       end
 
+      def self.check_account_activation(account_id, delayed: true)
+        options = delayed ? { delay: Epics::Box.configuration.activation_check_interval } : {}
+        client.tubes[ACTIVATION_TUBE].put({ account_id: account_id }, options)
+      end
+
 
       def initialize
         self.logger ||= Box.logger
@@ -65,6 +72,7 @@ module Epics
         register(ORDER_TUBE, Jobs::FetchProcessingStatus)
         register(STA_TUBE, Jobs::FetchStatements)
         register(WEBHOOK_TUBE, Jobs::Webhook)
+        register(ACTIVATION_TUBE, Jobs::CheckActivation)
         DB.extension(:connection_validator)
         DB.pool.connection_validation_timeout = -1
         self.class.client.jobs.process!

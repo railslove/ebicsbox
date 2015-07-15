@@ -13,6 +13,10 @@ module Epics
         120 # seconds
       end
 
+      def activation_check_interval
+        60 * 60 * 24 # seconds
+      end
+
       def secret_token
         if token = ENV['SECRET_TOKEN']
           token

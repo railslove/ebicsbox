@@ -62,6 +62,11 @@ module Epics
           expect_any_instance_of(Epics::Box::Account::File).to receive(:HIA)
           account.setup!
         end
+
+        it 'queues an account activation job' do
+          expect(Epics::Box::Queue).to receive(:check_account_activation).with(account.id)
+          account.setup!
+        end
       end
 
       describe '#activate' do
