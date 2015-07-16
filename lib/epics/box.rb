@@ -40,7 +40,6 @@ Sequel.extension :pg_json
 DB.extension :pg_json
 
 require "epics/box/server"
-require "epics/box/admin"
 require "epics/box/worker"
 require "epics/box/queue"
 require "epics/box/models/account"
@@ -48,3 +47,4 @@ require "epics/box/models/statement"
 require "epics/box/models/transaction"
 require "epics/box/presenters/transaction_presenter"
 require "epics/box/presenters/statement_presenter"
+require "epics/box/presenters/account_presenter"

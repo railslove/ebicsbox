@@ -27,7 +27,23 @@ module Epics
       end
 
       describe '#setup!' do
-        let(:account) { Account.create(mode: 'File') }
+        let(:account) { Account.create(mode: 'File', user: 'user', host: 'host', url: 'url', partner: 'partner') }
+
+        context 'incomplete ebics data' do
+          before { account.update(user: nil) }
+
+          it 'fails to submit' do
+            expect { account.setup! }.to raise_error(Account::IncompleteEbicsData)
+          end
+        end
+
+        context 'ini already sent' do
+          before { account.update(ini_letter: 'some data') }
+
+          it 'fails if reset flag is not set' do
+            expect { account.setup! }.to raise_error(Account::AlreadyActivated)
+          end
+        end
 
         it 'saves the keys' do
           account.update(key: nil)
@@ -44,6 +60,11 @@ module Epics
         it 'calls INI and HIA' do
           expect_any_instance_of(Epics::Box::Account::File).to receive(:INI)
           expect_any_instance_of(Epics::Box::Account::File).to receive(:HIA)
+          account.setup!
+        end
+
+        it 'queues an account activation job' do
+          expect(Epics::Box::Queue).to receive(:check_account_activation).with(account.id)
           account.setup!
         end
       end

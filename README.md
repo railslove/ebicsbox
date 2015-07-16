@@ -27,6 +27,10 @@ Run it:
 
     $ foreman start
 
+In development, run it with
+
+    $ foreman start -f Procfile.dev
+
 ## Configuration
 
 ### Generate a secret token

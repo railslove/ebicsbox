@@ -17,8 +17,9 @@ box = Rack::Builder.app do
   use Epics::Box::Middleware::ConnectionValidator, DB
 
   map "/admin" do
-    run Epics::Box::Admin
+    use Rack::Static, urls: [""], root: "public", index: "index.html"
   end
+
   run Epics::Box::Server
 end
 

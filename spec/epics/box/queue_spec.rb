@@ -10,6 +10,7 @@ module Epics
         client.tubes[Queue::ORDER_TUBE].clear
         client.tubes[Queue::STA_TUBE].clear
         client.tubes[Queue::WEBHOOK_TUBE].clear
+        client.tubes[Queue::ACTIVATION_TUBE].clear
       end
 
       around do |example|
@@ -45,6 +46,40 @@ module Epics
           accounts = Array.new(3).map { Account.create }
           described_class.fetch_account_statements
           expect(tube.peek(:ready).body).to eq(account_ids: accounts.map(&:id))
+        end
+      end
+
+      describe '.check_account_activation' do
+        let(:tube) { client.tubes[Queue::ACTIVATION_TUBE] }
+
+        context 'delay check by default' do
+          it 'puts a new message onto the activation queue' do
+            expect { described_class.check_account_activation(1) }.to change { tube.peek(:delayed) }
+          end
+
+          it 'puts only provided account id onto job' do
+            described_class.check_account_activation(1)
+            expect(tube.peek(:delayed).body).to eq(account_id: 1)
+          end
+
+          it 'does not put anything on immediate execution tube' do
+            expect { described_class.check_account_activation(1) }.to_not change { tube.peek(:ready) }
+          end
+        end
+
+        context 'can schedule immidiate check' do
+          it 'puts a new message onto the activation queue' do
+            expect { described_class.check_account_activation(1, false) }.to change { tube.peek(:ready) }
+          end
+
+          it 'puts only provided account id onto job' do
+            described_class.check_account_activation(1, false)
+            expect(tube.peek(:ready).body).to eq(account_id: 1)
+          end
+
+          it 'does not put anything on delayed execution tube' do
+            expect { described_class.check_account_activation(1, false) }.to_not change { tube.peek(:delayed) }
+          end
         end
       end
 

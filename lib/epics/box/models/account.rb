@@ -1,5 +1,11 @@
 require 'securerandom'
 class Epics::Box::Account < Sequel::Model
+
+  AlreadyActivated = Class.new(StandardError)
+  IncompleteEbicsData = Class.new(StandardError)
+
+  self.raise_on_save_failure = true
+
   one_to_many :statements
   one_to_many :transactions
 
@@ -41,8 +47,25 @@ class Epics::Box::Account < Sequel::Model
     !self.activated_at.nil?
   end
 
-  def setup!
-    # TODO: validate all fields are present
+  def ebics_data?
+    [user, url, partner, host].all?(&:present?)
+  end
+
+  def state
+    if active?
+      'active'
+    elsif submitted_at.present?
+      'submitted'
+    elsif ebics_data?
+      'ready_to_submit'
+    else
+      'needs_ebics_data'
+    end
+  end
+
+  def setup!(reset = false)
+    fail(AlreadyActivated) if !ini_letter.nil? && !reset
+    fail(IncompleteEbicsData) unless ebics_data?
     # TODO: handle exceptions
     Epics::Box.logger.info("setting up EBICS keys for account #{self.id}")
     epics = client_adapter.setup(self.passphrase, self.url, self.host, self.user, self.partner)
@@ -53,19 +76,21 @@ class Epics::Box::Account < Sequel::Model
     epics.HIA
     self.ini_letter = epics.ini_letter(self.bankname)
     Epics::Box.logger.info("EBICS key exchange done and ini letter generated for account #{self.id}")
+    self.submitted_at = DateTime.now
     self.save
+    Epics::Box::Queue.check_account_activation(id)
   end
 
   def activate!
     Epics::Box.logger.info("activating account #{self.id}")
     self.client.HPB
     self.key = self.client.send(:dump_keys)
-    self.activated_at = Time.now
+    self.activated_at ||= Time.now
     self.save
-  rescue Epics::Error => e
+  rescue => e
     # TODO: show the error to the user
     Epics::Box.logger.error("failed to activate account #{self.id}: #{e.to_s}")
-    return false
+    false
   end
 
   class File
