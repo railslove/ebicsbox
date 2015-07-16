@@ -53,7 +53,10 @@ class AccountSubmit extends React.Component {
 
   componentDidUpdate() {
     var printFrame = window.frames["iniletter-frame"];
-    printFrame.document.write(`<body>${this.state.account.ini_letter}</body>`);
+    if(printFrame) {
+      printFrame.document.write(`<body>${this.state.account.ini_letter}</body>`);
+    }
+
   }
 
   renderWaiting() {
@@ -86,12 +89,18 @@ class AccountSubmit extends React.Component {
     switch(this.state.account.state) {
       case 'activated':
         this.context.router.transitionTo('account', { id: this.props.params.id });
+        return null;
         break;
       case 'submitted':
         return this.renderWaiting();
         break;
       case 'ready_to_submit':
         return this.renderSubmit();
+        break;
+      case 'needs_ebics_data':
+        this.context.router.transitionTo('edit-account-ebics', { id: this.props.params.id });
+        return null;
+        break;
       default:
         return(<div>Loading account data…</div>);
     }
