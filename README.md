@@ -19,10 +19,6 @@ It offers a HTTP interface and can be integrated with different message queueing
 
 ## Installation
 
-Install it:
-
-    $ gem install epics-box
-
 Run it:
 
     $ foreman start
@@ -32,6 +28,10 @@ In development, run it with
     $ foreman start -f Procfile.dev
 
 ## Configuration
+
+Is done via environment variables. You can utilize a `.env` file while
+developing locally. Please revise `.env.example` for a overview
+of needed parameters.
 
 ### Generate a secret token
 
@@ -44,53 +44,8 @@ generate one, you can use the following command:
 ```
 
 ## Usage
-### HTTP
 
-```ruby
-  POST https://ebics.box/debits
-  {
-    "callback": "https://"
-    "document": "< a base64 encoded representation of a pain008 document >"
-    "creditor_identifier": ""
-    "transactions": [
-      {
-        "name": "Peter Pan",
-        "bic": "COLSDE33XXX",
-        "iban": "DE51370501981929807319",
-        "amount": "100.00",
-        "reference": "",
-        "remittance_information": "",
-        "mandate_id": "number",
-        "mandate_date_of_signature": "",
-        "local_instrument": "CORE",
-        "sequence_type": "FRST",
-        "requested_date": ""
-      }
-    ]
-    "order_type": "CDD"
-  }
-```
-
-
-```ruby
-  POST https://ebics.box/credits
-  {
-    "callback": "https://"
-    "document": "< a base64 encoded representation of a pain001 document >"
-    "transactions": [
-      {
-        "name": "Peter Pan",
-        "bic": "COLSDE33XXX",
-        "iban": "DE51370501981929807319",
-        "amount": "100.00",
-        "reference": "",
-        "remittance_information": ""
-      }
-    ]
-  }
-```
-### Message Queue
-
+see [docs.ebicsbox.apiary.io](http://docs.ebicsbox.apiary.io)
 
 ### Tests
 
