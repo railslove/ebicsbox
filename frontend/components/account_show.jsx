@@ -54,7 +54,7 @@ class AccountShow extends React.Component {
           <div className="col-sm-4 col-md-3">
             <dl>
               <dt>Bank</dt>
-              <dd>{account.bank_name || 'unknown'}</dd>
+              <dd>{account.bankname || 'unknown'}</dd>
               <dt>IBAN</dt>
               <dd>{account.iban}</dd>
               <dt>BIC</dt>
