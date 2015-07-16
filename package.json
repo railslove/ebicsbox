@@ -17,6 +17,7 @@
     "file-loader": "^0.8.4",
     "imports-loader": "^0.6.4",
     "jquery": "^2.1.4",
+    "optimist": "^0.6.1",
     "react": "^0.13.3",
     "react-router": "^0.13.3",
     "style-loader": "^0.12.3",
