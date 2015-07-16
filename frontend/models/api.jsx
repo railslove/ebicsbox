@@ -28,19 +28,19 @@ class Api {
   // generic api methods
 
   static post(path, data) {
-    return fetch(path, { method: 'post', headers: this.headers, body: JSON.stringify(data) })
+    return fetch(path, { method: 'post', credentials: 'include', headers: this.headers, body: JSON.stringify(data) })
       .then(this.status)
       .then(this.json);
   }
 
   static put(path, data) {
-    return fetch(path, { method: 'put', headers: this.headers, body: JSON.stringify(data) })
+    return fetch(path, { method: 'put', credentials: 'include', headers: this.headers, body: JSON.stringify(data) })
       .then(this.status)
       .then(this.json);
   }
 
   static get(path) {
-    return fetch(path, { method: 'get', headers: this.headers })
+    return fetch(path, { method: 'get', credentials: 'include', headers: this.headers })
       .then(this.status)
       .then(this.json);
   }
