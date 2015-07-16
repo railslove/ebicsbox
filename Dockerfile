@@ -9,7 +9,6 @@ RUN bundle config --global frozen 1
 RUN mkdir -p /usr/ebicsbox
 WORKDIR /usr/ebicsbox
 
-RUN echo compat.version=2.0 > /usr/ebicsbox/.jrubyrc
 RUN echo invokedynamic.all=true >> /usr/ebicsbox/.jrubyrc
 
 ADD epics-box.gemspec /usr/ebicsbox/
@@ -23,12 +22,19 @@ RUN npm install webpack -g
 ADD . /usr/ebicsbox
 RUN npm install
 RUN webpack -p
+RUN rake jruby:build
+
 
 RUN rm Dockerfile*
 RUN rm Rakefile
 RUN rm .env
-RUN rm -rf .node_modules
+RUN rm -rf ./node_modules
 RUN rm -rf .git
 RUN rm -rf pkg
+RUN rm -rf log
+RUN rm Procfile*
+RUN rm README*
+RUN rm package.json
+RUN rm webpack.config.js
 
 CMD ["bin/start", "server"]
