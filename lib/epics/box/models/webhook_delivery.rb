@@ -35,7 +35,7 @@ module Epics
               req.body = event.to_webhook_payload
             end
           end
-        rescue Faraday::TimeoutError, Faraday::ConnectionFailed => ex
+        rescue Faraday::TimeoutError, Faraday::ConnectionFailed, Faraday::Error => ex
           response = FailedResponse.new(ex.message)
         end
         [response, execution_time]
