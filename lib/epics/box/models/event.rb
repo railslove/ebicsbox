@@ -5,6 +5,7 @@ module Epics
     class Event < Sequel::Model
       SUPPORTED_TYPES = [
         :account_created,
+        :account_activated,
         :debit_created,
         :debit_failed,
         :debit_succeeded,

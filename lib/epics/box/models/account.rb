@@ -87,6 +87,8 @@ class Epics::Box::Account < Sequel::Model
     self.key = self.client.send(:dump_keys)
     self.activated_at ||= Time.now
     self.save
+    Event.account_activated(self)
+    true
   rescue => e
     # TODO: show the error to the user
     Epics::Box.logger.error("failed to activate account #{self.id}: #{e.to_s}")
