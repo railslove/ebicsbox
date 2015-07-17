@@ -1,4 +1,5 @@
 require 'openssl'
+require 'epics/box/models/webhook_delivery'
 
 module Epics
   module Box

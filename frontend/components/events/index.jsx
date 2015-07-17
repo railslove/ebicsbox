@@ -14,7 +14,7 @@ class EventRow extends Component {
         <td>{event.type}</td>
         <td>{event.webhook_status}</td>
         <td>{event.webhook_retries}</td>
-        <td></td>
+        <td><Link to="event" params={{id: event.id}} className="btn btn-xs btn-default">Details</Link></td>
       </tr>
     )
   }

@@ -29,6 +29,10 @@ class Api {
     return this.get('/events')
   }
 
+  static fetchEvent(id) {
+    return this.get(`/events/${id}`)
+  }
+
   // generic api methods
 
   static post(path, data) {
