@@ -1,3 +1,6 @@
+require 'epics/box/models/event'
+require 'epics/box/models/webhook_delivery'
+
 module Epics
   module Box
     module Jobs

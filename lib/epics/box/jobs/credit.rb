@@ -14,7 +14,7 @@ module Epics
           )
 
           transaction.execute!
-          Event.credit_created(transaction.to_webhook_payload)
+          Event.credit_created(transaction)
           Queue.update_processing_status(message[:account_id])
 
           Box.logger.info("[Jobs::Credit] Created credit! transaction_id=#{transaction.id}")

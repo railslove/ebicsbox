@@ -62,6 +62,7 @@ module Epics
         desc 'Add a new account'
         post do
           if account = Account.create(params)
+            Event.account_created(account)
             present account, with: ManageAccountPresenter
           else
             error!({ message: 'Failed to create account' }, 400)

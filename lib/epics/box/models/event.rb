@@ -4,9 +4,16 @@ module Epics
   module Box
     class Event < Sequel::Model
       SUPPORTED_TYPES = [
-        :debit_created, :debit_failed, :debit_succeeded,
-        :credit_created, :credit_failed, :credit_suceeded,
-        :statement_created, :statement_updated,
+        :account_created,
+        :account_activated,
+        :debit_created,
+        :debit_failed,
+        :debit_succeeded,
+        :credit_created,
+        :credit_failed,
+        :credit_suceeded,
+        :statement_created,
+        :statement_updated,
         :transaction_updated,
       ]
       RETRY_THRESHOLD = 10
@@ -33,14 +40,23 @@ module Epics
 
       def self.method_missing(method_name, *args, &block)
         if SUPPORTED_TYPES.include?(method_name)
-          publish(method_name, *args)
+          data = args.shift
+          if data.respond_to?(:as_event_payload)
+            data = data.as_event_payload
+          end
+          publish(method_name, *(args.unshift(data)))
         else
           super # ignore and pass along
         end
       end
 
       def self.publish(event_type, payload = {})
-        event = new type: event_type, payload: Sequel.pg_json(payload.stringify_keys), signature: signature(payload)
+        event = new(
+          type: event_type,
+          payload: Sequel.pg_json(payload.stringify_keys),
+          signature: signature(payload),
+          account_id: payload[:account_id],
+        )
         event.save
         Queue.trigger_webhook(event_id: event.id)
       end
@@ -56,7 +72,7 @@ module Epics
       end
 
       def account
-        @account ||= Account[payload[:account_id]]
+        @account ||= Account[account_id]
       end
 
       def delivery_success!

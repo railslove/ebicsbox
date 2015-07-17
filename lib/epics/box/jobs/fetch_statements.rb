@@ -71,7 +71,7 @@ module Epics
               transaction.set_state_from("debit_received")
             end
 
-            Event.statement_created(statement.to_webhook_payload)
+            Event.statement_created(statement)
           end
         end
 
