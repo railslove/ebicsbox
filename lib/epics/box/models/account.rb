@@ -93,6 +93,13 @@ class Epics::Box::Account < Sequel::Model
     false
   end
 
+  def as_event_payload
+    {
+      account_id: id,
+      account: self.to_hash,
+    }
+  end
+
   class File
     def initialize(*args); end
 
