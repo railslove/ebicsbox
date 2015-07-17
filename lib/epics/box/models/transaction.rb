@@ -27,7 +27,7 @@ class Ebics::Box::Transaction < Sequel::Model
     self.save
 
     if old_status != status
-      Ebics::Box::Event.transaction_updated(self.to_webhook_payload)
+      Ebics::Box::Event.transaction_updated(self)
     end
 
     self.status
@@ -40,8 +40,9 @@ class Ebics::Box::Transaction < Sequel::Model
     update(ebics_order_id: order_id, ebics_transaction_id: transaction_id)
   end
 
-  def to_webhook_payload
+  def as_event_payload
     {
+      account_id: account_id,
       transaction: {
         id: id,
         eref: eref,
