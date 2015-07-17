@@ -1,6 +1,7 @@
 require("bootstrap-webpack");
 
 import React from 'react';
+import {Link} from 'react-router';
 
 class Navigation extends React.Component {
   render() {
@@ -18,7 +19,8 @@ class Navigation extends React.Component {
           </div>
           <div id="navbar" className="navbar-collapse collapse">
             <ul className="nav navbar-nav">
-              <li><a href="#accounts">Accounts</a></li>
+              <li><Link to="account-index">Accounts</Link></li>
+              <li><Link to="events-index">Events</Link></li>
             </ul>
           </div>
         </div>
