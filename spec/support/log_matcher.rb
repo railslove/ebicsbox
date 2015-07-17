@@ -4,7 +4,11 @@ RSpec::Matchers.define :have_logged_message do |message|
   match do |actual|
     actual.call
     $box_logger.rewind
-    $box_logger.read.include?(message)
+    if message.is_a?(Regexp)
+      $box_logger.read =~ message
+    else
+      $box_logger.read.include?(message)
+    end
   end
 
   supports_block_expectations
