@@ -14,8 +14,17 @@ It offers a HTTP interface and can be integrated with different message queueing
 
 ## Prerequistes
 
+* ruby (jruby / ruby 2.2.x)
 * beanstalkd
 * postgres
+* webpack (npm install webpack -g)
+
+## Development
+
+Run it: 
+
+    $ forman start -f Procfile.dev
+
 
 ## Installation
 
@@ -23,11 +32,16 @@ Run it:
 
     $ foreman start
 
-In development, run it with
-
-    $ foreman start -f Procfile.dev
-
 ## Configuration
+
+Set the following environment variables: 
+
+* DATABASE_URL
+* BEANSTALKD_URL
+* PASSPHRASE
+* SECRET_TOKEN
+
+you can store these in a local .env file for development.
 
 Is done via environment variables. You can utilize a `.env` file while
 developing locally. Please revise `.env.example` for a overview
