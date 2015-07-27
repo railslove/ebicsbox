@@ -3,7 +3,7 @@ module Epics
     module Jobs
       RSpec.describe Debit do
         describe '.process!' do
-          let(:transaction) { double('Transaction', execute!: true, id: 1, to_webhook_payload: {}) }
+          let(:last_transaction) { Transaction.last }
           let(:message) do
             {
               amount: 100,
@@ -14,36 +14,34 @@ module Epics
             }
           end
 
-
           before do
-            allow(Transaction).to receive(:create).and_return(transaction)
+            allow_any_instance_of(Transaction).to receive(:execute!).and_return(true)
             allow(Queue).to receive(:update_processing_status)
           end
 
           it 'creates a transaction' do
-            described_class.process!(message)
-            expect(Transaction).to have_received(:create)
+            expect { described_class.process!(message) }.to change { Transaction.count }.by(1)
           end
 
           it 'sets correct amount' do
             described_class.process!(message)
-            expect(Transaction).to have_received(:create).with(hash_including(amount: 100))
+            expect(last_transaction.amount).to eq(100)
           end
 
           it 'sets valid order type based on used instrument' do
             described_class.process!(message)
-            expect(Transaction).to have_received(:create).with(hash_including(order_type: :CDD))
+            expect(last_transaction.type).to eq('debit')
           end
 
           it 'encodes the pain payload with base 64' do
             encoded_payload = Base64.strict_decode64('PAIN')
             described_class.process!(message)
-            expect(Transaction).to have_received(:create).with(hash_including(payload: encoded_payload))
+            expect(last_transaction.payload).to eq(encoded_payload)
           end
 
           it 'executes the created transaction' do
+            expect_any_instance_of(Transaction).to receive(:execute!)
             described_class.process!(message)
-            expect(transaction).to have_received(:execute!)
           end
 
           it 'tells the system to check for job processing status' do
@@ -52,7 +50,7 @@ module Epics
           end
 
           it 'logs an info message' do
-            expect(Box.logger).to receive(:info).with('[Jobs::Debit] Created debit! transaction_id=1')
+            expect(Box.logger).to receive(:info).with(/\[Jobs::Debit\] Created debit! transaction_id=\d+/)
             described_class.process!(message)
           end
         end
