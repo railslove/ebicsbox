@@ -9,8 +9,8 @@ class Epics::Box::Account < Sequel::Model
   one_to_many :statements
   one_to_many :transactions
 
-  def self.all_ids
-    select(:id).all.map(&:id)
+  def self.all_active_ids
+    select(:id).exclude(activated_at: nil).map(&:id)
   end
 
   def passphrase

@@ -7,14 +7,16 @@ module Epics
         end
       end
 
-      describe '.all_ids' do
+      describe '.all_active_ids' do
         it 'returns an empty array if no accounts are created yet' do
-          expect(Account.all_ids).to eq([])
+          expect(Account.all_active_ids).to eq([])
         end
 
         it 'returns all account ids' do
-          accounts = Array.new(2).map { Account.create }
-          expect(Account.all_ids).to eq(accounts.map(&:id))
+          account = Account.create(activated_at: Time.now)
+                    Account.create(activated_at: nil)
+
+          expect(Account.all_active_ids).to eq([account.id])
         end
       end
 

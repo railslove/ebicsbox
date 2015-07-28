@@ -29,14 +29,14 @@ module Epics
       end
 
       def self.update_processing_status(account_ids = nil)
-        account_ids ||= Account.all_ids
+        account_ids ||= Account.all_active_ids
         unless client.tubes[ORDER_TUBE].peek(:delayed)
           client.tubes[ORDER_TUBE].put({ do: :it, account_ids: Array.wrap(account_ids) }, { delay: Epics::Box.configuration.hac_retrieval_interval })
         end
       end
 
       def self.fetch_account_statements(account_ids = nil)
-        account_ids ||= Account.all_ids
+        account_ids ||= Account.all_active_ids
         client.tubes[STA_TUBE].put(account_ids: Array.wrap(account_ids))
       end
 

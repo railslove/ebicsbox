@@ -43,7 +43,7 @@ module Epics
         end
 
         it 'puts all existing account ids onto the job if none is provided' do
-          accounts = Array.new(3).map { Account.create }
+          accounts = Array.new(3).map { Account.create(activated_at: Time.now) }
           described_class.fetch_account_statements
           expect(tube.peek(:ready).body).to eq(account_ids: accounts.map(&:id))
         end
@@ -102,7 +102,7 @@ module Epics
           end
 
           it 'puts all existing account ids onto the job if none is provided' do
-            accounts = Array.new(3).map { Account.create }
+            accounts = Array.new(3).map { Account.create(activated_at: Time.now) }
             described_class.update_processing_status
             expect(tube.peek(:delayed).body).to match hash_including(account_ids: accounts.map(&:id))
           end
