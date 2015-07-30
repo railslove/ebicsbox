@@ -71,8 +71,12 @@ module Epics
         end
       end
 
-      describe '#activate' do
+      describe '#activate!' do
         let(:account) { Account.create(mode: 'File') }
+
+        it 'is truthy on success' do
+          expect(account.activate!).to be(true)
+        end
 
         it 'saves activation date' do
           account.update(activated_at: nil)
