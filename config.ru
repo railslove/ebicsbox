@@ -9,7 +9,6 @@ require File.expand_path(File.dirname(__FILE__) + '/lib/epics/box/middleware/lic
 require File.expand_path(File.dirname(__FILE__) + '/lib/epics/box/middleware/connection_validator.rb')
 
 box = Rack::Builder.app do
-  use Rack::CommonLogger
   use Rack::CommonLogger if ENV['RACK_ENV']=='production'
   use Rack::Auth::Basic, "Protected Area" do |username, password|
     username == ENV['USERNAME'] && password == ENV['PASSWORD']
