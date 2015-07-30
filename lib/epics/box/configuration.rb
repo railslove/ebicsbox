@@ -21,7 +21,7 @@ module Epics
         if token = ENV['SECRET_TOKEN']
           token
         else
-          raise 'Please set a secure token'
+          raise 'Please set a secret token'
         end
       end
 
