@@ -135,7 +135,7 @@ module Epics
       post ':account/debits' do
         begin
           sdd = SEPA::DirectDebit.new(account.pain_attributes_hash).tap do |credit|
-            credit.message_identification= "EBCIS-BOX/#{Time.now.to_i}"
+            credit.message_identification= "EBICS-BOX/#{SecureRandom.hex(11).upcase}"
             credit.add_transaction(
               name: params[:name],
               bic: params[:bic],
@@ -180,7 +180,7 @@ module Epics
       post ':account/credits' do
         begin
           sct = SEPA::CreditTransfer.new(account.credit_pain_attributes_hash).tap do |credit|
-            credit.message_identification= "EBCIS-BOX/#{Time.now.to_i}"
+            credit.message_identification= "EBICS-BOX/#{SecureRandom.hex(11).upcase}"
             credit.add_transaction(
               name: params[:name],
               bic: params[:bic],
