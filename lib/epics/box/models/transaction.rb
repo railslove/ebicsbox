@@ -47,6 +47,7 @@ class Ebics::Box::Transaction < Sequel::Model
         id: id,
         eref: eref,
         type: type,
+        status: status,
         ebics_order_id: ebics_order_id,
         ebics_transaction_id: ebics_transaction_id,
       }
