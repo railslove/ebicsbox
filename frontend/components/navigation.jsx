@@ -20,6 +20,9 @@ class Navigation extends React.Component {
             <ul className="nav navbar-nav">
               <li><a href="#accounts">Accounts</a></li>
             </ul>
+            <ul className="nav navbar-nav">
+              <li><a href="http://docs.ebicsbox.apiary.io/">Documentation</a></li>
+            </ul>
           </div>
         </div>
       </nav>
