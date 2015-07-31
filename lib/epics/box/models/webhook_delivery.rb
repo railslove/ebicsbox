@@ -16,7 +16,7 @@ module Epics
           delivered_at: DateTime.now,
           response_body: response.body,
           reponse_headers: Sequel.pg_json(response.headers.stringify_keys),
-          response_status: response.code,
+          response_status: response.status,
           response_time: execution_time,
         )
         save
@@ -32,10 +32,12 @@ module Epics
           execution_time = Benchmark.realtime do
             response = Faraday.post(event.callback_url) do |req|
               req.headers['Content-Type'] = 'application/json'
-              req.body = event.to_webhook_payload
+              req.headers['X-Signature'] = event.signature if event.signature
+              req.body = event.to_webhook_payload.to_json
             end
           end
         rescue Faraday::TimeoutError, Faraday::ConnectionFailed, Faraday::Error => ex
+          Box.logger.warn("[WebhookDelivery] Failed for event_id=#{event.id}: #{ex.message}")
           response = FailedResponse.new(ex.message)
         end
         [response, execution_time]
@@ -58,7 +60,7 @@ module Epics
           {}
         end
 
-        def code
+        def status
           0
         end
       end

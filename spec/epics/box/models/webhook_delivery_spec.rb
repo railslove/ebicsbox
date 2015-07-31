@@ -60,7 +60,7 @@ module Epics
         end
 
         context 'with callback_url defined' do
-          let(:response) { double('Response', body: 'my test', code: 201, headers: { 'User-Agent' => 'Spec' }, success?: true) }
+          let(:response) { double('Response', body: 'my test', status: 201, headers: { 'User-Agent' => 'Spec' }, success?: true) }
 
           before do
             allow(subject).to receive(:execute_request).and_return([response, 1])
