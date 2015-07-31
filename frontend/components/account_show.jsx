@@ -45,6 +45,7 @@ class AccountShow extends React.Component {
 
     if(account == null) return <div>Loading…</div>;
 
+    var modeClass = account.mode == 'File' ? 'label-default label' : 'label-info label'
     return (
       <div className="container">
         <div className="page-header">
@@ -59,6 +60,8 @@ class AccountShow extends React.Component {
               <dd>{account.iban}</dd>
               <dt>BIC</dt>
               <dd>{account.bic}</dd>
+              <dt>Mode</dt>
+              <dd><span className={modeClass}>{account.mode || 'Live'}</span></dd>
             </dl>
           </div>
           <div className="col-sm-8 col-md-9">
