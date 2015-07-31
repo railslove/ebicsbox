@@ -5,6 +5,11 @@ class Ebics::Box::Transaction < Sequel::Model
   many_to_one :account
   one_to_many :statements
 
+  def self.paginated_by_account(account_id, options = {})
+    options = { per_page: 10, page: 1 }.merge(options)
+    where(account_id: account_id).limit(options[:per_page]).offset((options[:page] - 1) * options[:per_page]).reverse_order(:id)
+  end
+
   def set_state_from(action, reason_code = nil)
     old_status = status
     case

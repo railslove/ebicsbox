@@ -206,7 +206,7 @@ module Epics
         end
       end
 
-      desc "Returns statements for"
+      desc "Returns statements for account"
       params do
         requires :account,  type: String, desc: "IBAN for an existing account"
         optional :from,  type: Integer, desc: "results starting at"
@@ -219,6 +219,21 @@ module Epics
           statements = Statement.paginated_by_account(account.id, per_page: params[:per_page], page: params[:page]).all
           # statements = Statement.where(account_id: account.id).limit(params[:per_page]).offset((params[:page] - 1) * params[:per_page]).all
           present statements, with: Epics::Box::StatementPresenter
+        rescue Sequel::NoMatchingRow => ex
+          { errors: "no account found error: #{ex.message}" }
+        end
+      end
+
+      desc "Returns transactions for account"
+      params do
+        requires :account,  type: String, desc: "IBAN for an existing account"
+        optional :page,  type: Integer, desc: "page through the results", default: 1
+        optional :per_page,  type: Integer, desc: "how many results per page", values: 1..100, default: 10
+      end
+      get ':account/transactions' do
+        begin
+          statements = Transaction.paginated_by_account(account.id, per_page: params[:per_page], page: params[:page]).all
+          present statements, with: Epics::Box::TransactionPresenter
         rescue Sequel::NoMatchingRow => ex
           { errors: "no account found error: #{ex.message}" }
         end
