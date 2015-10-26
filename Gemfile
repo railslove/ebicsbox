@@ -11,6 +11,7 @@ gem 'trinidad', "1.5.0.B1", platform: :jruby
 group :development, :test do
   gem 'byebug', platform: :mri
   gem 'database_cleaner'
+  gem 'dotenv'
   gem 'rspec'
   gem 'guard-rspec', require: false
   gem 'airborne', '0.1.15'
