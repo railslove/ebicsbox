@@ -1,12 +1,27 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in epics-http.gemspec
-gemspec
+gem 'beaneater', '~> 1.0.0'
+gem 'clockwork'
+gem 'cmxl'
+gem 'epics', branch: 'proxy_server'
+gem 'grape'
+gem 'grape-entity'
+gem 'httparty'
+gem 'nokogiri'
+gem 'sepa_king'
+gem 'sequel'
+gem 'sinatra'
 
-gem 'pg', platform: :mri
-gem 'thin', platform: :mri
-gem 'jdbc-postgres', platform: :jruby
-gem 'trinidad', "1.5.0.B1", platform: :jruby
+platforms :mri do
+  gem 'pg'
+  gem 'thin'
+end
+
+platforms :jruby do
+  gem 'jdbc-postgres'
+  gem 'jruby-openssl'
+  gem 'trinidad', "1.5.0.B1"
+end
 
 group :development, :test do
   gem 'byebug', platform: :mri
