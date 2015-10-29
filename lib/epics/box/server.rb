@@ -1,4 +1,6 @@
 require 'epics/box/presenters/manage_account_presenter'
+require 'epics/box/presenters/event_presenter'
+require 'epics/box/presenters/event_details_presenter'
 
 module Epics
   module Box
@@ -113,6 +115,16 @@ module Epics
           else
             error!({ message: 'Failed to update account' }, 400)
           end
+        end
+      end
+
+      resource :events do
+        get do
+          present Event.all, with: EventPresenter
+        end
+
+        get ':id' do
+          present Event[params[:id]], with: EventDetailsPresenter
         end
       end
 
