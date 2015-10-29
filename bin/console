@@ -9,7 +9,7 @@ require 'bundler'
 Bundler.setup(:default, :development)
 
 # Load app
-require 'epics/box'
+require './lib/epics/box'
 
 # Start pry session
 require 'pry'

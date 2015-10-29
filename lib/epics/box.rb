@@ -1,3 +1,6 @@
+lib = File.expand_path("../..", __FILE__)
+$:.unshift(lib)
+
 require 'grape'
 require 'grape-entity'
 require 'sequel'
@@ -10,7 +13,6 @@ require 'sepa_king'
 require 'sinatra'
 require 'base64'
 
-require 'epics/box/version'
 require 'epics/box/configuration'
 
 module Epics
