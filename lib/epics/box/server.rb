@@ -35,7 +35,23 @@ module Epics
 
       format :json
 
+      before do
+        if current_user.nil?
+          error!({ message: 'Unauthorized access. Please provide a valid access token!' }, 401)
+        end
+      end
+
       helpers do
+        def current_user
+          @current_user ||= begin
+            if match = env['Authorization'].to_s.match(/token (.+)/)
+              User.find_by_access_token(match[1])
+            else
+              nil
+            end
+          end
+        end
+
         def account
           Epics::Box::Account.first!({iban: params[:account]})
         end
@@ -43,6 +59,10 @@ module Epics
         def logger
           Server.logger
         end
+      end
+
+      get '/' do
+        "Home"
       end
 
       resource :accounts do

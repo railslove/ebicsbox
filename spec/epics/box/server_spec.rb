@@ -1,23 +1,51 @@
 module Epics
   module Box
     RSpec.describe Server do
+      let(:organization) { Organization.create(name: 'Organization 1') }
+      let(:user) { User.create(organization_id: organization.id, name: 'Some user', access_token: 'orga-user') }
+
+      describe 'Access' do
+        context 'Unauthorized user' do
+          it 'returns a 401 unauthorized code' do
+            get "/"
+            expect_status 401
+          end
+
+          it 'includes an error message' do
+            get "/"
+            expect_json 'message', 'Unauthorized access. Please provide a valid access token!'
+          end
+        end
+
+        context 'authenticated user' do
+          before { user }
+
+          it 'grants access to the app' do
+            get '/', { 'Authorization' => 'token orga-user' }
+            expect_status 200
+          end
+        end
+      end
+
       describe 'GET :account/statements' do
-        let(:account) { Account.create(iban: SecureRandom.uuid) }
+        let(:account) { Account.create(organization_id: organization.id, iban: SecureRandom.uuid) }
+
+        before { user }
 
         it 'returns an empty array for new accounts' do
-          get "#{account.iban}/statements"
+          get "#{account.iban}/statements", { 'Authorization' => 'token orga-user' }
           expect_json([])
         end
 
         it 'returns properly formatted statements' do
           statement = Statement.create account_id: account.id
-          get "#{account.iban}/statements"
+          get "#{account.iban}/statements", { 'Authorization' => 'token orga-user' }
           expect_json '0.statement', { account_id: account.id }
         end
 
         it 'passes page and per_page params to statement retrieval function' do
           allow(Statement).to receive(:paginated_by_account) { double(all: [])}
-          get "#{account.iban}/statements?page=4&per_page=2"
+          get "#{account.iban}/statements?page=4&per_page=2", { 'Authorization' => 'token orga-user' }
           expect(Statement).to have_received(:paginated_by_account).with(account.id, per_page: 2, page: 4)
         end
 
@@ -25,8 +53,10 @@ module Epics
       end
 
       describe 'POST /accounts' do
+        before { user }
+
         context 'invalid body' do
-          before { post 'accounts', {} }
+          before { post 'accounts', {}, { 'Authorization' => 'token orga-user' } }
 
           it 'rejects empty posts' do
             expect_status 400
@@ -39,7 +69,7 @@ module Epics
 
         context 'valid body' do
           def do_request
-            post 'accounts', { name: 'Test account', iban: 'my-iban', bic: 'my-iban' }
+            post 'accounts', { name: 'Test account', iban: 'my-iban', bic: 'my-iban' }, { 'Authorization' => 'token orga-user' }
           end
 
           it 'stores new minimal accounts' do
@@ -54,21 +84,25 @@ module Epics
       end
 
       describe 'PUT /accounts/:id' do
-        let(:account) { Account.create(name: 'name', iban: 'old-iban', bic: 'old-bic') }
+        before { user }
+
+        let(:account) { Account.create(name: 'name', iban: 'old-iban', bic: 'old-bic', organization_id: organization.id) }
+
+        it 'denies updates to inaccesible accounts'
 
         context 'activated account' do
           before { account.update(activated_at: 1.hour.ago) }
 
           it 'cannot change iban' do
-            expect { put "accounts/#{account.iban}", { iban: 'new-iban' } }.to_not change { account.reload.iban }
+            expect { put "accounts/#{account.iban}", { iban: 'new-iban' }, { 'Authorization' => 'token orga-user' } }.to_not change { account.reload.iban }
           end
 
           it 'cannot change bic' do
-            expect { put "accounts/#{account.iban}", { bic: 'new-bic' } }.to_not change { account.reload.bic }
+            expect { put "accounts/#{account.iban}", { bic: 'new-bic' }, { 'Authorization' => 'token orga-user' } }.to_not change { account.reload.bic }
           end
 
           it 'ignores iban if it did not change' do
-            expect { put "accounts/#{account.iban}", { iban: 'old-iban', name: 'new name' } }.to change { account.reload.name }
+            expect { put "accounts/#{account.iban}", { iban: 'old-iban', name: 'new name' }, { 'Authorization' => 'token orga-user' } }.to change { account.reload.name }
           end
         end
 
@@ -76,11 +110,11 @@ module Epics
           before { account.update(activated_at: nil) }
 
           it 'can change iban' do
-            expect { put "accounts/#{account.iban}", { iban: 'new-iban' } }.to change { account.reload.iban }
+            expect { put "accounts/#{account.iban}", { iban: 'new-iban' }, { 'Authorization' => 'token orga-user' } }.to change { account.reload.iban }
           end
 
           it 'can change iban' do
-            expect { put "accounts/#{account.iban}", { bic: 'new-bic' } }.to change { account.reload.bic }
+            expect { put "accounts/#{account.iban}", { bic: 'new-bic' }, { 'Authorization' => 'token orga-user' } }.to change { account.reload.bic }
           end
         end
       end
