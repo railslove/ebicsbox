@@ -52,8 +52,12 @@ module Epics
           end
         end
 
+        def current_organization
+          @current_organization ||= current_user.organization
+        end
+
         def account
-          Epics::Box::Account.first!({iban: params[:account]})
+          Account.where(organization: current_organization).first!(iban: params[:account])
         end
 
         def logger
@@ -126,12 +130,16 @@ module Epics
           optional :mode, type: String, desc: 'mode'
         end
         put ':id' do
-          account = Account.find(iban: params[:id])
-          account.set(params.except('id', 'state'))
-          if !account.modified? || account.save
-            present account, with: ManageAccountPresenter
-          else
-            error!({ message: 'Failed to update account' }, 400)
+          begin
+            account = Account.where(organization: current_organization).first!(iban: params[:id])
+            account.set(params.except('id', 'state'))
+            if !account.modified? || account.save
+              present account, with: ManageAccountPresenter
+            else
+              error!({ message: 'Failed to update account' }, 400)
+            end
+          rescue Sequel::NoMatchingRow => ex
+            error!({ message: 'Your organization does not have an account with given IBAN!' }, 400)
           end
         end
       end

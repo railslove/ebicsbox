@@ -84,11 +84,35 @@ module Epics
       end
 
       describe 'PUT /accounts/:id' do
+        let(:other_organization) { Organization.create(name: 'Organization 2') }
+        let(:account) { Account.create(name: 'name', iban: 'old-iban', bic: 'old-bic', organization_id: organization.id) }
+        let(:other_account) { Account.create(name: 'name', iban: 'iban-2', bic: 'bic-2', organization_id: other_organization.id, activated_at: 1.hour.ago) }
+
         before { user }
 
-        let(:account) { Account.create(name: 'name', iban: 'old-iban', bic: 'old-bic', organization_id: organization.id) }
+        context 'no account with given IBAN exist' do
+          it 'returns an error' do
+            put "accounts/NOTEXISTING", {}, { 'Authorization' => 'token orga-user' }
+            expect_status 400
+          end
 
-        it 'denies updates to inaccesible accounts'
+          it 'returns a proper error message' do
+            put "accounts/NOTEXISTING", {}, { 'Authorization' => 'token orga-user' }
+            expect_json 'message', 'Your organization does not have an account with given IBAN!'
+          end
+        end
+
+        context 'account with given IBAN belongs to another organization' do
+          it 'denies updates to inaccesible accounts' do
+            put "accounts/#{other_account.iban}", {}, { 'Authorization' => 'token orga-user' }
+            expect_status 400
+          end
+
+          it 'returns a proper error message' do
+            put "accounts/#{other_account.iban}", {}, { 'Authorization' => 'token orga-user' }
+            expect_json 'message', 'Your organization does not have an account with given IBAN!'
+          end
+        end
 
         context 'activated account' do
           before { account.update(activated_at: 1.hour.ago) }

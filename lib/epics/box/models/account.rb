@@ -8,6 +8,7 @@ class Epics::Box::Account < Sequel::Model
 
   one_to_many :statements
   one_to_many :transactions
+  many_to_one :organization
 
   def self.all_active_ids
     select(:id).exclude(activated_at: nil).map(&:id)
