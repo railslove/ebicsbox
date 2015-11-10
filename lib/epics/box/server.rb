@@ -57,7 +57,7 @@ module Epics
         end
 
         def account
-          Account.where(organization: current_organization).first!(iban: params[:account])
+          current_organization.accounts_dataset.first!(iban: params[:account])
         end
 
         def logger
@@ -85,7 +85,7 @@ module Epics
         end
         desc 'Add a new account'
         post do
-          if account = Account.create(params)
+          if account = current_organization.add_account(params)
             Event.account_created(account)
             present account, with: ManageAccountPresenter
           else
@@ -94,18 +94,18 @@ module Epics
         end
 
         get do
-          accounts = Account.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
+          accounts = current_organization.accounts_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
           present accounts, with: ManageAccountPresenter
         end
 
         get ':id' do
-          account = Account.first!({ iban: params[:id] })
+          account = current_organization.accounts_dataset.first!({ iban: params[:id] })
           present account, with: ManageAccountPresenter
         end
 
         put ':id/submit' do
           begin
-            account = Account.first!({ iban: params[:id] })
+            account = current_organization.accounts_dataset.first!({ iban: params[:id] })
             account.setup!
           rescue Account::AlreadyActivated => ex
             error!({ message: "Account is already activated" }, 400)
@@ -248,7 +248,7 @@ module Epics
           # statements = Statement.where(account_id: account.id).limit(params[:per_page]).offset((params[:page] - 1) * params[:per_page]).all
           present statements, with: Epics::Box::StatementPresenter
         rescue Sequel::NoMatchingRow => ex
-          { errors: "no account found error: #{ex.message}" }
+          error!({ message: 'Your organization does not have an account with given IBAN!' }, 404)
         end
       end
 
