@@ -143,7 +143,7 @@ module Epics
         end
 
         context 'activated account' do
-          before { account.update(activated_at: 1.hour.ago) }
+          before { account.add_subscriber(activated_at: 1.hour.ago) }
 
           it 'cannot change iban' do
             expect { put "accounts/#{account.iban}", { iban: 'new-iban' }, { 'Authorization' => 'token orga-user' } }.to_not change { account.reload.iban }

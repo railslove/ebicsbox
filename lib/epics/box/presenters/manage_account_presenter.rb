@@ -16,13 +16,13 @@ module Epics
       expose :url
       expose :host
       expose :partner
-      expose :user
-      expose :ini_letter
+      # expose :user
+      # expose :ini_letter
 
       # Meta data
-      expose :activated_at
-      expose :submitted_at
-      expose :state
+      # expose :activated_at
+      # expose :submitted_at
+      # expose :state
     end
   end
 end

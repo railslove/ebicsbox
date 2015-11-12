@@ -3,6 +3,7 @@ require 'epics/box/models/event'
 class Ebics::Box::Transaction < Sequel::Model
 
   many_to_one :account
+  many_to_one :user
   one_to_many :statements
 
   def self.paginated_by_account(account_id, options = {})
@@ -40,8 +41,7 @@ class Ebics::Box::Transaction < Sequel::Model
 
   def execute!
     return if ebics_transaction_id.present?
-
-    transaction_id, order_id = account.client.public_send(order_type, payload)
+    transaction_id, order_id = account.client_for(user.id).public_send(order_type, payload)
     update(ebics_order_id: order_id, ebics_transaction_id: transaction_id)
   end
 

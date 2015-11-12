@@ -183,7 +183,14 @@ module Epics
 
           fail(RuntimeError.new(sdd.errors.full_messages.join(" "))) unless sdd.valid?
 
-          Queue.execute_debit account_id: account.id, payload: Base64.strict_encode64(sdd.to_xml), amount: params[:amount], eref: params[:eref], instrument: params[:instrument]
+          Queue.execute_debit(
+            account_id: account.id,
+            user_id: current_user.id,
+            payload: Base64.strict_encode64(sdd.to_xml),
+            amount: params[:amount],
+            eref: params[:eref],
+            instrument: params[:instrument]
+          )
 
           {debit: 'ok'}
         rescue RuntimeError, ArgumentError => e
@@ -224,7 +231,13 @@ module Epics
 
           fail(RuntimeError.new(sct.errors.full_messages.join(" "))) unless sct.valid?
 
-          Queue.execute_credit account_id: account.id, payload: Base64.strict_encode64(sct.to_xml), eref: params[:eref], amount: params[:amount]
+          Queue.execute_credit(
+            account_id: account.id,
+            user_id: current_user.id,
+            payload: Base64.strict_encode64(sct.to_xml),
+            eref: params[:eref],
+            amount: params[:amount]
+          )
 
           {credit: 'ok'}
         rescue RuntimeError, ArgumentError => e

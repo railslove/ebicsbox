@@ -21,11 +21,15 @@ module Epics
         end
 
         describe '#execute!' do
-          subject(:account) { Account.create }
-          subject(:transaction) { described_class.create(account_id: account.id, order_type: 'test', payload: 'my-pain') }
+          let(:client) { double('Client') }
+          let(:account) { Account.create }
+          let(:user) { User.create }
+          let!(:subscriber) { user.add_subscriber(account: account) }
+          subject(:transaction) { account.add_transaction(user: user, order_type: 'test', payload: 'my-pain') }
 
           before do
-            allow(transaction.account.client).to receive(:public_send) do |type, pain|
+            allow_any_instance_of(Subscriber).to receive(:client).and_return(client)
+            allow(client).to receive(:public_send) do |type, pain|
               ["transaction-#{type}", "order-#{type}"]
             end
           end
@@ -33,7 +37,7 @@ module Epics
           it 'does not allow to execute transactions more than once' do
             transaction.ebics_transaction_id = '123'
             transaction.execute!
-            expect(transaction.account.client).to_not have_received(:public_send)
+            expect(client).to_not have_received(:public_send)
           end
 
           it 'store the ebics order id' do
@@ -48,12 +52,12 @@ module Epics
 
           it 'executes a ebics call with stored PAIN payload' do
             transaction.execute!
-            expect(transaction.account.client).to have_received(:public_send).with(anything, 'my-pain')
+            expect(client).to have_received(:public_send).with(anything, 'my-pain')
           end
 
           it 'executes the correct ebics call' do
             transaction.execute!
-            expect(transaction.account.client).to have_received(:public_send).with('test', anything)
+            expect(client).to have_received(:public_send).with('test', anything)
           end
         end
       end
