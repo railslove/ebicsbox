@@ -3,7 +3,8 @@ module Epics
     module Jobs
       RSpec.describe FetchStatements do
         describe '.process!' do
-          let(:account) { Account.create() }
+          let(:account) { Account.create }
+          let!(:subscriber) { account.add_subscriber(signature_class: 'T', activated_at: 1.day.ago) }
 
           def exec_process
             described_class.process!(account_ids: [account.id])
@@ -23,13 +24,13 @@ module Epics
 
             before do
               account.imported_at!(1.day.ago)
-              allow_any_instance_of(Account).to receive(:client) { client }
+              allow_any_instance_of(Subscriber).to receive(:client) { client }
               allow(client).to receive(:STA).and_return(File.read('spec/fixtures/mt940.txt'))
             end
 
             it 'fetches statements from remote server' do
               exec_process
-              expect(account.client).to have_received(:STA)
+              expect(account.transport_client).to have_received(:STA)
             end
 
             it 'adds info that a new import happened' do

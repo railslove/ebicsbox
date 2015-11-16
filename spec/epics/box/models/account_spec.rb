@@ -1,102 +1,35 @@
 module Epics
   module Box
     RSpec.describe Account do
-      describe 'acticated?' do
-        specify do
-          expect(Account.new(activated_at: Time.now)).to be_active
-        end
-      end
-
       describe '.all_active_ids' do
         it 'returns an empty array if no accounts are created yet' do
-          expect(Account.all_active_ids).to eq([])
+          expect(described_class.all_active_ids).to eq([])
         end
 
         it 'returns all account ids' do
-          account = Account.create(activated_at: Time.now)
-                    Account.create(activated_at: nil)
+          activated_account = described_class.create
+          inactive_account = described_class.create
 
-          expect(Account.all_active_ids).to eq([account.id])
+          Subscriber.create(account: activated_account, activated_at: Time.now)
+          Subscriber.create(account: inactive_account, activated_at: nil)
+
+          expect(described_class.all_active_ids).to eq([activated_account.id])
         end
       end
 
-      describe '#imported_at!' do
-        let(:account) { Account.create }
+      describe '#pain_attributes_hash' do
+        subject { Account.create(name: 'name', bic: 'bic', iban: 'iban', creditor_identifier: 'ci') }
 
-        it 'adds a new import for the account and the given day' do
-          expect{ account.imported_at!(Date.today) }.to change { DB[:imports].where(account_id: account.id).count }.by(1)
+        it 'returns only relevant pain attributes' do
+          expect(subject.pain_attributes_hash.keys).to eq([:name, :bic, :iban, :creditor_identifier])
         end
       end
 
-      describe '#setup!' do
-        let(:account) { Account.create(mode: 'File', user: 'user', host: 'host', url: 'url', partner: 'partner') }
+      describe '#credit_pain_attributes_hash' do
+        subject { Account.create(name: 'name', bic: 'bic', iban: 'iban', creditor_identifier: 'ci') }
 
-        context 'incomplete ebics data' do
-          before { account.update(user: nil) }
-
-          it 'fails to submit' do
-            expect { account.setup! }.to raise_error(Account::IncompleteEbicsData)
-          end
-        end
-
-        context 'ini already sent' do
-          before { account.update(ini_letter: 'some data') }
-
-          it 'fails if reset flag is not set' do
-            expect { account.setup! }.to raise_error(Account::AlreadyActivated)
-          end
-        end
-
-        it 'saves the keys' do
-          account.update(key: nil)
-          account.setup!
-          expect(account.reload.key).to eql(Epics::Box::Account::File.new.dump_keys)
-        end
-
-        it 'saves the ini letter' do
-          account.update(ini_letter: nil)
-          account.setup!
-          expect(account.reload.ini_letter).to eql(Epics::Box::Account::File.new.ini_letter(account.bankname))
-        end
-
-        it 'calls INI and HIA' do
-          expect_any_instance_of(Epics::Box::Account::File).to receive(:INI)
-          expect_any_instance_of(Epics::Box::Account::File).to receive(:HIA)
-          account.setup!
-        end
-
-        it 'queues an account activation job' do
-          expect(Epics::Box::Queue).to receive(:check_account_activation).with(account.id)
-          account.setup!
-        end
-      end
-
-      describe '#activate!' do
-        let(:account) { Account.create(mode: 'File') }
-
-        it 'is truthy on success' do
-          expect(account.activate!).to be(true)
-        end
-
-        it 'saves activation date' do
-          account.update(activated_at: nil)
-          account.activate!
-          expect(account.reload.activated_at).to be_instance_of(Time)
-        end
-
-        it 'exchanges the keys' do
-          expect(account.client).to receive(:HPB)
-          account.update(key: nil)
-          account.activate!
-          expect(account.reload.key).to eql(Epics::Box::Account::File.new.dump_keys)
-        end
-
-        context 'error case' do
-          let(:account) { Account.create(mode: 'File') }
-          it 'catches the epics error and returns false' do
-            expect(account.client).to receive(:HPB).and_raise(Epics::Error::BusinessError.new('nope'))
-            expect(account.activate!).to eql(false)
-          end
+        it 'returns only relevant pain attributes' do
+          expect(subject.credit_pain_attributes_hash.keys).to eq([:name, :bic, :iban])
         end
       end
 

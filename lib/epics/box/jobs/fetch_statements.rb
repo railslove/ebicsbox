@@ -20,7 +20,7 @@ module Epics
           to_date = Date.today
 
           if from_date < to_date
-            mt940 = account.client.STA(from_date , to_date)
+            mt940 = account.transport_client.STA(from_date , to_date)
             Cmxl.parse(mt940).map(&:transactions).flatten.each do |transaction|
               create_statement(account_id, transaction)
             end
