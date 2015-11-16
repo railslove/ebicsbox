@@ -35,14 +35,38 @@ module Epics
 
       format :json
 
+      before do
+        if current_user.nil?
+          error!({ message: 'Unauthorized access. Please provide a valid access token!' }, 401)
+        end
+      end
+
       helpers do
+        def current_user
+          @current_user ||= begin
+            if match = env['Authorization'].to_s.match(/token (.+)/)
+              User.find_by_access_token(match[1])
+            else
+              nil
+            end
+          end
+        end
+
+        def current_organization
+          @current_organization ||= current_user.organization
+        end
+
         def account
-          Epics::Box::Account.first!({iban: params[:account]})
+          current_organization.accounts_dataset.first!(iban: params[:account])
         end
 
         def logger
           Server.logger
         end
+      end
+
+      get '/' do
+        "Home"
       end
 
       resource :accounts do
@@ -61,7 +85,7 @@ module Epics
         end
         desc 'Add a new account'
         post do
-          if account = Account.create(params)
+          if account = current_organization.add_account(params)
             Event.account_created(account)
             present account, with: ManageAccountPresenter
           else
@@ -70,18 +94,18 @@ module Epics
         end
 
         get do
-          accounts = Account.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
+          accounts = current_organization.accounts_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
           present accounts, with: ManageAccountPresenter
         end
 
         get ':id' do
-          account = Account.first!({ iban: params[:id] })
+          account = current_organization.accounts_dataset.first!({ iban: params[:id] })
           present account, with: ManageAccountPresenter
         end
 
         put ':id/submit' do
           begin
-            account = Account.first!({ iban: params[:id] })
+            account = current_organization.accounts_dataset.first!({ iban: params[:id] })
             account.setup!
           rescue Account::AlreadyActivated => ex
             error!({ message: "Account is already activated" }, 400)
@@ -106,12 +130,16 @@ module Epics
           optional :mode, type: String, desc: 'mode'
         end
         put ':id' do
-          account = Account.find(iban: params[:id])
-          account.set(params.except('id', 'state'))
-          if !account.modified? || account.save
-            present account, with: ManageAccountPresenter
-          else
-            error!({ message: 'Failed to update account' }, 400)
+          begin
+            account = Account.where(organization: current_organization).first!(iban: params[:id])
+            account.set(params.except('id', 'state'))
+            if !account.modified? || account.save
+              present account, with: ManageAccountPresenter
+            else
+              error!({ message: 'Failed to update account' }, 400)
+            end
+          rescue Sequel::NoMatchingRow => ex
+            error!({ message: 'Your organization does not have an account with given IBAN!' }, 400)
           end
         end
       end
@@ -155,7 +183,14 @@ module Epics
 
           fail(RuntimeError.new(sdd.errors.full_messages.join(" "))) unless sdd.valid?
 
-          Queue.execute_debit account_id: account.id, payload: Base64.strict_encode64(sdd.to_xml), amount: params[:amount], eref: params[:eref], instrument: params[:instrument]
+          Queue.execute_debit(
+            account_id: account.id,
+            user_id: current_user.id,
+            payload: Base64.strict_encode64(sdd.to_xml),
+            amount: params[:amount],
+            eref: params[:eref],
+            instrument: params[:instrument]
+          )
 
           {debit: 'ok'}
         rescue RuntimeError, ArgumentError => e
@@ -196,7 +231,13 @@ module Epics
 
           fail(RuntimeError.new(sct.errors.full_messages.join(" "))) unless sct.valid?
 
-          Queue.execute_credit account_id: account.id, payload: Base64.strict_encode64(sct.to_xml), eref: params[:eref], amount: params[:amount]
+          Queue.execute_credit(
+            account_id: account.id,
+            user_id: current_user.id,
+            payload: Base64.strict_encode64(sct.to_xml),
+            eref: params[:eref],
+            amount: params[:amount]
+          )
 
           {credit: 'ok'}
         rescue RuntimeError, ArgumentError => e
@@ -220,7 +261,7 @@ module Epics
           # statements = Statement.where(account_id: account.id).limit(params[:per_page]).offset((params[:page] - 1) * params[:per_page]).all
           present statements, with: Epics::Box::StatementPresenter
         rescue Sequel::NoMatchingRow => ex
-          { errors: "no account found error: #{ex.message}" }
+          error!({ message: 'Your organization does not have an account with given IBAN!' }, 404)
         end
       end
 

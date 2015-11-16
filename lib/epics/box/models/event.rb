@@ -5,7 +5,6 @@ module Epics
     class Event < Sequel::Model
       SUPPORTED_TYPES = [
         :account_created,
-        :account_activated,
         :debit_created,
         :debit_failed,
         :debit_succeeded,
@@ -14,6 +13,7 @@ module Epics
         :credit_suceeded,
         :statement_created,
         :statement_updated,
+        :subscriber_activated,
         :transaction_updated,
       ]
       RETRY_THRESHOLD = 10

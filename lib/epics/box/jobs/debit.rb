@@ -14,6 +14,7 @@ module Epics
             type: "debit",
             order_type: INSTRUMENT_MAPPING[message[:instrument]],
             account_id: message[:account_id],
+            user_id: message[:user_id],
             eref: message[:eref],
             payload: Base64.strict_decode64(message[:payload]),
             status: "created",

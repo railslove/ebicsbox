@@ -4,28 +4,28 @@ module Epics
   module Box
     module Jobs
       RSpec.describe CheckActivation do
-        let(:account) { Account.create }
+        let(:subscriber) { Subscriber.create }
 
         def execute
-          described_class.process!(account_id: account.id)
+          described_class.process!(subscriber_id: subscriber.id)
         end
 
         it 'tries to activate the account' do
-          expect_any_instance_of(Account).to receive(:activate!)
+          expect_any_instance_of(Subscriber).to receive(:activate!)
           execute
         end
 
         context 'activation failed' do
           it 'logs an info' do
-            expect { execute }.to have_logged_message("[Jobs::CheckActivation] Failed to activate account! account_id=#{account.id}")
+            expect { execute }.to have_logged_message("[Jobs::CheckActivation] Failed to activate subscriber! subscriber_id=#{subscriber.id}")
           end
         end
 
         context 'activated' do
-          before { allow_any_instance_of(Account).to receive(:activate!).and_return(true) }
+          before { allow_any_instance_of(Subscriber).to receive(:activate!).and_return(true) }
 
           it 'logs an info' do
-            expect { execute }.to have_logged_message("[Jobs::CheckActivation] Activated account! account_id=#{account.id}")
+            expect { execute }.to have_logged_message("[Jobs::CheckActivation] Activated subscriber! subscriber_id=#{subscriber.id}")
           end
         end
       end
