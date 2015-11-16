@@ -1,4 +1,4 @@
-require "bundler/gem_tasks"
+# require "bundler/gem_tasks"
 
 namespace :jruby do
   task 'build' do

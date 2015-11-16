@@ -11,8 +11,6 @@ WORKDIR /usr/ebicsbox
 
 RUN echo invokedynamic.all=true >> /usr/ebicsbox/.jrubyrc
 
-ADD epics-box.gemspec /usr/ebicsbox/
-ADD lib/epics/box/version.rb /usr/ebicsbox/lib/epics/box/version.rb
 ADD Gemfile /usr/ebicsbox/
 ADD Gemfile.lock /usr/ebicsbox/
 RUN bundle install
