@@ -1,6 +1,6 @@
 module Epics
   module Box
-    RSpec.describe Server do
+    RSpec.describe Content do
       let(:organization) { Organization.create(name: 'Organization 1') }
       let(:other_organization) { Organization.create(name: 'Organization 2') }
       let(:user) { User.create(organization_id: organization.id, name: 'Some user', access_token: 'orga-user') }
@@ -23,6 +23,22 @@ module Epics
 
           it 'grants access to the app' do
             get '/', { 'Authorization' => 'token orga-user' }
+            expect_status 200
+          end
+        end
+      end
+
+      describe "GET: /accounts" do
+        it 'is not accessible for unknown users' do
+          get '/accounts', { 'Authorization' => nil }
+          expect_status 401
+        end
+
+        context 'valid user' do
+          include_context 'valid user'
+
+          it 'returns a success status' do
+            get '/accounts', { 'Authorization' => "token #{user.access_token}" }
             expect_status 200
           end
         end

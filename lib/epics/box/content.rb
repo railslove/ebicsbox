@@ -17,11 +17,13 @@ module Epics
       end
 
       resource :accounts do
+        desc 'Returns a list of all accessible accounts'
         get do
           accounts = current_organization.accounts_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
           present accounts, with: AccountPresenter
         end
 
+        desc 'Returns detaild information about a single account'
         params do
           requires :account, type: String, desc: "the account to use"
         end
