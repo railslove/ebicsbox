@@ -96,6 +96,59 @@ module Epics
           it 'allows to filter results by a date range'
         end
       end
+
+      describe 'POST /:account/debits' do
+        include_context 'valid user'
+
+        context 'account does not exist' do
+
+        end
+
+        context 'account is owned by another organization' do
+
+        end
+
+        context 'account is not yet activated' do
+
+        end
+
+        context 'account is activated and accessible' do
+          let(:account) { organization.add_account(iban: 'AL90208110080000001039531801', name: 'Test Account', creditor_identifier: 'DE98ZZZ09999999999') }
+
+          context 'invalid data' do
+            it 'includes a proper error message' do
+              post "#{account.iban}/debits", { some: 'data' }, { 'Authorization' => "token #{user.access_token}" }
+              expect_json 'message', 'Validation of your request\'s payload failed!'
+            end
+
+            it 'includes a list of all errors' do
+              post "#{account.iban}/debits", { some: 'data' }, { 'Authorization' => "token #{user.access_token}" }
+              expect_json_types errors: :object
+            end
+          end
+
+          context 'valid data' do
+            let(:payload) { {
+              name: 'Some person',
+              amount: 123,
+              bic: 'DABAIE2D',
+              iban: 'AL90208110080000001039531801',
+              eref: 'test-1',
+              mandate_id: '1123',
+              mandate_signature_date: Time.now.to_i } }
+
+            it 'iniates a new direct debit' do
+              expect(Epics::Box::DirectDebit).to receive(:create!)
+              post "#{account.iban}/debits", payload, { 'Authorization' => "token #{user.access_token}" }
+            end
+
+            it 'returns a proper message' do
+              post "#{account.iban}/debits", payload, { 'Authorization' => "token #{user.access_token}" }
+              expect_json 'message', 'Direct debit has been initiated successfully!'
+            end
+          end
+        end
+      end
     end
   end
 end

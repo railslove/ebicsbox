@@ -4,11 +4,21 @@ require 'epics/box/validations/unique_transaction'
 # Helpers
 require 'epics/box/helpers/default'
 
+# Business processes
+require 'epics/box/business_processes/direct_debit'
+
 module Epics
   module Box
     class Content < Grape::API
       format :json
       helpers Helpers::Default
+
+      rescue_from Grape::Exceptions::ValidationErrors do |e|
+        error!({
+          message: 'Validation of your request\'s payload failed!',
+          errors: Hash[e.errors.map{ |k, v| [k.first, v]}]
+        }, 400)
+      end
 
       before do
         if current_user.nil?
@@ -51,41 +61,12 @@ module Epics
       desc "debits a customer account"
       post ':account/debits' do
         begin
-          sdd = SEPA::DirectDebit.new(account.pain_attributes_hash).tap do |credit|
-            credit.message_identification= "EBICS-BOX/#{SecureRandom.hex(11).upcase}"
-            credit.add_transaction(
-              name: params[:name],
-              bic: params[:bic],
-              iban: params[:iban],
-              amount: params[:amount] / 100.0,
-              instruction: params[:instruction],
-              mandate_id: params[:mandate_id],
-              mandate_date_of_signature: Time.at(params[:mandate_signature_date]).to_date,
-              local_instrument: params[:instrument],
-              sequence_type: params[:sequence_type],
-              reference: params[:eref],
-              remittance_information: params[:remittance_information],
-              requested_date: Time.at(params[:requested_date]).to_date,
-              batch_booking: true
-            )
-          end
-
-          fail(RuntimeError.new(sdd.errors.full_messages.join(" "))) unless sdd.valid?
-
-          Queue.execute_debit(
-            account_id: account.id,
-            user_id: current_user.id,
-            payload: Base64.strict_encode64(sdd.to_xml),
-            amount: params[:amount],
-            eref: params[:eref],
-            instrument: params[:instrument]
-          )
-
-          {debit: 'ok'}
-        rescue RuntimeError, ArgumentError => e
-          {debit: 'nok', error: e.message}
+          DirectDebit.create!(account, params, current_user)
+          { message: 'Direct debit has been initiated successfully!' }
+        rescue RuntimeError, DirectDebit::Failure => e
+          error!({ message: 'Failed to initiate a direct debit.', errors: e.errors }, 400)
         rescue Sequel::NoMatchingRow => e
-          {credit: 'nok', errors: 'no account found'}
+          error!({ message: 'Please specify a valid account!' }, 404)
         end
       end
 
