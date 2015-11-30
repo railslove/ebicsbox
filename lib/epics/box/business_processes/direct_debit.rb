@@ -4,9 +4,9 @@ module Epics
   module Box
     class DirectDebit
       def self.create!(account, params, user)
-        sdd = SEPA::DirectDebit.new(account.pain_attributes_hash).tap do |credit|
-          credit.message_identification= "EBICS-BOX/#{SecureRandom.hex(11).upcase}"
-          credit.add_transaction(
+        sdd = SEPA::DirectDebit.new(account.pain_attributes_hash).tap do |debit|
+          debit.message_identification= "EBICS-BOX/#{SecureRandom.hex(11).upcase}"
+          debit.add_transaction(
             name: params[:name],
             bic: params[:bic],
             iban: params[:iban],
