@@ -35,6 +35,10 @@ module Epics
         error!({ message: 'Failed to initiate a business process.', errors: e.errors }, 400)
       end
 
+      rescue_from Account::NotFound do |e|
+        error!({ message: 'Your organization does not have an account with given IBAN!' }, 404)
+      end
+
       before do
         if current_user.nil?
           error!({ message: 'Unauthorized access. Please provide a valid access token!' }, 401)
@@ -53,7 +57,6 @@ module Epics
           requires :account, type: String, desc: "the account to use"
         end
         get ':account' do
-          account = current_organization.accounts_dataset.first!({ iban: params[:id] })
           present account, with: AccountPresenter
         end
       end
@@ -75,13 +78,9 @@ module Epics
       end
       desc "debits a customer account"
       post ':account/debits' do
-        begin
-          params[:requested_date] ||= Time.now.to_i + 172800 # grape defaults interfere with swagger doc creation
-          DirectDebit.create!(account, params, current_user)
-          { message: 'Direct debit has been initiated successfully!' }
-        rescue Sequel::NoMatchingRow => e
-          error!({ message: 'Your organization does not have an account with given IBAN!' }, 404)
-        end
+        params[:requested_date] ||= Time.now.to_i + 172800 # grape defaults interfere with swagger doc creation
+        DirectDebit.create!(account, params, current_user)
+        { message: 'Direct debit has been initiated successfully!' }
       end
 
       params do
@@ -96,13 +95,9 @@ module Epics
         optional :service_level, type: String, desc: "requested execution date", default: "SEPA", values: ["SEPA", "URGP"]
       end
       post ':account/credits' do
-        begin
-          params[:requested_date] ||= Time.now.to_i
-          Credit.create!(account, params, current_user)
-          { message: 'Credit has been initiated successfully!' }
-        rescue Sequel::NoMatchingRow => e
-          error!({ message: 'Your organization does not have an account with given IBAN!' }, 404)
-        end
+        params[:requested_date] ||= Time.now.to_i # grape defaults interfere with swagger doc creation
+        Credit.create!(account, params, current_user)
+        { message: 'Credit has been initiated successfully!' }
       end
 
       desc "Returns statements for account"
@@ -114,13 +109,8 @@ module Epics
         optional :per_page, type: Integer, desc: "how many results per page", values: 1..100, default: 10
       end
       get ':account/statements' do
-        begin
-          statements = Statement.paginated_by_account(account.id, per_page: params[:per_page], page: params[:page]).all
-          # statements = Statement.where(account_id: account.id).limit(params[:per_page]).offset((params[:page] - 1) * params[:per_page]).all
-          present statements, with: Epics::Box::StatementPresenter
-        rescue Sequel::NoMatchingRow => ex
-          error!({ message: 'Your organization does not have an account with given IBAN!' }, 404)
-        end
+        statements = Statement.paginated_by_account(account.id, per_page: params[:per_page], page: params[:page]).all
+        present statements, with: StatementPresenter
       end
 
       desc "Returns transactions for account"
@@ -130,12 +120,8 @@ module Epics
         optional :per_page, type: Integer, desc: "how many results per page", values: 1..100, default: 10
       end
       get ':account/transactions' do
-        begin
-          statements = Transaction.paginated_by_account(account.id, per_page: params[:per_page], page: params[:page]).all
-          present statements, with: Epics::Box::TransactionPresenter
-        rescue Sequel::NoMatchingRow => ex
-          { errors: "no account found error: #{ex.message}" }
-        end
+        statements = Transaction.paginated_by_account(account.id, per_page: params[:per_page], page: params[:page]).all
+        present statements, with: TransactionPresenter
       end
     end
   end

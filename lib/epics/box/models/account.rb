@@ -5,6 +5,16 @@ class Epics::Box::Account < Sequel::Model
 
   NoTransportClient = Class.new(StandardError)
   NotActivated = Class.new(StandardError)
+  NotFound = Class.new(ArgumentError) do
+    attr_accessor :organization_id, :iban
+
+    def self.for_orga(organization_id:, iban:)
+      new("Could not find account! iban=#{iban} organization_id=#{organization_id}").tap do |error|
+        error.organization_id = organization_id
+        error.iban = iban
+      end
+    end
+  end
 
   one_to_many :statements
   one_to_many :subscribers

@@ -17,7 +17,7 @@ module Epics
         end
 
         def account
-          current_organization.accounts_dataset.first!(iban: params[:account])
+          current_organization.find_account!(params[:account])
         end
 
         def logger
