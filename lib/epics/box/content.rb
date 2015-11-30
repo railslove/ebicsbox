@@ -48,19 +48,19 @@ module Epics
       end
 
       params do
-        requires :account,  type: String, desc: "the account to use"
-        requires :name,  type: String, desc: "the customers name"
-        requires :bic,  type: String, desc: "the customers bic" # TODO validate / clearer
-        requires :iban,  type: String, desc: "the customers iban" # TODO validate
-        requires :amount,  type: Integer, desc: "amount to credit", values: 1..12000000
-        requires :eref,  type: String, desc: "end to end id", unique_transaction: true
-        requires :mandate_id,  type: String, desc: "mandate id"
+        requires :account, type: String, desc: "the account to use"
+        requires :name, type: String, desc: "the customers name"
+        requires :bic, type: String, desc: "the customers bic" # TODO validate / clearer
+        requires :iban, type: String, desc: "the customers iban" # TODO validate
+        requires :amount, type: Integer, desc: "amount to credit", values: 1..12000000
+        requires :eref, type: String, desc: "end to end id", unique_transaction: true
+        requires :mandate_id, type: String, desc: "mandate id"
         requires :mandate_signature_date, type: Integer, desc: "mandate signature date"
         optional :instrument, type: String, desc: "", values: %w[CORE COR1 B2B], default: "COR1"
         optional :sequence_type, type: String, desc: "", values: ["FRST", "RCUR", "OOFF", "FNAL"], default: "FRST"
-        optional :remittance_information ,  type: String, desc: "will apear on the customers bank statement"
-        optional :instruction,  type: String, desc: "instruction identification, will not be submitted to the debtor"
-        optional :requested_date,  type: Integer, desc: "requested execution date" #TODO validate, future
+        optional :remittance_information, type: String, desc: "will apear on the customers bank statement"
+        optional :instruction, type: String, desc: "instruction identification, will not be submitted to the debtor"
+        optional :requested_date, type: Integer, desc: "requested execution date" #TODO validate, future
       end
       desc "debits a customer account"
       post ':account/debits' do
@@ -100,11 +100,11 @@ module Epics
 
       desc "Returns statements for account"
       params do
-        requires :account,  type: String, desc: "IBAN for an existing account"
-        optional :from,  type: Integer, desc: "results starting at"
-        optional :to,    type: Integer, desc: "results ending at"
-        optional :page,  type: Integer, desc: "page through the results", default: 1
-        optional :per_page,  type: Integer, desc: "how many results per page", values: 1..100, default: 10
+        requires :account, type: String, desc: "IBAN for an existing account"
+        optional :from, type: Integer, desc: "results starting at"
+        optional :to, type: Integer, desc: "results ending at"
+        optional :page, type: Integer, desc: "page through the results", default: 1
+        optional :per_page, type: Integer, desc: "how many results per page", values: 1..100, default: 10
       end
       get ':account/statements' do
         begin
@@ -118,9 +118,9 @@ module Epics
 
       desc "Returns transactions for account"
       params do
-        requires :account,  type: String, desc: "IBAN for an existing account"
-        optional :page,  type: Integer, desc: "page through the results", default: 1
-        optional :per_page,  type: Integer, desc: "how many results per page", values: 1..100, default: 10
+        requires :account, type: String, desc: "IBAN for an existing account"
+        optional :page, type: Integer, desc: "page through the results", default: 1
+        optional :per_page, type: Integer, desc: "how many results per page", values: 1..100, default: 10
       end
       get ':account/transactions' do
         begin
