@@ -1,8 +1,10 @@
 require 'securerandom'
+
 class Epics::Box::Account < Sequel::Model
   self.raise_on_save_failure = true
 
   NoTransportClient = Class.new(StandardError)
+  NotActivated = Class.new(StandardError)
 
   one_to_many :statements
   one_to_many :subscribers
@@ -28,10 +30,12 @@ class Epics::Box::Account < Sequel::Model
   end
 
   def pain_attributes_hash
+    fail(NotActivated) unless active?
     values.slice(:name, :bic, :iban, :creditor_identifier)
   end
 
   def credit_pain_attributes_hash
+    fail(NotActivated) unless active?
     values.slice(:name, :bic, :iban)
   end
 

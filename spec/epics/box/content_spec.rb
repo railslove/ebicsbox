@@ -100,20 +100,60 @@ module Epics
       describe 'POST /:account/debits' do
         include_context 'valid user'
 
-        context 'account does not exist' do
+        let(:valid_payload) { {
+          name: 'Some person',
+          amount: 123,
+          bic: 'DABAIE2D',
+          iban: 'AL90208110080000001039531801',
+          eref: 'test-1',
+          mandate_id: '1123',
+          mandate_signature_date: Time.now.to_i
+        }}
 
+        context 'account does not exist' do
+          it 'fails with a proper error message' do
+            post "NOT_EXISTING/debits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
+            expect_json 'message', 'Your organization does not have an account with given IBAN!'
+          end
+
+          it 'fails with a 404 status' do
+            post "NOT_EXISTING/debits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
+            expect_status 404
+          end
         end
 
         context 'account is owned by another organization' do
+          let(:account) { other_organization.add_account(iban: 'SOME_IBAN') }
 
+          it 'fails with a proper error message' do
+            post "#{account.iban}/debits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
+            expect_json 'message', 'Your organization does not have an account with given IBAN!'
+          end
+
+          it 'fails with a 404 status' do
+            post "#{account.iban}/debits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
+            expect_status 404
+          end
         end
 
         context 'account is not yet activated' do
+          let(:account) { organization.add_account(iban: 'AL90208110080000001039531801', name: 'Test Account', creditor_identifier: 'DE98ZZZ09999999999') }
 
+          it 'fails with a proper error message' do
+            post "#{account.iban}/debits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
+            expect_json 'message', 'The account has not been activated. Please activate before submitting requests!'
+          end
+
+          it 'fails with a 412 (precondition failed) status' do
+            post "#{account.iban}/debits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
+            expect_status 412
+          end
         end
 
         context 'account is activated and accessible' do
           let(:account) { organization.add_account(iban: 'AL90208110080000001039531801', name: 'Test Account', creditor_identifier: 'DE98ZZZ09999999999') }
+
+          before { account.add_subscriber(activated_at: 1.day.ago) }
 
           context 'invalid data' do
             it 'includes a proper error message' do
@@ -128,22 +168,13 @@ module Epics
           end
 
           context 'valid data' do
-            let(:payload) { {
-              name: 'Some person',
-              amount: 123,
-              bic: 'DABAIE2D',
-              iban: 'AL90208110080000001039531801',
-              eref: 'test-1',
-              mandate_id: '1123',
-              mandate_signature_date: Time.now.to_i } }
-
             it 'iniates a new direct debit' do
               expect(Epics::Box::DirectDebit).to receive(:create!)
-              post "#{account.iban}/debits", payload, { 'Authorization' => "token #{user.access_token}" }
+              post "#{account.iban}/debits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
             end
 
             it 'returns a proper message' do
-              post "#{account.iban}/debits", payload, { 'Authorization' => "token #{user.access_token}" }
+              post "#{account.iban}/debits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
               expect_json 'message', 'Direct debit has been initiated successfully!'
             end
 
@@ -152,7 +183,7 @@ module Epics
               Timecop.freeze(now) do
                 default = now.to_i + 172800
                 expect(Epics::Box::DirectDebit).to receive(:create!).with(anything, hash_including('requested_date' => default), anything)
-                post "#{account.iban}/debits", payload, { 'Authorization' => "token #{user.access_token}" }
+                post "#{account.iban}/debits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
               end
             end
           end
@@ -162,20 +193,59 @@ module Epics
       describe 'POST /:account/credits' do
         include_context 'valid user'
 
-        context 'account does not exist' do
+        let(:valid_payload) { {
+          name: 'Some person',
+          amount: 123,
+          bic: 'DABAIE2D',
+          iban: 'AL90208110080000001039531801',
+          eref: 'test-credit-1',
+          remittance_information: 'Just s abasic test credit'
+        }}
 
+        context 'account does not exist' do
+          it 'fails with a proper error message' do
+            post "NOT_EXISTING/credits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
+            expect_json 'message', 'Your organization does not have an account with given IBAN!'
+          end
+
+          it 'fails with a 404 status' do
+            post "NOT_EXISTING/credits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
+            expect_status 404
+          end
         end
 
         context 'account is owned by another organization' do
+          let(:account) { other_organization.add_account(iban: 'SOME_IBAN') }
 
+          it 'fails with a proper error message' do
+            post "#{account.iban}/credits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
+            expect_json 'message', 'Your organization does not have an account with given IBAN!'
+          end
+
+          it 'fails with a 404 status' do
+            post "#{account.iban}/credits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
+            expect_status 404
+          end
         end
 
         context 'account is not yet activated' do
+          let(:account) { organization.add_account(iban: 'AL90208110080000001039531801', name: 'Test Account', creditor_identifier: 'DE98ZZZ09999999999') }
 
+          it 'fails with a proper error message' do
+            post "#{account.iban}/credits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
+            expect_json 'message', 'The account has not been activated. Please activate before submitting requests!'
+          end
+
+          it 'fails with a 412 (precondition failed) status' do
+            post "#{account.iban}/credits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
+            expect_status 412
+          end
         end
 
         context 'account is activated and accessible' do
           let(:account) { organization.add_account(iban: 'AL90208110080000001039531801', name: 'Test Account', creditor_identifier: 'DE98ZZZ09999999999') }
+
+          before { account.add_subscriber(activated_at: 1.day.ago) }
 
           context 'invalid data' do
             it 'includes a proper error message' do
@@ -190,22 +260,13 @@ module Epics
           end
 
           context 'valid data' do
-            let(:payload) { {
-              name: 'Some person',
-              amount: 123,
-              bic: 'DABAIE2D',
-              iban: 'AL90208110080000001039531801',
-              eref: 'test-credit-1',
-              remittance_information: 'Just s abasic test credit'
-            }}
-
             it 'iniates a new credit' do
               expect(Epics::Box::Credit).to receive(:create!)
-              post "#{account.iban}/credits", payload, { 'Authorization' => "token #{user.access_token}" }
+              post "#{account.iban}/credits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
             end
 
             it 'returns a proper message' do
-              post "#{account.iban}/credits", payload, { 'Authorization' => "token #{user.access_token}" }
+              post "#{account.iban}/credits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
               expect_json 'message', 'Credit has been initiated successfully!'
             end
 
@@ -214,7 +275,7 @@ module Epics
               Timecop.freeze(now) do
                 default = now.to_i
                 expect(Epics::Box::Credit).to receive(:create!).with(anything, hash_including('requested_date' => default), anything)
-                post "#{account.iban}/credits", payload, { 'Authorization' => "token #{user.access_token}" }
+                post "#{account.iban}/credits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
               end
             end
           end

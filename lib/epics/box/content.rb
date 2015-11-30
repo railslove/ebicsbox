@@ -68,10 +68,12 @@ module Epics
           params[:requested_date] ||= Time.now.to_i + 172800 # grape defaults interfere with swagger doc creation
           DirectDebit.create!(account, params, current_user)
           { message: 'Direct debit has been initiated successfully!' }
+        rescue Account::NotActivated => e
+          error!({ message: 'The account has not been activated. Please activate before submitting requests!' }, 412)
         rescue BusinessProcessFailure => e
           error!({ message: 'Failed to initiate a direct debit.', errors: e.errors }, 400)
         rescue Sequel::NoMatchingRow => e
-          error!({ message: 'Please specify a valid account!' }, 404)
+          error!({ message: 'Your organization does not have an account with given IBAN!' }, 404)
         end
       end
 
@@ -91,10 +93,12 @@ module Epics
           params[:requested_date] ||= Time.now.to_i
           Credit.create!(account, params, current_user)
           { message: 'Credit has been initiated successfully!' }
+        rescue Account::NotActivated => e
+          error!({ message: 'The account has not been activated. Please activate before submitting requests!' }, 412)
         rescue BusinessProcessFailure => e
           error!({ message: 'Failed to initiate a credit', errors: e.errors }, 400)
         rescue Sequel::NoMatchingRow => e
-          error!({ message: 'Please specify a valid account!' }, 404)
+          error!({ message: 'Your organization does not have an account with given IBAN!' }, 404)
         end
       end
 
