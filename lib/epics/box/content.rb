@@ -46,8 +46,8 @@ module Epics
       params do
         requires :account,  type: String, desc: "the account to use"
         requires :name,  type: String, desc: "the customers name"
-        requires :bic ,  type: String, desc: "the customers bic" # TODO validate / clearer
-        requires :iban ,  type: String, desc: "the customers iban" # TODO validate
+        requires :bic,  type: String, desc: "the customers bic" # TODO validate / clearer
+        requires :iban,  type: String, desc: "the customers iban" # TODO validate
         requires :amount,  type: Integer, desc: "amount to credit", values: 1..12000000
         requires :eref,  type: String, desc: "end to end id", unique_transaction: true
         requires :mandate_id,  type: String, desc: "mandate id"
@@ -56,11 +56,12 @@ module Epics
         optional :sequence_type, type: String, desc: "", values: ["FRST", "RCUR", "OOFF", "FNAL"], default: "FRST"
         optional :remittance_information ,  type: String, desc: "will apear on the customers bank statement"
         optional :instruction,  type: String, desc: "instruction identification, will not be submitted to the debtor"
-        optional :requested_date,  type: Integer, desc: "requested execution date", default: ->{ Time.now.to_i + 172800 } #TODO validate, future
+        optional :requested_date,  type: Integer, desc: "requested execution date" #TODO validate, future
       end
       desc "debits a customer account"
       post ':account/debits' do
         begin
+          params[:requested_date] ||= Time.now.to_i + 172800 # grape defaults interfere with swagger doc creation
           DirectDebit.create!(account, params, current_user)
           { message: 'Direct debit has been initiated successfully!' }
         rescue RuntimeError, DirectDebit::Failure => e
@@ -78,12 +79,12 @@ module Epics
         requires :amount,  type: Integer, desc: "amount to credit", values: 1..12000000
         requires :eref,  type: String, desc: "end to end id", unique_transaction: true
         optional :remittance_information ,  type: String, desc: "will apear on the customers bank statement"
-        optional :requested_date,  type: Integer, desc: "requested execution date", default: ->{ Time.now.to_i }
+        optional :requested_date,  type: Integer, desc: "requested execution date"
         optional :service_level, type: String, desc: "requested execution date", default: "SEPA", values: ["SEPA", "URGP"]
       end
-      desc "Credits a customer account"
       post ':account/credits' do
         begin
+          params[:requested_date] ||= Time.now.to_i
           sct = SEPA::CreditTransfer.new(account.credit_pain_attributes_hash).tap do |credit|
             credit.message_identification= "EBICS-BOX/#{SecureRandom.hex(11).upcase}"
             credit.add_transaction(

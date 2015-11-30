@@ -30,5 +30,6 @@ group :development, :test do
   gem 'rspec'
   gem 'guard-rspec', require: false
   gem 'airborne', '0.1.15'
+  gem 'timecop'
   gem 'webmock'
 end

@@ -146,6 +146,15 @@ module Epics
               post "#{account.iban}/debits", payload, { 'Authorization' => "token #{user.access_token}" }
               expect_json 'message', 'Direct debit has been initiated successfully!'
             end
+
+            it 'sets a default value for requested_date' do
+              now = Time.now
+              Timecop.freeze(now) do
+                default = now.to_i + 172800
+                expect(Epics::Box::DirectDebit).to receive(:create!).with(anything, hash_including('requested_date' => default), anything)
+                post "#{account.iban}/debits", payload, { 'Authorization' => "token #{user.access_token}" }
+              end
+            end
           end
         end
       end
