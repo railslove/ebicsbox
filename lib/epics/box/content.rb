@@ -11,6 +11,9 @@ require 'epics/box/business_processes/direct_debit'
 # Errors
 require 'epics/box/errors/business_process_failure'
 
+# Models
+require 'epics/box/models/account'
+
 module Epics
   module Box
     class Content < Grape::API
@@ -22,6 +25,14 @@ module Epics
           message: 'Validation of your request\'s payload failed!',
           errors: Hash[e.errors.map{ |k, v| [k.first, v]}]
         }, 400)
+      end
+
+      rescue_from Account::NotActivated do |e|
+        error!({ message: 'The account has not been activated. Please activate before submitting requests!' }, 412)
+      end
+
+      rescue_from BusinessProcessFailure do |e|
+        error!({ message: 'Failed to initiate a business process.', errors: e.errors }, 400)
       end
 
       before do
@@ -68,10 +79,6 @@ module Epics
           params[:requested_date] ||= Time.now.to_i + 172800 # grape defaults interfere with swagger doc creation
           DirectDebit.create!(account, params, current_user)
           { message: 'Direct debit has been initiated successfully!' }
-        rescue Account::NotActivated => e
-          error!({ message: 'The account has not been activated. Please activate before submitting requests!' }, 412)
-        rescue BusinessProcessFailure => e
-          error!({ message: 'Failed to initiate a direct debit.', errors: e.errors }, 400)
         rescue Sequel::NoMatchingRow => e
           error!({ message: 'Your organization does not have an account with given IBAN!' }, 404)
         end
@@ -93,10 +100,6 @@ module Epics
           params[:requested_date] ||= Time.now.to_i
           Credit.create!(account, params, current_user)
           { message: 'Credit has been initiated successfully!' }
-        rescue Account::NotActivated => e
-          error!({ message: 'The account has not been activated. Please activate before submitting requests!' }, 412)
-        rescue BusinessProcessFailure => e
-          error!({ message: 'Failed to initiate a credit', errors: e.errors }, 400)
         rescue Sequel::NoMatchingRow => e
           error!({ message: 'Your organization does not have an account with given IBAN!' }, 404)
         end
