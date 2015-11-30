@@ -158,6 +158,68 @@ module Epics
           end
         end
       end
+
+      describe 'POST /:account/credits' do
+        include_context 'valid user'
+
+        context 'account does not exist' do
+
+        end
+
+        context 'account is owned by another organization' do
+
+        end
+
+        context 'account is not yet activated' do
+
+        end
+
+        context 'account is activated and accessible' do
+          let(:account) { organization.add_account(iban: 'AL90208110080000001039531801', name: 'Test Account', creditor_identifier: 'DE98ZZZ09999999999') }
+
+          context 'invalid data' do
+            it 'includes a proper error message' do
+              post "#{account.iban}/credits", { some: 'data' }, { 'Authorization' => "token #{user.access_token}" }
+              expect_json 'message', 'Validation of your request\'s payload failed!'
+            end
+
+            it 'includes a list of all errors' do
+              post "#{account.iban}/credits", { some: 'data' }, { 'Authorization' => "token #{user.access_token}" }
+              expect_json_types errors: :object
+            end
+          end
+
+          context 'valid data' do
+            let(:payload) { {
+              name: 'Some person',
+              amount: 123,
+              bic: 'DABAIE2D',
+              iban: 'AL90208110080000001039531801',
+              eref: 'test-credit-1',
+              remittance_information: 'Just s abasic test credit'
+            }}
+
+            it 'iniates a new credit' do
+              expect(Epics::Box::Credit).to receive(:create!)
+              post "#{account.iban}/credits", payload, { 'Authorization' => "token #{user.access_token}" }
+            end
+
+            it 'returns a proper message' do
+              post "#{account.iban}/credits", payload, { 'Authorization' => "token #{user.access_token}" }
+              expect_json 'message', 'Credit has been initiated successfully!'
+            end
+
+            it 'sets a default value for requested_date' do
+              now = Time.now
+              Timecop.freeze(now) do
+                default = now.to_i
+                expect(Epics::Box::Credit).to receive(:create!).with(anything, hash_including('requested_date' => default), anything)
+                post "#{account.iban}/credits", payload, { 'Authorization' => "token #{user.access_token}" }
+              end
+            end
+          end
+        end
+      end
     end
   end
 end

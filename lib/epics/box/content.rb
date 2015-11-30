@@ -5,7 +5,11 @@ require 'epics/box/validations/unique_transaction'
 require 'epics/box/helpers/default'
 
 # Business processes
+require 'epics/box/business_processes/credit'
 require 'epics/box/business_processes/direct_debit'
+
+# Errors
+require 'epics/box/errors/business_process_failure'
 
 module Epics
   module Box
@@ -64,7 +68,7 @@ module Epics
           params[:requested_date] ||= Time.now.to_i + 172800 # grape defaults interfere with swagger doc creation
           DirectDebit.create!(account, params, current_user)
           { message: 'Direct debit has been initiated successfully!' }
-        rescue RuntimeError, DirectDebit::Failure => e
+        rescue BusinessProcessFailure => e
           error!({ message: 'Failed to initiate a direct debit.', errors: e.errors }, 400)
         rescue Sequel::NoMatchingRow => e
           error!({ message: 'Please specify a valid account!' }, 404)
@@ -72,49 +76,25 @@ module Epics
       end
 
       params do
-        requires :account,  type: String, desc: "the account to use"
-        requires :name,  type: String, desc: "the customers name"
-        requires :bic ,  type: String, desc: "the customers bic"
-        requires :iban ,  type: String, desc: "the customers iban"
-        requires :amount,  type: Integer, desc: "amount to credit", values: 1..12000000
-        requires :eref,  type: String, desc: "end to end id", unique_transaction: true
-        optional :remittance_information ,  type: String, desc: "will apear on the customers bank statement"
-        optional :requested_date,  type: Integer, desc: "requested execution date"
+        requires :account, type: String, desc: "the account to use"
+        requires :name, type: String, desc: "the customers name"
+        requires :bic , type: String, desc: "the customers bic"
+        requires :iban, type: String, desc: "the customers iban"
+        requires :amount, type: Integer, desc: "amount to credit", values: 1..12000000
+        requires :eref, type: String, desc: "end to end id", unique_transaction: true
+        optional :remittance_information, type: String, desc: "will apear on the customers bank statement"
+        optional :requested_date, type: Integer, desc: "requested execution date"
         optional :service_level, type: String, desc: "requested execution date", default: "SEPA", values: ["SEPA", "URGP"]
       end
       post ':account/credits' do
         begin
           params[:requested_date] ||= Time.now.to_i
-          sct = SEPA::CreditTransfer.new(account.credit_pain_attributes_hash).tap do |credit|
-            credit.message_identification= "EBICS-BOX/#{SecureRandom.hex(11).upcase}"
-            credit.add_transaction(
-              name: params[:name],
-              bic: params[:bic],
-              iban: params[:iban],
-              amount: params[:amount] / 100.0,
-              reference: params[:eref],
-              remittance_information: params[:remittance_information],
-              requested_date: Time.at(params[:requested_date]).to_date,
-              batch_booking: true,
-              service_level: params[:service_level]
-            )
-          end
-
-          fail(RuntimeError.new(sct.errors.full_messages.join(" "))) unless sct.valid?
-
-          Queue.execute_credit(
-            account_id: account.id,
-            user_id: current_user.id,
-            payload: Base64.strict_encode64(sct.to_xml),
-            eref: params[:eref],
-            amount: params[:amount]
-          )
-
-          {credit: 'ok'}
-        rescue RuntimeError, ArgumentError => e
-          {credit: 'nok', errors: sct.errors.to_hash}
+          Credit.create!(account, params, current_user)
+          { message: 'Credit has been initiated successfully!' }
+        rescue BusinessProcessFailure => e
+          error!({ message: 'Failed to initiate a credit', errors: e.errors }, 400)
         rescue Sequel::NoMatchingRow => e
-          {credit: 'nok', errors: 'no account found'}
+          error!({ message: 'Please specify a valid account!' }, 404)
         end
       end
 

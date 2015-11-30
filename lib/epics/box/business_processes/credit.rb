@@ -2,42 +2,37 @@ require 'epics/box/errors/business_process_failure'
 
 module Epics
   module Box
-    class DirectDebit
+    class Credit
       def self.create!(account, params, user)
-        sdd = SEPA::DirectDebit.new(account.pain_attributes_hash).tap do |credit|
+        sct = SEPA::CreditTransfer.new(account.credit_pain_attributes_hash).tap do |credit|
           credit.message_identification= "EBICS-BOX/#{SecureRandom.hex(11).upcase}"
           credit.add_transaction(
             name: params[:name],
             bic: params[:bic],
             iban: params[:iban],
             amount: params[:amount] / 100.0,
-            instruction: params[:instruction],
-            mandate_id: params[:mandate_id],
-            mandate_date_of_signature: Time.at(params[:mandate_signature_date]).to_date,
-            local_instrument: params[:instrument],
-            sequence_type: params[:sequence_type],
             reference: params[:eref],
             remittance_information: params[:remittance_information],
             requested_date: Time.at(params[:requested_date]).to_date,
-            batch_booking: true
+            batch_booking: true,
+            service_level: params[:service_level]
           )
         end
 
-        if sdd.valid?
-          Queue.execute_debit(
+        if sct.valid?
+          Queue.execute_credit(
             account_id: account.id,
             user_id: user.id,
-            payload: Base64.strict_encode64(sdd.to_xml),
-            amount: params[:amount],
+            payload: Base64.strict_encode64(sct.to_xml),
             eref: params[:eref],
-            instrument: params[:instrument]
+            amount: params[:amount]
           )
         else
-          fail BusinessProcessFailure.new(sdd.errors)
+          fail(BusinessProcessFailure.new(sct.errors.full_messages.join(" ")))
         end
       rescue ArgumentError => e
         # TODO: Will be fixed upstream in the sepa_king gem by us
-        fail BusinessProcessFailure.new({base: e.message}, 'Invalid data')
+        fail BusinessProcessFailure.new({ base: e.message }, 'Invalid data')
       end
     end
   end
