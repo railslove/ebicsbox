@@ -186,6 +186,7 @@ GEM
     thread_safe (0.3.5)
     thread_safe (0.3.5-java)
     tilt (2.0.1)
+    timecop (0.7.3)
     timers (4.0.1)
       hitimes
     trinidad (1.5.0.B1)
@@ -233,6 +234,7 @@ DEPENDENCIES
   sequel
   sinatra
   thin
+  timecop
   trinidad (= 1.5.0.B1)
   webmock
 
