@@ -2,7 +2,7 @@ language: ruby
 sudo: false
 rvm:
   - 2.2.2
-  - jruby-19mode
+  - jruby-9.0.4.0
 cache:
   - bundler
   - apt
