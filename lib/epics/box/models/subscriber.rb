@@ -12,6 +12,7 @@ class Epics::Box::Subscriber < Sequel::Model
       account_id: account.id,
       user_id: user.id,
       subscriber: remote_user_id,
+      subscriber_id: id,
       signature_class: signature_class,
     }
   end
