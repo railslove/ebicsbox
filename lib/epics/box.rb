@@ -1,6 +1,9 @@
 lib = File.expand_path("../..", __FILE__)
 $:.unshift(lib)
 
+require 'dotenv'
+Dotenv.load
+
 require 'grape'
 require 'grape-entity'
 require 'sequel'
