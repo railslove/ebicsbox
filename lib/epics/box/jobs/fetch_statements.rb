@@ -14,7 +14,7 @@ module Epics
         def self.fetch_new_statements(account_id)
           Box.logger.info("[Jobs::FetchStatements] Starting import. id=#{account_id}")
 
-          account = Account[account_id]
+          account = Account.first!(id: account_id)
 
           from_date = account.last_imported_at || (Date.today - 30)
           to_date = Date.today
@@ -26,8 +26,10 @@ module Epics
             end
             account.imported_at!(to_date)
           end
+        rescue Sequel::NoMatchingRow  => ex
+          Box.logger.error("[Jobs::FetchStatements] Could not find account. account_id=#{account_id}")
         rescue Epics::Error::BusinessError => ex
-          Box.logger.info(ex.message) # expected
+          Box.logger.error(ex.message) # expected
         end
 
         def self.create_statement(account_id, data)
