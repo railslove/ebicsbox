@@ -20,16 +20,36 @@ module Epics
       describe '#pain_attributes_hash' do
         subject { Account.create(name: 'name', bic: 'bic', iban: 'iban', creditor_identifier: 'ci') }
 
-        it 'returns only relevant pain attributes' do
-          expect(subject.pain_attributes_hash.keys).to eq([:name, :bic, :iban, :creditor_identifier])
+        context 'activated account' do
+          before { subject.add_subscriber(activated_at: 1.day.ago) }
+
+          it 'returns only relevant pain attributes' do
+            expect(subject.pain_attributes_hash.keys).to eq([:name, :bic, :iban, :creditor_identifier])
+          end
+        end
+
+        context 'not yet activated account' do
+          it 'fails with an exception' do
+            expect { subject.credit_pain_attributes_hash }.to raise_error(Account::NotActivated)
+          end
         end
       end
 
       describe '#credit_pain_attributes_hash' do
         subject { Account.create(name: 'name', bic: 'bic', iban: 'iban', creditor_identifier: 'ci') }
 
-        it 'returns only relevant pain attributes' do
-          expect(subject.credit_pain_attributes_hash.keys).to eq([:name, :bic, :iban])
+        context 'activated account' do
+          before { subject.add_subscriber(activated_at: 1.day.ago) }
+
+          it 'returns only relevant pain attributes' do
+            expect(subject.credit_pain_attributes_hash.keys).to eq([:name, :bic, :iban])
+          end
+        end
+
+        context 'not yet activated account' do
+          it 'fails with an exception' do
+            expect { subject.credit_pain_attributes_hash }.to raise_error(Account::NotActivated)
+          end
         end
       end
 

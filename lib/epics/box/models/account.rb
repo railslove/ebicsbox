@@ -1,8 +1,20 @@
 require 'securerandom'
+
 class Epics::Box::Account < Sequel::Model
   self.raise_on_save_failure = true
 
   NoTransportClient = Class.new(StandardError)
+  NotActivated = Class.new(StandardError)
+  NotFound = Class.new(ArgumentError) do
+    attr_accessor :organization_id, :iban
+
+    def self.for_orga(organization_id:, iban:)
+      new("Could not find account! iban=#{iban} organization_id=#{organization_id}").tap do |error|
+        error.organization_id = organization_id
+        error.iban = iban
+      end
+    end
+  end
 
   one_to_many :statements
   one_to_many :subscribers
@@ -28,10 +40,12 @@ class Epics::Box::Account < Sequel::Model
   end
 
   def pain_attributes_hash
+    fail(NotActivated) unless active?
     values.slice(:name, :bic, :iban, :creditor_identifier)
   end
 
   def credit_pain_attributes_hash
+    fail(NotActivated) unless active?
     values.slice(:name, :bic, :iban)
   end
 
