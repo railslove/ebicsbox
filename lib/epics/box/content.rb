@@ -46,7 +46,11 @@ module Epics
       end
 
       resource :accounts do
-        desc 'Returns a list of all accessible accounts'
+        api_desc 'Returns a list of all accessible accounts' do
+          detail 'This API does this and that and more'
+          tags 'content'
+          api_name 'get_accounts'
+        end
         get do
           accounts = current_organization.accounts_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
           present accounts, with: AccountPresenter
@@ -83,6 +87,11 @@ module Epics
         { message: 'Direct debit has been initiated successfully!' }
       end
 
+      desc "Credits a customer account"
+      api_desc 'Credits a customer account' do
+        api_name 'initiate_credit'
+        tags 'content'
+      end
       params do
         requires :account, type: String, desc: "the account to use"
         requires :name, type: String, desc: "the customers name"
