@@ -1,0 +1,23 @@
+---
+swagger: '2.0'
+info:
+  title: EbicsBox
+  description: |
+    A modern API for bank accounts. Fully automatize processing of incoming and outgoing money
+    transactions.
+  termsOfService: https://localhost/tos.html
+  contact:
+    name: Support
+    email: contact@ebicsbox.com
+    url: http://www.ebicsbox.com/
+  license:
+    name: UNLICENSED
+  version: '0.1'
+host: localhost:80
+basePath: "/"
+schemes:
+- https
+consumes:
+- application/json
+produces:
+- application/json
