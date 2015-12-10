@@ -170,7 +170,7 @@ module Epics
           amount: 123,
           bic: 'DABAIE2D',
           iban: 'AL90208110080000001039531801',
-          eref: 'test-1',
+          eref: SecureRandom.hex,
           mandate_id: '1123',
           mandate_signature_date: Time.now.to_i
         }}
@@ -263,7 +263,7 @@ module Epics
           amount: 123,
           bic: 'DABAIE2D',
           iban: 'AL90208110080000001039531801',
-          eref: 'test-credit-1',
+          eref: SecureRandom.hex,
           remittance_information: 'Just s abasic test credit'
         }}
 

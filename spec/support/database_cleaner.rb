@@ -8,7 +8,9 @@ RSpec.configure do |config|
 
   config.around(:each) do |example|
     DatabaseCleaner.cleaning do
-      example.run
+      DB.transaction(rollback: :always, auto_savepoint: true) do
+        example.run
+      end
     end
   end
 end
