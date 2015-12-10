@@ -141,6 +141,7 @@ GEM
       rack
     rack-test (0.6.3)
       rack (>= 1.0)
+    rake (10.4.2)
     rb-fsevent (0.9.5)
     rb-inotify (0.9.5)
       ffi (>= 0.5.0)
@@ -162,6 +163,8 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.3.0)
     rspec-support (3.3.0)
+    ruby-swagger (0.0.3)
+      addressable
     rubyzip (1.1.7)
     safe_yaml (1.0.4)
     sepa_king (0.5.0)
@@ -229,7 +232,9 @@ DEPENDENCIES
   jruby-openssl
   nokogiri
   pg
+  rake
   rspec
+  ruby-swagger
   sepa_king
   sequel
   sinatra
