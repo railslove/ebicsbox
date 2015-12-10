@@ -5,13 +5,26 @@ info:
   description: |
     A modern API for bank accounts. Fully automatize processing of incoming and outgoing money
     transactions.
+
+    ---
+
+    ## Versioning
+
+    If not specified otherwise, the API will always use the most recent version available. In order
+    to use a specific version, clients need to request it via header:
+    ```Accept: application/vnd.ebicsbox.v1+json```.
+
+    Please note that we expect applications to be flexible enought to accept additional fields
+    without a major version change. Breaking changes, like changed behaviour and removal or renaming
+    of fields will always result in a version number bump.
+
+    ---
+
   termsOfService: https://localhost/tos.html
   contact:
-    name: Support
+    name: Railslove
     email: contact@ebicsbox.com
     url: http://www.ebicsbox.com/
-  license:
-    name: UNLICENSED
   version: '0.1'
 host: localhost:80
 basePath: "/"
