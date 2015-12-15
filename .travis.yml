@@ -11,7 +11,8 @@ addons:
 env:
   - DATABASE_URL="postgres://localhost/ebicsbox_test"
   - DATABASE_URL="jdbc:postgresql://localhost/ebicsbox_test"
-  - TEST=yep:]
+  - TEST_DATABASE_URL="postgres://localhost/ebicsbox_test"
+  - TEST_DATABASE_URL="jdbc:postgresql://localhost/ebicsbox_test"
 before_install:
   - wget https://github.com/kr/beanstalkd/archive/v1.10.tar.gz
   - tar xf v1.10.tar.gz
