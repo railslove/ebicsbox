@@ -32,7 +32,7 @@ module Epics
       end
 
       def test?
-        !ENV['TEST'].empty?
+        ENV['ENVIRONMENT'] == 'test'
       end
     end
   end
