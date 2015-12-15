@@ -1,6 +1,5 @@
-GIT
-  remote: git@github.com:railslove/blebics-wrapper.git
-  revision: ae97256d22201d982085bef3e21b7652fc888219
+PATH
+  remote: ../blebics-wrapper
   specs:
     blebics-wrapper (0.1.0-java)
 
@@ -27,6 +26,7 @@ GEM
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
     beaneater (1.0.0)
+    bouncy-castle-java (1.5.0146.1)
     builder (3.2.2)
     byebug (5.0.0)
       columnize (= 0.9.0)
@@ -104,7 +104,8 @@ GEM
     iban-tools (1.0.0)
     ice_nine (0.11.1)
     jdbc-postgres (9.4.1200)
-    jruby-openssl (0.9.11-java)
+    jruby-openssl (0.8.2)
+      bouncy-castle-java (>= 1.5.0146.1)
     jruby-rack (1.1.19)
     json (1.8.3)
     json (1.8.3-java)
@@ -236,7 +237,7 @@ DEPENDENCIES
   guard-rspec
   httparty
   jdbc-postgres
-  jruby-openssl
+  jruby-openssl (= 0.8.2)
   nokogiri
   pg
   rake

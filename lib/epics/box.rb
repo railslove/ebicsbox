@@ -18,6 +18,9 @@ require 'base64'
 
 # Extensions to add swagger documentation methods
 require 'ruby-swagger/grape/grape'
+if RUBY_PLATFORM == 'java'
+  require 'blebics'
+end
 
 require 'epics/box/configuration'
 
