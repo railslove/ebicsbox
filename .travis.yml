@@ -9,8 +9,6 @@ cache:
 addons:
   postgresql: "9.4"
 env:
-  - DATABASE_URL="postgres://localhost/ebicsbox_test"
-  - DATABASE_URL="jdbc:postgresql://localhost/ebicsbox_test"
   - TEST_DATABASE_URL="postgres://localhost/ebicsbox_test"
   - TEST_DATABASE_URL="jdbc:postgresql://localhost/ebicsbox_test"
 before_install:
@@ -20,7 +18,7 @@ before_install:
   - mv beanstalkd-1.10/beanstalkd .
 before_script:
   - createdb ebicsbox_test
-  - bundle exec sequel -m migrations $DATABASE_URL
+  - bundle exec sequel -m migrations $TEST_DATABASE_URL
   - ./beanstalkd &
 script:
   - bundle exec rspec spec
