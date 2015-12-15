@@ -14,9 +14,7 @@ module Epics
       end
 
       api_desc 'Renders homepage with most relevant information' do
-        detail 'Simple homepage with links to all relevant resources'
-        tags 'service'
-        api_name 'home'
+        tags 'Service'
       end
       get '/' do
         "Home"

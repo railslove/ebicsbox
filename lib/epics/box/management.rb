@@ -21,11 +21,33 @@ module Epics
           end
         end
 
+        api_desc 'Entry point for management area' do
+          hidden true
+        end
         get '/' do
           { message: 'not yet implemented' }
         end
 
         resource :accounts do
+          api_desc 'Retrieve a list of all onboarded accounts' do
+            tags 'Account Management'
+          end
+          get do
+            accounts = current_organization.accounts_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
+            present accounts, with: ManageAccountPresenter
+          end
+
+          api_desc 'Retrieve a single account by its IBAN' do
+            tags 'Account Management'
+          end
+          get ':id' do
+            account = current_organization.accounts_dataset.first!({ iban: params[:id] })
+            present account, with: ManageAccountPresenter
+          end
+
+          api_desc 'Create a new account' do
+            tags 'Account Management'
+          end
           params do
             requires :name, type: String, unique_account: true, allow_blank: false, desc: 'Internal description of account'
             requires :iban, type: String, unique_account: true, allow_blank: false, desc: 'IBAN'
@@ -39,7 +61,6 @@ module Epics
             optional :url, type: String, desc: 'url'
             optional :mode, type: String, desc: 'mode'
           end
-          desc 'Add a new account'
           post do
             if account = current_organization.add_account(params)
               Event.account_created(account)
@@ -49,16 +70,9 @@ module Epics
             end
           end
 
-          get do
-            accounts = current_organization.accounts_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
-            present accounts, with: ManageAccountPresenter
+          api_desc 'Submit a newly created account?' do
+            tags 'Account Management'
           end
-
-          get ':id' do
-            account = current_organization.accounts_dataset.first!({ iban: params[:id] })
-            present account, with: ManageAccountPresenter
-          end
-
           put ':id/submit' do
             begin
               account = current_organization.accounts_dataset.first!({ iban: params[:id] })
@@ -72,6 +86,9 @@ module Epics
             end
           end
 
+          api_desc 'Update an existing account' do
+            tags 'Account Management'
+          end
           params do
             optional :name, type: String, unique_account: true, allow_blank: false, desc: 'Internal description of account'
             optional :iban, type: String, unique_account: true, active_account: false, allow_blank: false, desc: 'IBAN'
