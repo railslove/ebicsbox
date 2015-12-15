@@ -2,7 +2,9 @@ module Epics
   module Box
     class Configuration
       def database_url
-        ENV['DATABASE_URL'] || 'postgres://localhost/ebicsbox_test'
+        test? ?
+          (ENV['TEST_DATABASE_URL'] || 'postgres://localhost/ebicsbox_test') :
+          (ENV['DATABASE_URL'] || 'postgres://localhost/ebicsbox')
       end
 
       def beanstalkd_url
@@ -27,6 +29,10 @@ module Epics
 
       def db_passphrase
         ENV['PASSPHRASE']
+      end
+
+      def test?
+        ENV['ENVIRONMENT'] == 'test'
       end
     end
   end
