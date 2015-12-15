@@ -299,14 +299,19 @@
 }
 .swagger-section .swagger-ui-wrap .info_url {
   padding-bottom: 5px;
+  font-size: 0.875rem;
 }
 .swagger-section .swagger-ui-wrap .info_email {
   padding-bottom: 5px;
+  font-size: 0.875rem;
 }
 .swagger-section .swagger-ui-wrap .info_name {
   padding-bottom: 5px;
+  font-size: 0.875rem;
 }
 .swagger-section .swagger-ui-wrap .info_description {
+  border-bottom: 1px solid #eee;
+  margin-bottom: 1rem;
   padding-bottom: 10px;
   font-size: 15px;
 }
