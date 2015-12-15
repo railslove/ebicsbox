@@ -1,4 +1,6 @@
 # require "bundler/gem_tasks"
+require 'dotenv'
+Dotenv.load
 
 namespace :jruby do
   task 'build' do
@@ -15,5 +17,21 @@ namespace :jruby do
       end
     end
 
+  end
+end
+
+namespace :db do
+  desc "Run migrations"
+  task :migrate, [:version] do |t, args|
+    require "sequel"
+    Sequel.extension :migration
+    db = Sequel.connect(ENV.fetch("DATABASE_URL"))
+    if args[:version]
+      puts "Migrating to version #{args[:version]}"
+      Sequel::Migrator.run(db, "migrations", target: args[:version].to_i)
+    else
+      puts "Migrating to latest"
+      Sequel::Migrator.run(db, "migrations")
+    end
   end
 end
