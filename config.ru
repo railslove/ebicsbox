@@ -10,9 +10,6 @@ require File.expand_path(File.dirname(__FILE__) + '/lib/epics/box/middleware/con
 
 box = Rack::Builder.app do
   use Rack::CommonLogger if ENV['RACK_ENV']=='production'
-  use Rack::Auth::Basic, "Protected Area" do |username, password|
-    username == ENV['USERNAME'] && password == ENV['PASSWORD']
-  end if ENV['USERNAME'] && ENV['PASSWORD']
 
   use Epics::Box::Middleware::LicenseValidator if ENV['REPLICATED_INTEGRATIONAPI']
   use Epics::Box::Middleware::ConnectionValidator, DB
@@ -30,7 +27,7 @@ box = Rack::Builder.app do
         200,
         {
           'Content-Type'  => 'text/html',
-          # 'Cache-Control' => 'public, max-age=86400'
+          'Cache-Control' => 'public, max-age=86400'
         },
         File.open('public/swagger/index.html', File::RDONLY)
       ]
