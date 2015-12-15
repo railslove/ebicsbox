@@ -72,8 +72,10 @@ Our goal is to provide an always up-to-date documentation from within the app. I
 this, we have rake tasks which extract inline documentation and generate swagger formatted files
 which again can be used to auto-generate a UI.
 
-To update the existing documentation run ```rake swagger:compile_doc``` from the root of the project.
+To update the existing documentation run ```bin/update_docs``` from the root of the project.
 It will update the existing documentation with changes from the project.
+
+Documentation is available at http://YOUR-HOST/docs
 
 ## Contributing
 
