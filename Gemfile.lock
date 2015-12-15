@@ -1,5 +1,6 @@
-PATH
-  remote: ../blebics-wrapper
+GIT
+  remote: git@github.com:railslove/blebics-wrapper.git
+  revision: 9cce43a60b771a0f191f3603e13b3a72902c4957
   specs:
     blebics-wrapper (0.1.0-java)
 
