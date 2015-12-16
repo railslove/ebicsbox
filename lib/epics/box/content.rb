@@ -24,6 +24,12 @@ module Epics
       AUTH_HEADERS = {
         'Authorization' => { description: 'OAuth 2 Bearer token', type: 'String' }
       }
+      DEFAULT_ERROR_RESPONSES = {
+        "400" => { description: "Invalid request" },
+        "401" => { description: "Not authorized to access this resource" },
+        "404" => { description: "No account with given IBAN found" },
+        "412" => { description: "EBICS account credentials not yet activated" },
+      }
 
       rescue_from Grape::Exceptions::ValidationErrors do |e|
         error!({
@@ -54,8 +60,9 @@ module Epics
         api_desc 'Returns a list of all accessible accounts' do
           api_name 'accounts'
           tags 'Accounts'
-          headers AUTH_HEADERS
           response Entities::Account, isArray: true
+          headers AUTH_HEADERS
+          errors DEFAULT_ERROR_RESPONSES
         end
         get do
           accounts = current_organization.accounts_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
@@ -65,8 +72,9 @@ module Epics
         api_desc 'Returns detaild information about a single account' do
           api_name 'accounts_show'
           tags 'Accounts'
-          headers AUTH_HEADERS
           response Entities::Account
+          headers AUTH_HEADERS
+          errors DEFAULT_ERROR_RESPONSES
         end
         params do
           requires :account, type: String, desc: "the account to use"
