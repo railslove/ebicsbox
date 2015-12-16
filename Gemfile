@@ -31,7 +31,7 @@ group :development, :test do
   gem 'dotenv'
   gem 'rspec'
   gem 'guard-rspec', require: false
-  gem 'airborne', '0.1.15'
+  gem 'airborne'
   gem 'timecop'
   gem 'webmock'
 end
