@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 
+gem 'rake'
 gem 'beaneater', '~> 1.0.0'
 gem 'clockwork'
 gem 'cmxl'
@@ -8,6 +9,7 @@ gem 'grape'
 gem 'grape-entity'
 gem 'httparty'
 gem 'nokogiri'
+gem 'ruby-swagger'
 gem 'sepa_king'
 gem 'sequel'
 gem 'sinatra'
@@ -29,7 +31,7 @@ group :development, :test do
   gem 'dotenv'
   gem 'rspec'
   gem 'guard-rspec', require: false
-  gem 'airborne', '0.1.15'
+  gem 'airborne'
   gem 'timecop'
   gem 'webmock'
 end

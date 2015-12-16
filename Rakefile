@@ -1,10 +1,20 @@
-# require "bundler/gem_tasks"
+# Setup environment
 require 'dotenv'
 Dotenv.load
 
-namespace :jruby do
-  task 'build' do
+# Require dependencies from gemfile
+Bundler.require
 
+# Load swagger rake task
+spec = Gem::Specification.find_by_name 'ruby-swagger'
+load "#{spec.gem_dir}/lib/tasks/swagger.rake"
+
+# Load application
+require './lib/epics/box'
+
+namespace :jruby do
+  desc 'Build jruby classes'
+  task 'build' do
     Dir["lib/**/queue.rb", "lib/**/server.rb", "lib/**/jobs/*.rb", "lib/**/models/*.rb"].each do |file|
       if system("jrubyc #{file}")
 
@@ -16,7 +26,6 @@ namespace :jruby do
         exit(1)
       end
     end
-
   end
 end
 

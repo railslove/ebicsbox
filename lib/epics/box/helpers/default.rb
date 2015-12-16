@@ -4,8 +4,8 @@ module Epics
       module Default
         def current_user
           @current_user ||= begin
-            if match = env['Authorization'].to_s.match(/token (.+)/)
-              User.find_by_access_token(match[1])
+            if token = params['access_token'] || headers['Authorization'].to_s[/token (.+)/, 1]
+              User.find_by_access_token(token)
             else
               nil
             end

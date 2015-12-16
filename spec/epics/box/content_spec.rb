@@ -100,7 +100,7 @@ module Epics
 
           it 'returns an empty array for new accounts' do
             get "#{account.iban}/statements", { 'Authorization' => 'token orga-user' }
-            expect_json([])
+            expect(response.body).to eq('[]')
           end
 
           it 'returns properly formatted statements' do
@@ -153,7 +153,7 @@ module Epics
 
           it 'returns an empty array for new accounts' do
             get "#{account.iban}/transactions", { 'Authorization' => 'token orga-user' }
-            expect_json([])
+            expect(response.body).to eq('[]')
           end
 
           it 'returns properly formatted transactions'

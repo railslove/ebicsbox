@@ -21,7 +21,7 @@ It offers a HTTP interface and can be integrated with different message queueing
 
 ## Development
 
-Run it: 
+Run it:
 
     $ forman start -f Procfile.dev
 
@@ -34,7 +34,7 @@ Run it:
 
 ## Configuration
 
-Set the following environment variables: 
+Set the following environment variables:
 
 * DATABASE_URL
 * BEANSTALKD_URL
@@ -66,6 +66,16 @@ see [docs.ebicsbox.apiary.io](http://docs.ebicsbox.apiary.io)
 We are using RSpec to test this project. In order to execute all specs once, run ```bundle exec rspec```.
 If you are actively developing, you can execute specs automatically by running guard with ```bundle exec guard```.
 
+### Documentation
+
+Our goal is to provide an always up-to-date documentation from within the app. In order to achieve
+this, we have rake tasks which extract inline documentation and generate swagger formatted files
+which again can be used to auto-generate a UI.
+
+To update the existing documentation run ```bin/update_docs``` from the root of the project.
+It will update the existing documentation with changes from the project.
+
+Documentation is available at http://YOUR-HOST/docs
 
 ## Contributing
 

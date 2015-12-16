@@ -16,6 +16,9 @@ require 'sepa_king'
 require 'sinatra'
 require 'base64'
 
+# Extensions to add swagger documentation methods
+require 'ruby-swagger/grape/grape'
+
 require 'epics/box/configuration'
 
 module Epics

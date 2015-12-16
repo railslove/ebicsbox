@@ -20,6 +20,10 @@ module Epics
       format :json
       helpers Helpers::Default
 
+      AUTH_HEADERS = {
+        'Authorization' => { description: 'OAuth 2 Bearer token', type: 'String' }
+      }
+
       rescue_from Grape::Exceptions::ValidationErrors do |e|
         error!({
           message: 'Validation of your request\'s payload failed!',
@@ -46,13 +50,21 @@ module Epics
       end
 
       resource :accounts do
-        desc 'Returns a list of all accessible accounts'
+        api_desc 'Returns a list of all accessible accounts' do
+          api_name 'accounts'
+          tags 'Accounts'
+          headers AUTH_HEADERS
+        end
         get do
           accounts = current_organization.accounts_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
           present accounts, with: AccountPresenter
         end
 
-        desc 'Returns detaild information about a single account'
+        api_desc 'Returns detaild information about a single account' do
+          api_name 'accounts_show'
+          tags 'Accounts'
+          headers AUTH_HEADERS
+        end
         params do
           requires :account, type: String, desc: "the account to use"
         end
@@ -61,36 +73,68 @@ module Epics
         end
       end
 
+      api_desc "Debit a customer's bank account" do
+        api_name 'accounts_debit'
+        tags 'Orders'
+        detail <<-END
+Creating a debit by parameter should be the preferred way for low-volume transactions esp. for use
+cases where the PAIN XML isn't generated before. Transactions can be transmitted either as ```CD1```
+or ```CDD``` depending on the order types your bank is offering you, the ```order_type``` parameter
+lets you choose among them.
+
+sequence_type
+
+* OOFF - one-off debit
+* FRST - first debit
+* RCUR - recurring debit
+* FNAL - final debit
+
+Once validated, transactions are transmitted asynchronously to the banking system.
+Errors that happen eventually are delivered via Webhooks.
+END
+        headers AUTH_HEADERS
+      end
       params do
         requires :account, type: String, desc: "the account to use"
         requires :name, type: String, desc: "the customers name"
         requires :bic, type: String, desc: "the customers bic" # TODO validate / clearer
         requires :iban, type: String, desc: "the customers iban" # TODO validate
-        requires :amount, type: Integer, desc: "amount to credit", values: 1..12000000
+        requires :amount, type: Integer, desc: "amount to debit (positive, charged in cents)", values: 1..12000000
         requires :eref, type: String, desc: "end to end id", unique_transaction: true
-        requires :mandate_id, type: String, desc: "mandate id"
-        requires :mandate_signature_date, type: Integer, desc: "mandate signature date"
+        requires :mandate_id, type: String, desc: "ID of the SEPA mandate (max. 35 char)"
+        requires :mandate_signature_date, type: Integer, desc: "when the mandate was signed by the customer"
         optional :instrument, type: String, desc: "", values: %w[CORE COR1 B2B], default: "COR1"
         optional :sequence_type, type: String, desc: "", values: ["FRST", "RCUR", "OOFF", "FNAL"], default: "FRST"
-        optional :remittance_information, type: String, desc: "will apear on the customers bank statement"
+        optional :remittance_information, type: String, desc: "description of the transaction (max. 140 char)"
         optional :instruction, type: String, desc: "instruction identification, will not be submitted to the debtor"
         optional :requested_date, type: Integer, desc: "requested execution date" #TODO validate, future
       end
-      desc "debits a customer account"
       post ':account/debits' do
         params[:requested_date] ||= Time.now.to_i + 172800 # grape defaults interfere with swagger doc creation
         DirectDebit.create!(account, params, current_user)
         { message: 'Direct debit has been initiated successfully!' }
       end
 
+      api_desc "Credit a customer's bank account" do
+        api_name 'accounts_credit'
+        tags 'Orders'
+        detail <<-END
+Creating a credit by parameter should be the preferred way for low-volume transactions
+esp. for use cases where the PAIN XML isn't generated before.
+
+Once validated, transactions are transmitted asynchronously to the banking system. Errors
+that happen eventually are delivered via Webhooks.
+END
+        headers AUTH_HEADERS
+      end
       params do
         requires :account, type: String, desc: "the account to use"
         requires :name, type: String, desc: "the customers name"
         requires :bic , type: String, desc: "the customers bic"
         requires :iban, type: String, desc: "the customers iban"
-        requires :amount, type: Integer, desc: "amount to credit", values: 1..12000000
+        requires :amount, type: Integer, desc: "amount to credit (charged in cents)", values: 1..12000000
         requires :eref, type: String, desc: "end to end id", unique_transaction: true
-        optional :remittance_information, type: String, desc: "will apear on the customers bank statement"
+        optional :remittance_information, type: String, desc: "description of the transaction (max. 140 char)"
         optional :requested_date, type: Integer, desc: "requested execution date"
         optional :service_level, type: String, desc: "requested execution date", default: "SEPA", values: ["SEPA", "URGP"]
       end
@@ -100,7 +144,16 @@ module Epics
         { message: 'Credit has been initiated successfully!' }
       end
 
-      desc "Returns statements for account"
+      api_desc "Retrieve all account statements" do
+        api_name 'accounts_statements'
+        tags 'Orders'
+        detail <<-END
+Transactions are imported on a daily basis and stored so they can be easily retrieved and searched
+for a timeframe that exceeds the usual timeframe your bank will hold them on record for you. Besides
+pulling plain lists it is also possible to filter by eref or remittance_infomation.
+END
+        headers AUTH_HEADERS
+      end
       params do
         requires :account, type: String, desc: "IBAN for an existing account"
         optional :from, type: Integer, desc: "results starting at"
@@ -113,7 +166,11 @@ module Epics
         present statements, with: StatementPresenter
       end
 
-      desc "Returns transactions for account"
+      api_desc "Retrieve all executed orders" do
+        api_name 'accounts_transactions'
+        tags 'Orders'
+        headers AUTH_HEADERS
+      end
       params do
         requires :account, type: String, desc: "IBAN for an existing account"
         optional :page, type: Integer, desc: "page through the results", default: 1

@@ -13,6 +13,9 @@ module Epics
         end
       end
 
+      api_desc 'Renders homepage with most relevant information' do
+        tags 'Service'
+      end
       get '/' do
         "Home"
       end
