@@ -17,7 +17,15 @@ module Epics
         tags 'Service'
       end
       get '/' do
-        "Home"
+        {
+          documentation: Epics::Box.configuration.app_url + '/docs',
+          management: {
+            accounts: Epics::Box.configuration.app_url + "/management/accounts",
+          },
+          resources: {
+            accounts: Epics::Box.configuration.app_url + "/accounts",
+          },
+        }
       end
     end
   end
