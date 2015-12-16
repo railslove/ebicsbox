@@ -17,11 +17,11 @@ module Epics
 
         expose(:_links, documentation: { type: "Hash", desc: "Links to resources" }) do |account, options|
           {
-            self: Epics::Box.configuration.app_url + "/accounts/#{account.iban}",
-            credit: Epics::Box.configuration.app_url + "/accounts/#{account.iban}/credits",
-            debit: Epics::Box.configuration.app_url + "/accounts/#{account.iban}/debits",
-            statements: Epics::Box.configuration.app_url + "/accounts/#{account.iban}/statements",
-            transactions: Epics::Box.configuration.app_url + "/accounts/#{account.iban}/transactions",
+            self: Epics::Box.configuration.app_url + "/#{account.iban}",
+            credit: Epics::Box.configuration.app_url + "/#{account.iban}/credits",
+            debit: Epics::Box.configuration.app_url + "/#{account.iban}/debits",
+            statements: Epics::Box.configuration.app_url + "/#{account.iban}/statements",
+            transactions: Epics::Box.configuration.app_url + "/#{account.iban}/transactions",
           }
         end
       end
