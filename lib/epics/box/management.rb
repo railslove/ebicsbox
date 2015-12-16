@@ -163,6 +163,26 @@ module Epics
             user = current_organization.users_dataset.first!({ id: params[:id] })
             present user, with: Entities::User, type: 'full'
           end
+
+          api_desc 'Create a new user instance' do
+            api_name 'management_user_create'
+            tags 'Management'
+            headers AUTH_HEADERS
+            errors DEFAULT_ERROR_RESPONSES
+          end
+          params do
+            requires :name, type: String, desc: "The user's display name"
+          end
+          post do
+            if user = current_organization.add_user(params.merge(access_token: SecureRandom.hex))
+              {
+                message: 'User has been created successfully!',
+                user: Entities::User.represent(user),
+              }
+            else
+              error!({ message: 'Failed to create user' }, 400)
+            end
+          end
         end
       end
     end
