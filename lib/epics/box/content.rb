@@ -55,6 +55,7 @@ module Epics
           api_name 'accounts'
           tags 'Accounts'
           headers AUTH_HEADERS
+          response Entities::Account, isArray: true
         end
         get do
           accounts = current_organization.accounts_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
@@ -65,6 +66,7 @@ module Epics
           api_name 'accounts_show'
           tags 'Accounts'
           headers AUTH_HEADERS
+          response Entities::Account
         end
         params do
           requires :account, type: String, desc: "the account to use"
