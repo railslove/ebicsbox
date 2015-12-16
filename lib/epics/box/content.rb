@@ -103,6 +103,7 @@ module Epics
   Errors that happen eventually are delivered via Webhooks.
   END
           headers AUTH_HEADERS
+          errors DEFAULT_ERROR_RESPONSES
         end
         params do
           requires :account, type: String, desc: "the account to use"
@@ -136,6 +137,7 @@ module Epics
   that happen eventually are delivered via Webhooks.
   END
           headers AUTH_HEADERS
+          errors DEFAULT_ERROR_RESPONSES
         end
         params do
           requires :account, type: String, desc: "the account to use"
@@ -159,6 +161,7 @@ module Epics
           tags 'Account specific endpoints'
           detail "Transactions are imported on a daily basis and stored so they can be easily retrieved and searched for a timeframe that exceeds the usual timeframe your bank will hold them on record for you. Besides pulling plain lists it is also possible to filter by eref or remittance_infomation."
           headers AUTH_HEADERS
+          errors DEFAULT_ERROR_RESPONSES
         end
         params do
           requires :account, type: String, desc: "IBAN for an existing account"
@@ -176,6 +179,7 @@ module Epics
           api_name 'accounts_transactions'
           tags 'Account specific endpoints'
           headers AUTH_HEADERS
+          errors DEFAULT_ERROR_RESPONSES
         end
         params do
           requires :account, type: String, desc: "IBAN for an existing account"
