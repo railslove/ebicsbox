@@ -20,6 +20,10 @@ module Epics
       format :json
       helpers Helpers::Default
 
+      AUTH_HEADERS = {
+        'Authorization' => { description: 'OAuth 2 Bearer token', type: 'String' }
+      }
+
       rescue_from Grape::Exceptions::ValidationErrors do |e|
         error!({
           message: 'Validation of your request\'s payload failed!',
@@ -49,6 +53,7 @@ module Epics
         api_desc 'Returns a list of all accessible accounts' do
           api_name 'accounts'
           tags 'Accounts'
+          headers AUTH_HEADERS
         end
         get do
           accounts = current_organization.accounts_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
@@ -58,6 +63,7 @@ module Epics
         api_desc 'Returns detaild information about a single account' do
           api_name 'accounts_show'
           tags 'Accounts'
+          headers AUTH_HEADERS
         end
         params do
           requires :account, type: String, desc: "the account to use"
@@ -86,6 +92,7 @@ sequence_type
 Once validated, transactions are transmitted asynchronously to the banking system.
 Errors that happen eventually are delivered via Webhooks.
 END
+        headers AUTH_HEADERS
       end
       params do
         requires :account, type: String, desc: "the account to use"
@@ -118,6 +125,7 @@ esp. for use cases where the PAIN XML isn't generated before.
 Once validated, transactions are transmitted asynchronously to the banking system. Errors
 that happen eventually are delivered via Webhooks.
 END
+        headers AUTH_HEADERS
       end
       params do
         requires :account, type: String, desc: "the account to use"
@@ -144,6 +152,7 @@ Transactions are imported on a daily basis and stored so they can be easily retr
 for a timeframe that exceeds the usual timeframe your bank will hold them on record for you. Besides
 pulling plain lists it is also possible to filter by eref or remittance_infomation.
 END
+        headers AUTH_HEADERS
       end
       params do
         requires :account, type: String, desc: "IBAN for an existing account"
@@ -160,6 +169,7 @@ END
       api_desc "Retrieve all executed orders" do
         api_name 'accounts_transactions'
         tags 'Orders'
+        headers AUTH_HEADERS
       end
       params do
         requires :account, type: String, desc: "IBAN for an existing account"
