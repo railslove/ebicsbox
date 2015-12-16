@@ -1,6 +1,10 @@
 module Epics
   module Box
     class Configuration
+      def app_url
+        ENV['APP_URL'] || "http://localhost:5000"
+      end
+
       def database_url
         test? ?
           (ENV['TEST_DATABASE_URL'] || 'postgres://localhost/ebicsbox_test') :

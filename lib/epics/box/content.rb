@@ -11,8 +11,9 @@ require 'epics/box/business_processes/direct_debit'
 # Errors
 require 'epics/box/errors/business_process_failure'
 
-# Models
+# Models and entities
 require 'epics/box/models/account'
+require 'epics/box/entities/account'
 
 module Epics
   module Box
@@ -57,7 +58,7 @@ module Epics
         end
         get do
           accounts = current_organization.accounts_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
-          present accounts, with: AccountPresenter
+          present accounts, with: Entities::Account
         end
 
         api_desc 'Returns detaild information about a single account' do
@@ -69,7 +70,7 @@ module Epics
           requires :account, type: String, desc: "the account to use"
         end
         get ':account' do
-          present account, with: AccountPresenter
+          present account, with: Entities::Account
         end
       end
 
