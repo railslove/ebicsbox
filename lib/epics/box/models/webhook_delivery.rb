@@ -1,3 +1,5 @@
+require 'benchmark'
+
 module Epics
   module Box
     class WebhookDelivery < Sequel::Model

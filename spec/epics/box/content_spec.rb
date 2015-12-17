@@ -54,12 +54,12 @@ module Epics
 
           context 'account does not exist' do
             it 'fails with a proper error message' do
-              get 'accounts/NOT_EXISTING', { 'Authorization' => "token #{user.access_token}" }
+              get 'NOT_EXISTING', { 'Authorization' => "token #{user.access_token}" }
               expect_json 'message', 'Your organization does not have an account with given IBAN!'
             end
 
             it 'returns a 404' do
-              get 'accounts/NOT_EXISTING', { 'Authorization' => "token #{user.access_token}" }
+              get 'NOT_EXISTING', { 'Authorization' => "token #{user.access_token}" }
               expect_status 404
             end
           end

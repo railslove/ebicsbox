@@ -57,7 +57,7 @@ GEM
     ffi (1.9.8)
     ffi (1.9.8-java)
     formatador (0.2.5)
-    grape (0.13.0)
+    grape (0.14.0)
       activesupport
       builder
       hashie (>= 2.1.0)
