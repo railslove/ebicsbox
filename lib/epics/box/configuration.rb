@@ -31,6 +31,10 @@ module Epics
         end
       end
 
+      def ebics_client
+        (ENV['EBICS_CLIENT'] || 'Epics::Client').constantize
+      end
+
       def db_passphrase
         ENV['PASSPHRASE']
       end

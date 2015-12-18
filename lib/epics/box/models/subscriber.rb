@@ -36,7 +36,7 @@ class Epics::Box::Subscriber < Sequel::Model
   def client_adapter
     self.class.const_get(account.mode)
   rescue => e
-    Epics::Client
+    Epics::Box.configuration.ebics_client
   end
 
   def setup!(reset = false)
