@@ -19,17 +19,17 @@ require './lib/epics/box'
 namespace :jruby do
   desc 'Build jruby classes'
   task 'build' do
-    Dir["lib/**/queue.rb", "lib/**/server.rb", "lib/**/jobs/*.rb", "lib/**/models/*.rb"].each do |file|
-      if system("jrubyc #{file}")
+    # Dir["lib/**/queue.rb", "lib/**/server.rb", "lib/**/jobs/*.rb", "lib/**/models/*.rb", "lib/**/**/*.rb", "lib/epics/box.rb"].uniq.each do |file|
+    #   if system("jrubyc #{file}")
 
-        puts " ---> Processing: #{file}"
+    #     puts " ---> Processing: #{file}"
 
-        File.write(file, 'load __FILE__.sub(/\.rb$/, ".class")')
-      else
-        puts " ---> Failed: #{file}"
-        exit(1)
-      end
-    end
+    #     File.write(file, 'load __FILE__.sub(/\.rb$/, ".class")')
+    #   else
+    #     puts " ---> Failed: #{file}"
+    #     exit(1)
+    #   end
+    # end
   end
 end
 
