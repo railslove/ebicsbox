@@ -3,20 +3,11 @@ module Epics
     module Jobs
       RSpec.describe FetchStatements do
         describe '.process!' do
-          let(:account) { Account.create }
+          let(:account) { Account.create(host: "HOST") }
           let!(:subscriber) { account.add_subscriber(signature_class: 'T', activated_at: 1.day.ago) }
 
           def exec_process
             described_class.process!(account_ids: [account.id])
-          end
-
-          context 'import already ran at day' do
-            before { account.imported_at!(Date.today) }
-
-            it 'does not import any data' do
-              expect_any_instance_of(Account).to_not receive(:imported_at!)
-              exec_process
-            end
           end
 
           context 'last import happened at least one day ago' do
