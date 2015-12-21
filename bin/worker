@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby -w
+
+# Load environment variables
+require 'dotenv'
+Dotenv.load
+
+# Load environment
+require 'bundler'
+Bundler.setup(:default, :development)
+
+# Load app
+require './lib/epics/box'
+
+# Start worker
+Epics::Box::Worker.new.process!
