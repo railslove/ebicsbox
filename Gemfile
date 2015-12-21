@@ -13,6 +13,7 @@ gem 'ruby-swagger'
 gem 'sepa_king'
 gem 'sequel'
 gem 'sinatra'
+gem 'pry'
 
 platforms :mri do
   gem 'pg'
@@ -22,7 +23,7 @@ end
 platforms :jruby do
   gem 'jdbc-postgres'
   gem 'jruby-openssl', '0.8.2'
-  gem 'trinidad', "1.5.0.B1"
+  gem 'trinidad', git: 'git@github.com:trinidad/trinidad.git' #"1.5.0.B1"
   gem 'blebics-wrapper', git: 'git@github.com:railslove/blebics-wrapper.git'
 end
 
