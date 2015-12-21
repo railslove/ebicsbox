@@ -4,6 +4,15 @@ GIT
   specs:
     blebics-wrapper (0.1.0-java)
 
+GIT
+  remote: git@github.com:trinidad/trinidad.git
+  revision: 866a07a864b33b5419a52b03b200d47c1a4588af
+  specs:
+    trinidad (1.5.0.PRE)
+      jruby-rack (~> 1.1.14)
+      trinidad_jars (>= 1.5, < 1.7)
+    trinidad_jars (1.5.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -200,10 +209,6 @@ GEM
     timecop (0.7.3)
     timers (4.0.1)
       hitimes
-    trinidad (1.5.0.B1)
-      jruby-rack (~> 1.1.14)
-      trinidad_jars (>= 1.4.0, < 1.6.0)
-    trinidad_jars (1.4.1)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
     unf (0.1.4)
@@ -241,6 +246,7 @@ DEPENDENCIES
   jruby-openssl (= 0.8.2)
   nokogiri
   pg
+  pry
   rake
   rspec
   ruby-swagger
@@ -249,7 +255,7 @@ DEPENDENCIES
   sinatra
   thin
   timecop
-  trinidad (= 1.5.0.B1)
+  trinidad!
   webmock
 
 BUNDLED WITH
