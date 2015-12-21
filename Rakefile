@@ -1,6 +1,10 @@
 # Setup environment
-require 'dotenv'
-Dotenv.load
+begin
+  require('dotenv')
+  Dotenv.load
+rescue LoadError
+  puts 'No Dotenv! It won\'t work.'
+end
 
 # Require dependencies from gemfile
 Bundler.require
