@@ -124,7 +124,7 @@ module Epics
         end
         post 'debits' do
           params[:requested_date] ||= Time.now.to_i + 172800 # grape defaults interfere with swagger doc creation
-          DirectDebit.create!(account, params, current_user)
+          DirectDebit.create!(account, declared(params), current_user)
           { message: 'Direct debit has been initiated successfully!' }
         end
 
@@ -154,7 +154,7 @@ module Epics
         end
         post 'credits' do
           params[:requested_date] ||= Time.now.to_i # grape defaults interfere with swagger doc creation
-          Credit.create!(account, params, current_user)
+          Credit.create!(account, declared(params), current_user)
           { message: 'Credit has been initiated successfully!' }
         end
 
