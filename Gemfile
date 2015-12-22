@@ -24,7 +24,7 @@ platforms :jruby do
   gem 'jdbc-postgres'
   gem 'jruby-openssl', '0.8.2'
   gem 'trinidad', git: 'git@github.com:trinidad/trinidad.git' #"1.5.0.B1"
-  gem 'blebics-wrapper', git: 'git@github.com:railslove/blebics-wrapper.git'
+  # gem 'blebics-wrapper', git: 'git@github.com:railslove/blebics-wrapper.git'
 end
 
 group :development, :test do

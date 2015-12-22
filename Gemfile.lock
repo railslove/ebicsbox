@@ -1,10 +1,4 @@
 GIT
-  remote: git@github.com:railslove/blebics-wrapper.git
-  revision: 51b443bd378b14b71805c852e31e430d7acb0bd6
-  specs:
-    blebics-wrapper (0.1.0-java)
-
-GIT
   remote: git@github.com:trinidad/trinidad.git
   revision: 866a07a864b33b5419a52b03b200d47c1a4588af
   specs:
@@ -231,7 +225,6 @@ PLATFORMS
 DEPENDENCIES
   airborne
   beaneater (~> 1.0.0)
-  blebics-wrapper!
   byebug
   clockwork
   cmxl

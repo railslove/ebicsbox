@@ -1,9 +1,9 @@
 #!/bin/bash
 
 /usr/local/bundle/bin/bundle exec bin/migrate
-/usr/local/bundle/bin/bundle exec bin/update_docs
 
 if [ "$1" = "server" ]; then
+  /usr/local/bundle/bin/bundle exec bin/update_docs
   /usr/local/bundle/bin/bundle exec trinidad --config config/trinidad.yml
 fi
 
