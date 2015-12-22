@@ -2,6 +2,16 @@ class Epics::Box::Statement < Sequel::Model
   many_to_one :account
   many_to_one :transaction
 
+  def self.count_by_account(account_id:, transaction_id: nil, **unused)
+    query = self
+      .where(account_id: account_id)
+
+    # Filter by transaction id
+    query = query.where(transaction_id: transaction_id) if transaction_id.present?
+
+    query.count
+  end
+
   def self.paginated_by_account(account_id:, per_page: 10, page: 1, transaction_id: nil, **unused)
     query = self
       .where(account_id: account_id)
