@@ -1,4 +1,5 @@
 class Epics::Box::Statement < Sequel::Model
+  many_to_one :account
   many_to_one :transaction
 
   def self.paginated_by_account(account_id, options = {})
@@ -12,6 +13,10 @@ class Epics::Box::Statement < Sequel::Model
 
   def debit?
     self.debit
+  end
+
+  def type
+    debit? ? 'debit' : 'credit'
   end
 
   def as_event_payload
