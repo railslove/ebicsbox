@@ -138,8 +138,15 @@ module Epics
 
           context 'valid data' do
             it 'iniates a new direct debit' do
-              expect(Epics::Box::DirectDebit).to receive(:create!)
+              expect(DirectDebit).to receive(:create!)
               post "#{account.iban}/debits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
+            end
+
+            it 'does not send unknow attributes to business process' do
+              allow(DirectDebit).to receive(:create!) do |account, params, user|
+                expect(params).to_not include('testme')
+              end
+              post "#{account.iban}/debits", valid_payload.merge(testme: 'testme'), { 'Authorization' => "token #{user.access_token}" }
             end
 
             it 'returns a proper message' do
@@ -151,7 +158,7 @@ module Epics
               now = Time.now
               Timecop.freeze(now) do
                 default = now.to_i + 172800
-                expect(Epics::Box::DirectDebit).to receive(:create!).with(anything, hash_including('requested_date' => default), anything)
+                expect(DirectDebit).to receive(:create!).with(anything, hash_including('requested_date' => default), anything)
                 post "#{account.iban}/debits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
               end
             end
@@ -237,6 +244,13 @@ module Epics
             it 'returns a proper message' do
               post "#{account.iban}/credits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
               expect_json 'message', 'Credit has been initiated successfully!'
+            end
+
+            it 'does not send unknow attributes to business process' do
+              allow(Credit).to receive(:create!) do |account, params, user|
+                expect(params).to_not include('testme')
+              end
+              post "#{account.iban}/credits", valid_payload.merge(testme: 'testme'), { 'Authorization' => "token #{user.access_token}" }
             end
 
             it 'sets a default value for requested_date' do
