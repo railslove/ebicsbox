@@ -4,6 +4,7 @@ module Epics
   module Box
     module Entities
       class Transaction < Grape::Entity
+        expose(:account) { |statement| statement.account.iban }
         expose :eref
         expose :type
         expose :status
