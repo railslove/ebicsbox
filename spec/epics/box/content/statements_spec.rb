@@ -33,7 +33,7 @@ module Epics
           end
 
           it 'returns a proper error message' do
-            get "#{account.iban}/statements", { 'Authorization' => "token #{user.access_token}" }
+            get "#{account.iban}/statements?test=1", { 'Authorization' => "token #{user.access_token}" }
             expect_json 'message', 'Your organization does not have an account with given IBAN!'
           end
         end
@@ -87,10 +87,22 @@ module Epics
             end
           end
 
+          describe 'filtering by transaction id' do
+            let(:trx_1) { Transaction.create }
+            let(:trx_2) { Transaction.create }
+            let!(:statement_1) { Statement.create account_id: account.id, transaction_id: trx_1.id, eref: 'trx-1' }
+            let!(:statement_2) { Statement.create account_id: account.id, transaction_id: trx_2.id, eref: 'trx-2' }
+
+            it 'only includes statements which are linked to requested transaction' do
+              get "#{account.iban}/statements?transaction_id=#{trx_1.id}", { 'Authorization' => 'token orga-user' }
+              expect_json '*', eref: 'trx-1'
+            end
+          end
+
           it 'passes page and per_page params to statement retrieval function' do
             allow(Statement).to receive(:paginated_by_account) { double(all: [])}
             get "#{account.iban}/statements?page=4&per_page=2", { 'Authorization' => 'token orga-user' }
-            expect(Statement).to have_received(:paginated_by_account).with(account.id, per_page: 2, page: 4)
+            expect(Statement).to have_received(:paginated_by_account).with(hash_including(account_id: account.id, per_page: 2, page: 4))
           end
 
           it 'allows to filter results by a date range'

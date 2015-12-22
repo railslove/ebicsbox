@@ -167,13 +167,13 @@ module Epics
         end
         params do
           requires :account, type: String, desc: "IBAN for an existing account"
-          optional :from, type: Integer, desc: "results starting at"
-          optional :to, type: Integer, desc: "results ending at"
+          optional :transaction_id, type: Integer, desc: "filter all statements by a specific transaction id"
           optional :page, type: Integer, desc: "page through the results", default: 1
           optional :per_page, type: Integer, desc: "how many results per page", values: 1..100, default: 10
         end
         get 'statements' do
-          statements = Statement.paginated_by_account(account.id, per_page: params[:per_page], page: params[:page]).all
+          safe_params = declared(params).to_hash.merge(account_id: account.id).symbolize_keys
+          statements = Statement.paginated_by_account(safe_params).all
           present statements, with: Entities::Statement
         end
 
