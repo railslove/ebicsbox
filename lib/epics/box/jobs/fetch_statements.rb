@@ -16,7 +16,7 @@ module Epics
           account = Account.first!(id: account_id)
           mt940 = account.transport_client.STA
           Cmxl.parse(mt940).map(&:transactions).flatten.each do |transaction|
-            create_statement(account_id, transaction)
+            create_statement(account_id, transaction, mt940)
           end
           account.imported_at!(Time.now)
         rescue Sequel::NoMatchingRow  => ex
@@ -25,7 +25,7 @@ module Epics
           Box.logger.error(ex.message) # expected
         end
 
-        def self.create_statement(account_id, data)
+        def self.create_statement(account_id, data, raw_data)
           trx = {
             account_id: account_id,
             sha: Digest::SHA2.hexdigest(data.information),
@@ -45,7 +45,8 @@ module Epics
             eref: data.sepa["EREF"],
             mref: data.sepa["MREF"],
             svwz: data.sepa["SVWZ"],
-            creditor_identifier: data.sepa["CRED"]
+            creditor_identifier: data.sepa["CRED"],
+            raw_data: raw_data,
           }
 
           if statement = Statement.where(sha: trx[:sha]).first

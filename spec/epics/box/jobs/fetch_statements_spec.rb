@@ -63,7 +63,7 @@ module Epics
           end
 
           def exec_create_action
-            described_class.create_statement(1, data)
+            described_class.create_statement(1, data, "raw_data")
           end
 
           context 'the statement was already imported' do
