@@ -66,102 +66,6 @@ module Epics
         end
       end
 
-      describe 'GET :account/statements' do
-        before { user }
-
-        context 'account does not exist' do
-          it 'returns a not found status' do
-            get "NOT_EXISTING/statements", { 'Authorization' => "token #{user.access_token}" }
-            expect_status 404
-          end
-
-          it 'returns a proper error message' do
-            get "NOT_EXISTING/statements", { 'Authorization' => "token #{user.access_token}" }
-            expect_json 'message', 'Your organization does not have an account with given IBAN!'
-          end
-        end
-
-        context 'account owned by another organization' do
-          let(:account) { other_organization.add_account(iban: SecureRandom.uuid) }
-
-          it 'returns a not found status' do
-            get "#{account.iban}/statements", { 'Authorization' => "token #{user.access_token}" }
-            expect_status 404
-          end
-
-          it 'returns a proper error message' do
-            get "#{account.iban}/statements", { 'Authorization' => "token #{user.access_token}" }
-            expect_json 'message', 'Your organization does not have an account with given IBAN!'
-          end
-        end
-
-        context 'account is owned by user\s organization' do
-          let(:account) { organization.add_account(iban: SecureRandom.uuid) }
-
-          it 'returns an empty array for new accounts' do
-            get "#{account.iban}/statements", { 'Authorization' => 'token orga-user' }
-            expect(response.body).to eq('[]')
-          end
-
-          it 'returns properly formatted statements' do
-            statement = Statement.create account_id: account.id
-            get "#{account.iban}/statements", { 'Authorization' => 'token orga-user' }
-            expect_json '0.statement', { account_id: account.id }
-          end
-
-          it 'passes page and per_page params to statement retrieval function' do
-            allow(Statement).to receive(:paginated_by_account) { double(all: [])}
-            get "#{account.iban}/statements?page=4&per_page=2", { 'Authorization' => 'token orga-user' }
-            expect(Statement).to have_received(:paginated_by_account).with(account.id, per_page: 2, page: 4)
-          end
-
-          it 'allows to filter results by a date range'
-        end
-      end
-
-      describe 'GET :account/transactions' do
-        before { user }
-
-        context 'account does not exist' do
-          it 'returns a not found status' do
-            get "NOT_EXISTING/transactions", { 'Authorization' => "token #{user.access_token}" }
-            expect_status 404
-          end
-
-          it 'returns a proper error message' do
-            get "NOT_EXISTING/transactions", { 'Authorization' => "token #{user.access_token}" }
-            expect_json 'message', 'Your organization does not have an account with given IBAN!'
-          end
-        end
-
-        context 'account owned by another organization' do
-          let(:account) { other_organization.add_account(iban: SecureRandom.uuid) }
-
-          it 'returns a not found status' do
-            get "#{account.iban}/transactions", { 'Authorization' => "token #{user.access_token}" }
-            expect_status 404
-          end
-
-          it 'returns a proper error message' do
-            get "#{account.iban}/transactions", { 'Authorization' => "token #{user.access_token}" }
-            expect_json 'message', 'Your organization does not have an account with given IBAN!'
-          end
-        end
-
-        context 'account is owned by user\s organization' do
-          let(:account) { organization.add_account(iban: SecureRandom.uuid) }
-
-          it 'returns an empty array for new accounts' do
-            get "#{account.iban}/transactions", { 'Authorization' => 'token orga-user' }
-            expect(response.body).to eq('[]')
-          end
-
-          it 'returns properly formatted transactions'
-
-          it 'allows to filter results by a date range'
-        end
-      end
-
       describe 'POST /:account/debits' do
         include_context 'valid user'
 
@@ -234,8 +138,15 @@ module Epics
 
           context 'valid data' do
             it 'iniates a new direct debit' do
-              expect(Epics::Box::DirectDebit).to receive(:create!)
+              expect(DirectDebit).to receive(:create!)
               post "#{account.iban}/debits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
+            end
+
+            it 'does not send unknow attributes to business process' do
+              allow(DirectDebit).to receive(:create!) do |account, params, user|
+                expect(params).to_not include('testme')
+              end
+              post "#{account.iban}/debits", valid_payload.merge(testme: 'testme'), { 'Authorization' => "token #{user.access_token}" }
             end
 
             it 'returns a proper message' do
@@ -247,7 +158,7 @@ module Epics
               now = Time.now
               Timecop.freeze(now) do
                 default = now.to_i + 172800
-                expect(Epics::Box::DirectDebit).to receive(:create!).with(anything, hash_including('requested_date' => default), anything)
+                expect(DirectDebit).to receive(:create!).with(anything, hash_including('requested_date' => default), anything)
                 post "#{account.iban}/debits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
               end
             end
@@ -333,6 +244,13 @@ module Epics
             it 'returns a proper message' do
               post "#{account.iban}/credits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
               expect_json 'message', 'Credit has been initiated successfully!'
+            end
+
+            it 'does not send unknow attributes to business process' do
+              allow(Credit).to receive(:create!) do |account, params, user|
+                expect(params).to_not include('testme')
+              end
+              post "#{account.iban}/credits", valid_payload.merge(testme: 'testme'), { 'Authorization' => "token #{user.access_token}" }
             end
 
             it 'sets a default value for requested_date' do

@@ -33,7 +33,7 @@ module Epics
 
         def self.remote_records(account_id)
           account = Account[account_id]
-          file = account.transport_client.HAC(Date.today - 1, Date.today)
+          file = account.transport_client.HAC
           Nokogiri::XML(file).remove_namespaces!.xpath("//OrgnlPmtInfAndSts").map do |info|
             {
               reason_code: info.xpath("./StsRsnInf/Rsn/Cd").text,

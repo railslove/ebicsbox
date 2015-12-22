@@ -6,15 +6,15 @@ module Epics
         let!(:statements) { [nil, nil, nil].map { Statement.create(account_id: account.id) } }
 
         it 'only account is required' do
-          expect(described_class.paginated_by_account(account.id).all).to eq(statements)
+          expect(described_class.paginated_by_account(account_id: account.id).all).to eq(statements)
         end
 
         it 'allows to limit the size of returned dataset' do
-          expect(described_class.paginated_by_account(account.id, per_page: 2).all).to eq(statements.take(2))
+          expect(described_class.paginated_by_account(account_id: account.id, per_page: 2).all).to eq(statements.take(2))
         end
 
         it 'allows to specify offset of returned dataset' do
-          expect(described_class.paginated_by_account(account.id, per_page: 2, page: 2).all).to eq([statements[2]])
+          expect(described_class.paginated_by_account(account_id: account.id, per_page: 2, page: 2).all).to eq([statements[2]])
         end
       end
 

@@ -13,26 +13,19 @@ module Epics
         # when no new statements are available
         def self.fetch_new_statements(account_id)
           Box.logger.info("[Jobs::FetchStatements] Starting import. id=#{account_id}")
-
           account = Account.first!(id: account_id)
-
-          from_date = account.last_imported_at || (Date.today - 30)
-          to_date = Date.today
-
-          if from_date < to_date
-            mt940 = account.transport_client.STA(from_date , to_date)
-            Cmxl.parse(mt940).map(&:transactions).flatten.each do |transaction|
-              create_statement(account_id, transaction)
-            end
-            account.imported_at!(to_date)
+          mt940 = account.transport_client.STA
+          Cmxl.parse(mt940).map(&:transactions).flatten.each do |transaction|
+            create_statement(account_id, transaction, mt940)
           end
+          account.imported_at!(Time.now)
         rescue Sequel::NoMatchingRow  => ex
           Box.logger.error("[Jobs::FetchStatements] Could not find account. account_id=#{account_id}")
         rescue Epics::Error::BusinessError => ex
           Box.logger.error(ex.message) # expected
         end
 
-        def self.create_statement(account_id, data)
+        def self.create_statement(account_id, data, raw_data)
           trx = {
             account_id: account_id,
             sha: Digest::SHA2.hexdigest(data.information),
@@ -52,7 +45,8 @@ module Epics
             eref: data.sepa["EREF"],
             mref: data.sepa["MREF"],
             svwz: data.sepa["SVWZ"],
-            creditor_identifier: data.sepa["CRED"]
+            creditor_identifier: data.sepa["CRED"],
+            raw_data: raw_data,
           }
 
           if statement = Statement.where(sha: trx[:sha]).first

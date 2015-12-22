@@ -3,6 +3,7 @@ require 'epics/box/validations/unique_transaction'
 
 # Helpers
 require 'epics/box/helpers/default'
+require 'epics/box/helpers/pagination'
 
 # Business processes
 require 'epics/box/business_processes/credit'
@@ -14,12 +15,15 @@ require 'epics/box/errors/business_process_failure'
 # Models and entities
 require 'epics/box/models/account'
 require 'epics/box/entities/account'
+require 'epics/box/entities/statement'
+require 'epics/box/entities/transaction'
 
 module Epics
   module Box
     class Content < Grape::API
       format :json
       helpers Helpers::Default
+      helpers Helpers::Pagination
 
       AUTH_HEADERS = {
         'Authorization' => { description: 'OAuth 2 Bearer token', type: 'String' }
@@ -122,7 +126,7 @@ module Epics
         end
         post 'debits' do
           params[:requested_date] ||= Time.now.to_i + 172800 # grape defaults interfere with swagger doc creation
-          DirectDebit.create!(account, params, current_user)
+          DirectDebit.create!(account, declared(params), current_user)
           { message: 'Direct debit has been initiated successfully!' }
         end
 
@@ -152,7 +156,7 @@ module Epics
         end
         post 'credits' do
           params[:requested_date] ||= Time.now.to_i # grape defaults interfere with swagger doc creation
-          Credit.create!(account, params, current_user)
+          Credit.create!(account, declared(params), current_user)
           { message: 'Credit has been initiated successfully!' }
         end
 
@@ -165,14 +169,16 @@ module Epics
         end
         params do
           requires :account, type: String, desc: "IBAN for an existing account"
-          optional :from, type: Integer, desc: "results starting at"
-          optional :to, type: Integer, desc: "results ending at"
+          optional :transaction_id, type: Integer, desc: "filter all statements by a specific transaction id"
           optional :page, type: Integer, desc: "page through the results", default: 1
           optional :per_page, type: Integer, desc: "how many results per page", values: 1..100, default: 10
         end
         get 'statements' do
-          statements = Statement.paginated_by_account(account.id, per_page: params[:per_page], page: params[:page]).all
-          present statements, with: StatementPresenter
+          safe_params = declared(params).to_hash.merge(account_id: account.id).symbolize_keys
+          record_count = Statement.count_by_account(safe_params)
+          statements = Statement.paginated_by_account(safe_params).all
+          setup_pagination_header(record_count)
+          present statements, with: Entities::Statement
         end
 
         api_desc "Retrieve all executed orders" do
@@ -187,8 +193,10 @@ module Epics
           optional :per_page, type: Integer, desc: "how many results per page", values: 1..100, default: 10
         end
         get 'transactions' do
-          statements = Transaction.paginated_by_account(account.id, per_page: params[:per_page], page: params[:page]).all
-          present statements, with: TransactionPresenter
+          record_count = Transaction.count_by_account(account.id)
+          transactions = Transaction.paginated_by_account(account.id, per_page: params[:per_page], page: params[:page]).all
+          setup_pagination_header(record_count)
+          present transactions, with: Entities::Transaction
         end
       end
     end
