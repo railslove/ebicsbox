@@ -3,6 +3,7 @@ require 'epics/box/validations/unique_transaction'
 
 # Helpers
 require 'epics/box/helpers/default'
+require 'epics/box/helpers/pagination'
 
 # Business processes
 require 'epics/box/business_processes/credit'
@@ -22,6 +23,7 @@ module Epics
     class Content < Grape::API
       format :json
       helpers Helpers::Default
+      helpers Helpers::Pagination
 
       AUTH_HEADERS = {
         'Authorization' => { description: 'OAuth 2 Bearer token', type: 'String' }
@@ -173,7 +175,9 @@ module Epics
         end
         get 'statements' do
           safe_params = declared(params).to_hash.merge(account_id: account.id).symbolize_keys
+          record_count = Statement.count_by_account(safe_params)
           statements = Statement.paginated_by_account(safe_params).all
+          setup_pagination_header(record_count)
           present statements, with: Entities::Statement
         end
 
@@ -189,8 +193,10 @@ module Epics
           optional :per_page, type: Integer, desc: "how many results per page", values: 1..100, default: 10
         end
         get 'transactions' do
-          statements = Transaction.paginated_by_account(account.id, per_page: params[:per_page], page: params[:page]).all
-          present statements, with: Entities::Transaction
+          record_count = Transaction.count_by_account(account.id)
+          transactions = Transaction.paginated_by_account(account.id, per_page: params[:per_page], page: params[:page]).all
+          setup_pagination_header(record_count)
+          present transactions, with: Entities::Transaction
         end
       end
     end
