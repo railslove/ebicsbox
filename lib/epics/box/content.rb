@@ -14,6 +14,7 @@ require 'epics/box/errors/business_process_failure'
 # Models and entities
 require 'epics/box/models/account'
 require 'epics/box/entities/account'
+require 'epics/box/entities/statement'
 
 module Epics
   module Box
@@ -172,7 +173,7 @@ module Epics
         end
         get 'statements' do
           statements = Statement.paginated_by_account(account.id, per_page: params[:per_page], page: params[:page]).all
-          present statements, with: StatementPresenter
+          present statements, with: Epics::Box::Entities::Statement
         end
 
         api_desc "Retrieve all executed orders" do
