@@ -1,8 +1,11 @@
 GIT
-  remote: git@github.com:railslove/blebics-wrapper.git
-  revision: 51b443bd378b14b71805c852e31e430d7acb0bd6
+  remote: git@github.com:trinidad/trinidad.git
+  revision: 866a07a864b33b5419a52b03b200d47c1a4588af
   specs:
-    blebics-wrapper (0.1.0-java)
+    trinidad (1.5.0.PRE)
+      jruby-rack (~> 1.1.14)
+      trinidad_jars (>= 1.5, < 1.7)
+    trinidad_jars (1.5.0)
 
 GEM
   remote: https://rubygems.org/
@@ -200,10 +203,6 @@ GEM
     timecop (0.7.3)
     timers (4.0.1)
       hitimes
-    trinidad (1.5.0.B1)
-      jruby-rack (~> 1.1.14)
-      trinidad_jars (>= 1.4.0, < 1.6.0)
-    trinidad_jars (1.4.1)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
     unf (0.1.4)
@@ -226,7 +225,6 @@ PLATFORMS
 DEPENDENCIES
   airborne
   beaneater (~> 1.0.0)
-  blebics-wrapper!
   byebug
   clockwork
   cmxl
@@ -241,6 +239,7 @@ DEPENDENCIES
   jruby-openssl (= 0.8.2)
   nokogiri
   pg
+  pry
   rake
   rspec
   ruby-swagger
@@ -249,7 +248,7 @@ DEPENDENCIES
   sinatra
   thin
   timecop
-  trinidad (= 1.5.0.B1)
+  trinidad!
   webmock
 
 BUNDLED WITH

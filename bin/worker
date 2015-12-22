@@ -1,8 +1,11 @@
-#!/usr/bin/env ruby -w
+#!/usr/bin/env ruby
 
 # Load environment variables
-require 'dotenv'
-Dotenv.load
+begin
+  require 'dotenv'
+  Dotenv.load
+rescue LoadError
+end
 
 # Load environment
 require 'bundler'

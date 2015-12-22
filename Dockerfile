@@ -1,5 +1,6 @@
-FROM jruby:1.7-jdk
+FROM jruby:9.0.4.0-jdk
 
+ENV DATABASE_URL=jdbc:postgresql://postgres/postgres?user=postgres
 RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -
 RUN apt-get install -y nodejs
 
@@ -13,7 +14,9 @@ RUN echo invokedynamic.all=true >> /usr/ebicsbox/.jrubyrc
 
 ADD Gemfile /usr/ebicsbox/
 ADD Gemfile.lock /usr/ebicsbox/
-RUN bundle install
+RUN mkdir -p /usr/ebicsbox/vendor/cache
+ADD vendor/cache /usr/ebicsbox/vendor/cache
+RUN cd /usr/ebicsbox && bundle install --deployment --local --without development test
 
 RUN npm install webpack -g
 
@@ -22,9 +25,7 @@ RUN npm install
 RUN webpack -p
 RUN rake jruby:build
 
-
 RUN rm Dockerfile*
-RUN rm Rakefile
 RUN rm .env
 RUN rm -rf ./node_modules
 RUN rm -rf .git
