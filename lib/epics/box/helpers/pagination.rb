@@ -35,7 +35,7 @@ module Epics
 
         def build_path(new_params)
           new_query = Rack::Utils.build_query(request.env['rack.request.query_hash'].merge(new_params))
-          Epics::Box.configuration.app_url + request.env['REQUEST_PATH'] + '?' + new_query
+          Rack::Request.new(request.env).url.split('?').first + '?' + new_query
         end
       end
     end
