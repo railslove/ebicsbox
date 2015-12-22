@@ -1,5 +1,5 @@
 require 'grape-entity'
-require 'epics/box/presenters/transaction_presenter'
+require 'epics/box/entities/transaction'
 
 module Epics
   module Box

@@ -1,6 +1,3 @@
-# Presenters
-require 'epics/box/presenters/manage_account_presenter'
-
 # Validations
 require 'epics/box/validations/unique_account'
 require 'epics/box/validations/active_account'
@@ -86,7 +83,7 @@ module Epics
           post do
             if account = current_organization.add_account(params)
               Event.account_created(account)
-              present account, with: ManageAccountPresenter
+              present account, with: Entities::ManagementAccount
             else
               error!({ message: 'Failed to create account' }, 400)
             end
@@ -129,7 +126,7 @@ module Epics
               account = Account.where(organization: current_organization).first!(iban: params[:id])
               account.set(params.except('id', 'state'))
               if !account.modified? || account.save
-                present account, with: ManageAccountPresenter
+                present account, with: Entities::ManagementAccount
               else
                 error!({ message: 'Failed to update account' }, 400)
               end

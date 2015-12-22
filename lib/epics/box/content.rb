@@ -15,6 +15,7 @@ require 'epics/box/errors/business_process_failure'
 require 'epics/box/models/account'
 require 'epics/box/entities/account'
 require 'epics/box/entities/statement'
+require 'epics/box/entities/transaction'
 
 module Epics
   module Box
@@ -166,14 +167,14 @@ module Epics
         end
         params do
           requires :account, type: String, desc: "IBAN for an existing account"
-          optional :from, type: Integer, desc: "results starting at"
-          optional :to, type: Integer, desc: "results ending at"
+          optional :transaction_id, type: Integer, desc: "filter all statements by a specific transaction id"
           optional :page, type: Integer, desc: "page through the results", default: 1
           optional :per_page, type: Integer, desc: "how many results per page", values: 1..100, default: 10
         end
         get 'statements' do
-          statements = Statement.paginated_by_account(account.id, per_page: params[:per_page], page: params[:page]).all
-          present statements, with: Epics::Box::Entities::Statement
+          safe_params = declared(params).to_hash.merge(account_id: account.id).symbolize_keys
+          statements = Statement.paginated_by_account(safe_params).all
+          present statements, with: Entities::Statement
         end
 
         api_desc "Retrieve all executed orders" do
@@ -189,7 +190,7 @@ module Epics
         end
         get 'transactions' do
           statements = Transaction.paginated_by_account(account.id, per_page: params[:per_page], page: params[:page]).all
-          present statements, with: TransactionPresenter
+          present statements, with: Entities::Transaction
         end
       end
     end

@@ -66,49 +66,6 @@ module Epics
         end
       end
 
-      describe 'GET :account/transactions' do
-        before { user }
-
-        context 'account does not exist' do
-          it 'returns a not found status' do
-            get "NOT_EXISTING/transactions", { 'Authorization' => "token #{user.access_token}" }
-            expect_status 404
-          end
-
-          it 'returns a proper error message' do
-            get "NOT_EXISTING/transactions", { 'Authorization' => "token #{user.access_token}" }
-            expect_json 'message', 'Your organization does not have an account with given IBAN!'
-          end
-        end
-
-        context 'account owned by another organization' do
-          let(:account) { other_organization.add_account(iban: SecureRandom.uuid) }
-
-          it 'returns a not found status' do
-            get "#{account.iban}/transactions", { 'Authorization' => "token #{user.access_token}" }
-            expect_status 404
-          end
-
-          it 'returns a proper error message' do
-            get "#{account.iban}/transactions", { 'Authorization' => "token #{user.access_token}" }
-            expect_json 'message', 'Your organization does not have an account with given IBAN!'
-          end
-        end
-
-        context 'account is owned by user\s organization' do
-          let(:account) { organization.add_account(iban: SecureRandom.uuid) }
-
-          it 'returns an empty array for new accounts' do
-            get "#{account.iban}/transactions", { 'Authorization' => 'token orga-user' }
-            expect(response.body).to eq('[]')
-          end
-
-          it 'returns properly formatted transactions'
-
-          it 'allows to filter results by a date range'
-        end
-      end
-
       describe 'POST /:account/debits' do
         include_context 'valid user'
 
