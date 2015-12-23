@@ -26,9 +26,6 @@ require 'epics/box/configuration'
 
 module Epics
   module Box
-    # CLIENT = Epics::Client.new( File.open(ENV['KEYFILE']), ENV['PASSPHRASE'], ENV['EBICS_URL'], ENV['EBICS_HOST'], ENV['EBICS_USER'], ENV['EBICS_PARTNER'])
-    # Your code goes here...
-
     def self.configuration
       @configuration ||= Configuration.new
     end
