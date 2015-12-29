@@ -116,7 +116,27 @@ module Epics
 
             it 'includes all statements if no date filter param is provided' do
               get "#{account.iban}/statements", { 'Authorization' => 'token orga-user' }
-              expect(json_body.map {|h| h[:eref] }).to eq(["trx-3", "trx-2", "trx-1"])
+              expect(json_body.map {|h| h[:eref] }).to match_array(["trx-3", "trx-2", "trx-1"])
+            end
+          end
+
+          describe 'filtering by type' do
+            let!(:statement_1) { Statement.create account_id: account.id, eref: 'trx-1', debit: true }
+            let!(:statement_2) { Statement.create account_id: account.id, eref: 'trx-2', debit: false }
+
+            it 'only includes credit statements' do
+              get "#{account.iban}/statements?type=credit", { 'Authorization' => 'token orga-user' }
+              expect_json '*', eref: 'trx-2'
+            end
+
+            it 'only includes debit statements' do
+              get "#{account.iban}/statements?type=debit", { 'Authorization' => 'token orga-user' }
+              expect_json '*', eref: 'trx-1'
+            end
+
+            it 'includes all statements if no type filter param is provided' do
+              get "#{account.iban}/statements", { 'Authorization' => 'token orga-user' }
+              expect(json_body.map {|h| h[:eref] }).to match_array(["trx-2", "trx-1"])
             end
           end
 
