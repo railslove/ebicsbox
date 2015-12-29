@@ -99,6 +99,27 @@ module Epics
             end
           end
 
+          describe 'filtering by date' do
+            let!(:statement_1) { Statement.create account_id: account.id, eref: 'trx-1', date: '2015-12-01' }
+            let!(:statement_2) { Statement.create account_id: account.id, eref: 'trx-2', date: '2015-12-02' }
+            let!(:statement_3) { Statement.create account_id: account.id, eref: 'trx-3', date: '2015-12-03' }
+
+            it 'only includes statements with date after or on from param' do
+              get "#{account.iban}/statements?from=2015-12-03", { 'Authorization' => 'token orga-user' }
+              expect_json '*', eref: 'trx-3'
+            end
+
+            it 'only includes statements with date before or on to param' do
+              get "#{account.iban}/statements?to=2015-12-01", { 'Authorization' => 'token orga-user' }
+              expect_json '*', eref: 'trx-1'
+            end
+
+            it 'includes all statements if no date filter param is provided' do
+              get "#{account.iban}/statements", { 'Authorization' => 'token orga-user' }
+              expect(json_body.map {|h| h[:eref] }).to eq(["trx-3", "trx-2", "trx-1"])
+            end
+          end
+
           it 'passes page and per_page params to statement retrieval function' do
             allow(Statement).to receive(:paginated_by_account) { double(all: [])}
             get "#{account.iban}/statements?page=4&per_page=2", { 'Authorization' => 'token orga-user' }

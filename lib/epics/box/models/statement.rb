@@ -2,27 +2,28 @@ class Epics::Box::Statement < Sequel::Model
   many_to_one :account
   many_to_one :transaction
 
-  def self.count_by_account(account_id:, transaction_id: nil, **unused)
-    query = self
-      .where(account_id: account_id)
+  def self.generic_filter(query, account_id:, transaction_id: nil, from: nil, to: nil, **unused)
+    # Filter by account id
+    query = query.where(account_id: account_id)
 
     # Filter by transaction id
     query = query.where(transaction_id: transaction_id) if transaction_id.present?
 
+    # Filter by statement date
+    query = query.where("statements.date >= ?", from) if from.present?
+    query = query.where("statements.date <= ?", to) if to.present?
+
+    query
+  end
+
+  def self.count_by_account(**generic_filters)
+    query = generic_filter(self, generic_filters)
     query.count
   end
 
-  def self.paginated_by_account(account_id:, per_page: 10, page: 1, transaction_id: nil, **unused)
-    query = self
-      .where(account_id: account_id)
-      .limit(per_page)
-      .offset((page - 1) * per_page)
-      .reverse_order(:date)
-
-    # Filter by transaction id
-    query = query.where(transaction_id: transaction_id) if transaction_id.present?
-
-    query
+  def self.paginated_by_account(per_page: 10, page: 1, **generic_filters)
+    query = self.limit(per_page).offset((page - 1) * per_page).reverse_order(:date)
+    generic_filter(query, generic_filters)
   end
 
   def credit?
