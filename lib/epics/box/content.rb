@@ -174,6 +174,7 @@ module Epics
           optional :per_page, type: Integer, desc: "how many results per page", values: 1..100, default: 10
           optional :from, type: Date, desc: "Date from which on to filter the results"
           optional :to, type: Date, desc: "Date to which filter results"
+          optional :type, type: String, desc: "Type of statement", values: ['credit', 'debit']
         end
         get 'statements' do
           safe_params = declared(params).to_hash.merge(account_id: account.id).symbolize_keys

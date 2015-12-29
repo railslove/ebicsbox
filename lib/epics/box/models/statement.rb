@@ -2,7 +2,7 @@ class Epics::Box::Statement < Sequel::Model
   many_to_one :account
   many_to_one :transaction
 
-  def self.generic_filter(query, account_id:, transaction_id: nil, from: nil, to: nil, **unused)
+  def self.generic_filter(query, account_id:, transaction_id: nil, from: nil, to: nil, type: nil, **unused)
     # Filter by account id
     query = query.where(account_id: account_id)
 
@@ -12,6 +12,9 @@ class Epics::Box::Statement < Sequel::Model
     # Filter by statement date
     query = query.where("statements.date >= ?", from) if from.present?
     query = query.where("statements.date <= ?", to) if to.present?
+
+    # Filter by type
+    query = query.where(debit: type == 'debit') if type.present?
 
     query
   end
