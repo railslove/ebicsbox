@@ -149,6 +149,21 @@ module Epics
           it 'allows to filter results by a date range'
         end
       end
+
+      describe 'GET :account/import/statements' do
+        let(:account) { organization.add_account(iban: SecureRandom.uuid) }
+        let(:client) { double('Epics Client') }
+        let!(:subscriber) { account.add_subscriber(signature_class: 'T', activated_at: 1.day.ago) }
+
+        before { user }
+
+        it 'works' do
+          allow_any_instance_of(Subscriber).to receive(:client) { client }
+          allow(client).to receive(:STA).and_return(File.read('spec/fixtures/mt940.txt'))
+          get "#{account.iban}/import/statements?from=2015-12-01&to=2015-12-31", { 'Authorization' => 'token orga-user' }
+          expect_json_types fetched: :integer, imported: :integer
+        end
+      end
     end
   end
 end

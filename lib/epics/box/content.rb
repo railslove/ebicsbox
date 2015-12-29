@@ -8,6 +8,7 @@ require 'epics/box/helpers/pagination'
 # Business processes
 require 'epics/box/business_processes/credit'
 require 'epics/box/business_processes/direct_debit'
+require 'epics/box/jobs/fetch_statements'
 
 # Errors
 require 'epics/box/errors/business_process_failure'
@@ -200,6 +201,29 @@ module Epics
           transactions = Transaction.paginated_by_account(account.id, per_page: params[:per_page], page: params[:page]).all
           setup_pagination_header(record_count)
           present transactions, with: Entities::Transaction
+        end
+
+        namespace :import do
+          api_desc "Manually import statements for a given timeframe" do
+            api_name 'accounts_import_statements'
+            detail "Use this endpoint to manually import statements. This might be useful if another system fetched data via STA and you now need to get this data again."
+            tags 'Account specific endpoints'
+            headers AUTH_HEADERS
+            errors DEFAULT_ERROR_RESPONSES
+          end
+          params do
+            requires :account, type: String, desc: "IBAN for an existing account"
+            requires :from, type: Date, desc: "Date from which on to filter the results"
+            requires :to, type: Date, desc: "Date to which filter results"
+          end
+          get 'statements' do
+            stats = Jobs::FetchStatements.fetch_new_statements(account.id, params[:from], params[:to])
+            {
+              message: "Imported statements successfully",
+              fetched: stats[:fetched],
+              imported: stats[:imported],
+            }
+          end
         end
       end
     end

@@ -2,26 +2,50 @@ module Epics
   module Box
     module Jobs
       RSpec.describe FetchStatements do
-        describe '.process!' do
-          let(:account) { Account.create(host: "HOST") }
-          let!(:subscriber) { account.add_subscriber(signature_class: 'T', activated_at: 1.day.ago) }
+        let(:account) { Account.create(host: "HOST") }
+        let!(:subscriber) { account.add_subscriber(signature_class: 'T', activated_at: 1.day.ago) }
 
-          def exec_process
-            described_class.process!(account_ids: [account.id])
+        describe '.process!' do
+          it 'fetches statements for every submitted account' do
+            allow(described_class).to receive(:fetch_new_statements)
+            described_class.process!(account_ids: [1, 2, 3])
+            expect(described_class).to have_received(:fetch_new_statements).with(1).with(2).with(3)
+          end
+        end
+
+        describe '.fetch_new_statements' do
+          let(:client) { double('Epics Client') }
+
+          before do
+            account.imported_at!(1.day.ago)
+            allow_any_instance_of(Subscriber).to receive(:client) { client }
+            allow(client).to receive(:STA).and_return(File.read('spec/fixtures/mt940.txt'))
           end
 
-          context 'last import happened at least one day ago' do
-            let(:client) { double('Epics Client') }
-
-            before do
-              account.imported_at!(1.day.ago)
-              allow_any_instance_of(Subscriber).to receive(:client) { client }
-              allow(client).to receive(:STA).and_return(File.read('spec/fixtures/mt940.txt'))
+          context 'with timeframe' do
+            def exec_process
+              described_class.fetch_new_statements(account.id, "2015-12-01", "2015-12-31")
             end
 
             it 'fetches statements from remote server' do
               exec_process
-              expect(account.transport_client).to have_received(:STA)
+              expect(account.transport_client).to have_received(:STA).with("2015-12-01", "2015-12-31")
+            end
+
+            it 'does not alter date when last import happened' do
+              expect_any_instance_of(Account).to_not receive(:imported_at!)
+              exec_process
+            end
+          end
+
+          context 'without timeframe' do
+            def exec_process
+              described_class.fetch_new_statements(account.id)
+            end
+
+            it 'fetches statements from remote server' do
+              exec_process
+              expect(account.transport_client).to have_received(:STA).with(nil, nil)
             end
 
             it 'adds info that a new import happened' do
