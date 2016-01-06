@@ -14,7 +14,7 @@ module Epics
             reference: params[:eref],
             remittance_information: params[:remittance_information],
             requested_date: Time.at(params[:requested_date]).to_date,
-            batch_booking: true,
+            batch_booking: false,
             service_level: params[:service_level]
           )
         end
