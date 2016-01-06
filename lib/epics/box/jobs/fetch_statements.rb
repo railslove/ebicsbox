@@ -11,14 +11,14 @@ module Epics
         # Fetch all new statements for a single account since its last import. Each account import
         # can fail and should not affect imports for other accounts. The BusinessError can occur
         # when no new statements are available
-        def self.fetch_new_statements(account_id, from = nil, to = nil)
+        def self.fetch_new_statements(account_id, from = 30.days.ago.to_date.to_s, to = Date.today.to_s)
           Box.logger.info("[Jobs::FetchStatements] Starting import. id=#{account_id}")
 
           account = Account.first!(id: account_id)
           mt940 = account.transport_client.STA(from, to)
           transactions = Cmxl.parse(mt940).map(&:transactions).flatten
           imported = transactions.map { |transaction| create_statement(account_id, transaction, mt940) }
-          account.imported_at!(Time.now) unless !!from or !!to
+          account.imported_at!(Time.now) if imported.include?(true)
 
           { fetched: transactions.count, imported: imported.select{ |obj| obj }.count }
         rescue Sequel::NoMatchingRow  => ex

@@ -33,6 +33,7 @@ module Epics
             end
 
             it 'does not alter date when last import happened' do
+              exec_process
               expect_any_instance_of(Account).to_not receive(:imported_at!)
               exec_process
             end
@@ -45,7 +46,7 @@ module Epics
 
             it 'fetches statements from remote server' do
               exec_process
-              expect(account.transport_client).to have_received(:STA).with(nil, nil)
+              expect(account.transport_client).to have_received(:STA).with(30.days.ago.to_date.to_s, Date.today.to_s)
             end
 
             it 'adds info that a new import happened' do
