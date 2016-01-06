@@ -77,6 +77,7 @@ module Epics
               name: 'name',
               information: 'information',
               description: 'description',
+              sha: 'balbalblabladslflasdfk',
               sepa: {
                 "EREF" => 'my-eref',
                 "MREF" => 'my-mref',

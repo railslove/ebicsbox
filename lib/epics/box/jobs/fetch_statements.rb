@@ -30,7 +30,7 @@ module Epics
         def self.create_statement(account_id, data, raw_data)
           trx = {
             account_id: account_id,
-            sha: Digest::SHA2.hexdigest([data.sha, data.date, data.amount, raw_data].join).to_s,
+            sha: Digest::SHA2.hexdigest([data.sha, data.date, data.amount_in_cents, data.sepa].join).to_s,
             date: data.date,
             entry_date: data.entry_date,
             amount: data.amount_in_cents,
