@@ -92,7 +92,7 @@ module Epics
           end
 
           context 'the statement was already imported' do
-            before { Statement.create(sha: 'dea7111a8406e27cfc8bf5f49c5d40898402b0b584b3285f069170a36f9eec31') }
+            before { Statement.create(sha: '63feaabebb3f24986f64cc2691cc905ff40e600130aa6fec9e281452e93abb58') }
 
             it 'does not create a statement' do
               expect { exec_create_action }.to_not change{ Statement.count }
