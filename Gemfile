@@ -13,18 +13,10 @@ gem 'ruby-swagger'
 gem 'sepa_king'
 gem 'sequel'
 gem 'sinatra'
-
-platforms :mri do
-  gem 'pg'
-  gem 'thin'
-end
-
-platforms :jruby do
-  gem 'jdbc-postgres'
-  gem 'jruby-openssl', '0.9.13' #, '0.8.2'
-  gem 'trinidad', "1.5.0.B1"
-  # gem 'blebics-wrapper', git: 'git@github.com:railslove/blebics-wrapper.git'
-end
+gem 'jdbc-postgres'
+gem 'jruby-openssl', '0.9.13' #, '0.8.2'
+gem 'trinidad', "1.5.0.B1"
+# gem 'blebics-wrapper', git: 'git@github.com:railslove/blebics-wrapper.git'
 
 group :development, :test do
   gem 'byebug', platform: :mri

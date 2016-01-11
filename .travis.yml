@@ -1,7 +1,6 @@
 language: ruby
 sudo: false
 rvm:
-  - 2.2.2
   - jruby-9.0.1.0
 cache:
   - bundler
@@ -9,7 +8,6 @@ cache:
 addons:
   postgresql: "9.4"
 env:
-  - TEST_DATABASE_URL="postgres://localhost/ebicsbox_test"
   - TEST_DATABASE_URL="jdbc:postgresql://localhost/ebicsbox_test" EBICS_CLIENT="Blebics::Client"
 before_install:
   - wget https://github.com/kr/beanstalkd/archive/v1.10.tar.gz
@@ -24,7 +22,5 @@ script:
   - bundle exec rspec spec
 matrix:
   exclude:
-    - rvm: 2.2.2
-      env: TEST_DATABASE_URL="jdbc:postgresql://localhost/ebicsbox_test" EBICS_CLIENT="Blebics::Client"
     - rvm: jruby-9.0.1.0
       env: TEST_DATABASE_URL="postgres://localhost/ebicsbox_test"
