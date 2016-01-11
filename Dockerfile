@@ -21,7 +21,6 @@ RUN npm install
 RUN webpack -p
 RUN rake jruby:build
 
-
 RUN rm Dockerfile*
 RUN rm Rakefile
 RUN rm .env
