@@ -15,6 +15,7 @@ while(true) do
     break
   rescue Exception => e
     puts e.message
+    puts ENV['DATABASE_URL']
     tries -= 1
     if tries > 0
       sleep 2
