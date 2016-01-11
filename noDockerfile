@@ -1,4 +1,4 @@
-FROM jruby:1.7-jdk
+FROM ruby:2.2.3
 
 RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -
 RUN apt-get install -y nodejs
