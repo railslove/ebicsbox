@@ -1,5 +1,4 @@
-FROM ruby:2.2.3
-
+FROM jruby:9.0.4.0-jdk
 RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -
 RUN apt-get install -y nodejs
 
@@ -9,7 +8,7 @@ RUN bundle config --global frozen 1
 RUN mkdir -p /usr/ebicsbox
 WORKDIR /usr/ebicsbox
 
-# RUN echo invokedynamic.all=true >> /usr/ebicsbox/.jrubyrc
+RUN echo invokedynamic.all=true >> /usr/ebicsbox/.jrubyrc
 
 ADD Gemfile /usr/ebicsbox/
 ADD Gemfile.lock /usr/ebicsbox/
@@ -20,7 +19,7 @@ RUN npm install webpack -g
 ADD . /usr/ebicsbox
 RUN npm install
 RUN webpack -p
-# RUN rake jruby:build
+RUN rake jruby:build
 
 
 RUN rm Dockerfile*
