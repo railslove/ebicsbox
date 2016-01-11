@@ -231,7 +231,7 @@ DEPENDENCIES
   guard-rspec
   httparty
   jdbc-postgres
-  jruby-openssl (= 0.8.2)
+  jruby-openssl
   nokogiri
   pg
   rake
