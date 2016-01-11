@@ -14,8 +14,8 @@ gem 'sepa_king'
 gem 'sequel'
 gem 'sinatra'
 gem 'jdbc-postgres'
-gem 'jruby-openssl', '0.9.13' #, '0.8.2'
-gem 'trinidad', "1.5.0.B1"
+gem 'jruby-openssl'#, '0.9.13' #, '0.8.2'
+gem 'trinidad', git: 'https://github.com/trinidad/trinidad.git' #"1.5.0.B1"
 # gem 'blebics-wrapper', git: 'git@github.com:railslove/blebics-wrapper.git'
 
 group :development, :test do

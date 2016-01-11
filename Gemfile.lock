@@ -1,3 +1,12 @@
+GIT
+  remote: https://github.com/trinidad/trinidad.git
+  revision: 866a07a864b33b5419a52b03b200d47c1a4588af
+  specs:
+    trinidad (1.5.0.PRE)
+      jruby-rack (~> 1.1.14)
+      trinidad_jars (>= 1.5, < 1.7)
+    trinidad_jars (1.5.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -21,6 +30,7 @@ GEM
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
     beaneater (1.0.0)
+    bouncy-castle-java (1.5.0147)
     builder (3.2.2)
     byebug (5.0.0)
       columnize (= 0.9.0)
@@ -96,7 +106,8 @@ GEM
     iban-tools (1.0.0)
     ice_nine (0.11.1)
     jdbc-postgres (9.4.1204)
-    jruby-openssl (0.9.13-java)
+    jruby-openssl (0.9.4)
+      bouncy-castle-java (>= 1.5.0147)
     jruby-rack (1.1.19)
     json (1.8.3)
     json (1.8.3-java)
@@ -185,10 +196,6 @@ GEM
     timecop (0.7.3)
     timers (4.0.1)
       hitimes
-    trinidad (1.5.0.B1)
-      jruby-rack (~> 1.1.14)
-      trinidad_jars (>= 1.4.0, < 1.6.0)
-    trinidad_jars (1.4.2)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
     unf (0.1.4)
@@ -222,7 +229,7 @@ DEPENDENCIES
   guard-rspec
   httparty
   jdbc-postgres
-  jruby-openssl (= 0.9.13)
+  jruby-openssl
   nokogiri
   rake
   rspec
@@ -231,7 +238,7 @@ DEPENDENCIES
   sequel
   sinatra
   timecop
-  trinidad (= 1.5.0.B1)
+  trinidad!
   webmock
 
 BUNDLED WITH
