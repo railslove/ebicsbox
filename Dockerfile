@@ -21,16 +21,15 @@ RUN npm install
 RUN webpack -p
 RUN rake jruby:build
 
-RUN rm Dockerfile* > /dev/nul 2>&1
-RUN rm Rakefile > /dev/nul 2>&1
-RUN rm .env > /dev/nul 2>&1
-RUN rm -rf ./node_modules > /dev/nul 2>&1
-RUN rm -rf .git > /dev/nul 2>&1
-RUN rm -rf pkg > /dev/nul 2>&1
-RUN rm -rf log > /dev/nul 2>&1
-RUN rm Procfile* > /dev/nul 2>&1
-RUN rm README* > /dev/nul 2>&1
-RUN rm package.json > /dev/nul 2>&1
-RUN rm webpack.config.js > /dev/nul 2>&1
+RUN rm Dockerfile*
+RUN rm Rakefile
+RUN rm -rf ./node_modules
+RUN rm -rf .git
+RUN rm -rf pkg
+RUN rm -rf log
+RUN rm Procfile*
+RUN rm README*
+RUN rm package.json
+RUN rm webpack.config.js
 
 CMD ["bin/start", "server"]
