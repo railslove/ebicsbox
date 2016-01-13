@@ -63,7 +63,7 @@ module Epics
 
       describe 'PUT /accounts/:id' do
         let(:account) { Account.create(name: 'name', iban: 'old-iban', bic: 'old-bic', organization_id: organization.id) }
-        let(:other_account) { Account.create(name: 'name', iban: 'iban-2', bic: 'bic-2', organization_id: other_organization.id, activated_at: 1.hour.ago) }
+        let(:other_account) { Account.create(name: 'name', iban: 'iban-2', bic: 'bic-2', organization_id: other_organization.id) }
 
         before { user }
 
@@ -108,7 +108,7 @@ module Epics
         end
 
         context 'inactive account' do
-          before { account.update(activated_at: nil) }
+          before { account.subscribers_dataset.update(activated_at: nil) }
 
           it 'can change iban' do
             expect { put "management/accounts/#{account.iban}", { iban: 'new-iban' }, { 'Authorization' => 'token orga-user' } }.to change { account.reload.iban }
