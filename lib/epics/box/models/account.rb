@@ -57,6 +57,12 @@ class Epics::Box::Account < Sequel::Model
     DB[:imports].insert(date: date, account_id: id)
   end
 
+  def set_balance(date, amount_in_cents)
+    self.balance_date = date
+    self.balance_in_cents = amount_in_cents
+    save
+  end
+
   def as_event_payload
     {
       account_id: id,
