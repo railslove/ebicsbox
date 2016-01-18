@@ -3,7 +3,7 @@
 bin/migrate
 
 if [ "$1" = "server" ]; then
-  /usr/local/bundle/bin/bundle exec puma config.ru -p 5000
+  /usr/local/bundle/bin/bundle exec puma config.ru -p $PORT
 fi
 
 if [ "$1" = "clock" ]; then
