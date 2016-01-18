@@ -20,7 +20,7 @@ namespace :jruby do
 
         puts " ---> Processing: #{file}"
 
-        File.write(file, 'require_relative __FILE__.sub(/\.rb$/, ".class")')
+        File.write(file, 'java_import __FILE__.sub(/\.rb$/, ".class")')
       else
         puts " ---> Failed: #{file}"
         exit(1)
