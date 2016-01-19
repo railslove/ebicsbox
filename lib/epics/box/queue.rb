@@ -28,6 +28,10 @@ module Epics
         @client ||= Beaneater.new(Box.configuration.beanstalkd_url)
       end
 
+      def self.clear!(queue)
+        client.tubes[queue].clear
+      end
+
       def self.update_processing_status(account_ids = nil)
         account_ids ||= Account.all_active_ids
         unless client.tubes[ORDER_TUBE].peek(:delayed)
