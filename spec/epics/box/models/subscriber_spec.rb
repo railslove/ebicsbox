@@ -31,18 +31,18 @@ module Epics
         it 'saves the keys' do
           subject.update(encryption_keys: nil)
           subject.setup!
-          expect(subject.reload.encryption_keys).to eql(Subscriber::File.new.dump_keys)
+          expect(subject.reload.encryption_keys).to eql(Adapters::File.new.dump_keys)
         end
 
         it 'saves the ini letter' do
           subject.update(ini_letter: nil)
           subject.setup!
-          expect(subject.reload.ini_letter).to eql(Subscriber::File.new.ini_letter(account.bankname))
+          expect(subject.reload.ini_letter).to eql(Adapters::File.new.ini_letter(account.bankname))
         end
 
         it 'calls INI and HIA' do
-          expect_any_instance_of(Subscriber::File).to receive(:INI)
-          expect_any_instance_of(Subscriber::File).to receive(:HIA)
+          expect_any_instance_of(Adapters::File).to receive(:INI)
+          expect_any_instance_of(Adapters::File).to receive(:HIA)
           subject.setup!
         end
 
@@ -71,7 +71,7 @@ module Epics
           expect(subject.client).to receive(:HPB)
           subject.update(encryption_keys: nil)
           subject.activate!
-          expect(subject.reload.encryption_keys).to eql(Subscriber::File.new.dump_keys)
+          expect(subject.reload.encryption_keys).to eql(Adapters::File.new.dump_keys)
         end
 
         context 'error case' do
