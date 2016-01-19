@@ -11,7 +11,6 @@ module Epics
         expose :bic, documentation: { type: "String", desc: "Bank branch's unique BIC" }
         expose :bankname, documentation: { type: "String", desc: "Name of bank account's hosting bank" }
         expose :creditor_identifier, documentation: { type: "String", desc: "Creditor identifier used for direct debits" }
-        expose :activated_at, documentation: { type: "DateTime", desc: "Date and time when ebics client credentials were activated" }
 
         expose :callback_url, documentation: { type: "String", desc: "URL where webhooks are sent at" }
         expose :url, documentation: { type: "String", desc: "Bank's EBICS server URL" }

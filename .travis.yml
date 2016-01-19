@@ -1,14 +1,14 @@
 language: ruby
 sudo: false
 rvm:
-  - jruby-9.0.1.0
+  - jruby-9.0.4.0
 cache:
   - bundler
   - apt
 addons:
   postgresql: "9.4"
 env:
-  - TEST_DATABASE_URL="jdbc:postgresql://localhost/ebicsbox_test" EBICS_CLIENT="Blebics::Client"
+  - TEST_DATABASE_URL="jdbc:postgresql://localhost/ebicsbox_test"
 before_install:
   - wget https://github.com/kr/beanstalkd/archive/v1.10.tar.gz
   - tar xf v1.10.tar.gz

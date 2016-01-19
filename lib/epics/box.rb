@@ -18,10 +18,8 @@ require 'base64'
 
 # Extensions to add swagger documentation methods
 require 'ruby-swagger/grape/grape'
-if RUBY_PLATFORM == 'java' && ENV['EBICS_CLIENT'] == 'Blebics::Client'
-  require 'blebics'
-end
 
+# Load configuration
 require 'epics/box/configuration'
 
 module Epics

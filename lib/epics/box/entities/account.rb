@@ -9,7 +9,8 @@ module Epics
         expose :bic, documentation: { type: "String", desc: "Bank branch's unique BIC" }
         expose :bankname, documentation: { type: "String", desc: "Name of bank account's hosting bank" }
         expose :creditor_identifier, documentation: { type: "String", desc: "Creditor identifier used for direct debits" }
-        expose :activated_at, documentation: { type: "DateTime", desc: "Date and time when ebics client credentials were activated" }
+        expose :balance_date, documentation: { type: "Date", desc: "Date of balance" }
+        expose :balance_in_cents, documentation: { type: "Integer", desc: "Account balance" }
 
         expose(:test_mode, documentation: { type: "Boolean", desc: "Whether this is a test account" }) do |account|
           account.mode == 'File'

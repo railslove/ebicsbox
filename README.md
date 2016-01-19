@@ -25,6 +25,11 @@ Run it:
 
     $ forman start -f Procfile.dev
 
+If this is too noisy, you can prefix the command with ```RUBYOPT="-W0"``` which removes warnings
+raised by jruby and beaneater about uninitialized variables.
+
+Furthermore, we recommend using ```JRUBY_OPTS="$JRUBY_OPTS --dev"``` which speeds up jruby quite a
+bit. Check https://github.com/jruby/jruby/wiki/Improving-startup-time for more infomation about it.
 
 ## Installation
 

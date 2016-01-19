@@ -1,3 +1,5 @@
+require 'active_support/all'
+
 module Epics
   module Box
     RSpec.describe Content do
@@ -61,6 +63,20 @@ module Epics
             it 'returns a 404' do
               get 'NOT_EXISTING', { 'Authorization' => "token #{user.access_token}" }
               expect_status 404
+            end
+          end
+
+          context 'account exists' do
+            let(:account) { organization.add_account(iban: 'AL90208110080000001039531801', name: 'Test Account', creditor_identifier: 'DE98ZZZ09999999999', balance_date: Date.new(2015, 1, 1), balance_in_cents: 123) }
+
+            it 'includes current balance' do
+              get account.iban, { 'Authorization' => "token #{user.access_token}" }
+              expect_json 'balance_in_cents', 123
+            end
+
+            it 'includes balance date' do
+              get account.iban, { 'Authorization' => "token #{user.access_token}" }
+              expect_json 'balance_date', '2015-01-01'
             end
           end
         end

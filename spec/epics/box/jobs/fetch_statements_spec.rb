@@ -1,3 +1,5 @@
+require 'active_support/all'
+
 module Epics
   module Box
     module Jobs
@@ -20,6 +22,12 @@ module Epics
             account.imported_at!(1.day.ago)
             allow_any_instance_of(Subscriber).to receive(:client) { client }
             allow(client).to receive(:STA).and_return(File.read('spec/fixtures/mt940.txt'))
+          end
+
+          it 'updates its meta data' do
+            expect(FetchStatements).to receive(:update_meta_data)
+              .with(account, all(be_a(Cmxl::Statement)), "2015-12-31")
+            described_class.fetch_new_statements(account.id, "2015-12-01", "2015-12-31")
           end
 
           context 'with timeframe' do
@@ -57,6 +65,48 @@ module Epics
             it 'creates local statements for each remote record' do
               expect(described_class).to receive(:create_statement).at_least(:once)
               exec_process
+            end
+          end
+
+          describe 'changing of balance data' do
+            let(:balance) { double('ClosingBalance', date: Date.new(2015, 2, 1), amount_in_cents: 10) }
+
+            before { allow_any_instance_of(Cmxl::Statement).to receive(:closing_balance).and_return(balance) }
+
+            context 'no previous balance' do
+              before { account.set_balance(nil, nil) }
+
+              it 'stores new closing balance date' do
+                expect { described_class.fetch_new_statements(account.id) }.to change { account.reload.balance_date }
+              end
+
+              it 'stores new closing balance' do
+                expect { described_class.fetch_new_statements(account.id) }.to change { account.reload.balance_in_cents }
+              end
+            end
+
+            context 'date of closing balance is newer' do
+              before { account.set_balance(Date.new(2015, 1, 1), 30) }
+
+              it 'stores new closing balance date' do
+                expect { described_class.fetch_new_statements(account.id) }.to change { account.reload.balance_date }
+              end
+
+              it 'stores new closing balance' do
+                expect { described_class.fetch_new_statements(account.id) }.to change { account.reload.balance_in_cents }
+              end
+            end
+
+            context 'date of closing balance is older' do
+              before { account.set_balance(Date.new(2015, 3, 1), 20) }
+
+              it 'does not store its balance date' do
+                expect { described_class.fetch_new_statements(account.id) }.to_not change { account.reload.balance_date }
+              end
+
+              it 'does not store the old closing balance' do
+                expect { described_class.fetch_new_statements(account.id) }.to_not change { account.reload.balance_in_cents }
+              end
             end
           end
         end
@@ -129,6 +179,7 @@ module Epics
 
           context 'transaction exists' do
             let!(:transaction) { Transaction.create(eref: statement.eref) }
+            let(:event) { object_double(Event).as_stubbed_const }
 
             context 'statement is a credit' do
               before { statement.update(debit: false) }
@@ -138,11 +189,13 @@ module Epics
                 exec_link_action
               end
 
-              skip 'triggers a webhook' do
-                expect(Event).to receive(:statement_created)
+              it 'triggers a webhook' do
+                expect(event).to receive(:statement_created).with(anything)
                 exec_link_action
               end
             end
+
+
 
             context 'statement is a debit' do
               before { statement.update(debit: true) }
@@ -153,7 +206,7 @@ module Epics
               end
 
               it 'triggers a webhook' do
-                expect(Queue).to receive(:trigger_webhook).at_least(:once)
+                expect(event).to receive(:statement_created)
                 exec_link_action
               end
             end

@@ -16,15 +16,34 @@ module Epics
 
           account = Account.first!(id: account_id)
           mt940 = account.transport_client.STA(from, to)
-          transactions = Cmxl.parse(mt940).map(&:transactions).flatten
+          statements = Cmxl.parse(mt940)
+          transactions = statements.map(&:transactions).flatten
           imported = transactions.map { |transaction| create_statement(account_id, transaction, mt940) }
-          account.imported_at!(Time.now) if imported.include?(true)
+
+          update_meta_data(account, statements, to)
 
           { fetched: transactions.count, imported: imported.select{ |obj| obj }.count }
         rescue Sequel::NoMatchingRow  => ex
           Box.logger.error("[Jobs::FetchStatements] Could not find account. account_id=#{account_id}")
         rescue Epics::Error::BusinessError => ex
           Box.logger.error(ex.message) # expected
+        end
+
+        def self.update_meta_data(account, statements, to)
+          return unless statements.any?
+          balance = statements.last.closing_balance
+
+          # Update account balance if new data is available
+          if !account.balance_date || account.balance_date <= balance.date
+            account.set_balance(balance.date, balance.amount_in_cents)
+          end
+
+          # Update imported at timestamp
+          imported_at = account.last_imported_at
+
+          if !imported_at || imported_at <= Date.parse(to)
+            account.imported_at!(Time.now)
+          end
         end
 
         def self.create_statement(account_id, data, raw_data)
