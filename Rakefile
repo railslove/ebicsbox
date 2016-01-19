@@ -1,17 +1,3 @@
-# Setup environment
-# require 'dotenv'
-# Dotenv.load
-
-# Require dependencies from gemfile
-# Bundler.require
-
-# Load swagger rake task
-# spec = Gem::Specification.find_by_name 'ruby-swagger'
-# load "#{spec.gem_dir}/lib/tasks/swagger.rake"
-
-# Load application
-# require './lib/epics/box'
-
 namespace :jruby do
   desc 'Build jruby classes'
   task 'build' do
@@ -28,20 +14,3 @@ namespace :jruby do
     end
   end
 end
-
-# namespace :db do
-#   desc "Run migrations"
-#   task :migrate, [:version] do |t, args|
-#     require "sequel"
-#     Sequel.extension :migration
-#     db_url = ENV.fetch("TEST") ? ENV.fetch("TEST_DATABASE_URL") : ENV.fetch("DATABASE_URL")
-#     DB = Sequel.connect(db_url)
-#     if args[:version]
-#       puts "Migrating to version #{args[:version]} on #{db_url}"
-#       Sequel::Migrator.run(DB, "migrations", target: args[:version].to_i)
-#     else
-#       puts "Migrating to latest on #{db_url}"
-#       Sequel::Migrator.run(DB, "migrations")
-#     end
-#   end
-# end
