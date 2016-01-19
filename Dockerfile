@@ -19,7 +19,7 @@ RUN npm install webpack -g
 ADD . /usr/ebicsbox
 RUN npm install
 RUN webpack -p
-RUN rake jruby:build
+#RUN rake jruby:build
 
 RUN rm Dockerfile*
 RUN rm Rakefile
