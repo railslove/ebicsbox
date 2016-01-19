@@ -1,3 +1,4 @@
+require 'epics/box/adapters/fake'
 require 'epics/box/adapters/file'
 
 class Epics::Box::Subscriber < Sequel::Model
