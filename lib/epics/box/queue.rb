@@ -28,6 +28,10 @@ module Epics
         @client ||= Beaneater.new(Box.configuration.beanstalkd_url)
       end
 
+      def self.clear!(queue)
+        client.tubes[queue].try(:clear)
+      end
+
       def self.update_processing_status(account_ids = nil)
         account_ids ||= Account.all_active_ids
         unless client.tubes[ORDER_TUBE].peek(:delayed)
@@ -80,7 +84,7 @@ module Epics
 
       def register(tube_name, klass)
         self.class.client.jobs.register(tube_name) do |job|
-          with_error_logging do
+          with_error_logging(tube_name, job.id) do
             DB.synchronize { klass.process!(job.body) }
           end
         end
@@ -88,10 +92,10 @@ module Epics
 
       # Run any job within a block provided to this method to ensure that jobs are not only
       # burried, but also an error is logged. Otherwise, the queue would just swallow any exceptions
-      def with_error_logging(&block)
+      def with_error_logging(tube_name, job_id, &block)
         block.call
       rescue => e
-        @logger.error("[Queue] Failed job. message='#{e.message}'")
+        @logger.error("[Queue] Failed job. tube=#{tube_name} job='#{job_id}' message='#{e.message}'")
         raise
       end
 

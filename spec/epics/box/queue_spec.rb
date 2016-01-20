@@ -5,12 +5,12 @@ module Epics
       let(:client) { described_class.client }
 
       def clear_all_tubes
-        client.tubes[Queue::DEBIT_TUBE].clear
-        client.tubes[Queue::CREDIT_TUBE].clear
-        client.tubes[Queue::ORDER_TUBE].clear
-        client.tubes[Queue::STA_TUBE].clear
-        client.tubes[Queue::WEBHOOK_TUBE].clear
-        client.tubes[Queue::ACTIVATION_TUBE].clear
+        Queue.clear!(Queue::DEBIT_TUBE)
+        Queue.clear!(Queue::CREDIT_TUBE)
+        Queue.clear!(Queue::ORDER_TUBE)
+        Queue.clear!(Queue::STA_TUBE)
+        Queue.clear!(Queue::WEBHOOK_TUBE)
+        Queue.clear!(Queue::ACTIVATION_TUBE)
       end
 
       around do |example|
@@ -141,17 +141,17 @@ module Epics
         let(:exception) { StandardError.new('test') }
 
         it 'returns the original result' do
-          expect(subject.with_error_logging { 'ok' }).to eq('ok')
+          expect(subject.with_error_logging("test-tube", 1) { 'ok' }).to eq('ok')
         end
 
         it 're-raises any exception raised in its code block' do
-          expect { subject.with_error_logging { raise exception } }.to raise_error(exception)
+          expect { subject.with_error_logging("test-tube", 1) { raise exception } }.to raise_error(exception)
         end
 
         it 'logs any exception messages' do
           subject.logger = logger
-          subject.with_error_logging { raise exception } rescue ''
-          expect(logger).to have_received(:error).with("[Queue] Failed job. message='test'")
+          subject.with_error_logging("test-tube", 1) { raise exception } rescue ''
+          expect(logger).to have_received(:error).with("[Queue] Failed job. tube=test-tube job='1' message='test'")
         end
       end
     end
