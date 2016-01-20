@@ -8,6 +8,11 @@ module Epics
       one_to_many :accounts
       one_to_many :users
 
+      def self.find_by_management_token(token)
+        return unless token
+        first(management_token: token)
+      end
+
       def find_account!(iban)
         accounts_dataset.first!(iban: iban)
       rescue Sequel::NoMatchingRow => ex

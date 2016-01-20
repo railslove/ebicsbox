@@ -27,8 +27,8 @@ module Epics
 
       namespace :management do
         before do
-          if current_user.nil?
-            error!({ message: 'Unauthorized access. Please provide a valid access token!' }, 401)
+          if managed_organization.nil?
+            error!({ message: 'Unauthorized access. Please provide a valid organization management token token!' }, 401)
           end
         end
 
