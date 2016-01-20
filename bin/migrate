@@ -1,30 +1,30 @@
 #!/usr/bin/env ruby
 
-require 'dotenv'
-Dotenv.load
+# How often to retry the migration
+tries = 3
 
-require 'sequel'
+begin
+  # Load app configuration
+  require_relative '../lib/epics/box/configuration'
+  configuration = Epics::Box::Configuration.new
 
-tries = 10
+  # Setup database connection
+  require 'sequel'
+  DB ||= Sequel.connect(configuration.database_url, max_connections: 10)
+  Sequel.extension :migration, :core_extensions
 
-while(true) do
-  begin
-    DB ||= Sequel.connect(ENV['DATABASE_URL'], max_connections: 10)
-    Sequel.extension :migration, :core_extensions
-
-    version = Sequel::Migrator.run(DB, File.join( File.dirname(__FILE__),  '../migrations/'), use_transactions: true)
-    puts "migrated to: #{version}"
-
-    break
-  rescue Exception => e
-    puts e.message
-    tries -= 1
-    if tries > 0
-      sleep 2
-      retry
-    else
-      puts "Oh Noes! Waited too long"
-      exit(1)
-    end
+  # Migrate to latest version
+  version = Sequel::Migrator.run(DB, File.join( File.dirname(__FILE__),  '../migrations/'), use_transactions: true)
+  puts "migrated to: #{version}"
+rescue Exception => e
+  puts e.message
+  tries -= 1
+  if tries > 0
+    puts
+    sleep 2
+    retry
+  else
+    puts "Oh Noes! Waited too long"
+    exit(1)
   end
 end
