@@ -51,6 +51,10 @@ module Epics
       def test?
         ENV['ENVIRONMENT'] == 'test'
       end
+
+      def registrations_allowed?
+        ENV['REGISTRATIONS'].to_i == 'enabled'
+      end
     end
   end
 end

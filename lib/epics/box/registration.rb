@@ -8,6 +8,12 @@ module Epics
     class Registration < Grape::API
       format :json
 
+      before do
+        unless Box.configuration.registrations_allowed?
+          error!({ message: "Registration is not enabled. Please contact an admin!" }, 405)
+        end
+      end
+
       rescue_from Grape::Exceptions::ValidationErrors do |e|
         error!({
           message: 'Validation of your request\'s payload failed!',

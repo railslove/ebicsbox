@@ -1,3 +1,4 @@
+require_relative '../box'
 require_relative './registration'
 require_relative './service'
 require_relative './management'
@@ -7,9 +8,9 @@ module Epics
   module Box
     class Server < Grape::API
       mount Service
-      mount Registration
       mount Management
       mount Content
+      mount Registration
     end
   end
 end
