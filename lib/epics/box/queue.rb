@@ -29,7 +29,7 @@ module Epics
       end
 
       def self.clear!(queue)
-        client.tubes[queue].clear
+        client.tubes[queue].try(:clear)
       end
 
       def self.update_processing_status(account_ids = nil)
