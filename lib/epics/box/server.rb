@@ -1,6 +1,8 @@
-require 'epics/box/service'
-require 'epics/box/management'
-require 'epics/box/content'
+require_relative '../box'
+require_relative './registration'
+require_relative './service'
+require_relative './management'
+require_relative './content'
 
 module Epics
   module Box
@@ -8,6 +10,7 @@ module Epics
       mount Service
       mount Management
       mount Content
+      mount Registration
     end
   end
 end

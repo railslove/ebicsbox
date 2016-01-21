@@ -13,6 +13,12 @@ module Epics
         first(management_token: token)
       end
 
+      def self.register(params)
+        orga = new(params)
+        orga.management_token ||= SecureRandom.hex
+        orga.save
+      end
+
       def find_account!(iban)
         accounts_dataset.first!(iban: iban)
       rescue Sequel::NoMatchingRow => ex
