@@ -54,8 +54,16 @@ module Epics
             expect_status 400
           end
 
-          it 'rejects empty posts' do
-            expect_json_types error: :string
+          it 'contains a meaningful message' do
+            expect_json 'message', "Validation of your request's payload failed!"
+          end
+
+          it 'highlights missing fields' do
+            expect_json 'errors', {
+              name: ["is missing", "is empty"],
+              iban: ["is missing", "is empty"],
+              bic: ["is missing", "is empty"],
+            }
           end
         end
 
@@ -130,6 +138,93 @@ module Epics
 
           it 'can change iban' do
             expect { put "management/accounts/#{account.iban}", { bic: 'new-bic' }, { 'Authorization' => 'token management-token-1' } }.to change { account.reload.bic }
+          end
+        end
+      end
+
+      describe 'GET /accounts/:iban/subscribers' do
+        let(:account) { Account.create(name: 'name', iban: 'iban', bic: 'bic', organization_id: organization.id) }
+
+        context 'without subscribers' do
+          it 'returns an empty array' do
+            get "management/accounts/#{account.iban}/subscribers", { 'Authorization' => 'token management-token-1' }
+            expect_json []
+          end
+        end
+
+        context 'with subscribers' do
+          before { account.add_subscriber(user_id: user.id, remote_user_id: 'test') }
+
+          it 'returns a representation of account subscribers' do
+            get "management/accounts/#{account.iban}/subscribers", { 'Authorization' => 'token management-token-1' }
+            expect_json '0.ebics_user', 'test'
+          end
+        end
+      end
+
+      describe 'POST /accounts/:iban/subscribers' do
+        let(:account) { Account.create(name: 'name', iban: 'iban', bic: 'bic', organization_id: organization.id) }
+
+        def perform_request
+          post "management/accounts/#{account.iban}/subscribers", data, { 'Authorization' => 'token management-token-1' }
+        end
+
+        context 'missing attributes' do
+          let(:data) { { ebics_user: "test" } }
+
+          it 'returns an error code' do
+            perform_request
+            expect_status 400
+          end
+
+          it 'contains a meaningful message' do
+            perform_request
+            expect_json 'message', "Validation of your request's payload failed!"
+          end
+
+          it 'highlights missing fields' do
+            perform_request
+            expect_json 'errors', user_id: ['is missing']
+          end
+        end
+
+        context 'user with same used id' do
+          let(:data) { { ebics_user: "test", user_id: user.id } }
+
+          before { account.add_subscriber(remote_user_id: 'test', user_id: user.id) }
+
+          it 'returns an error code' do
+            perform_request
+            expect_status 400
+          end
+
+          it 'contains a meaningful message' do
+            perform_request
+            expect_json 'message', "Validation of your request's payload failed!"
+          end
+
+          it 'highlights interfering fields' do
+            perform_request
+            expect_json 'errors', ebics_user: ['already setup for given account']
+          end
+        end
+
+        context 'valid data' do
+          let(:data) { { ebics_user: "test", user_id: user.id } }
+
+          it 'returns a success code' do
+            perform_request
+            expect_status 201
+          end
+
+          it 'returns a meaningful message' do
+            perform_request
+            expect_json 'message', 'Subscriber has been created successfully!'
+          end
+
+          it 'returns a representation of the subscriber' do
+            perform_request
+            expect_json 'subscriber.ebics_user', 'test'
           end
         end
       end

@@ -1,6 +1,7 @@
 # Validations
 require 'epics/box/validations/unique_account'
 require 'epics/box/validations/active_account'
+require 'epics/box/validations/unique_subscriber'
 
 # Helpers
 require 'epics/box/helpers/default'
@@ -24,6 +25,13 @@ module Epics
         "404" => { description: "No account with given IBAN found" },
         "412" => { description: "EBICS account credentials not yet activated" },
       }
+
+      rescue_from Grape::Exceptions::ValidationErrors do |e|
+        error!({
+          message: 'Validation of your request\'s payload failed!',
+          errors: Hash[e.errors.map{ |k, v| [k.first, v]}]
+        }, 400)
+      end
 
       namespace :management do
         before do
@@ -123,7 +131,7 @@ module Epics
           end
           put ':id' do
             begin
-              account = Account.where(organization: current_organization).first!(iban: params[:id])
+              account = current_organization.accounts_dataset.first!(iban: params[:id])
               account.set(params.except('id', 'state'))
               if !account.modified? || account.save
                 present account, with: Entities::ManagementAccount
@@ -132,6 +140,44 @@ module Epics
               end
             rescue Sequel::NoMatchingRow => ex
               error!({ message: 'Your organization does not have an account with given IBAN!' }, 400)
+            end
+          end
+        end
+
+        resource 'accounts/:account_id/subscribers' do
+          api_desc 'Retrieve a list of all subscribers for given account' do
+            api_name 'management_account_subscribers'
+            tags 'Management'
+            response Entities::Subscriber, isArray: true
+            headers AUTH_HEADERS
+            errors DEFAULT_ERROR_RESPONSES
+          end
+          get do
+            account = current_organization.accounts_dataset.first!(iban: params[:account_id])
+            present account.subscribers, with: Entities::Subscriber
+          end
+
+          api_desc 'Add a subscriber to given account' do
+            api_name 'management_account_subscriber_create'
+            tags 'Management'
+            headers AUTH_HEADERS
+            errors DEFAULT_ERROR_RESPONSES
+          end
+          params do
+            requires :user_id, type: Integer, desc: "Internal user identifier to associate the subscriber with"
+            requires :ebics_user, type: String, unique_subscriber: true, desc: "EBICS user to represent"
+          end
+          post do
+            account = current_organization.accounts_dataset.first!(iban: params[:account_id])
+            declared_params = declared(params)
+            ebics_user = declared_params.delete(:ebics_user)
+            if subscriber = account.add_subscriber(declared_params.merge(remote_user_id: ebics_user))
+              {
+                message: 'Subscriber has been created successfully!',
+                subscriber: Entities::Subscriber.represent(subscriber),
+              }
+            else
+              error!({ message: 'Failed to create subscriber' }, 400)
             end
           end
         end
