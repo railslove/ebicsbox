@@ -171,11 +171,17 @@ module Epics
             account = current_organization.accounts_dataset.first!(iban: params[:account_id])
             declared_params = declared(params)
             ebics_user = declared_params.delete(:ebics_user)
-            if subscriber = account.add_subscriber(declared_params.merge(remote_user_id: ebics_user))
-              {
-                message: 'Subscriber has been created successfully!',
-                subscriber: Entities::Subscriber.represent(subscriber),
-              }
+            subscriber = account.add_subscriber(declared_params.merge(remote_user_id: ebics_user))
+            if subscriber
+              if subscriber.setup!
+                {
+                  message: 'Subscriber has been created and setup successfully! Please fetch INI letter, sign it, and submit it to your bank.',
+                  subscriber: Entities::Subscriber.represent(subscriber),
+                }
+              else
+                subscriber.destroy
+                error!({ message: 'Failed to setup subscriber. Make sure your data is valid and retry!' }, 412)
+              end
             else
               error!({ message: 'Failed to create subscriber' }, 400)
             end

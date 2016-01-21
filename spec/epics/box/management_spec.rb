@@ -163,7 +163,15 @@ module Epics
       end
 
       describe 'POST /accounts/:iban/subscribers' do
-        let(:account) { Account.create(name: 'name', iban: 'iban', bic: 'bic', organization_id: organization.id) }
+        let(:account) { Account.create(
+          name: 'name',
+          iban: 'iban',
+          bic: 'bic',
+          url: 'url',
+          host: 'host',
+          partner: 'partner',
+          mode: 'File',
+          organization_id: organization.id) }
 
         def perform_request
           post "management/accounts/#{account.iban}/subscribers", data, { 'Authorization' => 'token management-token-1' }
@@ -209,8 +217,30 @@ module Epics
           end
         end
 
+        context 'remote ebics server throws an error' do
+          let(:data) { { ebics_user: "test", user_id: user.id } }
+
+          before { allow_any_instance_of(Subscriber).to receive(:setup!).and_return(false) }
+
+          it 'returns an error status' do
+            perform_request
+            expect_status 412
+          end
+
+          it 'returns a meaningful error message' do
+            perform_request
+            expect_json 'message', 'Failed to setup subscriber. Make sure your data is valid and retry!'
+          end
+
+          it 'removes created subscriber' do
+            expect { perform_request }.to_not change { Subscriber.count }
+          end
+        end
+
         context 'valid data' do
           let(:data) { { ebics_user: "test", user_id: user.id } }
+
+          # before { stub_request(:post, /url/).to_return(status: 200, body: '') }
 
           it 'returns a success code' do
             perform_request
@@ -219,7 +249,7 @@ module Epics
 
           it 'returns a meaningful message' do
             perform_request
-            expect_json 'message', 'Subscriber has been created successfully!'
+            expect_json 'message', 'Subscriber has been created and setup successfully! Please fetch INI letter, sign it, and submit it to your bank.'
           end
 
           it 'returns a representation of the subscriber' do
