@@ -53,7 +53,7 @@ module Epics
       end
 
       def registrations_allowed?
-        ENV['REGISTRATIONS'].to_i == 'enabled'
+        ENV['ALLOW_REGISTRATIONS'] == 'enabled'
       end
     end
   end
