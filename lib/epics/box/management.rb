@@ -15,6 +15,7 @@ module Epics
     class Management < Grape::API
       format :json
       helpers Helpers::Default
+      content_type :html, 'text/html'
 
       AUTH_HEADERS = {
         'Authorization' => { description: 'OAuth 2 Bearer token', type: 'String' }
@@ -145,6 +146,16 @@ module Epics
         end
 
         resource 'accounts/:account_id/subscribers' do
+          get ':id/ini_letter' do
+            subscriber = Subscriber.join(:accounts, id: :account_id).where(organization_id: current_organization.id, iban: params[:account_id]).first!(Sequel.qualify(:subscribers, :id) => params[:id])
+            if subscriber.ini_letter.nil?
+              error!({ message: 'Subscriber setup not yet initiated!' }, 412)
+            else
+              content_type 'text/html'
+              subscriber.ini_letter
+            end
+          end
+
           api_desc 'Retrieve a list of all subscribers for given account' do
             api_name 'management_account_subscribers'
             tags 'Management'

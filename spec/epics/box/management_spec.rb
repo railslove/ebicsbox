@@ -258,6 +258,47 @@ module Epics
           end
         end
       end
+
+      describe 'GET /accounts/:iban/subscribers/ini_letter' do
+        let(:account) { Account.create(name: 'name', iban: 'iban', organization_id: organization.id) }
+
+        def perform_request
+          get "management/accounts/#{account.iban}/subscribers/#{subscriber.id}/ini_letter", { 'Authorization' => 'token management-token-1' }
+        end
+
+        context 'setup has not been performed' do
+          let(:subscriber) { account.add_subscriber(remote_user_id: 'test1') }
+
+          it 'fails with an error status' do
+            perform_request
+            expect_status 412
+          end
+
+          it 'fails with a meaningful error message' do
+            perform_request
+            expect_json 'message', 'Subscriber setup not yet initiated'
+          end
+        end
+
+        context 'setup has been initiated before' do
+          let(:subscriber) { account.add_subscriber(remote_user_id: "test1", ini_letter: "INI LETTER") }
+
+          it 'returns a success code' do
+            perform_request
+            expect_status 200
+          end
+
+          it 'returns data as html content' do
+            perform_request
+            expect(response.headers["Content-Type"]).to eq('text/html')
+          end
+
+          it 'returns the ini letter' do
+            perform_request
+            expect(response.body).to eq("INI LETTER")
+          end
+        end
+      end
     end
   end
 end
