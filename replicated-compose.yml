@@ -2,7 +2,7 @@
 ---
 replicated_api_version: "1.0.0"
 name: "EBICS::Box"
-version: "0.0.62"
+version: "0.0.69xx"
 release_notes: ""
 components:
 - name: Postgresql
@@ -55,7 +55,7 @@ components:
   containers:
   - source: replicated
     image_name: ebicsbox
-    version: 0.1.13
+    version: 0.1.14
     config_files: []
     customer_files: []
     env_vars:
@@ -75,13 +75,17 @@ components:
       static_val: "-J-Xmx512m"
     - name: JAVA_OPTS
       static_val: "-Djava.security.egd=file:/dev/./urandom"
+    - name: PORT
+      static_val: "5000"
+    - name: RACK_ENV
+      static_val: "production"
+    - name: VIRTUAL_HOST
+      static_val: "{{repl ConfigOption \"virtual_host\" }}"
+    - name: ALLOW_REGISTRATIONS
+      static_val: "enabled"
     ports:
-    - private_port: "8080"
-      public_port: "8080"
-      port_type: tcp
-      when: ""
-    - private_port: "8080"
-      public_port: "80"
+    - private_port: "5000"
+      public_port: "5000"
       port_type: tcp
       when: ""
     support_files: []
@@ -90,31 +94,25 @@ components:
   - source: public
     image_name: jwilder/nginx-proxy
     version: latest
-  volumes:
-  - host_path: "{{repl ConfigOption \"certs_path\" }}"
-    container_path: /etc/nginx/certs
-    permission: "0644"
-    owner: "100"
-    is_excluded_from_backup: true
-  - host_path: /var/run/docker.sock
-    container_path: /var/run/docker.sock
-    permission: "0644"
-    owner: "100"
-    is_excluded_from_backup: true
-  ports:
-  - private_port: "80"
-    public_port: "80"
-    port_type: tcp
-    when: ""
-  - private_port: "443"
-    public_port: "443"
-    port_type: tcp
-    when: ""
+    volumes:
+    - host_path: "{{repl ConfigOption \"certs_path\" }}"
+      container_path: /etc/nginx/certs
+    - host_path: /var/run/docker.sock
+      container_path: /tmp/docker.sock
+    ports:
+    - private_port: "80"
+      public_port: "80"
+      port_type: tcp
+      when: ""
+    - private_port: "443"
+      public_port: "443"
+      port_type: tcp
+      when: ""
 - name: Clock
   containers:
   - source: replicated
     image_name: ebicsbox
-    version: 0.1.13
+    version: 0.1.14
     config_files: []
     customer_files: []
     env_vars:
@@ -133,7 +131,7 @@ components:
   containers:
   - source: replicated
     image_name: ebicsbox
-    version: 0.1.13
+    version: 0.1.14
     config_files: []
     customer_files: []
     env_vars:
@@ -149,6 +147,8 @@ components:
       static_val: "-J-Xmx512m"
     - name: JAVA_OPTS
       static_val: "-Djava.security.egd=file:/dev/./urandom"
+    - name: ALLOW_REGISTRATIONS
+      static_val: "enabled"
     ports: []
     cmd: "[\"bin/start\", \"worker\"]"
     support_files: []
@@ -181,4 +181,16 @@ config:
   - name: passphrase
     title: Passphrase
     type: password
+    required: true
+- name: nginx
+  title: Nginx Settings
+  description: Define some important things!
+  items:
+  - name: certs_path
+    title: Certificate Path
+    type: text
+    required: true
+  - name: virtual_host
+    title: Virtual host for ebicsbox
+    type: text
     required: true
