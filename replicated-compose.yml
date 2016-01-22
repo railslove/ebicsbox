@@ -1,0 +1,184 @@
+
+---
+replicated_api_version: "1.0.0"
+name: "EBICS::Box"
+version: "0.0.62"
+release_notes: ""
+components:
+- name: Postgresql
+  containers:
+  - source: public
+    image_name: "postgres"
+    version: latest
+    publish_events:
+    - name: Container Postgres started
+      trigger: container-start
+      data: ""
+      subscriptions:
+      - component: BOX
+        container: ebicsbox
+        action: start
+    env_vars:
+    - name: POSTGRES_PASSWORD
+      static_val: "mysecretpassword"
+    - name: POSTGRES_USER
+      static_val: "ebicsbox"
+    ports:
+    - private_port: "5432"
+      public_port: "5432"
+      port_type: tcp
+      interface: docker0
+      when: ""
+    volumes:
+    - host_path: /data-postgresql
+      container_path: /var/lib/postgresql/data
+- name: Beanstalkd
+  containers:
+  - source: public
+    image_name: "michaelcontento/beanstalkd"
+    version: latest
+    publish_events:
+    - name: Container Beanstalkd started
+      trigger: container-start
+      data: ""
+      subscriptions:
+      - component: Clock
+        container: ebicsbox
+        action: start
+    ports:
+    - private_port: "11300"
+      public_port: "11300"
+      port_type: tcp
+      interface: docker0
+      when: ""
+- name: BOX
+  containers:
+  - source: replicated
+    image_name: ebicsbox
+    version: 0.1.13
+    config_files: []
+    customer_files: []
+    env_vars:
+    - name: USERNAME
+      static_val: "{{repl ConfigOption \"username\" }}"
+    - name: PASSWORD
+      static_val: "{{repl ConfigOption \"password\" }}"
+    - name: BEANSTALKD_URL
+      static_val: "{{repl InterfaceAddress \"docker0\" }}:11300"
+    - name: SECRET_TOKEN
+      static_val: "{{repl ConfigOption \"secret_token\" }}"
+    - name: DATABASE_URL
+      static_val: "jdbc:postgresql://{{repl InterfaceAddress \"docker0\" }}/ebicsbox?user=ebicsbox&password=mysecretpassword"
+    - name: EBICS_CLIENT
+      static_val: "Epics::Client"
+    - name: JRUBY_OPTS
+      static_val: "-J-Xmx512m"
+    - name: JAVA_OPTS
+      static_val: "-Djava.security.egd=file:/dev/./urandom"
+    ports:
+    - private_port: "8080"
+      public_port: "8080"
+      port_type: tcp
+      when: ""
+    - private_port: "8080"
+      public_port: "80"
+      port_type: tcp
+      when: ""
+    support_files: []
+- name: nginx
+  containers:
+  - source: public
+    image_name: jwilder/nginx-proxy
+    version: latest
+  volumes:
+  - host_path: "{{repl ConfigOption \"certs_path\" }}"
+    container_path: /etc/nginx/certs
+    permission: "0644"
+    owner: "100"
+    is_excluded_from_backup: true
+  - host_path: /var/run/docker.sock
+    container_path: /var/run/docker.sock
+    permission: "0644"
+    owner: "100"
+    is_excluded_from_backup: true
+  ports:
+  - private_port: "80"
+    public_port: "80"
+    port_type: tcp
+    when: ""
+  - private_port: "443"
+    public_port: "443"
+    port_type: tcp
+    when: ""
+- name: Clock
+  containers:
+  - source: replicated
+    image_name: ebicsbox
+    version: 0.1.13
+    config_files: []
+    customer_files: []
+    env_vars:
+    - name: BEANSTALKD_URL
+      static_val: "{{repl InterfaceAddress \"docker0\" }}:11300"
+    - name: DATABASE_URL
+      static_val: "jdbc:postgresql://{{repl InterfaceAddress \"docker0\" }}/ebicsbox?user=ebicsbox&password=mysecretpassword"
+    - name: JRUBY_OPTS
+      static_val: "-J-Xmx512m"
+    - name: JAVA_OPTS
+      static_val: "-Djava.security.egd=file:/dev/./urandom"
+    ports: []
+    cmd: "[\"bin/start\", \"clock\"]"
+    support_files: []
+- name: Worker
+  containers:
+  - source: replicated
+    image_name: ebicsbox
+    version: 0.1.13
+    config_files: []
+    customer_files: []
+    env_vars:
+    - name: PASSPHRASE
+      static_val: "{{repl ConfigOption \"passphrase\" }}"
+    - name: SECRET_TOKEN
+      static_val: "{{repl ConfigOption \"secret_token\" }}"
+    - name: BEANSTALKD_URL
+      static_val: "{{repl InterfaceAddress \"docker0\" }}:11300"
+    - name: DATABASE_URL
+      static_val: "jdbc:postgresql://{{repl InterfaceAddress \"docker0\" }}/ebicsbox?user=ebicsbox&password=mysecretpassword"
+    - name: JRUBY_OPTS
+      static_val: "-J-Xmx512m"
+    - name: JAVA_OPTS
+      static_val: "-Djava.security.egd=file:/dev/./urandom"
+    ports: []
+    cmd: "[\"bin/start\", \"worker\"]"
+    support_files: []
+backup:
+  enabled: false
+  init: []
+  run: []
+cmds: []
+config:
+- name: authentication
+  title: Authentication
+  description: These are the Basic Auth credentials used by your EBCIS::Box
+  items:
+  - name: username
+    title: Username
+    type: text
+    recommended: true
+  - name: password
+    title: Password
+    type: password
+    recommended: true
+  - name: secret_token
+    title: Secret Webhook Token
+    type: password
+    required: true
+- name: key_passphrase
+  title: Passphrase
+  description: To protect your EBCIS keys
+  items:
+  - name: passphrase
+    title: Passphrase
+    type: password
+    required: true

@@ -31,5 +31,7 @@ RUN rm Procfile*
 RUN rm README*
 RUN rm package.json
 RUN rm webpack.config.js
+RUN rm docker-compose.yml
+RUN rm replicated-compose.yml
 
 CMD ["bin/start", "server"]
