@@ -91,7 +91,7 @@ module Epics
               transaction.set_state_from("debit_received")
             end
 
-            Event.statement_created(statement)
+            # Event.statement_created(statement)
           end
         end
 

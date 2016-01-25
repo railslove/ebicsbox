@@ -193,25 +193,13 @@ module Epics
                 expect_any_instance_of(Transaction).to receive(:set_state_from).with('credit_received')
                 exec_link_action
               end
-
-              it 'triggers a webhook' do
-                expect(event).to receive(:statement_created).with(anything)
-                exec_link_action
-              end
             end
-
-
 
             context 'statement is a debit' do
               before { statement.update(debit: true) }
 
               it 'sets correct transaction state' do
                 expect_any_instance_of(Transaction).to receive(:set_state_from).with('debit_received')
-                exec_link_action
-              end
-
-              it 'triggers a webhook' do
-                expect(event).to receive(:statement_created)
                 exec_link_action
               end
             end
