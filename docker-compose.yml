@@ -4,13 +4,15 @@ db:
     - POSTGRES_PASSWORD=mysecretpassword
     - POSTGRES_USER=ebicsbox
   expose:
-    - "5432:5432"
+    - "5432"
   volumes:
     - /data-postgresql:/var/lib/postgresql/data
 queue:
   image: michaelcontento/beanstalkd
   expose:
-    - "11300:11300"
+    - "11300"
+  volumes:
+    - /data-beanstalkd:/data
 app:
   image: ebicsbox:0.1.15
   environment:
@@ -23,11 +25,13 @@ app:
     - "PORT=5000"
     - "RACK_ENV=production"
     - "VIRTUAL_HOST=ebicsbox"
+    - "PASSPHRASE=asdasdasdasdasd"
+    - "SECRET_TOKEN=sehrlangersecrettokenistsecret1234"
   links:
     - db
     - queue
   expose:
-    - "5000:5000"
+    - "5000"
   command: "bin/start server"
 clock:
   image: ebicsbox:0.1.15
@@ -39,7 +43,6 @@ clock:
     - "JAVA_OPTS=-Djava.security.egd=file:/dev/./urandom"
     - "JRUBY_OPTS=-J-Xmx512m"
   links:
-    - db
     - queue
   command: "bin/start clock"
 worker:
@@ -58,7 +61,7 @@ worker:
 proxy:
   image: jwilder/nginx-proxy:latest
   volumes:
-    - /Users/yoyostile/Desktop/certs:/etc/nginx/certs
+    - /certs:/etc/nginx/certs
     - /var/run/docker.sock:/tmp/docker.sock:ro
   links:
     - "app:ebicsbox"
