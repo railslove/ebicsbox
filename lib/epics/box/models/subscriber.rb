@@ -43,18 +43,21 @@ class Epics::Box::Subscriber < Sequel::Model
     fail(AlreadyActivated) if !ini_letter.nil? && !reset
     fail(IncompleteEbicsData) unless ebics_data?
     # TODO: handle exceptions
-    Epics::Box.logger.info("setting up EBICS keys for account #{self.id}")
+    Epics::Box.logger.info("setting up EBICS keys for subscriber #{id}")
     epics = client_adapter.setup(passphrase, account.url, account.host, remote_user_id, account.partner)
     self.encryption_keys = epics.send(:dump_keys)
     self.save
-    Epics::Box.logger.info("starting EBICS key exchange for account #{self.id}")
+    Epics::Box.logger.info("starting EBICS key exchange for subscriber #{id}")
     epics.INI
     epics.HIA
     self.ini_letter = epics.ini_letter(account.bankname)
-    Epics::Box.logger.info("EBICS key exchange done and ini letter generated for account #{self.id}")
+    Epics::Box.logger.info("EBICS key exchange done and ini letter generated for subscriber #{id}")
     self.submitted_at = DateTime.now
     self.save
     Epics::Box::Queue.check_subscriber_activation(id)
+  rescue Epics::Error::TechnicalError, Epics::Error::BusinessError => ex
+    Epics::Box.logger.error("Failed to init subscriber #{id}. Reason='#{ex.message}'")
+    false
   end
 
   def activate!
