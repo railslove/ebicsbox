@@ -75,6 +75,7 @@ module Epics
             false
           else
             statement = Statement.create(trx)
+            Event.statement_created(statement)
             link_statement_to_transaction(account_id, statement)
             true
           end
