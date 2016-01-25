@@ -4,7 +4,7 @@ module Epics
   module Box
     module Jobs
       RSpec.describe FetchStatements do
-        let(:account) { Account.create(host: "HOST") }
+        let(:account) { Account.create(host: "HOST", iban: "iban") }
         let!(:subscriber) { account.add_subscriber(signature_class: 'T', activated_at: 1.day.ago) }
 
         describe '.process!' do
@@ -139,11 +139,11 @@ module Epics
           end
 
           def exec_create_action
-            described_class.create_statement(1, data, "raw_data")
+            described_class.create_statement(account.id, data, "raw_data")
           end
 
           context 'the statement was already imported' do
-            before { Statement.create(sha: '63feaabebb3f24986f64cc2691cc905ff40e600130aa6fec9e281452e93abb58') }
+            before { Statement.create(sha: '63feaabebb3f24986f64cc2691cc905ff40e600130aa6fec9e281452e93abb58', account_id: account.id) }
 
             it 'does not create a statement' do
               expect { exec_create_action }.to_not change{ Statement.count }
@@ -160,11 +160,16 @@ module Epics
                 creditor_identifier: 'my-cred',
               ))
             end
+
+            it 'creates an event' do
+              expect(Event).to receive(:publish).with(:statement_created, anything)
+              exec_create_action
+            end
           end
         end
 
         describe '.link_statement_to_transaction' do
-          let(:statement) { Statement.create(eref: 'eref-123') }
+          let(:statement) { Statement.create(eref: 'eref-123', account_id: account.id) }
 
           def exec_link_action
             described_class.link_statement_to_transaction(1, statement)
