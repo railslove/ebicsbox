@@ -17,6 +17,7 @@ module Epics
         expose(:_links, documentation: { type: "Hash", desc: "Links to resources" }) do |subscriber, options|
           {
             self: Epics::Box.configuration.app_url + "/management/#{subscriber.account.iban}/subscribers/#{subscriber.id}",
+            ini_letter: Epics::Box.configuration.app_url + "/management/users/#{subscriber.id}/ini_letter",
             account: Epics::Box.configuration.app_url + "/management/#{subscriber.account.iban}",
             user: Epics::Box.configuration.app_url + "/management/users/#{subscriber.user.try(:id)}",
           }

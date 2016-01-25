@@ -12,7 +12,7 @@ queue:
   expose:
     - "11300:11300"
 app:
-  image: ebicsbox:0.1.14
+  image: ebicsbox:0.1.15
   environment:
     - USERNAME=ebics
     - PASSWORD=istsuper
@@ -30,7 +30,7 @@ app:
     - "5000:5000"
   command: "bin/start server"
 clock:
-  image: ebicsbox:0.1.14
+  image: ebicsbox:0.1.15
   environment:
     - USERNAME=ebics
     - PASSWORD=istsuper
@@ -43,7 +43,7 @@ clock:
     - queue
   command: "bin/start clock"
 worker:
-  image: ebicsbox:0.1.14
+  image: ebicsbox:0.1.15
   environment:
     - USERNAME=ebics
     - PASSWORD=istsuper

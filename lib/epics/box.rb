@@ -1,9 +1,11 @@
 lib = File.expand_path("../..", __FILE__)
 $:.unshift(lib)
 
-require 'dotenv'
-Dotenv.load
+# Load configuration
+require 'epics/box/configuration'
 
+# Load dependencies
+# TODO: Remove them here and load where really used!
 require 'grape'
 require 'grape-entity'
 require 'sequel'
@@ -18,9 +20,6 @@ require 'base64'
 
 # Extensions to add swagger documentation methods
 require 'ruby-swagger/grape/grape'
-
-# Load configuration
-require 'epics/box/configuration'
 
 module Epics
   module Box
