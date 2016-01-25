@@ -14,4 +14,9 @@ if [ "$1" = "worker" ]; then
   /usr/local/bin/ruby -Ilib -repics/box -eEpics::Box::Worker.new.process!
 fi
 
+if [ "$1" = "all" ]; then
+  /usr/local/bundle/bin/bundle exec puma config.ru -p $PORT
+  /usr/local/bundle/bin/bundle exec clockwork lib/epics/scheduler/scheduler.rb
+  /usr/local/bin/ruby -Ilib -repics/box -eEpics::Box::Worker.new.process!
+fi
 exit 1
