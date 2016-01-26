@@ -14,7 +14,7 @@ queue:
   volumes:
     - /data-beanstalkd:/data
 app:
-  image: ebicsbox:0.1.15
+  image: ebicsbox:0.1.16
   environment:
     - USERNAME=ebics
     - PASSWORD=istsuper
@@ -34,7 +34,7 @@ app:
     - "5000"
   command: "bin/start server"
 clock:
-  image: ebicsbox:0.1.15
+  image: ebicsbox:0.1.16
   environment:
     - USERNAME=ebics
     - PASSWORD=istsuper
@@ -43,10 +43,11 @@ clock:
     - "JAVA_OPTS=-Djava.security.egd=file:/dev/./urandom"
     - "JRUBY_OPTS=-J-Xmx512m"
   links:
+    - db
     - queue
   command: "bin/start clock"
 worker:
-  image: ebicsbox:0.1.15
+  image: ebicsbox:0.1.16
   environment:
     - USERNAME=ebics
     - PASSWORD=istsuper
