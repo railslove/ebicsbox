@@ -54,7 +54,7 @@ module Epics
             end
 
             it 'creates associated events' do
-              expect { Jobs::Credit.process!(@job.body) }.to change { Event.all.map(&:type) }.to(["transaction_updated", "credit_created"])
+              expect { Jobs::Credit.process!(@job.body) }.to change { Event.all.map(&:type) }.to(["transaction_updated", "statement_created", "credit_created"])
             end
           end
 

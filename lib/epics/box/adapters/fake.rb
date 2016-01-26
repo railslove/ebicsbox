@@ -56,7 +56,7 @@ module Epics
           when 100.00
             transaction = Transaction[eref: eref]
             transaction.set_state_from("debit_received", "credit")
-            Statement.create({
+            statement = Statement.create({
               account_id: transaction.account_id,
               sha: Digest::SHA2.hexdigest(SecureRandom.hex(12)).to_s,
               date: Date.today,
@@ -74,6 +74,8 @@ module Epics
               description: desc,
               eref: eref,
             })
+
+            Event.statement_created(statement)
           when 200.00
             # failed to insufficient balance
           else
