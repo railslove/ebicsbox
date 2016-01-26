@@ -35,7 +35,7 @@ module Epics
           ::File.read( ::File.expand_path("~/sta.mt940"))
         end
 
-        def HAC(from, to)
+        def HAC(from = nil, to = nil)
           ::File.open( ::File.expand_path("~/hac_empty.xml"))
         end
 
