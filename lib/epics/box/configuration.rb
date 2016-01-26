@@ -11,7 +11,7 @@ module Epics
   module Box
     class Configuration
       def app_url
-        ENV['APP_URL'] || "http://localhost:5000"
+        ENV['APP_URL'] || 'http://localhost:5000'
       end
 
       def database_url
@@ -21,7 +21,7 @@ module Epics
       end
 
       def beanstalkd_url
-        ENV['BEANSTALKD_URL'] || 'localhost:11300'
+        ENV['BEANSTALKD_URL'].gsub('beanstalkd://','').gsub('/','') || 'localhost:11300'
       end
 
       def hac_retrieval_interval
