@@ -232,12 +232,14 @@ module Epics
           end
           params do
             requires :name, type: String, desc: "The user's display name"
+            optional :token, type: String, desc: 'Set a custom access token'
           end
           post do
-            if user = current_organization.add_user(params.merge(access_token: SecureRandom.hex))
+            token = params[:token] || SecureRandom.hex
+            if user = current_organization.add_user(name: params[:name], access_token: token)
               {
                 message: 'User has been created successfully!',
-                user: Entities::User.represent(user),
+                user: Entities::User.represent(user, include_token: true),
               }
             else
               error!({ message: 'Failed to create user' }, 400)

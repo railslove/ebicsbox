@@ -75,6 +75,7 @@ module Epics
             false
           else
             statement = Statement.create(trx)
+            Event.statement_created(statement)
             link_statement_to_transaction(account_id, statement)
             true
           end
@@ -89,8 +90,6 @@ module Epics
             elsif statement.debit?
               transaction.set_state_from("debit_received")
             end
-
-            Event.statement_created(statement)
           end
         end
 

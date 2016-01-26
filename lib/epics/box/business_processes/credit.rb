@@ -28,7 +28,7 @@ module Epics
             amount: params[:amount]
           )
         else
-          fail(BusinessProcessFailure.new(sct.errors.full_messages.join(" ")))
+          fail(BusinessProcessFailure.new(sct.errors))
         end
       rescue ArgumentError => e
         # TODO: Will be fixed upstream in the sepa_king gem by us

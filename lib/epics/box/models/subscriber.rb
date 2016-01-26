@@ -1,3 +1,6 @@
+require 'epics/box/adapters/fake'
+require 'epics/box/adapters/file'
+
 class Epics::Box::Subscriber < Sequel::Model
   self.raise_on_save_failure = true
 
@@ -34,7 +37,7 @@ class Epics::Box::Subscriber < Sequel::Model
   end
 
   def client_adapter
-    self.class.const_get(account.mode)
+    Epics::Box::Adapters.const_get(account.mode)
   rescue => e
     Epics::Box.configuration.ebics_client
   end
@@ -84,36 +87,5 @@ class Epics::Box::Subscriber < Sequel::Model
     else
       'needs_ebics_data'
     end
-  end
-
-  class File
-    def initialize(*args); end
-
-    def self.setup(*args)
-      return new(*args)
-    end
-    def dump_keys
-      "{}"
-    end
-    def ini_letter(name)
-      "ini"
-    end
-    def INI;end
-    def HIA;end
-    def HPB;end
-    def STA(from, to)
-      ::File.read( ::File.expand_path("~/sta.mt940"))
-    end
-
-    def HAC(from, to)
-      ::File.open( ::File.expand_path("~/hac.xml"))
-    end
-
-    def CD1(pain)
-      ["TRX#{SecureRandom.hex(6)}", "N#{SecureRandom.hex(6)}"]
-    end
-    alias :CDD :CD1
-    alias :CDB :CD1
-    alias :CCT :CD1
   end
 end
