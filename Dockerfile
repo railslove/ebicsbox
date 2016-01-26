@@ -22,7 +22,7 @@ RUN webpack -p
 #RUN rake jruby:build
 
 # Generate documentation
-RUN sed 's/localhost:80/ebics-box-test\.apps\.railslabs\.com:443/g' doc/swagger/swagger.json
+RUN sed -i.bak 's/localhost:80/ebics-box-test\.apps\.railslabs\.com:443/g' doc/swagger/swagger.json
 
 # Clean up
 RUN rm Dockerfile*
