@@ -21,6 +21,11 @@ RUN npm install
 RUN webpack -p
 #RUN rake jruby:build
 
+# Generate documentation
+RUN sed 's/host: localhost:80/host: ebics-box-test\.apps\.railslabs\.com:443/g' doc/swagger/base_doc.yml
+RUN bundle exec bin/update_docs
+
+# Clean up
 RUN rm Dockerfile*
 RUN rm Rakefile
 RUN rm -rf ./node_modules
