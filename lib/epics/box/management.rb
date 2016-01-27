@@ -85,7 +85,6 @@ module Epics
             optional :callback_url, type: String, desc: 'callback_url'
             optional :host, type: String, desc: 'host'
             optional :partner, type: String, desc: 'partner'
-            optional :user, type: String, desc: 'user'
             optional :url, type: String, desc: 'url'
             optional :mode, type: String, desc: 'mode'
           end
@@ -126,7 +125,6 @@ module Epics
             optional :callback_url, type: String, desc: 'callback_url'
             optional :host, type: String, desc: 'host'
             optional :partner, type: String, desc: 'partner'
-            optional :user, type: String, desc: 'user'
             optional :url, type: String, desc: 'url'
             optional :mode, type: String, desc: 'mode'
           end

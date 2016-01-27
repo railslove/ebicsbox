@@ -13,7 +13,7 @@ module Epics
         expose :balance_in_cents, documentation: { type: "Integer", desc: "Account balance" }
 
         expose(:test_mode, documentation: { type: "Boolean", desc: "Whether this is a test account" }) do |account|
-          account.mode == 'File'
+          account.mode == 'File' || account.mode == 'Fake'
         end
 
         expose(:_links, documentation: { type: "Hash", desc: "Links to resources" }) do |account, options|
