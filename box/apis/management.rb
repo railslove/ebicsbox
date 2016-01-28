@@ -144,6 +144,12 @@ module Box
         end
 
         resource 'accounts/:account_id/subscribers' do
+          api_desc 'Returns an HTML formatted INI letter to be printed and submitted to bank' do
+            api_name 'management_account_subscribers_ini_letter'
+            tags 'Management'
+            headers AUTH_HEADERS
+            errors DEFAULT_ERROR_RESPONSES
+          end
           get ':id/ini_letter' do
             subscriber = Subscriber.join(:accounts, id: :account_id).where(organization_id: current_organization.id, iban: params[:account_id]).first!(Sequel.qualify(:subscribers, :id) => params[:id])
             if subscriber.ini_letter.nil?

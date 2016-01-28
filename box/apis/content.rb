@@ -64,7 +64,7 @@ module Box
 
       api_desc 'Returns a list of all accessible accounts' do
         api_name 'accounts'
-        tags 'Accessible resources'
+        tags 'Account specific endpoints'
         response Entities::Account, isArray: true
         headers AUTH_HEADERS
         errors DEFAULT_ERROR_RESPONSES
