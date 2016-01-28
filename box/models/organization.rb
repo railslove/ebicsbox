@@ -1,3 +1,7 @@
+require 'securerandom'
+require 'sequel'
+
+require_relative '../init'
 require_relative './account'
 
 module Box

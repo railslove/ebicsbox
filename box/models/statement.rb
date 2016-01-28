@@ -1,3 +1,6 @@
+require 'sequel'
+
+require_relative '../init'
 require_relative '../entities/statement'
 
 module Box

@@ -1,4 +1,8 @@
 require 'benchmark'
+require 'faraday'
+require 'sequel'
+
+require_relative '../init'
 
 module Box
   class WebhookDelivery < Sequel::Model

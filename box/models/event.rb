@@ -1,4 +1,9 @@
 require 'openssl'
+require 'sequel'
+
+require_relative '../init'
+require_relative '../queue'
+require_relative './account'
 
 module Box
   class Event < Sequel::Model
