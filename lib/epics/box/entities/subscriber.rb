@@ -7,6 +7,7 @@ module Epics
         expose(:account, documentation: { type: "String", desc: "Display name for given bank account" }) do |subscriber|
           subscriber.account.iban
         end
+        expose :id, documentation: { type: "Integer", desc: "Internal id" }
         expose :user_id, documentation: { type: "String", desc: "Associated user id" }
         expose :remote_user_id, as: 'ebics_user', documentation: { type: "String", desc: "EBICS user identifier" }
         expose :signature_class, documentation: { type: "String", desc: "EBICS signature class" }
@@ -17,8 +18,8 @@ module Epics
         expose(:_links, documentation: { type: "Hash", desc: "Links to resources" }) do |subscriber, options|
           {
             self: Epics::Box.configuration.app_url + "/management/#{subscriber.account.iban}/subscribers/#{subscriber.id}",
-            ini_letter: Epics::Box.configuration.app_url + "/management/users/#{subscriber.id}/ini_letter",
-            account: Epics::Box.configuration.app_url + "/management/#{subscriber.account.iban}",
+            ini_letter: Epics::Box.configuration.app_url + "/management/accounts/#{subscriber.account.iban}/#{subscriber.id}/ini_letter",
+            account: Epics::Box.configuration.app_url + "/management/accounts/#{subscriber.account.iban}",
             user: Epics::Box.configuration.app_url + "/management/users/#{subscriber.user.try(:id)}",
           }
         end
