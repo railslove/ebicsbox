@@ -3,7 +3,7 @@ spec = Gem::Specification.find_by_name 'ruby-swagger'
 load "#{spec.gem_dir}/lib/tasks/swagger.rake"
 
 # Load application
-require './lib/epics/box'
+require './box/init'
 
 namespace :jruby do
   desc 'Build jruby classes'
