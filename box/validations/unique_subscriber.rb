@@ -1,3 +1,7 @@
+require 'grape'
+
+require_relative '../models/subscriber'
+
 module Box
   class UniqueSubscriber < Grape::Validations::Base
     def validate_param!(attr_name, params)

@@ -1,3 +1,7 @@
+require 'grape'
+
+require_relative '../models/account'
+
 module Box
   class ActiveAccount < Grape::Validations::Base
     def validate_param!(attr_name, params)
