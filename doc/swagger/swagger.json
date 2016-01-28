@@ -179,10 +179,6 @@
                   "description": "partner",
                   "type": "string"
                 },
-                "user": {
-                  "description": "user",
-                  "type": "string"
-                },
                 "url": {
                   "description": "url",
                   "type": "string"
@@ -440,10 +436,6 @@
                 },
                 "partner": {
                   "description": "partner",
-                  "type": "string"
-                },
-                "user": {
-                  "description": "user",
                   "type": "string"
                 },
                 "url": {
