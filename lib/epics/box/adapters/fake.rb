@@ -52,35 +52,30 @@ module Epics
           trx = doc.css("Document CstmrCdtTrfInitn PmtInf CdtTrfTxInf")
           eref = trx.css("PmtId EndToEndId").text
           desc = trx.css("RmtInf Ustrd").text
-          case amount
-          when 100.00
-            transaction = Transaction[eref: eref]
-            transaction.set_state_from("debit_received", "credit")
-            statement = Statement.create({
-              account_id: transaction.account_id,
-              sha: Digest::SHA2.hexdigest(SecureRandom.hex(12)).to_s,
-              date: Date.today,
-              entry_date: Date.today,
-              amount: 100_00,
-              sign: 1,
-              debit: false,
-              swift_code: "",
-              reference: desc,
-              bank_reference: "",
-              bic: trx.css("CdtrAgt FinInstnId BIC").text,
-              iban: trx.css("CdtrAcct Id IBAN").text,
-              name: trx.css("Cdtr Nm").text,
-              information: "",
-              description: desc,
-              eref: eref,
-            })
+          amount = (trx.css("Amt InstdAmt").text.to_f * 100).to_i
+          transaction = Transaction[eref: eref]
+          transaction.set_state_from("debit_received", "credit")
 
-            Event.statement_created(statement)
-          when 200.00
-            # failed to insufficient balance
-          else
-            # just ignore it by default
-          end
+          statement = Statement.create({
+            account_id: transaction.account_id,
+            sha: Digest::SHA2.hexdigest(SecureRandom.hex(12)).to_s,
+            date: Date.today,
+            entry_date: Date.today,
+            amount: amount,
+            sign: 1,
+            debit: false,
+            swift_code: "",
+            reference: desc,
+            bank_reference: "",
+            bic: trx.css("CdtrAgt FinInstnId BIC").text,
+            iban: trx.css("CdtrAcct Id IBAN").text,
+            name: trx.css("Cdtr Nm").text,
+            information: "",
+            description: desc,
+            eref: eref,
+          })
+
+          Event.statement_created(statement)
           ["TRX#{SecureRandom.hex(6)}", "N#{SecureRandom.hex(6)}"]
         end
       end

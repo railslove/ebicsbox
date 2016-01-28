@@ -38,7 +38,7 @@ module Epics
 
           before { Queue.clear!(Queue::CREDIT_TUBE) }
 
-          context 'auto accept with an amount of 100 EUR' do
+          context 'auto accept any credits and create statements' do
             before do
               Credit.create!(account, valid_payload.merge(amount: 100_00), user)
               @job = Queue.client.tubes[Queue::CREDIT_TUBE].reserve
@@ -56,18 +56,6 @@ module Epics
             it 'creates associated events' do
               expect { Jobs::Credit.process!(@job.body) }.to change { Event.all.map(&:type) }.to(["transaction_updated", "statement_created", "credit_created"])
             end
-          end
-
-          it 'rejects transactions with an amount of 200 EUR' do
-            Credit.create!(account, valid_payload.merge(amount: 200_00), user)
-            job = Queue.client.tubes[Queue::CREDIT_TUBE].reserve
-            expect { Epics::Box::Jobs::Credit.process!(job.body) }.to_not change { Statement.count }
-          end
-
-          it 'does not process transactions with another amount' do
-            Credit.create!(account, valid_payload.merge(amount: 300_00), user)
-            job = Queue.client.tubes[Queue::CREDIT_TUBE].reserve
-            expect { Epics::Box::Jobs::Credit.process!(job.body) }.to_not change { Statement.count }
           end
         end
       end
