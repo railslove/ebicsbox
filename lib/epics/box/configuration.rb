@@ -29,7 +29,7 @@ module Epics
       end
 
       def activation_check_interval
-        60 * 60 * 24 # seconds
+        60 * 60 # seconds
       end
 
       def secret_token
