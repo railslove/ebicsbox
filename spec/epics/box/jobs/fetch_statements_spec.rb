@@ -26,13 +26,13 @@ module Epics
 
           it 'updates its meta data' do
             expect(FetchStatements).to receive(:update_meta_data)
-              .with(account, all(be_a(Cmxl::Statement)), "2015-12-31")
-            described_class.fetch_new_statements(account.id, "2015-12-01", "2015-12-31")
+              .with(account, all(be_a(Cmxl::Statement)), Date.new(2015, 12, 31))
+            described_class.fetch_new_statements(account.id, Date.new(2015, 12, 1), Date.new(2015, 12, 31))
           end
 
           context 'with timeframe' do
             def exec_process
-              described_class.fetch_new_statements(account.id, "2015-12-01", "2015-12-31")
+              described_class.fetch_new_statements(account.id, Date.new(2015, 12, 1), Date.new(2015, 12, 31))
             end
 
             it 'fetches statements from remote server' do
