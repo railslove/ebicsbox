@@ -15,7 +15,6 @@ require 'json'
 require 'nokogiri'
 require 'epics'
 require 'sepa_king'
-require 'sinatra'
 require 'base64'
 
 # Extensions to add swagger documentation methods
