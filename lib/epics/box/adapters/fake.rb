@@ -4,7 +4,11 @@ module Epics
   module Box
     module Adapters
       class Fake
-        def initialize(*args); end
+        attr_accessor :setup_args
+
+        def initialize(*args)
+          self.setup_args = args
+        end
 
         def self.setup(*args)
           return new(*args)
