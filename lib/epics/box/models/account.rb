@@ -22,9 +22,15 @@ class Epics::Box::Account < Sequel::Model
   many_to_one :organization
 
   def transport_client
-    subscribers_dataset.where(subscribers__signature_class: 'T').exclude(subscribers__activated_at: nil).first!.client
-  rescue Sequel::NoMatchingRow => ex
-    fail NoTransportClient, 'Please setup and activate at least one subscriber with a transport signature'
+    @transport_client ||= begin
+      base_scope = subscribers_dataset.exclude(subscribers__activated_at: nil)
+      subscriber = base_scope.where(subscribers__signature_class: 'T').first || base_scope.first
+      if subscriber.nil?
+        fail NoTransportClient, 'Please setup and activate at least one subscriber with a transport signature'
+      else
+        subscriber.client
+      end
+    end
   end
 
   def client_for(user_id)
