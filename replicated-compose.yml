@@ -2,7 +2,7 @@
 ---
 replicated_api_version: "1.0.0"
 name: "EBICS::Box"
-version: "0.0.69xx"
+version: "0.0.70"
 release_notes: ""
 components:
 - name: Postgresql
@@ -41,10 +41,6 @@ components:
     - name: Container Beanstalkd started
       trigger: container-start
       data: ""
-      subscriptions:
-      - component: Clock
-        container: ebicsbox
-        action: start
     ports:
     - private_port: "11300"
       public_port: "11300"
@@ -55,7 +51,7 @@ components:
   containers:
   - source: replicated
     image_name: ebicsbox
-    version: 0.1.14
+    version: 0.1.21
     config_files: []
     customer_files: []
     env_vars:
@@ -108,50 +104,6 @@ components:
       public_port: "443"
       port_type: tcp
       when: ""
-- name: Clock
-  containers:
-  - source: replicated
-    image_name: ebicsbox
-    version: 0.1.14
-    config_files: []
-    customer_files: []
-    env_vars:
-    - name: BEANSTALKD_URL
-      static_val: "{{repl InterfaceAddress \"docker0\" }}:11300"
-    - name: DATABASE_URL
-      static_val: "jdbc:postgresql://{{repl InterfaceAddress \"docker0\" }}/ebicsbox?user=ebicsbox&password=mysecretpassword"
-    - name: JRUBY_OPTS
-      static_val: "-J-Xmx512m"
-    - name: JAVA_OPTS
-      static_val: "-Djava.security.egd=file:/dev/./urandom"
-    ports: []
-    cmd: "[\"bin/start\", \"clock\"]"
-    support_files: []
-- name: Worker
-  containers:
-  - source: replicated
-    image_name: ebicsbox
-    version: 0.1.14
-    config_files: []
-    customer_files: []
-    env_vars:
-    - name: PASSPHRASE
-      static_val: "{{repl ConfigOption \"passphrase\" }}"
-    - name: SECRET_TOKEN
-      static_val: "{{repl ConfigOption \"secret_token\" }}"
-    - name: BEANSTALKD_URL
-      static_val: "{{repl InterfaceAddress \"docker0\" }}:11300"
-    - name: DATABASE_URL
-      static_val: "jdbc:postgresql://{{repl InterfaceAddress \"docker0\" }}/ebicsbox?user=ebicsbox&password=mysecretpassword"
-    - name: JRUBY_OPTS
-      static_val: "-J-Xmx512m"
-    - name: JAVA_OPTS
-      static_val: "-Djava.security.egd=file:/dev/./urandom"
-    - name: ALLOW_REGISTRATIONS
-      static_val: "enabled"
-    ports: []
-    cmd: "[\"bin/start\", \"worker\"]"
-    support_files: []
 backup:
   enabled: false
   init: []
