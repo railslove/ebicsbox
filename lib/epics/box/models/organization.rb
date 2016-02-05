@@ -24,6 +24,11 @@ module Epics
       rescue Sequel::NoMatchingRow => ex
         fail Account::NotFound.for_orga(organization_id: self.id, iban: iban)
       end
+
+      def before_create
+        self.webhook_token ||= SecureRandom.hex
+        super
+      end
     end
   end
 end

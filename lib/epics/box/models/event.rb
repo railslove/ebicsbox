@@ -63,7 +63,7 @@ module Epics
 
       def self.signature(payload)
         digest = OpenSSL::Digest.new('sha1')
-        secret = Box.configuration.secret_token
+        secret = Account[payload[:account_id]].organization.webhook_token
         'sha1=' + OpenSSL::HMAC.hexdigest(digest, secret, payload.to_s)
       end
 
@@ -73,6 +73,10 @@ module Epics
 
       def account
         @account ||= Account[account_id]
+      end
+
+      def organization
+        @organization ||= account.organization
       end
 
       def delivery_success!

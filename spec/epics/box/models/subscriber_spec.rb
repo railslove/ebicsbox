@@ -57,6 +57,10 @@ module Epics
         let(:user) { User.create(name: 'John Doe') }
         subject { described_class.create(account: account, user: user) }
 
+        before do
+          allow(Account).to receive(:[]).and_return(double('account', organization: double('orga', webhook_token: 'token')))
+        end
+
         it 'is truthy on success' do
           expect(subject.activate!).to be(true)
         end
