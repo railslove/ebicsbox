@@ -2,7 +2,7 @@
 ---
 replicated_api_version: "1.0.0"
 name: "EBICS::Box"
-version: "0.0.70"
+version: "0.0.71"
 release_notes: ""
 components:
 - name: Postgresql
@@ -79,6 +79,8 @@ components:
       static_val: "{{repl ConfigOption \"virtual_host\" }}"
     - name: ALLOW_REGISTRATIONS
       static_val: "enabled"
+    - name: APP_URL
+      static_val: "{{repl ConfigOption \"app_url\" }}"
     ports:
     - private_port: "5000"
       public_port: "5000"
@@ -144,5 +146,9 @@ config:
     required: true
   - name: virtual_host
     title: Virtual host for ebicsbox
+    type: text
+    required: true
+  - name: app_url
+    title: App URL for documentation
     type: text
     required: true
