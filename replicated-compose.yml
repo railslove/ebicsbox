@@ -61,8 +61,6 @@ components:
       static_val: "{{repl ConfigOption \"password\" }}"
     - name: BEANSTALKD_URL
       static_val: "{{repl InterfaceAddress \"docker0\" }}:11300"
-    - name: SECRET_TOKEN
-      static_val: "{{repl ConfigOption \"secret_token\" }}"
     - name: DATABASE_URL
       static_val: "jdbc:postgresql://{{repl InterfaceAddress \"docker0\" }}/ebicsbox?user=ebicsbox&password=mysecretpassword"
     - name: EBICS_CLIENT
@@ -122,10 +120,6 @@ config:
     title: Password
     type: password
     recommended: true
-  - name: secret_token
-    title: Secret Webhook Token
-    type: password
-    required: true
 - name: key_passphrase
   title: Passphrase
   description: To protect your EBCIS keys
