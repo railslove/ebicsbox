@@ -32,7 +32,9 @@ module Epics
         execution_time = 0
         begin
           execution_time = Benchmark.realtime do
-            response = Faraday.post(event.callback_url) do |req|
+            conn = build_connection(event.callback_url)
+            response = conn.post do |req|
+              req.url URI(event.callback_url).path
               req.headers['Content-Type'] = 'application/json'
               req.headers['X-Signature'] = event.signature if event.signature
               req.body = event.to_webhook_payload.to_json
@@ -64,6 +66,20 @@ module Epics
 
         def status
           0
+        end
+      end
+
+      private
+      def extract_auth(url)
+        url.match(/:\/\/(.*):(.*)@/).try(:captures)
+      end
+
+      def build_connection(callback_url)
+        auth = extract_auth(callback_url)
+        uri = URI(callback_url)
+        Faraday.new("#{uri.scheme}://#{uri.host}") do |c|
+          c.basic_auth *auth if auth
+          c.adapter Faraday.default_adapter
         end
       end
     end
