@@ -2,7 +2,7 @@
 ---
 replicated_api_version: "1.0.0"
 name: "EBICS::Box"
-version: "0.0.71"
+version: "0.0.73"
 release_notes: ""
 components:
 - name: Postgresql
@@ -68,7 +68,7 @@ components:
     - name: EBICS_CLIENT
       static_val: "Epics::Client"
     - name: JRUBY_OPTS
-      static_val: "-J-Xmx512m"
+      static_val: "-J-Xmx384m"
     - name: JAVA_OPTS
       static_val: "-Djava.security.egd=file:/dev/./urandom"
     - name: PORT
