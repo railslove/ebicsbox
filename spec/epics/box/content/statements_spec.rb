@@ -47,7 +47,7 @@ module Epics
           end
 
           describe 'response' do
-            let!(:statement) { Statement.create account_id: account.id, swift_code: 'NTRF' }
+            let!(:statement) { Statement.create account_id: account.id, swift_code: 'NTRF', raw_data: 'RAW' }
 
             it 'includes account IBAN' do
               get "#{account.iban}/statements", { 'Authorization' => 'token orga-user' }
@@ -67,6 +67,18 @@ module Epics
             it 'includes transaction type' do
               get "#{account.iban}/statements", { 'Authorization' => 'token orga-user' }
               expect_json '0.transaction_type', "NTRF"
+            end
+
+            context 'raw mt940' do
+              it 'includes raw mt940' do
+                get "#{account.iban}/statements", { 'raw_data' => true, 'Authorization' => 'token orga-user' }
+                expect_json '0.mt940', "RAW"
+              end
+
+              it 'does not include raw mt940 on default' do
+                get "#{account.iban}/statements", { 'Authorization' => 'token orga-user' }
+                expect_json '0.mt940', nil
+              end
             end
 
             context 'linked to a transaction' do

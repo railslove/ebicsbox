@@ -19,6 +19,8 @@ module Epics
         expose :bank_reference
         expose :creditor_identifier, documentation: { type: "String", desc: "SEPA creditor identifier" }
         expose :swift_code, as: :transaction_type, documentation: { type: "String", desc: "SWIFT transaction code" }
+        expose :raw_data, as: :mt940, documentation: { type: "String", desc: "Raw MT940 output" },
+          if: -> (_, options) { (options[:env] || {})['raw_data'] }
         expose(:_links, documentation: { type: "Hash", desc: "Links to resources" }) do |statement|
           iban = statement.account.iban
           trx = statement.transaction
