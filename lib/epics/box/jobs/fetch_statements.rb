@@ -17,6 +17,7 @@ module Epics
           account = Account.first!(id: account_id)
           mt940 = account.transport_client.STA(from.to_s(:db), to.to_s(:db))
           statements = Cmxl.parse(mt940)
+          statements = statements.delete_if { |sta| !account.iban.end_with?(sta.account_identification.account_number) }
           transactions = statements.map(&:transactions).flatten
           imported = transactions.map { |transaction| create_statement(account_id, transaction, mt940) }
 
