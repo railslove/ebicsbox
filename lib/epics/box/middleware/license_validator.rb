@@ -25,7 +25,8 @@ module Epics
         end
 
         def license
-          HTTParty.get("#{ENV['REPLICATED_INTEGRATIONAPI']}/license/v1/license", verify: false).parsed_response
+          connection = Faraday.new URI(ENV['REPLICATED_INTEGRATIONAPI']), ssl: { verify: false }
+          JSON.parse(connection.get("license/v1/license").body)
         rescue
           {}
         end
