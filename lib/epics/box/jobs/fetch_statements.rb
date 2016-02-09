@@ -73,7 +73,6 @@ module Epics
 
           if statement = Statement.where(sha: trx[:sha]).first
             Box.logger.debug("[Jobs::FetchStatements] Already imported. sha='#{statement.sha}'")
-            puts("[Jobs::FetchStatements] Already imported. sha='#{statement.sha}'")
             false
           else
             statement = Statement.create(trx)
