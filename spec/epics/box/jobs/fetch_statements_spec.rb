@@ -4,7 +4,7 @@ module Epics
   module Box
     module Jobs
       RSpec.describe FetchStatements do
-        let(:account) { Account.create(host: "HOST", iban: "iban") }
+        let(:account) { Account.create(host: "HOST", iban: "iban1234567") }
         let!(:subscriber) { account.add_subscriber(signature_class: 'T', activated_at: 1.day.ago) }
 
         describe '.process!' do
@@ -50,6 +50,11 @@ module Epics
           context 'without timeframe' do
             def exec_process
               described_class.fetch_new_statements(account.id)
+            end
+
+            it 'fetches only statements for the correct account' do
+              exec_process
+              expect(account.statements.count).to eq 16
             end
 
             it 'fetches statements from remote server' do
