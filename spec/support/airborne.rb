@@ -1,5 +1,6 @@
 require 'airborne'
+require_relative '../../box/api'
 
 Airborne.configure do |config|
-  config.rack_app = Epics::Box::Server
+  config.rack_app = Box::Api
 end

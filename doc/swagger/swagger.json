@@ -40,7 +40,7 @@
     "/accounts": {
       "get": {
         "tags": [
-          "Accessible resources"
+          "Account specific endpoints"
         ],
         "summary": "Returns a list of all accessible accounts",
         "description": "Returns a list of all accessible accounts",
@@ -73,7 +73,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "$ref": "#/definitions/Epics::Box::Entities::Account"
+                "$ref": "#/definitions/Box::Entities::Account"
               }
             }
           },
@@ -119,7 +119,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "$ref": "#/definitions/Epics::Box::Entities::ManagementAccount"
+                "$ref": "#/definitions/Box::Entities::ManagementAccount"
               }
             }
           },
@@ -240,7 +240,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "$ref": "#/definitions/Epics::Box::Entities::Subscriber"
+                "$ref": "#/definitions/Box::Entities::Subscriber"
               }
             }
           },
@@ -315,9 +315,19 @@
     "/management/accounts/{account_id}/subscribers/{id}/ini_letter": {
       "get": {
         "tags": [
-          "management"
+          "Management"
         ],
+        "summary": "Returns an HTML formatted INI letter to be printed and submitted to bank",
+        "description": "Returns an HTML formatted INI letter to be printed and submitted to bank",
+        "operationId": "management_account_subscribers_ini_letter",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth 2 Bearer token",
+            "required": false,
+            "type": "string"
+          },
           {
             "name": "account_id",
             "in": "path",
@@ -332,6 +342,18 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Not authorized to access this resource"
+          },
+          "404": {
+            "description": "No account with given IBAN found"
+          },
+          "412": {
+            "description": "EBICS account credentials not yet activated"
+          },
           "default": {
             "description": "Unexpected error"
           }
@@ -378,7 +400,7 @@
             "description": "Successful result of the operation",
             "schema": {
               "type": "object",
-              "$ref": "#/definitions/Epics::Box::Entities::ManagementAccount"
+              "$ref": "#/definitions/Box::Entities::ManagementAccount"
             }
           },
           "default": {
@@ -515,7 +537,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "$ref": "#/definitions/Epics::Box::Entities::User"
+                "$ref": "#/definitions/Box::Entities::User"
               }
             }
           },
@@ -620,7 +642,7 @@
             "description": "Successful result of the operation",
             "schema": {
               "type": "object",
-              "$ref": "#/definitions/Epics::Box::Entities::User"
+              "$ref": "#/definitions/Box::Entities::User"
             }
           },
           "default": {
@@ -707,7 +729,7 @@
             "description": "Successful result of the operation",
             "schema": {
               "type": "object",
-              "$ref": "#/definitions/Epics::Box::Entities::Account"
+              "$ref": "#/definitions/Box::Entities::Account"
             }
           },
           "default": {
@@ -1109,7 +1131,7 @@
     }
   },
   "definitions": {
-    "Epics::Box::Entities::Account": {
+    "Box::Entities::Account": {
       "type": "object",
       "properties": {
         "name": {
@@ -1153,7 +1175,7 @@
         }
       }
     },
-    "Epics::Box::Entities::ManagementAccount": {
+    "Box::Entities::ManagementAccount": {
       "type": "object",
       "properties": {
         "name": {
@@ -1198,7 +1220,7 @@
         },
         "subscribers": {
           "type": "object",
-          "$ref": "#/definitions/Epics::Box::Entities::Subscriber"
+          "$ref": "#/definitions/Box::Entities::Subscriber"
         },
         "_links": {
           "type": "object",
@@ -1209,7 +1231,7 @@
         }
       }
     },
-    "Epics::Box::Entities::Subscriber": {
+    "Box::Entities::Subscriber": {
       "type": "object",
       "properties": {
         "account": {
@@ -1250,7 +1272,7 @@
         }
       }
     },
-    "Epics::Box::Entities::User": {
+    "Box::Entities::User": {
       "type": "object",
       "properties": {
         "id": {
@@ -1272,7 +1294,7 @@
         },
         "subscribers": {
           "type": "object",
-          "$ref": "#/definitions/Epics::Box::Entities::Subscriber"
+          "$ref": "#/definitions/Box::Entities::Subscriber"
         },
         "_links": {
           "type": "object",

@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 
-require 'epics/box'
+require_relative '../box/init'
 require 'timecop'
 
 Dir['spec/support/**/*.rb'].each { |f| require f }
@@ -98,8 +98,8 @@ RSpec.configure do |config|
   config.order = :random
 
   # Remove gems from backtrace
-  config.backtrace_exclusion_patterns << /gem/
-  config.backtrace_exclusion_patterns << /database_cleaner/
+  # config.backtrace_exclusion_patterns << /gem/
+  # config.backtrace_exclusion_patterns << /database_cleaner/
 
   # Seed global randomization in this process using the `--seed` CLI option.
   # Setting this allows you to use `--seed` to deterministically reproduce
