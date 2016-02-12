@@ -1,5 +1,5 @@
 GIT
-  remote: git@github.com:railslove/cmxl.git
+  remote: https://github.com/railslove/cmxl.git
   revision: 5fcc52206f2fd13b506b5caf259013b4b5f75c75
   specs:
     cmxl (0.1.3)
