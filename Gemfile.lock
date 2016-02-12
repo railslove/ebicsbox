@@ -1,3 +1,10 @@
+GIT
+  remote: git@github.com:railslove/cmxl.git
+  revision: 5fcc52206f2fd13b506b5caf259013b4b5f75c75
+  specs:
+    cmxl (0.1.3)
+      rchardet19
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -25,8 +32,6 @@ GEM
     clockwork (1.2.0)
       activesupport
       tzinfo
-    cmxl (0.1.2)
-      rchardet19
     coderay (1.1.0)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
@@ -181,7 +186,7 @@ DEPENDENCIES
   airborne
   beaneater (~> 1.0.0)
   clockwork
-  cmxl
+  cmxl!
   database_cleaner
   dotenv
   epics (~> 1.4.0)
