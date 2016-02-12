@@ -74,9 +74,9 @@ info:
     email: contact@ebicsbox.com
     url: http://www.ebicsbox.com/
   version: '0.1'
-host: localhost:80
-basePath: "/"
+basePath: ""
 schemes:
+- http
 - https
 consumes:
 - application/json
