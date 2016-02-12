@@ -11,12 +11,12 @@ if [ "$1" = "clock" ]; then
 fi
 
 if [ "$1" = "worker" ]; then
-  /usr/local/bin/ruby -Ilib -repics/box -eEpics::Box::Worker.new.process!
+  /usr/local/bin/ruby bin/worker
 fi
 
 if [ "$1" = "all" ]; then
   nohup /usr/local/bundle/bin/bundle exec clockwork lib/epics/scheduler/scheduler.rb &
-  nohup /usr/local/bin/ruby -Ilib -repics/box -eEpics::Box::Worker.new.process! &
+  nohup /usr/local/bin/ruby bin/worker &
   /usr/local/bundle/bin/bundle exec puma config.ru -p $PORT
 fi
 exit 1
