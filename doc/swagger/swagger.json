@@ -11,9 +11,9 @@
     },
     "version": "0.1"
   },
-  "host": "localhost:80",
-  "basePath": "//",
+  "basePath": "/",
   "schemes": [
+    "http",
     "https"
   ],
   "consumes": [
@@ -1215,6 +1215,10 @@
         "account": {
           "type": "string",
           "description": "Display name for given bank account"
+        },
+        "id": {
+          "type": "integer",
+          "description": "Internal id"
         },
         "user_id": {
           "type": "string",
