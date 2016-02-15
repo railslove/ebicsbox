@@ -1,4 +1,4 @@
-FROM registry.apps.railslabs.com/yoyostile/jruby:latest
+FROM yoyostile/jruby:9.0.5.0
 RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -
 RUN apt-get install -y nodejs git
 
