@@ -75,10 +75,6 @@ module Epics
         @account ||= Account[account_id]
       end
 
-      def organization
-        @organization ||= account.organization
-      end
-
       def delivery_success!
         set webhook_status: 'success'
         save

@@ -16,6 +16,7 @@ module Epics
       def self.register(params)
         orga = new(params)
         orga.management_token ||= SecureRandom.hex
+        orga.webhook_token ||= SecureRandom.hex
         orga.save
       end
 
@@ -23,11 +24,6 @@ module Epics
         accounts_dataset.first!(iban: iban)
       rescue Sequel::NoMatchingRow => ex
         fail Account::NotFound.for_orga(organization_id: self.id, iban: iban)
-      end
-
-      def before_create
-        self.webhook_token ||= SecureRandom.hex
-        super
       end
     end
   end
