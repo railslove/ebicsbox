@@ -11,9 +11,10 @@ require 'grape-entity'
 require 'sequel'
 require 'cmxl'
 require 'httparty'
+require 'faraday'
 require 'json'
 require 'nokogiri'
-require 'epics'
+require ENV['EBICS_CLIENT'] == 'Blebics::Client' ? 'blebics' : 'epics'
 require 'sepa_king'
 require 'base64'
 
@@ -38,6 +39,8 @@ end
 
 # Init database connection
 DB = Sequel.connect(Epics::Box.configuration.database_url, max_connections: 10)
+
+Ebics = Epics
 
 # Enable json extensions
 Sequel.extension :pg_json

@@ -58,8 +58,9 @@ class Epics::Box::Subscriber < Sequel::Model
     self.submitted_at = DateTime.now
     self.save
     Epics::Box::Queue.check_subscriber_activation(id)
-  rescue Epics::Error::TechnicalError, Epics::Error::BusinessError => ex
+  rescue => ex
     Epics::Box.logger.error("Failed to init subscriber #{id}. Reason='#{ex.message}'")
+    fail(ex) if ex.is_a?(AlreadyActivated) || ex.is_a?(IncompleteEbicsData)
     false
   end
 

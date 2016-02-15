@@ -1,6 +1,10 @@
 source 'https://rubygems.org'
 
-ruby '2.2.2', engine: 'jruby', engine_version: '9.0.4.0'
+if ENV['EBICS_CLIENT'] == 'Blebics::Client'
+  ruby '2.2.2', engine: 'jruby', engine_version: '9.0.3.0'
+else
+  ruby '2.2.3', engine: 'jruby', engine_version: '9.0.5.0'
+end
 
 gem 'rake'
 gem 'beaneater', '~> 1.0.0'
@@ -9,16 +13,17 @@ gem 'cmxl', git: 'https://github.com/railslove/cmxl.git'
 gem 'grape'
 gem 'grape-entity', '0.4.8'
 gem 'httparty'
+gem 'faraday'
 gem 'jdbc-postgres'
 gem 'nokogiri'
 gem 'ruby-swagger'
 gem 'sepa_king'
 gem 'sequel'
 gem 'jdbc-postgres'
-gem 'jruby-openssl', '0.9.13' #, '0.8.2'
 gem 'puma'
-# gem 'blebics-wrapper', git: 'git@github.com:railslove/blebics-wrapper.git'
+
 if ENV['EBICS_CLIENT'] == 'Blebics::Client'
+  gem 'bouncy-castle-java', '1.5.0146.1'
   gem 'jruby-openssl', '0.8.2'
   gem 'blebics-wrapper', git: 'git@github.com:railslove/blebics-wrapper.git'
 else

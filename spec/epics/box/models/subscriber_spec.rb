@@ -76,7 +76,7 @@ module Epics
 
         context 'error case' do
           before do
-            expect(subject.client).to receive(:HPB).and_raise(Epics::Error::BusinessError.new('nope'))
+            expect(subject.client).to receive(:HPB).and_raise
           end
 
           it 'catches the epics error and returns false' do
