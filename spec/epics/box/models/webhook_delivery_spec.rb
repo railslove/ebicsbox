@@ -39,11 +39,30 @@ module Epics
               expect(subject.execute_request.size).to eq(2)
             end
           end
+
+          context 'without auth defined' do
+            before { allow_any_instance_of(Faraday::Connection).to receive(:basic_auth).with('user', 'pass') }
+
+            it 'does not set anything auth related' do
+              expect_any_instance_of(Faraday::Connection).to_not receive(:basic_auth)
+              subject.execute_request
+            end
+          end
         end
 
         context 'no callback url defined' do
           it 'raises an exception' do
             expect { subject.execute_request }.to raise_error(Event::NoCallback)
+          end
+        end
+
+        context 'with auth callback_url defined' do
+          before { allow_any_instance_of(Event).to receive(:callback_url).and_return('http://user:pass@mycallback.url') }
+          before { allow_any_instance_of(Faraday::Connection).to receive(:basic_auth).with('user', 'pass') }
+
+          it 'sets basic auth information in faraday' do
+            expect_any_instance_of(Faraday::Connection).to receive(:basic_auth).with('user', 'pass')
+            subject.execute_request
           end
         end
       end
@@ -100,6 +119,21 @@ module Epics
               expect_any_instance_of(Event).to receive(:delivery_failure!)
               subject.deliver
             end
+          end
+        end
+      end
+
+      describe '#extract_auth' do
+        context 'callback url with auth specified' do
+          it 'extracts authentication data' do
+            url = 'http://user:pass@mycallback.url'
+            expect(subject.send(:extract_auth, url)).to eq(['user', 'pass'])
+          end
+        end
+        context 'callback url without auth specified' do
+          it 'returns nil' do
+            url = 'http://mycallback.url'
+            expect(subject.send(:extract_auth, url)).to eq(nil)
           end
         end
       end

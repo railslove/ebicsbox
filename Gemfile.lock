@@ -89,9 +89,6 @@ GEM
     hashie (3.4.3)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
-    httparty (0.13.7)
-      json (~> 1.8)
-      multi_xml (>= 0.5.2)
     i18n (0.7.0)
     iban-tools (1.1.0)
     ice_nine (0.11.2)
@@ -196,7 +193,6 @@ DEPENDENCIES
   grape
   grape-entity (= 0.4.8)
   guard-rspec
-  httparty
   jdbc-postgres
   jruby-openssl (= 0.8.2)
   nokogiri
