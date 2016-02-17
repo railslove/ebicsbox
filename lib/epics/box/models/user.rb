@@ -8,4 +8,8 @@ class Epics::Box::User < Sequel::Model
     return unless access_token
     first(access_token: access_token)
   end
+
+  def unsigned_orders
+    subscribers_dataset.exclude(activated_at: nil).all.map { |s| s.client.distributed_signature.overview }.flatten
+  end
 end
