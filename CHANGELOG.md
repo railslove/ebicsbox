@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.3.0
+
+* Expose events via https://box/events (including information about webhook deliveries)
 
 ## 0.2.0
 
