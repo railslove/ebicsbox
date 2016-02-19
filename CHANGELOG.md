@@ -3,6 +3,7 @@
 
 ## 0.2.0
 
+* Switch to JRuby 9.0.5.0
 * Proper support of OAuth Bearer tokens
 * Track account balance
 * Manual triggering of statement retrieval
