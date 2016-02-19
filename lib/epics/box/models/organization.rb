@@ -19,6 +19,10 @@ module Epics
         orga.save
       end
 
+      def events
+        accounts_dataset.left_join(:events)
+      end
+
       def find_account!(iban)
         accounts_dataset.first!(iban: iban)
       rescue Sequel::NoMatchingRow => ex

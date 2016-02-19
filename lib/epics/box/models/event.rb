@@ -1,5 +1,7 @@
 require 'openssl'
 
+require_relative './webhook_delivery'
+
 module Epics
   module Box
     class Event < Sequel::Model
@@ -33,6 +35,7 @@ module Epics
       NoCallback = Class.new(StandardError)
 
       one_to_many :webhook_deliveries
+      many_to_one :account
 
       def self.respond_to_missing?(method_name, include_private = false)
         SUPPORTED_TYPES.include?(method_name) || super
@@ -48,6 +51,12 @@ module Epics
         else
           super # ignore and pass along
         end
+      end
+
+      def self.by_organization(organization)
+        left_join(:accounts, id: :account_id)
+        .where(accounts__organization_id: organization.id)
+        .select_all(:events)
       end
 
       def self.publish(event_type, payload = {})
