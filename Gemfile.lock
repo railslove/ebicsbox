@@ -155,7 +155,7 @@ GEM
       builder
       i18n
       iban-tools
-    sequel (4.30.0)
+    sequel (4.31.0)
     shellany (0.0.1)
     slop (3.6.0)
     spoon (0.0.4)
