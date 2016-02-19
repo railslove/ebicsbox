@@ -1,4 +1,4 @@
-FROM yoyostile/jruby:9.0.5.0
+FROM yoyostile/railslove-jruby:9.0.5.0
 RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -
 RUN apt-get install -y git
 
