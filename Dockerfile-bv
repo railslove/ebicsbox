@@ -1,6 +1,5 @@
-FROM yoyostile/jruby:9.0.3.0
-RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -
-RUN apt-get install -y nodejs git
+FROM yoyostile/railslove-jruby:9.0.3.0
+# RUN apt-get install -y git
 
 # throw errors if Gemfile has been modified since Gemfile.lock
 RUN bundle config --global frozen 1
@@ -10,20 +9,15 @@ WORKDIR /usr/ebicsbox
 
 RUN echo invokedynamic.all=true >> /usr/ebicsbox/.jrubyrc
 
+RUN mkdir -p /var/bundle
+ADD vendor/cache /usr/ebicsbox/vendor/cache
+
 ADD Gemfile /usr/ebicsbox/
 ADD Gemfile.lock /usr/ebicsbox/
-RUN export EBICS_CLIENT=Blebics::Client
-RUN bundle install
-
-RUN npm install webpack -g
+RUN EBICS_CLIENT=Blebics::Client bundle install --system --local
 
 ADD . /usr/ebicsbox
-RUN npm install
-RUN webpack -p
 #RUN rake jruby:build
-
-# Generate documentation
-RUN sed -i.bak 's/localhost:80/ebics-box-test\.apps\.railslabs\.com:443/g' doc/swagger/swagger.json
 
 # Clean up
 RUN rm Dockerfile*

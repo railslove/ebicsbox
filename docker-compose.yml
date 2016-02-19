@@ -14,7 +14,7 @@ queue:
   volumes:
     - /data-beanstalkd:/data
 app:
-  image: ebicsbox-bv:0.1.25
+  image: ebicsbox-bv:0.1.27
   environment:
     - USERNAME=ebics
     - PASSWORD=istsuper
@@ -27,6 +27,7 @@ app:
     - "VIRTUAL_HOST=ebicsbox-bv"
     - "PASSPHRASE=asdasdasdasdasd"
     - "SECRET_TOKEN=sehrlangersecrettokenistsecret1234"
+    - "EBICS_CLIENT=Blebics::Client"
   links:
     - db
     - queue
