@@ -7,7 +7,7 @@ module Epics
     module Helpers
       module Default
         def access_token
-          params['access_token'] || headers['Authorization'].to_s[/token (.+)/, 1]
+          params['access_token'] || headers['Authorization'].to_s[/\A(?:token|Bearer) (.+)\z/, 1]
         end
 
         def current_user
