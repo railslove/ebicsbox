@@ -37,6 +37,17 @@ module Epics
       one_to_many :webhook_deliveries
       many_to_one :account
 
+      def_dataset_method(:paginated) do |page, per_page|
+        limit(per_page).offset((page - 1) * per_page)
+      end
+
+      def_dataset_method(:by_organization) do |organization|
+        left_join(:accounts, id: :account_id)
+        .where(accounts__organization_id: organization.id)
+        .select_all(:events)
+      end
+
+
       def self.respond_to_missing?(method_name, include_private = false)
         SUPPORTED_TYPES.include?(method_name) || super
       end
@@ -51,12 +62,6 @@ module Epics
         else
           super # ignore and pass along
         end
-      end
-
-      def self.by_organization(organization)
-        left_join(:accounts, id: :account_id)
-        .where(accounts__organization_id: organization.id)
-        .select_all(:events)
       end
 
       def self.publish(event_type, payload = {})
