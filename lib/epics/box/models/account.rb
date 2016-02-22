@@ -26,7 +26,9 @@ class Epics::Box::Account < Sequel::Model
       base_scope = subscribers_dataset.exclude(subscribers__activated_at: nil)
       subscriber = base_scope.where(subscribers__signature_class: 'T').first || base_scope.first
       if subscriber.nil?
-        fail NoTransportClient, 'Please setup and activate at least one subscriber with a transport signature'
+        message = 'Please setup and activate at least one subscriber with a transport signature'
+        set_last_error(message)
+        fail NoTransportClient, message
       else
         subscriber.client
       end
