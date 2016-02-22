@@ -8,8 +8,8 @@ module Epics
   module Box
     module Adapters
       RSpec.describe Fake do
-        let!(:organization) { Organization.create(name: "Test Orga") }
-        let!(:account) { organization.add_account(iban: "AL90208110080000001039531801", name: "Test account", mode: 'Fake', url: 'url', host: 'host', partner: 'partner') }
+        let!(:organization) { Organization.create(name: "Test Orga", webhook_token: 'topsecret') }
+        let!(:account) { organization.add_account(iban: "AL90208110080000001039531801", name: "Test account", mode: 'Fake', url: 'url', host: 'host', partner: 'partner', organization_id: organization.id) }
         let!(:user) { organization.add_user(name: "Test user", access_token: SecureRandom.hex) }
         let!(:subscriber) { account.add_subscriber(user_id: user.id, signature_class: 'T', activated_at: 1.day.ago) }
 
