@@ -6,7 +6,7 @@ GIT
       rchardet19
 
 PATH
-  remote: ../java-client
+  remote: vendor/cache/blebics-wrapper
   specs:
     blebics-wrapper (0.1.0-java)
 

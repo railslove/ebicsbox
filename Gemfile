@@ -24,7 +24,7 @@ gem 'puma'
 if ENV['EBICS_CLIENT'] == 'Blebics::Client'
   gem 'bouncy-castle-java', '1.5.0146.1'
   gem 'jruby-openssl', '0.8.2'
-  gem 'blebics-wrapper', path: '../java-client'
+  gem 'blebics-wrapper', path: '../blebics-wrapper'
 else
   gem 'jruby-openssl', '0.9.13'
   gem 'epics', '~> 1.4.0'
