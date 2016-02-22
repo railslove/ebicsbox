@@ -32,21 +32,37 @@ module Epics
             expect(json_response).to eq(nil)
           end
 
-          it 'returns the header access token if provided' do
-            header "Authorization", "token header-token"
-            get '/access_token'
-            expect(json_response).to eq('header-token')
-          end
-
           it 'returns the url param access token if provided' do
             get '/access_token?access_token=url-token'
             expect(json_response).to eq('url-token')
           end
 
-          it 'returns the url token if both, header and url token, are provided' do
-            header "Authorization", "token header-token"
-            get '/access_token?access_token=url-token'
-            expect(json_response).to eq('url-token')
+          context 'invalid token keyword' do
+            it 'returns the header access token if provided' do
+              header "Authorization", "token header-token"
+              get '/access_token'
+              expect(json_response).to eq('header-token')
+            end
+
+            it 'returns the url token if both, header and url token, are provided' do
+              header "Authorization", "token header-token"
+              get '/access_token?access_token=url-token'
+              expect(json_response).to eq('url-token')
+            end
+          end
+
+          context 'proper oauth bearer token keyword' do
+            it 'returns the header access token if provided' do
+              header "Authorization", "Bearer header-token"
+              get '/access_token'
+              expect(json_response).to eq('header-token')
+            end
+
+            it 'returns the url token if both, header and url token, are provided' do
+              header "Authorization", "Bearer header-token"
+              get '/access_token?access_token=url-token'
+              expect(json_response).to eq('url-token')
+            end
           end
         end
       end
