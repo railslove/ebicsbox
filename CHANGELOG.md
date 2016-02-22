@@ -3,6 +3,8 @@
 ## 0.3.0
 
 * Expose events via https://box/events (including information about webhook deliveries)
+* Expose raw MT940 in statements when requested via header or query parameter
+* Harden security around webhook payload verification
 
 ## 0.2.0
 
