@@ -19,6 +19,9 @@ require 'epics/box/entities/account'
 require 'epics/box/entities/statement'
 require 'epics/box/entities/transaction'
 
+# APIs
+require_relative 'apis/events'
+
 module Epics
   module Box
     class Content < Grape::API
@@ -60,6 +63,8 @@ module Epics
           error!({ message: 'Unauthorized access. Please provide a valid access token!' }, 401)
         end
       end
+
+      include Apis::Events
 
       api_desc 'Returns a list of all accessible accounts' do
         api_name 'accounts'
