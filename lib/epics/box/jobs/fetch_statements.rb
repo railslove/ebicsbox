@@ -30,7 +30,8 @@ module Epics
         rescue Sequel::NoMatchingRow  => ex
           Box.logger.error("[Jobs::FetchStatements] Could not find account. account_id=#{account_id}")
         rescue Epics::Error::BusinessError => ex
-          Box.logger.error(ex.message) # expected
+          Box.logger.error("[Jobs::FetchStatements] #{ex.message}. account_id=#{account_id}")
+          account.set_last_error(ex.message)
         end
 
         def self.update_meta_data(account, statements, to)
