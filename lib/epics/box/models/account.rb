@@ -69,6 +69,12 @@ class Epics::Box::Account < Sequel::Model
     save
   end
 
+  def set_last_error(message)
+    self.last_error = message
+    self.last_error_at = Time.now
+    save
+  end
+
   def as_event_payload
     {
       account_id: id,
