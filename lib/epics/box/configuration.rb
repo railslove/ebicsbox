@@ -1,3 +1,10 @@
+require 'dotenv'
+Dotenv.load
+
+if ENV['EBICS_CLIENT'] == 'Blebics::Client'
+  require 'blebics'
+end
+
 # Load BL EBICS client when in BV environment
 module Epics
   module Box
