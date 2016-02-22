@@ -19,7 +19,6 @@ gem 'pry'
 gem 'ruby-swagger'
 gem 'sepa_king'
 gem 'sequel'
-gem 'jdbc-postgres'
 gem 'puma'
 
 if ENV['EBICS_CLIENT'] == 'Blebics::Client'

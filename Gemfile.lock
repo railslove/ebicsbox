@@ -38,7 +38,7 @@ GEM
     clockwork (1.2.0)
       activesupport
       tzinfo
-    coderay (1.1.0)
+    coderay (1.1.1)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     crack (0.4.3)
@@ -81,7 +81,7 @@ GEM
       bouncy-castle-java (>= 1.5.0146.1)
     json (1.8.3-java)
     method_source (0.8.2)
-    mime-types (2.99)
+    mime-types (2.99.1)
     minitest (5.8.4)
     multi_json (1.11.2)
     multi_xml (0.5.5)
@@ -93,7 +93,7 @@ GEM
       method_source (~> 0.8.1)
       slop (~> 3.4)
       spoon (~> 0.0)
-    puma (2.15.3-java)
+    puma (2.16.0-java)
     rack (1.6.4)
     rack-accept (0.4.5)
       rack (>= 0.4)
@@ -111,7 +111,7 @@ GEM
       rspec-core (~> 3.4.0)
       rspec-expectations (~> 3.4.0)
       rspec-mocks (~> 3.4.0)
-    rspec-core (3.4.2)
+    rspec-core (3.4.3)
       rspec-support (~> 3.4.0)
     rspec-expectations (3.4.0)
       diff-lcs (>= 1.2.0, < 2.0)
@@ -128,7 +128,7 @@ GEM
       builder
       i18n
       iban-tools
-    sequel (4.30.0)
+    sequel (4.31.0)
     slop (3.6.0)
     spoon (0.0.4)
       ffi
@@ -143,7 +143,7 @@ GEM
       coercible (~> 1.0)
       descendants_tracker (~> 0.0, >= 0.0.3)
       equalizer (~> 0.0, >= 0.0.9)
-    webmock (1.22.6)
+    webmock (1.24.0)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff
@@ -173,7 +173,7 @@ DEPENDENCIES
   rspec
   ruby-swagger
   sepa_king
-  sequel (= 4.30.0)
+  sequel
   timecop
   webmock
 
