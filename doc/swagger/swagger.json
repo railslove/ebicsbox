@@ -424,9 +424,19 @@
     "/management/accounts/{account_id}/subscribers/{id}/ini_letter": {
       "get": {
         "tags": [
-          "management"
+          "Management"
         ],
+        "summary": "Fetch an account's INI letter",
+        "description": "Fetch an account's INI letter",
+        "operationId": "management_account_ini_letter",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth 2 Bearer token",
+            "required": false,
+            "type": "string"
+          },
           {
             "name": "account_id",
             "in": "path",
@@ -441,6 +451,18 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Not authorized to access this resource"
+          },
+          "404": {
+            "description": "No account with given IBAN found"
+          },
+          "412": {
+            "description": "EBICS account credentials not yet activated"
+          },
           "default": {
             "description": "Unexpected error"
           }
