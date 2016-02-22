@@ -1,15 +1,14 @@
 GIT
-  remote: git@github.com:railslove/blebics-wrapper.git
-  revision: 51b443bd378b14b71805c852e31e430d7acb0bd6
-  specs:
-    blebics-wrapper (0.1.0-java)
-
-GIT
   remote: https://github.com/railslove/cmxl.git
   revision: 5fcc52206f2fd13b506b5caf259013b4b5f75c75
   specs:
     cmxl (0.1.3)
       rchardet19
+
+PATH
+  remote: vendor/cache/blebics-wrapper
+  specs:
+    blebics-wrapper (0.1.0-java)
 
 GEM
   remote: https://rubygems.org/
