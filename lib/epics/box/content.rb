@@ -98,22 +98,22 @@ module Epics
         api_desc "Debit a customer's bank account" do
           api_name 'accounts_debit'
           tags 'Account specific endpoints'
-          detail <<-END
-  Creating a debit by parameter should be the preferred way for low-volume transactions esp. for use
-  cases where the PAIN XML isn't generated before. Transactions can be transmitted either as ```CD1```
-  or ```CDD``` depending on the order types your bank is offering you, the ```order_type``` parameter
-  lets you choose among them.
+          detail <<-USAGE.strip_heredoc
+            Creating a debit by parameter should be the preferred way for low-volume transactions esp. for use
+            cases where the PAIN XML isn't generated before. Transactions can be transmitted either as ```CD1```
+            or ```CDD``` depending on the order types your bank is offering you, the ```order_type``` parameter
+            lets you choose among them.
 
-  sequence_type
+            sequence_type
 
-  * OOFF - one-off debit
-  * FRST - first debit
-  * RCUR - recurring debit
-  * FNAL - final debit
+            * OOFF - one-off debit
+            * FRST - first debit
+            * RCUR - recurring debit
+            * FNAL - final debit
 
-  Once validated, transactions are transmitted asynchronously to the banking system.
-  Errors that happen eventually are delivered via Webhooks.
-  END
+            Once validated, transactions are transmitted asynchronously to the banking system.
+            Errors that happen eventually are delivered via Webhooks.
+          USAGE
           headers AUTH_HEADERS
           errors DEFAULT_ERROR_RESPONSES
         end
@@ -141,13 +141,13 @@ module Epics
         api_desc "Credit a customer's bank account" do
           api_name 'account_credit'
           tags 'Account specific endpoints'
-          detail <<-END
-  Creating a credit by parameter should be the preferred way for low-volume transactions
-  esp. for use cases where the PAIN XML isn't generated before.
+          detail <<-USAGE.strip_heredoc
+            Creating a credit by parameter should be the preferred way for low-volume transactions
+            esp. for use cases where the PAIN XML isn't generated before.
 
-  Once validated, transactions are transmitted asynchronously to the banking system. Errors
-  that happen eventually are delivered via Webhooks.
-  END
+            Once validated, transactions are transmitted asynchronously to the banking system. Errors
+            that happen eventually are delivered via Webhooks.
+          USAGE
           headers AUTH_HEADERS
           errors DEFAULT_ERROR_RESPONSES
         end

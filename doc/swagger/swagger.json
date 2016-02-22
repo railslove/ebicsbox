@@ -857,7 +857,7 @@
           "Account specific endpoints"
         ],
         "summary": "Credit a customer's bank account",
-        "description": "  Creating a credit by parameter should be the preferred way for low-volume transactions\n  esp. for use cases where the PAIN XML isn't generated before.\n\n  Once validated, transactions are transmitted asynchronously to the banking system. Errors\n  that happen eventually are delivered via Webhooks.\n",
+        "description": "Creating a credit by parameter should be the preferred way for low-volume transactions\nesp. for use cases where the PAIN XML isn't generated before.\n\nOnce validated, transactions are transmitted asynchronously to the banking system. Errors\nthat happen eventually are delivered via Webhooks.\n",
         "operationId": "account_credit",
         "parameters": [
           {
@@ -949,7 +949,7 @@
           "Account specific endpoints"
         ],
         "summary": "Debit a customer's bank account",
-        "description": "  Creating a debit by parameter should be the preferred way for low-volume transactions esp. for use\n  cases where the PAIN XML isn't generated before. Transactions can be transmitted either as ```CD1```\n  or ```CDD``` depending on the order types your bank is offering you, the ```order_type``` parameter\n  lets you choose among them.\n\n  sequence_type\n\n  * OOFF - one-off debit\n  * FRST - first debit\n  * RCUR - recurring debit\n  * FNAL - final debit\n\n  Once validated, transactions are transmitted asynchronously to the banking system.\n  Errors that happen eventually are delivered via Webhooks.\n",
+        "description": "Creating a debit by parameter should be the preferred way for low-volume transactions esp. for use\ncases where the PAIN XML isn't generated before. Transactions can be transmitted either as ```CD1```\nor ```CDD``` depending on the order types your bank is offering you, the ```order_type``` parameter\nlets you choose among them.\n\nsequence_type\n\n* OOFF - one-off debit\n* FRST - first debit\n* RCUR - recurring debit\n* FNAL - final debit\n\nOnce validated, transactions are transmitted asynchronously to the banking system.\nErrors that happen eventually are delivered via Webhooks.\n",
         "operationId": "accounts_debit",
         "parameters": [
           {
