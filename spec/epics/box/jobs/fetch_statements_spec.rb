@@ -22,6 +22,7 @@ module Epics
             account.imported_at!(1.day.ago)
             allow_any_instance_of(Subscriber).to receive(:client) { client }
             allow(client).to receive(:STA).and_return(File.read('spec/fixtures/mt940.txt'))
+            allow(Account).to receive(:[]).and_return(double('account', organization: double('orga', webhook_token: 'token')))
           end
 
           it 'updates its meta data' do
@@ -141,6 +142,10 @@ module Epics
                 "CRED" => 'my-cred',
               }
             )
+          end
+
+          before do
+            allow(Account).to receive(:[]).and_return(double('account', organization: double('orga', webhook_token: 'token')))
           end
 
           def exec_create_action

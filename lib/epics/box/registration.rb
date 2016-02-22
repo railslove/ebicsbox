@@ -28,6 +28,7 @@ module Epics
       params do
         requires :name, type: String, desc: "The organization's display name"
         optional :management_token, type: String, desc: "Token to access organization's management features"
+        optional :webhook_token, type: String, desc: "Token to sign organization's webhook payloads"
       end
       post '/organizations' do
         if organization = Organization.register(declared(params))

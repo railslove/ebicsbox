@@ -44,7 +44,6 @@ Set the following environment variables:
 * DATABASE_URL
 * BEANSTALKD_URL
 * PASSPHRASE
-* SECRET_TOKEN
 
 you can store these in a local .env file for development.
 
