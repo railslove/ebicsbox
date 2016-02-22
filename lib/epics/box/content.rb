@@ -182,7 +182,8 @@ module Epics
           record_count = Statement.count_by_account(safe_params)
           statements = Statement.paginated_by_account(safe_params).all
           setup_pagination_header(record_count)
-          present statements, with: Entities::Statement
+          raw_data = params["raw_data"].present? || headers['Include-Raw-Data'].present?
+          present statements, with: Entities::Statement, include_raw: !!raw_data
         end
 
         api_desc "Retrieve all executed orders" do

@@ -70,8 +70,13 @@ module Epics
             end
 
             context 'raw mt940' do
-              it 'includes raw mt940' do
-                get "#{account.iban}/statements", { 'raw_data' => true, 'Authorization' => 'token orga-user' }
+              it 'includes raw mt940 when requested per header' do
+                get "#{account.iban}/statements", { 'Include-Raw-Data' => true, 'Authorization' => 'token orga-user' }
+                expect_json '0.mt940', "RAW"
+              end
+
+              it 'includes raw mt940 when requested per query parameter' do
+                get "#{account.iban}/statements?raw_data=1", { 'Authorization' => 'token orga-user' }
                 expect_json '0.mt940', "RAW"
               end
 
