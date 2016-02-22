@@ -31,14 +31,6 @@ module Epics
         60 * 60 # seconds
       end
 
-      def secret_token
-        if token = ENV['SECRET_TOKEN']
-          token
-        else
-          raise 'Please set a secret token'
-        end
-      end
-
       def ebics_client
         (ENV['EBICS_CLIENT'] || 'Epics::Client').constantize
       end

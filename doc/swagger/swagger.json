@@ -83,6 +83,115 @@
         }
       }
     },
+    "/events": {
+      "get": {
+        "tags": [
+          "Accessible resources"
+        ],
+        "summary": "List of all events",
+        "description": "Paginated list of all events which occured on an organization. These are not account\nspecific. Each event will trigger a webhook delivery as long as a webhook endpoint\nis specified for an account. To get more data on webhook deliveries, please check an\nevents details by following the self source in its _links section.\n",
+        "operationId": "events",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth 2 Bearer token",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "page through the results",
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "how many results per page",
+            "type": "integer",
+            "default": 10
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Not authorized to access this resource"
+          },
+          "404": {
+            "description": "No account with given IBAN found"
+          },
+          "412": {
+            "description": "EBICS account credentials not yet activated"
+          },
+          "200": {
+            "description": "Successful result of the operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/Epics::Box::Entities::Event"
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error"
+          }
+        }
+      }
+    },
+    "/events/{id}": {
+      "get": {
+        "tags": [
+          "Accessible resources"
+        ],
+        "summary": "Details for an event",
+        "description": "Get details on every triggered event. In case of a webhook delivery, all attempts\nare listed. For each attempt we store data on its response and errors if any are\nencountered. After 10 attempts, the system will stop to any retries.\n",
+        "operationId": "event_details",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth 2 Bearer token",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Not authorized to access this resource"
+          },
+          "404": {
+            "description": "No account with given IBAN found"
+          },
+          "412": {
+            "description": "EBICS account credentials not yet activated"
+          },
+          "200": {
+            "description": "Successful result of the operation",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Epics::Box::Entities::Event"
+            }
+          },
+          "default": {
+            "description": "Unexpected error"
+          }
+        }
+      }
+    },
     "/management/accounts": {
       "get": {
         "tags": [
@@ -315,9 +424,19 @@
     "/management/accounts/{account_id}/subscribers/{id}/ini_letter": {
       "get": {
         "tags": [
-          "management"
+          "Management"
         ],
+        "summary": "Fetch an account's INI letter",
+        "description": "Fetch an account's INI letter",
+        "operationId": "management_account_ini_letter",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth 2 Bearer token",
+            "required": false,
+            "type": "string"
+          },
           {
             "name": "account_id",
             "in": "path",
@@ -332,6 +451,18 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Not authorized to access this resource"
+          },
+          "404": {
+            "description": "No account with given IBAN found"
+          },
+          "412": {
+            "description": "EBICS account credentials not yet activated"
+          },
           "default": {
             "description": "Unexpected error"
           }
@@ -655,6 +786,10 @@
                 "management_token": {
                   "description": "Token to access organization's management features",
                   "type": "string"
+                },
+                "webhook_token": {
+                  "description": "Token to sign organization's webhook payloads",
+                  "type": "string"
                 }
               }
             }
@@ -722,7 +857,7 @@
           "Account specific endpoints"
         ],
         "summary": "Credit a customer's bank account",
-        "description": "  Creating a credit by parameter should be the preferred way for low-volume transactions\n  esp. for use cases where the PAIN XML isn't generated before.\n\n  Once validated, transactions are transmitted asynchronously to the banking system. Errors\n  that happen eventually are delivered via Webhooks.\n",
+        "description": "Creating a credit by parameter should be the preferred way for low-volume transactions\nesp. for use cases where the PAIN XML isn't generated before.\n\nOnce validated, transactions are transmitted asynchronously to the banking system. Errors\nthat happen eventually are delivered via Webhooks.\n",
         "operationId": "account_credit",
         "parameters": [
           {
@@ -814,7 +949,7 @@
           "Account specific endpoints"
         ],
         "summary": "Debit a customer's bank account",
-        "description": "  Creating a debit by parameter should be the preferred way for low-volume transactions esp. for use\n  cases where the PAIN XML isn't generated before. Transactions can be transmitted either as ```CD1```\n  or ```CDD``` depending on the order types your bank is offering you, the ```order_type``` parameter\n  lets you choose among them.\n\n  sequence_type\n\n  * OOFF - one-off debit\n  * FRST - first debit\n  * RCUR - recurring debit\n  * FNAL - final debit\n\n  Once validated, transactions are transmitted asynchronously to the banking system.\n  Errors that happen eventually are delivered via Webhooks.\n",
+        "description": "Creating a debit by parameter should be the preferred way for low-volume transactions esp. for use\ncases where the PAIN XML isn't generated before. Transactions can be transmitted either as ```CD1```\nor ```CDD``` depending on the order types your bank is offering you, the ```order_type``` parameter\nlets you choose among them.\n\nsequence_type\n\n* OOFF - one-off debit\n* FRST - first debit\n* RCUR - recurring debit\n* FNAL - final debit\n\nOnce validated, transactions are transmitted asynchronously to the banking system.\nErrors that happen eventually are delivered via Webhooks.\n",
         "operationId": "accounts_debit",
         "parameters": [
           {
@@ -977,7 +1112,7 @@
           "Account specific endpoints"
         ],
         "summary": "Retrieve all account statements",
-        "description": "Transactions are imported on a daily basis and stored so they can be easily retrieved and searched for a timeframe that exceeds the usual timeframe your bank will hold them on record for you. Besides pulling plain lists it is also possible to filter by eref or remittance_infomation.",
+        "description": "Transactions are imported on a daily basis and stored so they can be easily retrieved\nand searched for a timeframe that exceeds the usual timeframe your bank will hold them\non record for you. Besides pulling plain lists it is also possible to filter by eref or\nremittance_infomation.\n\nIt is possible to inspect the raw MT940 data included in the bank statement. To do so,\neither set a header \"Include-Raw-Data\" or attach a query parameter \"raw_data\" and set it\nto a truthy value (ie. true/1).\n",
         "operationId": "accounts_statements",
         "parameters": [
           {
@@ -1153,6 +1288,47 @@
         }
       }
     },
+    "Epics::Box::Entities::Event": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "account": {
+          "type": "string",
+          "description": "Display name for given bank account"
+        },
+        "type": {
+          "type": "string"
+        },
+        "payload": {
+          "type": "string"
+        },
+        "triggered_at": {
+          "type": "string"
+        },
+        "signature": {
+          "type": "string"
+        },
+        "webhook_status": {
+          "type": "string"
+        },
+        "webhook_retries": {
+          "type": "string"
+        },
+        "webhook_deliveries": {
+          "type": "object",
+          "$ref": "#/definitions/Epics::Box::Entities::WebhookDelivery"
+        },
+        "_links": {
+          "type": "object",
+          "properties": {
+
+          },
+          "description": "Links to resources"
+        }
+      }
+    },
     "Epics::Box::Entities::ManagementAccount": {
       "type": "object",
       "properties": {
@@ -1284,6 +1460,26 @@
 
           },
           "description": "Links to resources"
+        }
+      }
+    },
+    "Epics::Box::Entities::WebhookDelivery": {
+      "type": "object",
+      "properties": {
+        "delivered_at": {
+          "type": "string"
+        },
+        "response_body": {
+          "type": "string"
+        },
+        "reponse_headers": {
+          "type": "string"
+        },
+        "response_status": {
+          "type": "string"
+        },
+        "response_time": {
+          "type": "string"
         }
       }
     }
