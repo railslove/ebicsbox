@@ -1,3 +1,5 @@
+require 'active_support/core_ext/string/strip'
+
 # Validations
 require 'epics/box/validations/unique_transaction'
 
@@ -169,7 +171,16 @@ module Epics
         api_desc "Retrieve all account statements" do
           api_name 'accounts_statements'
           tags 'Account specific endpoints'
-          detail "Transactions are imported on a daily basis and stored so they can be easily retrieved and searched for a timeframe that exceeds the usual timeframe your bank will hold them on record for you. Besides pulling plain lists it is also possible to filter by eref or remittance_infomation."
+          detail <<-USAGE.strip_heredoc
+            Transactions are imported on a daily basis and stored so they can be easily retrieved
+            and searched for a timeframe that exceeds the usual timeframe your bank will hold them
+            on record for you. Besides pulling plain lists it is also possible to filter by eref or
+            remittance_infomation.
+
+            It is possible to inspect the raw MT940 data included in the bank statement. To do so,
+            either set a header "Include-Raw-Data" or attach a query parameter "raw_data" and set it
+            to a truthy value (ie. true/1).
+          USAGE
           headers AUTH_HEADERS
           errors DEFAULT_ERROR_RESPONSES
         end
