@@ -19,12 +19,16 @@ require 'epics/box/entities/account'
 require 'epics/box/entities/statement'
 require 'epics/box/entities/transaction'
 
+require_relative './distributed_signature'
+
 module Epics
   module Box
     class Content < Grape::API
       format :json
       helpers Helpers::Default
       helpers Helpers::Pagination
+
+      include DistributedSignature
 
       AUTH_HEADERS = {
         'Authorization' => { description: 'OAuth 2 Bearer token', type: 'String' }
