@@ -1,4 +1,11 @@
 #!/usr/bin/env ruby
+require 'dotenv'
+Dotenv.load
+
+# Load environment
+require 'bundler'
+Bundler.setup(:default, :development)
+
 require 'securerandom'
 require 'sequel'
 
