@@ -20,6 +20,8 @@ require 'epics/box/models/account'
 require 'epics/box/entities/account'
 require 'epics/box/entities/statement'
 require 'epics/box/entities/transaction'
+require 'epics/box/entities/originator'
+require 'epics/box/entities/unsigned_order'
 
 require_relative './distributed_signature'
 

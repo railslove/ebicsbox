@@ -46,6 +46,15 @@ module Epics
         end
       end
 
+      describe "GET: /unsigned_orders" do
+        include_context 'valid user'
+
+        it 'returns a success status' do
+          get '/unsigned_orders', { 'Authorization' => "Bearer #{user.access_token}" }
+          expect_json '{}'
+        end
+      end
+
       describe 'GET: /:account' do
         context 'without a valid user session' do
           it 'should fail'

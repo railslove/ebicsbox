@@ -23,7 +23,23 @@ module Epics
       def self.included(api)
         api.resource 'unsigned_orders' do
           api.get do
-            current_user.unsigned_orders
+            unsigned_orders = current_user.unsigned_orders
+            present unsigned_orders, with: Entities::UnsignedOrder
+          end
+
+          api.get ':order_id' do
+            order = current_user.unsigned_orders.select{ |o| o.order_id == params['order_id'] }.first
+            present order, with: Entities::UnsignedOrder
+          end
+
+          api.put ':order_id' do
+            new_order_id = current_user.sign_order(params['order_id'])
+            { order_id: new_order_id }
+          end
+
+          api.delete ':order_id' do
+            new_order_id = current_user.cancel_order(params['order_id'])
+            { order_id: new_order_id }
           end
         end
       end
