@@ -8,6 +8,7 @@
 /tmp/
 /log/
 /ssl/
+/vendor/cache/
 *.bundle
 *.so
 *.o

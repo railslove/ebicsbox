@@ -20,6 +20,10 @@ require 'epics/box/models/account'
 require 'epics/box/entities/account'
 require 'epics/box/entities/statement'
 require 'epics/box/entities/transaction'
+require 'epics/box/entities/originator'
+require 'epics/box/entities/unsigned_order'
+
+require_relative './distributed_signature'
 
 # APIs
 require_relative 'apis/events'
@@ -30,6 +34,8 @@ module Epics
       format :json
       helpers Helpers::Default
       helpers Helpers::Pagination
+
+      include DistributedSignature
 
       AUTH_HEADERS = {
         'Authorization' => { description: 'OAuth 2 Bearer token', type: 'String' }

@@ -1,6 +1,10 @@
 source 'https://rubygems.org'
 
-ruby '2.2.3', engine: 'jruby', engine_version: '9.0.5.0'
+if ENV['EBICS_CLIENT'] == 'Blebics::Client'
+  ruby '2.2.2', engine: 'jruby', engine_version: '9.0.3.0'
+else
+  ruby '2.2.3', engine: 'jruby', engine_version: '9.0.5.0'
+end
 
 gem 'rake'
 gem 'beaneater', '~> 1.0.0'
@@ -15,12 +19,12 @@ gem 'pry'
 gem 'ruby-swagger'
 gem 'sepa_king'
 gem 'sequel'
-gem 'jruby-openssl', '0.9.13' #, '0.8.2' we have to use an old version of jruby-openssl for blebics-wrapper
 gem 'puma'
 
 if ENV['EBICS_CLIENT'] == 'Blebics::Client'
+  gem 'bouncy-castle-java', '1.5.0146.1'
   gem 'jruby-openssl', '0.8.2'
-  gem 'blebics-wrapper', git: 'git@github.com:railslove/blebics-wrapper.git'
+  gem 'blebics-wrapper', path: '../blebics-wrapper'
 else
   gem 'jruby-openssl', '0.9.13'
   gem 'epics', '~> 1.4.0'

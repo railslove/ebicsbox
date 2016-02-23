@@ -3,9 +3,11 @@ require 'active_support/all'
 module Epics
   module Box
     RSpec.describe Management do
-      let(:organization) { Organization.create(name: 'Organization 1', management_token: 'management-token-1') }
-      let(:other_organization) { Organization.create(name: 'Organization 2', management_token: 'management-token-2') }
+      let(:organization) { Organization.create(name: 'Organization 1', webhook_token: 'topsecret', management_token: 'management-token-1') }
+      let(:other_organization) { Organization.create(name: 'Organization 2', webhook_token: 'topsecret', management_token: 'management-token-2') }
       let(:user) { User.create(organization_id: organization.id, name: 'Some user', access_token: 'orga-user') }
+      let(:account) { Account.create(name: 'name', iban: 'old-iban', bic: 'old-bic', organization_id: organization.id) }
+      let(:other_account) { Account.create(name: 'name', iban: 'old-iban', bic: 'old-bic', organization_id: other_organization.id) }
 
       describe 'Access' do
         context 'Unauthorized user' do

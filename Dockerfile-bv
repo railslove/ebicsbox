@@ -1,5 +1,5 @@
-FROM yoyostile/railslove-jruby:9.0.5.0
-RUN apt-get install -y git
+FROM yoyostile/railslove-jruby:9.0.3.0
+# RUN apt-get install -y git
 
 # throw errors if Gemfile has been modified since Gemfile.lock
 RUN bundle config --global frozen 1
@@ -9,9 +9,12 @@ WORKDIR /usr/ebicsbox
 
 RUN echo invokedynamic.all=true >> /usr/ebicsbox/.jrubyrc
 
+RUN mkdir -p /var/bundle
+ADD vendor/cache /usr/ebicsbox/vendor/cache
+
 ADD Gemfile /usr/ebicsbox/
 ADD Gemfile.lock /usr/ebicsbox/
-RUN bundle install
+RUN EBICS_CLIENT=Blebics::Client bundle install --system --local
 
 ADD . /usr/ebicsbox
 #RUN rake jruby:build

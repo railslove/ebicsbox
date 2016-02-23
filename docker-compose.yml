@@ -14,7 +14,7 @@ queue:
   volumes:
     - /data-beanstalkd:/data
 app:
-  image: ebicsbox:0.2.0
+  image: ebicsbox-bv:0.2.0
   environment:
     - USERNAME=ebics
     - PASSWORD=istsuper
@@ -24,9 +24,10 @@ app:
     - "JRUBY_OPTS=-J-Xmx256m"
     - "PORT=5000"
     - "RACK_ENV=production"
-    - "VIRTUAL_HOST=ebicsbox"
+    - "VIRTUAL_HOST=ebicsbox-bv"
     - "PASSPHRASE=asdasdasdasdasd"
     - "SECRET_TOKEN=sehrlangersecrettokenistsecret1234"
+    - "EBICS_CLIENT=Blebics::Client"
   links:
     - db
     - queue
@@ -39,7 +40,7 @@ proxy:
     - /certs:/etc/nginx/certs
     - /var/run/docker.sock:/tmp/docker.sock:ro
   links:
-    - "app:ebicsbox"
+    - "app:ebicsbox-bv"
   ports:
     - "80:80"
     - "443:443"
