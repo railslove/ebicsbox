@@ -1,5 +1,6 @@
 # Changelog
 
+* Persist an account's last error in database, so users can check on their accounts
 ## 0.3.0
 
 * Expose events via https://box/events (including information about webhook deliveries)

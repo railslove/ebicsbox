@@ -11,6 +11,8 @@ module Epics
         expose :creditor_identifier, documentation: { type: "String", desc: "Creditor identifier used for direct debits" }
         expose :balance_date, documentation: { type: "Date", desc: "Date of balance" }
         expose :balance_in_cents, documentation: { type: "Integer", desc: "Account balance" }
+        expose :last_error, documentation: { type: "String", desc: "Information about the last error which occurred" }
+        expose :last_error_at, documentation: { type: "DateTime", desc: "Date and time when last error occured" }
 
         expose(:test_mode, documentation: { type: "Boolean", desc: "Whether this is a test account" }) do |account|
           account.mode == 'File' || account.mode == 'Fake'
