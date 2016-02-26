@@ -19,9 +19,9 @@ module Epics
           it 'fails with an no transport client exception' do
             expect { account.transport_client }.to raise_error(Account::NoTransportClient)
           end
-
           it 'persists error in database' do
-            expect { account.transport_client rescue nil }.to change { account.reload.last_error }
+            expect { account.transport_client rescue nil }.to change { account.reload.last_error }.
+              from(nil).to('Please setup and activate at least one subscriber with a transport signature')
           end
         end
 

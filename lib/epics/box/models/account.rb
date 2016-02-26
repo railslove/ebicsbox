@@ -1,8 +1,9 @@
 require 'securerandom'
 
 class Epics::Box::Account < Sequel::Model
-  self.raise_on_save_failure = true
+  include ActiveSupport::Rescuable
 
+  self.raise_on_save_failure = true
   NoTransportClient = Class.new(StandardError)
   NotActivated = Class.new(StandardError)
   NotFound = Class.new(ArgumentError) do
@@ -16,6 +17,8 @@ class Epics::Box::Account < Sequel::Model
     end
   end
 
+  rescue_from NoTransportClient, with: :persist_error
+
   one_to_many :events
   one_to_many :statements
   one_to_many :subscribers
@@ -27,9 +30,9 @@ class Epics::Box::Account < Sequel::Model
       base_scope = subscribers_dataset.exclude(subscribers__activated_at: nil)
       subscriber = base_scope.where(subscribers__signature_class: 'T').first || base_scope.first
       if subscriber.nil?
-        message = 'Please setup and activate at least one subscriber with a transport signature'
-        set_last_error(message)
-        fail NoTransportClient, message
+        raise_exception do
+          raise NoTransportClient, 'Please setup and activate at least one subscriber with a transport signature'
+        end
       else
         subscriber.client
       end
@@ -72,16 +75,31 @@ class Epics::Box::Account < Sequel::Model
     save
   end
 
+  def as_event_payload
+    {
+      account_id: id,
+      account: self.to_hash,
+    }
+  end
+
   def set_last_error(message)
     self.last_error = message
     self.last_error_at = Time.now
     save
   end
 
-  def as_event_payload
-    {
-      account_id: id,
-      account: self.to_hash,
-    }
+  private
+
+  def raise_exception(&block)
+    yield
+  rescue Exception => ex
+    rescue_with_handler(ex) || raise
+  end
+
+  def persist_error(ex)
+    self.last_error = ex.message
+    self.last_error_at = Time.now
+    self.save
+    raise ex
   end
 end
