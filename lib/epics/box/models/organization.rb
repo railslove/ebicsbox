@@ -16,7 +16,12 @@ module Epics
       def self.register(params)
         orga = new(params)
         orga.management_token ||= SecureRandom.hex
+        orga.webhook_token ||= SecureRandom.hex
         orga.save
+      end
+
+      def events
+        accounts_dataset.left_join(:events)
       end
 
       def find_account!(iban)

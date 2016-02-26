@@ -5,6 +5,7 @@ module Epics
     RSpec.describe Event do
       before do
         allow(Queue).to receive(:trigger_webhook)
+        allow(Account).to receive(:[]).and_return(double('account', organization: double('orga', webhook_token: 'token')))
       end
 
       describe 'supported types' do
@@ -41,7 +42,7 @@ module Epics
         # Signature for specs is defined in support configuration
 
         it 'returns a signature for given payload' do
-          expect(described_class.signature(some: 'payload')).to eq('sha1=b7842da55ba20279461f961222e3b4b72d21a3d5')
+          expect(described_class.signature(some: 'payload')).to eq('sha1=b6a7ebbd7ae723c465a82fa7e53018e8a5997df0')
         end
 
         it 'always generates the same signature with a given payload' do

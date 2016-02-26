@@ -17,6 +17,7 @@ module Epics
           before do
             allow_any_instance_of(Transaction).to receive(:execute!).and_return(true)
             allow(Queue).to receive(:update_processing_status)
+            allow(Account).to receive(:[]).and_return(double('account', organization: double('orga', webhook_token: 'token')))
           end
 
           it 'creates a transaction' do

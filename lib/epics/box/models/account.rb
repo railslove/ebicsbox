@@ -16,6 +16,7 @@ class Epics::Box::Account < Sequel::Model
     end
   end
 
+  one_to_many :events
   one_to_many :statements
   one_to_many :subscribers
   one_to_many :transactions

@@ -1,3 +1,5 @@
+require 'active_support/core_ext/string/strip'
+
 # Validations
 require 'epics/box/validations/unique_transaction'
 
@@ -18,6 +20,9 @@ require 'epics/box/models/account'
 require 'epics/box/entities/account'
 require 'epics/box/entities/statement'
 require 'epics/box/entities/transaction'
+
+# APIs
+require_relative 'apis/events'
 
 module Epics
   module Box
@@ -61,6 +66,8 @@ module Epics
         end
       end
 
+      include Apis::Events
+
       api_desc 'Returns a list of all accessible accounts' do
         api_name 'accounts'
         tags 'Accessible resources'
@@ -91,22 +98,22 @@ module Epics
         api_desc "Debit a customer's bank account" do
           api_name 'accounts_debit'
           tags 'Account specific endpoints'
-          detail <<-END
-  Creating a debit by parameter should be the preferred way for low-volume transactions esp. for use
-  cases where the PAIN XML isn't generated before. Transactions can be transmitted either as ```CD1```
-  or ```CDD``` depending on the order types your bank is offering you, the ```order_type``` parameter
-  lets you choose among them.
+          detail <<-USAGE.strip_heredoc
+            Creating a debit by parameter should be the preferred way for low-volume transactions esp. for use
+            cases where the PAIN XML isn't generated before. Transactions can be transmitted either as ```CD1```
+            or ```CDD``` depending on the order types your bank is offering you, the ```order_type``` parameter
+            lets you choose among them.
 
-  sequence_type
+            sequence_type
 
-  * OOFF - one-off debit
-  * FRST - first debit
-  * RCUR - recurring debit
-  * FNAL - final debit
+            * OOFF - one-off debit
+            * FRST - first debit
+            * RCUR - recurring debit
+            * FNAL - final debit
 
-  Once validated, transactions are transmitted asynchronously to the banking system.
-  Errors that happen eventually are delivered via Webhooks.
-  END
+            Once validated, transactions are transmitted asynchronously to the banking system.
+            Errors that happen eventually are delivered via Webhooks.
+          USAGE
           headers AUTH_HEADERS
           errors DEFAULT_ERROR_RESPONSES
         end
@@ -134,13 +141,13 @@ module Epics
         api_desc "Credit a customer's bank account" do
           api_name 'account_credit'
           tags 'Account specific endpoints'
-          detail <<-END
-  Creating a credit by parameter should be the preferred way for low-volume transactions
-  esp. for use cases where the PAIN XML isn't generated before.
+          detail <<-USAGE.strip_heredoc
+            Creating a credit by parameter should be the preferred way for low-volume transactions
+            esp. for use cases where the PAIN XML isn't generated before.
 
-  Once validated, transactions are transmitted asynchronously to the banking system. Errors
-  that happen eventually are delivered via Webhooks.
-  END
+            Once validated, transactions are transmitted asynchronously to the banking system. Errors
+            that happen eventually are delivered via Webhooks.
+          USAGE
           headers AUTH_HEADERS
           errors DEFAULT_ERROR_RESPONSES
         end
@@ -164,7 +171,16 @@ module Epics
         api_desc "Retrieve all account statements" do
           api_name 'accounts_statements'
           tags 'Account specific endpoints'
-          detail "Transactions are imported on a daily basis and stored so they can be easily retrieved and searched for a timeframe that exceeds the usual timeframe your bank will hold them on record for you. Besides pulling plain lists it is also possible to filter by eref or remittance_infomation."
+          detail <<-USAGE.strip_heredoc
+            Transactions are imported on a daily basis and stored so they can be easily retrieved
+            and searched for a timeframe that exceeds the usual timeframe your bank will hold them
+            on record for you. Besides pulling plain lists it is also possible to filter by eref or
+            remittance_infomation.
+
+            It is possible to inspect the raw MT940 data included in the bank statement. To do so,
+            either set a header "Include-Raw-Data" or attach a query parameter "raw_data" and set it
+            to a truthy value (ie. true/1).
+          USAGE
           headers AUTH_HEADERS
           errors DEFAULT_ERROR_RESPONSES
         end
@@ -182,7 +198,8 @@ module Epics
           record_count = Statement.count_by_account(safe_params)
           statements = Statement.paginated_by_account(safe_params).all
           setup_pagination_header(record_count)
-          present statements, with: Entities::Statement
+          raw_data = params["raw_data"].present? || headers['Include-Raw-Data'].present?
+          present statements, with: Entities::Statement, include_raw: !!raw_data
         end
 
         api_desc "Retrieve all executed orders" do
