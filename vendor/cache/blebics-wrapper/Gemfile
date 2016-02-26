@@ -1,8 +1,0 @@
-source 'https://rubygems.org'
-
-gem 'nokogiri'
-gem 'jruby-openssl', '0.8.2'
-gem 'bouncy-castle-java', '1.5.0146.1'
-gem 'ruby-debug'
-# Specify your gem's dependencies in blebics.gemspec
-gemspec
