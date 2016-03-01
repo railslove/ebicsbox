@@ -1,5 +1,10 @@
 # Changelog
 
+# 0.4.0
+
+* Drop support for organization management tokens
+* Add user admin flag to limit access to management features
+
 ## 0.3.0
 
 * Expose events via https://box/events (including information about webhook deliveries)
