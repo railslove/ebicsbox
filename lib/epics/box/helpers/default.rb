@@ -6,20 +6,12 @@ module Epics
   module Box
     module Helpers
       module Default
-        def access_token
-          params['access_token'] || headers['Authorization'].to_s[/\A(?:token|Bearer) (.+)\z/, 1]
-        end
-
         def current_user
-          @current_user ||= User.find_by_access_token(access_token)
-        end
-
-        def managed_organization
-          @managed_organization ||= Organization.find_by_management_token(access_token)
+          env['box.user']
         end
 
         def current_organization
-          @current_organization ||= request.path.match(/^\/management/i) ? managed_organization : current_user.organization
+          env['box.organization']
         end
 
         def account

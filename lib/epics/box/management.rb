@@ -36,8 +36,8 @@ module Epics
 
       namespace :management do
         before do
-          if managed_organization.nil?
-            error!({ message: 'Unauthorized access. Please provide a valid organization management token token!' }, 401)
+          unless env['box.admin']
+            error!({ message: 'Unauthorized access. Please provide a valid organization management token!' }, 401)
           end
         end
 
