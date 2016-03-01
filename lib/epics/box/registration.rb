@@ -42,7 +42,6 @@ module Epics
             present organization, with: Entities::RegistrationOrganization
           end
         rescue => ex
-          require 'pry'; binding.pry
           Box.logger.error("[Registration] #{ex.message}")
           error!({ message: "Failed to create organization!" }, 400)
         end
