@@ -775,7 +775,8 @@
             "description": "the content of the request",
             "schema": {
               "required": [
-                "name"
+                "name",
+                "user"
               ],
               "type": "object",
               "properties": {
@@ -783,9 +784,21 @@
                   "description": "The organization's display name",
                   "type": "string"
                 },
-                "management_token": {
-                  "description": "Token to access organization's management features",
-                  "type": "string"
+                "user": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "description": "The user's display name",
+                      "type": "string"
+                    },
+                    "access_token": {
+                      "description": "Set a custom access token",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ]
                 },
                 "webhook_token": {
                   "description": "Token to sign organization's webhook payloads",
