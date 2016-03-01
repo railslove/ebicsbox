@@ -27,13 +27,23 @@ module Epics
       end
       params do
         requires :name, type: String, desc: "The organization's display name"
-        optional :management_token, type: String, desc: "Token to access organization's management features"
+        requires :user, type: Hash do
+          requires :name, type: String, desc: "The user's display name"
+          optional :access_token, type: String, desc: 'Set a custom access token'
+        end
         optional :webhook_token, type: String, desc: "Token to sign organization's webhook payloads"
       end
       post '/organizations' do
-        if organization = Organization.register(declared(params))
-          present organization, with: Entities::RegistrationOrganization
-        else
+        begin
+          DB.transaction do
+            user_token = (params[:user][:access_token] || SecureRandom.hex)
+            organization = Organization.register(declared(params).except(:user))
+            user = organization.add_user(name: params[:user][:name], access_token: user_token)
+            present organization, with: Entities::RegistrationOrganization
+          end
+        rescue => ex
+          require 'pry'; binding.pry
+          Box.logger.error("[Registration] #{ex.message}")
           error!({ message: "Failed to create organization!" }, 400)
         end
       end

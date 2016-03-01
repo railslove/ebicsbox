@@ -41,35 +41,35 @@ module Epics
 
         context 'valid data without preset management token' do
           it 'returns a OK response' do
-            post '/organizations', { name: "New Organization" }
+            post '/organizations', { name: "New Organization", user: { name: "John Doe" } }
             expect_status 201
           end
 
-          it 'generates a management token' do
-            post '/organizations', { name: "New Organization" }
-            expect(Organization.last.management_token).to_not be_nil
+          it 'generates a user access token' do
+            post '/organizations', { name: "New Organization", user: { name: "John Doe" } }
+            expect(User.last.access_token).to_not be_nil
           end
 
-          it 'includes a generated management token in its response' do
-            post '/organizations', { name: "New Organization" }
-            expect_json 'management_token', Organization.last.management_token
+          it 'includes the generated user access token in its response' do
+            post '/organizations', { name: "New Organization", user: { name: "John Doe" } }
+            expect_json 'user.access_token', User.last.access_token
           end
         end
 
         context 'valid data with preset management token' do
           it 'returns a OK response' do
-            post '/organizations', { name: "New Organization", management_token: 'some-token' }
+            post '/organizations', { name: "New Organization", user: { name: "John Doe", access_token: 'some-token' } }
             expect_status 201
           end
 
           it 'stores the preset management token' do
-            post '/organizations', { name: "New Organization", management_token: 'some-token' }
-            expect(Organization.last.management_token).to eq('some-token')
+            post '/organizations', { name: "New Organization", user: { name: "John Doe", access_token: 'some-token' } }
+            expect(User.last.access_token).to eq('some-token')
           end
 
           it 'includes the preset management token in its response' do
-            post '/organizations', { name: "New Organization", management_token: 'some-token' }
-            expect_json 'management_token', 'some-token'
+            post '/organizations', { name: "New Organization", user: { name: "John Doe", access_token: 'some-token' } }
+            expect_json 'user.access_token', 'some-token'
           end
         end
 

@@ -5,12 +5,14 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 require_relative './lib/epics/box'
 require_relative './lib/epics/box/middleware/license_validator'
 require_relative './lib/epics/box/middleware/connection_validator'
+require_relative './lib/epics/box/middleware/static_authentication'
 
 box = Rack::Builder.app do
   use Rack::CommonLogger if ENV['RACK_ENV'] == 'production'
 
   use Epics::Box::Middleware::LicenseValidator if ENV['REPLICATED_INTEGRATIONAPI']
   use Epics::Box::Middleware::ConnectionValidator, DB
+  use Epics::Box::Middleware::StaticAuthentication
 
   map "/admin" do
     use Rack::Static, urls: [""], root: "public", index: "index.html"
