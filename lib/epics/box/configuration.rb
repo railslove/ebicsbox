@@ -47,6 +47,14 @@ module Epics
       def registrations_allowed?
         ENV['ALLOW_REGISTRATIONS'] == 'enabled'
       end
+
+      def jwt_secret
+        ENV['JWT_SECRET']
+      end
+
+      def oauth_server
+        ENV['OAUTH_SERVER'] || 'http://localhost:3000'
+      end
     end
   end
 end

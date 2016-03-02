@@ -17,6 +17,7 @@ gem 'sepa_king'
 gem 'sequel'
 gem 'jruby-openssl', '0.9.13' #, '0.8.2' we have to use an old version of jruby-openssl for blebics-wrapper
 gem 'puma'
+gem 'jwt'
 
 if ENV['EBICS_CLIENT'] == 'Blebics::Client'
   gem 'jruby-openssl', '0.8.2'
