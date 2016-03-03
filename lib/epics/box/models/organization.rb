@@ -4,6 +4,7 @@ module Epics
   module Box
     class Organization < Sequel::Model
       self.raise_on_save_failure = true
+      self.unrestrict_primary_key
 
       one_to_many :accounts
       one_to_many :users

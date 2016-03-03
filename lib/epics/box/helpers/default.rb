@@ -1,3 +1,5 @@
+require 'jwt'
+
 require_relative '../models/organization'
 require_relative '../models/user'
 require_relative '../server'

@@ -80,6 +80,7 @@ GEM
     jdbc-postgres (9.4.1204)
     jruby-openssl (0.9.13-java)
     json (1.8.3-java)
+    jwt (1.5.3)
     method_source (0.8.2)
     mime-types (2.99)
     minitest (5.8.3)
@@ -97,6 +98,7 @@ GEM
     rack (1.6.4)
     rack-accept (0.4.5)
       rack (>= 0.4)
+    rack-cors (0.4.0)
     rack-mount (0.8.3)
       rack (>= 1.0.0)
     rack-test (0.6.3)
@@ -166,9 +168,11 @@ DEPENDENCIES
   grape-entity (= 0.4.8)
   jdbc-postgres
   jruby-openssl (= 0.9.13)
+  jwt
   nokogiri
   pry
   puma
+  rack-cors
   rake
   rspec
   ruby-swagger

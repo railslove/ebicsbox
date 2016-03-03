@@ -1,5 +1,6 @@
 class Epics::Box::User < Sequel::Model
   self.raise_on_save_failure = true
+  self.unrestrict_primary_key
 
   many_to_one :organization
   one_to_many :subscribers
