@@ -55,6 +55,16 @@ module Epics
       def oauth_server
         ENV['OAUTH_SERVER'] || 'http://localhost:3000'
       end
+
+      def auth_provider
+        if ENV['AUTH_SERVICE'] == 'static'
+          require_relative './middleware/static_authentication'
+          Epics::Box::Middleware::StaticAuthentication
+        else
+          require_relative './middleware/oauth_authentication'
+          Epics::Box::Middleware::OauthAuthentication
+        end
+      end
     end
   end
 end
