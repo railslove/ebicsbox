@@ -75,9 +75,12 @@ module Epics
         headers AUTH_HEADERS
         errors DEFAULT_ERROR_RESPONSES
       end
+      params do
+        optional :include, type: Array[String], desc: "Additional data to include. Can be one of: subscriber"
+      end
       get 'accounts' do
         accounts = current_organization.accounts_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
-        present accounts, with: Entities::Account
+        present accounts, with: Entities::Account, include: params[:include]
       end
 
       resource ':account' do

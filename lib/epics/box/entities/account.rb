@@ -1,5 +1,7 @@
 require 'grape-entity'
 
+require_relative './subscriber'
+
 module Epics
   module Box
     module Entities
@@ -14,6 +16,12 @@ module Epics
 
         expose(:test_mode, documentation: { type: "Boolean", desc: "Whether this is a test account" }) do |account|
           account.mode == 'File' || account.mode == 'Fake'
+        end
+
+        expose(:subscriber, if: -> (account, options) { options[:include].try(:include?, 'subscriber') }) do |account|
+          if subscriber = account.subscriber_for(options[:env]['box.user'].id)
+            Entities::Subscriber.represent(subscriber, only: [:ebics_user, :signature_class, :state, :submitted_at, :activated_at])
+          end
         end
 
         expose(:_links, documentation: { type: "Hash", desc: "Links to resources" }) do |account, options|
