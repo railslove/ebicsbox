@@ -220,6 +220,26 @@ module Epics
           present transactions, with: Entities::Transaction
         end
 
+        api_desc "Add a new account subscriber" do
+          api_name 'accounts_add_subscriber'
+          tags 'Account specific endpoints'
+          headers AUTH_HEADERS
+          errors DEFAULT_ERROR_RESPONSES
+          hidden true
+        end
+        params do
+          requires :ebics_user, type: String, desc: "IBAN for an existing account"
+        end
+        post 'subscribers' do
+          begin
+            account.add_unique_subscriber(current_user.id, params[:ebics_user])
+            { message: 'Subscriber has been created and setup successfully! INI letter has been sent via eMail.' }
+          rescue => ex
+            Box.logger.info { "[Content::AddSubscriber] #{ex.message}" }
+            error!({ message: ex.message }, 400)
+          end
+        end
+
         namespace :import do
           api_desc "Manually import statements for a given timeframe" do
             api_name 'accounts_import_statements'
