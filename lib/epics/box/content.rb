@@ -75,9 +75,12 @@ module Epics
         headers AUTH_HEADERS
         errors DEFAULT_ERROR_RESPONSES
       end
+      params do
+        optional :include, type: Array[String], desc: "Additional data to include. Can be one of: subscriber"
+      end
       get 'accounts' do
         accounts = current_organization.accounts_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
-        present accounts, with: Entities::Account
+        present accounts, with: Entities::Account, include: params[:include]
       end
 
       resource ':account' do
@@ -218,6 +221,26 @@ module Epics
           transactions = Transaction.paginated_by_account(account.id, per_page: params[:per_page], page: params[:page]).all
           setup_pagination_header(record_count)
           present transactions, with: Entities::Transaction
+        end
+
+        api_desc "Add a new account subscriber" do
+          api_name 'accounts_add_subscriber'
+          tags 'Account specific endpoints'
+          headers AUTH_HEADERS
+          errors DEFAULT_ERROR_RESPONSES
+          hidden true
+        end
+        params do
+          requires :ebics_user, type: String, desc: "IBAN for an existing account"
+        end
+        post 'subscribers' do
+          begin
+            account.add_unique_subscriber(current_user.id, params[:ebics_user])
+            { message: 'Subscriber has been created and setup successfully! INI letter has been sent via eMail.' }
+          rescue => ex
+            Box.logger.info { "[Content::AddSubscriber] #{ex.message}" }
+            error!({ message: ex.message }, 400)
+          end
         end
 
         namespace :import do

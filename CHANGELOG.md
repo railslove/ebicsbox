@@ -1,6 +1,17 @@
 # Changelog
 
+# 0.5.0 (NEXT)
+
+This release will be all about distributed signatures.
+
+* Users can add their subscriber id (only one) for each account via non-management API endpoint
+* Users can request additional
+
 # 0.4.0
+
+This release focuses on how to authenticate. There is an accompanying project to perform user
+on-boarding and managing core data. By switching to OAuth we can provide a nice UI without having
+to include it in the box.
 
 * Drop support for organization management tokens
 * Add user admin flag to limit access to management features
@@ -14,6 +25,9 @@
 * Fix minor mistakes in documentation
 
 ## 0.2.0
+
+This is the first release where we will apply the semantic versioning scheme. All changes listed
+below have been added in the last few releases. Expect that we move forward in a more organized way.
 
 * Switch to JRuby 9.0.5.0
 * Proper support of OAuth Bearer tokens

@@ -35,7 +35,11 @@ class Epics::Box::Account < Sequel::Model
   end
 
   def client_for(user_id)
-    subscribers_dataset.first!(user_id: user_id).client
+    subscriber_for(user_id).client
+  end
+
+  def subscriber_for(user_id)
+    subscribers_dataset.first(user_id: user_id)
   end
 
   def self.all_active_ids
@@ -68,6 +72,22 @@ class Epics::Box::Account < Sequel::Model
     self.balance_date = date
     self.balance_in_cents = amount_in_cents
     save
+  end
+
+  def add_unique_subscriber(user_id, ebics_user)
+    DB.transaction do
+      if !!subscriber_for(user_id)
+        fail('This user already has a subscriber for this account.')
+      end
+
+      if subscribers_dataset.where(remote_user_id: ebics_user).any?
+        fail('Another user is using the same EBICS user id.')
+      end
+
+      if !(subscriber = add_subscriber(user_id: user_id, remote_user_id: ebics_user)) || !subscriber.setup!
+        fail('Failed to create subscriber.')
+      end
+    end
   end
 
   def as_event_payload
