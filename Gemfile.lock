@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/railslove/cmxl.git
-  revision: 5fcc52206f2fd13b506b5caf259013b4b5f75c75
+  revision: a5e4224ce865811e8cb36325bd83ce99d26b0fdc
   specs:
     cmxl (0.1.3)
       rchardet19

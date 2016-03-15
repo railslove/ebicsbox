@@ -1,6 +1,6 @@
-require 'epics/box/models/event'
+require_relative './event'
 
-class Ebics::Box::Transaction < Sequel::Model
+class Epics::Box::Transaction < Sequel::Model
 
   many_to_one :account
   many_to_one :user

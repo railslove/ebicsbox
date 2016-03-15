@@ -1,3 +1,10 @@
+require 'cmxl'
+require 'epics'
+
+require_relative '../business_processes/import_bank_statement'
+require_relative '../business_processes/import_statements'
+require_relative '../models/account'
+
 module Epics
   module Box
     module Jobs
@@ -9,94 +16,52 @@ module Epics
         end
 
         # Fetch all new statements for a single account since its last import. Each account import
-        # can fail and should not affect imports for other accounts. The BusinessError can occur
-        # when no new statements are available
+        # can fail and should not affect imports for other accounts.
         def self.fetch_new_statements(account_id, from = 30.days.ago.to_date, to = Date.today)
-          Box.logger.info("[Jobs::FetchStatements] Starting import. id=#{account_id}")
-
           account = Account.first!(id: account_id)
-          mt940 = account.transport_client.STA(from.to_s(:db), to.to_s(:db))
-          statements = Cmxl.parse(mt940)
-          statements = statements.delete_if do |sta|
-            # this is necessary because of strange account numbering of deutsche bank
-            !(account.iban.end_with?(sta.account_identification.account_number) || (account.iban + "00").end_with?(sta.account_identification.account_number))
-          end
-          transactions = statements.map(&:transactions).flatten
-          imported = transactions.map { |transaction| create_statement(account_id, transaction, mt940) }
+          combined_mt940 = account.transport_client.STA(from.to_s(:db), to.to_s(:db))
+          chunks = Cmxl.parse(combined_mt940)
 
-          update_meta_data(account, statements, to)
-
-          { fetched: transactions.count, imported: imported.select{ |obj| obj }.count }
-        rescue Sequel::NoMatchingRow  => ex
-          Box.logger.error("[Jobs::FetchStatements] Could not find account. account_id=#{account_id}")
-        rescue Epics::Error::BusinessError => ex
-          Box.logger.error(ex.message) # expected
-        end
-
-        def self.update_meta_data(account, statements, to)
-          return unless statements.any?
-          balance = statements.last.closing_balance
-
-          # Update account balance if new data is available
-          if !account.balance_date || account.balance_date <= balance.date
-            account.set_balance(balance.date, balance.amount_in_cents)
-          end
+          # Store all fetched bank statements for later usage
+          import_stats = import_to_database(chunks, account)
 
           # Update imported at timestamp
-          imported_at = account.last_imported_at
+          update_account_last_import(account, to)
 
+          Box.logger.info { "[Jobs::FetchStatements] Imported bank statements. id=#{account_id} bank_statement_count=#{chunks.count}" }
+
+          import_stats
+        rescue Sequel::NoMatchingRow => ex
+          Box.logger.error { "[Jobs::FetchStatements] Could not find account. account_id=#{account_id}" }
+        rescue Epics::Error::BusinessError => ex
+          # The BusinessError can occur when no new statements are available
+          Box.logger.error { "[Jobs::FetchStatements] EBICS error. id={account_id} reason='#{ex.message}'" }
+        end
+
+        def self.import_to_database(chunks, account)
+          chunks.map do |chunk|
+            begin
+              bank_statement = BusinessProcesses::ImportBankStatement.from_cmxl(chunk, account)
+              res = BusinessProcesses::ImportStatements.from_bank_statement(bank_statement)
+            rescue BusinessProcesses::ImportBankStatement::InvalidInput => ex
+              Box.logger.error { "[Jobs::FetchStatements] #{ex} account_id=#{account.id}" }
+              { total: 0, imported: 0 }
+            end
+          end.reduce({ total: 0, imported: 0 }) do |memo, chunk_stats|
+            {
+              total: memo[:total] + chunk_stats[:total],
+              imported: memo[:imported] + chunk_stats[:imported]
+            }
+          end
+        end
+
+        # TODO: Refactor this shitty implementation
+        def self.update_account_last_import(account, to)
+          imported_at = account.last_imported_at
           if !imported_at || imported_at <= to
             account.imported_at!(Time.now)
           end
         end
-
-        def self.create_statement(account_id, data, raw_data)
-          trx = {
-            account_id: account_id,
-            sha: Digest::SHA2.hexdigest([data.sha, data.date, data.amount_in_cents, data.sepa].join).to_s,
-            date: data.date,
-            entry_date: data.entry_date,
-            amount: data.amount_in_cents,
-            sign: data.sign,
-            debit: data.debit?,
-            swift_code: data.swift_code,
-            reference: data.reference,
-            bank_reference: data.bank_reference,
-            bic: data.bic,
-            iban: data.iban,
-            name: data.name,
-            information: data.information,
-            description: data.description,
-            eref: data.sepa["EREF"],
-            mref: data.sepa["MREF"],
-            svwz: data.sepa["SVWZ"],
-            creditor_identifier: data.sepa["CRED"],
-            raw_data: raw_data,
-          }
-
-          if statement = Statement.where(sha: trx[:sha]).first
-            Box.logger.debug("[Jobs::FetchStatements] Already imported. sha='#{statement.sha}'")
-            false
-          else
-            statement = Statement.create(trx)
-            Event.statement_created(statement)
-            link_statement_to_transaction(account_id, statement)
-            true
-          end
-        end
-
-        def self.link_statement_to_transaction(account_id, statement)
-          if transaction = Epics::Box::Transaction.where(eref: statement.eref).first
-            transaction.add_statement(statement)
-
-            if statement.credit?
-              transaction.set_state_from("credit_received")
-            elsif statement.debit?
-              transaction.set_state_from("debit_received")
-            end
-          end
-        end
-
       end
     end
   end
