@@ -1,5 +1,5 @@
 require 'grape-entity'
-require 'epics/box/entities/transaction'
+require_relative './transaction'
 
 module Epics
   module Box

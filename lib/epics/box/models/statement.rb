@@ -1,9 +1,13 @@
+require_relative '../models/account'
+require_relative '../models/bank_statement'
+require_relative '../models/transaction'
 require_relative '../entities/statement'
 
 module Epics
   module Box
     class Statement < Sequel::Model
       many_to_one :account
+      many_to_one :bank_statement
       many_to_one :transaction
 
       def self.generic_filter(query, account_id:, transaction_id: nil, from: nil, to: nil, type: nil, **unused)

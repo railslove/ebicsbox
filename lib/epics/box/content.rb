@@ -260,7 +260,7 @@ module Epics
             stats = Jobs::FetchStatements.fetch_new_statements(account.id, params[:from], params[:to])
             {
               message: "Imported statements successfully",
-              fetched: stats[:fetched],
+              fetched: stats[:total],
               imported: stats[:imported],
             }
           end
