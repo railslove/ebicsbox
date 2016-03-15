@@ -47,7 +47,7 @@ module Epics
           end
 
           describe 'response' do
-            let!(:statement) { Statement.create account_id: account.id, swift_code: 'NTRF', raw_data: 'RAW' }
+            let!(:statement) { Statement.create account_id: account.id, swift_code: 'NTRF' }
 
             it 'includes account IBAN' do
               get "#{account.iban}/statements", { 'Authorization' => 'token orga-user' }
