@@ -179,10 +179,6 @@ module Epics
             and searched for a timeframe that exceeds the usual timeframe your bank will hold them
             on record for you. Besides pulling plain lists it is also possible to filter by eref or
             remittance_infomation.
-
-            It is possible to inspect the raw MT940 data included in the bank statement. To do so,
-            either set a header "Include-Raw-Data" or attach a query parameter "raw_data" and set it
-            to a truthy value (ie. true/1).
           USAGE
           headers AUTH_HEADERS
           errors DEFAULT_ERROR_RESPONSES
@@ -201,8 +197,7 @@ module Epics
           record_count = Statement.count_by_account(safe_params)
           statements = Statement.paginated_by_account(safe_params).all
           setup_pagination_header(record_count)
-          raw_data = params["raw_data"].present? || headers['Include-Raw-Data'].present?
-          present statements, with: Entities::Statement, include_raw: !!raw_data
+          present statements, with: Entities::Statement
         end
 
         api_desc "Retrieve all executed orders" do
