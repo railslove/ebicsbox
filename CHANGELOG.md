@@ -1,11 +1,22 @@
 # Changelog
 
-# 0.5.0 (NEXT)
+# 0.5.0
 
-This release will be all about distributed signatures.
+This release is a major rewrite of the way we handle incoming data on statements and transactions.
+We now embrace the concept of account statements which include multiple transactions. It allows us
+to store raw MT940 data economically. Moreover, we can easily rebuild statement data in case of
+issues we are having with MT940 parsing.
+
+* Store all incoming bank statements in a separate table
+* Link account statements to imported bank statements
+* Rebuild statement data from bank statements, as we had an issue with MT940 parsing
+* Update to latest CMXL code to resolve issues with MT940 parsing.
+
+In addition to that, this release also includes a few additions in preparation of our upcoming
+distributed signature feature:
 
 * Users can add their subscriber id (only one) for each account via non-management API endpoint
-* Users can request additional
+* Expose more data on accounts (include subscriber for current user)
 
 # 0.4.0
 
