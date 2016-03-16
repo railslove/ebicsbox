@@ -1,5 +1,13 @@
 # Changelog
 
+# 0.5.1
+
+Bugfix release
+
+* Migrations run properly on setup
+* Updated documentation
+* Updated docker compose file
+
 # 0.5.0
 
 This release is a major rewrite of the way we handle incoming data on statements and transactions.
