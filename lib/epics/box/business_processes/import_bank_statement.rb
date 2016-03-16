@@ -11,11 +11,11 @@ module Epics
 
         def self.import_all_from_mt940(raw_mt940, account)
           Cmxl.parse(raw_mt940).map do |raw_bank_statement|
-            # begin
+            begin
               BusinessProcesses::ImportBankStatement.from_cmxl(raw_bank_statement, account)
-            # rescue BusinessProcesses::ImportBankStatement::InvalidInput => ex
-              # nil # ignore
-            # end
+            rescue BusinessProcesses::ImportBankStatement::InvalidInput => ex
+              nil # ignore
+            end
           end.compact
         end
 
