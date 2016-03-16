@@ -1,5 +1,12 @@
 # Changelog
 
+# 0.5.2
+
+Bugfix release
+
+* Handle exceptions when creating multiple bank statements at once
+* Add a migration to clean up a previous migration fuckup and add webhook tokens to organizations
+
 # 0.5.1
 
 Bugfix release
