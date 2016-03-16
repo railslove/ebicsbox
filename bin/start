@@ -1,6 +1,6 @@
 #!/bin/bash
 
-bin/migrate
+/usr/local/bundle/bin/bundle exec bin/migrate
 
 if [ "$1" = "server" ]; then
   /usr/local/bundle/bin/bundle exec puma config.ru -p $PORT
