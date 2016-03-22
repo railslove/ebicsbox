@@ -2,6 +2,7 @@ require 'active_support/all'
 require 'cmxl'
 
 require_relative '../../../../lib/epics/box/models/account'
+require_relative '../../../../lib/epics/box/models/organization'
 require_relative '../../../../lib/epics/box/business_processes/import_bank_statement'
 require_relative '../../../../lib/epics/box/business_processes/import_statements'
 
@@ -9,7 +10,8 @@ module Epics
   module Box
     module BusinessProcesses
       RSpec.describe ImportStatements do
-        let(:account) { Account.create(host: "HOST", iban: "iban1234567") }
+        let(:organization) { Organization.create(name: "Testorga") }
+        let(:account) { organization.add_account(host: "HOST", iban: "iban1234567") }
         let(:mt940_fixture) { 'single_valid.mt940' }
         let(:mt940) { File.read("spec/fixtures/#{mt940_fixture}") }
 
@@ -17,6 +19,15 @@ module Epics
           bank_statement = ImportBankStatement.from_mt940(mt940, account)
           expect(described_class).to receive(:create_statement).twice
           described_class.from_bank_statement(bank_statement)
+        end
+
+        context 'identical consecutive entries in bank statements' do
+          let(:mt940_fixture) { 'duplicated_entries.mt940' }
+
+          it 'imports both entries' do
+            bank_statement = ImportBankStatement.from_mt940(mt940, account)
+            expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(2)
+          end
         end
 
         describe '.create_statement' do
@@ -51,11 +62,12 @@ module Epics
           end
 
           def exec_create_action
-            described_class.create_statement(account, data, 1)
+            described_class.create_statement(account, data, 1, ['seq1', 1])
           end
 
           context 'the statement was already imported' do
-            before { Statement.create(sha: '63feaabebb3f24986f64cc2691cc905ff40e600130aa6fec9e281452e93abb58', account_id: account.id) }
+            # This is a precalculated SHA based on our algorythm
+            before { Statement.create(sha: 'a83041608974d854ef26f649a2a74c6af9688e327d2c4cf8fdf039f07755b521', account_id: account.id) }
 
             it 'does not create a statement' do
               expect { exec_create_action }.to_not change{ Statement.count }

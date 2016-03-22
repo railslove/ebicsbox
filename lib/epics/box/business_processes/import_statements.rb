@@ -12,19 +12,20 @@ module Epics
         def self.from_bank_statement(bank_statement)
           bank_transactions = Cmxl.parse(bank_statement.content).first.transactions
 
-          statements = bank_transactions.map do |bank_transaction|
-            create_statement(bank_statement.account, bank_transaction, bank_statement.id)
+          # We need to pass down index and bank statement sequence to create better checksums
+          statements = bank_transactions.each.with_index.map do |bank_transaction, i|
+            unique_identifier = [bank_statement.remote_account, bank_statement.sequence, i]
+            create_statement(bank_statement.account, bank_transaction, bank_statement.id, unique_identifier)
           end
 
-          # TODO: Somehow return this data
           stats = { total: bank_transactions.count, imported: statements.select(&:present?).count }
           Box.logger.debug { "[BusinessProcesses::ImportStatements] Imported statements from bank statement. total=#{stats[:total]} imported=#{stats[:imported]}" }
           stats
         end
 
 
-        def self.create_statement(account, bank_transaction, bank_statement_id)
-          trx = statement_attributes_from_bank_transaction(bank_transaction)
+        def self.create_statement(account, bank_transaction, bank_statement_id, unique_identifier)
+          trx = statement_attributes_from_bank_transaction(bank_transaction, unique_identifier)
 
           if statement = account.statements_dataset.where(sha: trx[:sha]).first
             Box.logger.debug("[BusinessProcesses::ImportStatements] Already imported. sha='#{statement.sha}'")
@@ -49,9 +50,18 @@ module Epics
           end
         end
 
-        def self.statement_attributes_from_bank_transaction(transaction)
+        def self.checksum(transaction, unique_identifier)
+          payload = [
+            unique_identifier, # composed of bank statement sequence and position on statement, account
+            transaction.date,
+            transaction.amount_in_cents,
+          ]
+          Digest::SHA2.hexdigest(payload.flatten.join).to_s
+        end
+
+        def self.statement_attributes_from_bank_transaction(transaction, unique_statement_id)
           {
-            sha: Digest::SHA2.hexdigest([transaction.sha, transaction.date, transaction.amount_in_cents, transaction.sepa].join).to_s,
+            sha: checksum(transaction, unique_statement_id),
             date: transaction.date,
             entry_date: transaction.entry_date,
             amount: transaction.amount_in_cents,

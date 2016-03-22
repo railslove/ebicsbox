@@ -5,6 +5,7 @@ module Epics
   module Box
     module Entities
       class Statement < Grape::Entity
+        expose :public_id, as: "id"
         expose(:account) { |statement| statement.account.iban }
         expose :name
         expose :bic
