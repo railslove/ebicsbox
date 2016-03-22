@@ -14,7 +14,7 @@ queue:
   volumes:
     - /data-beanstalkd:/data
 app:
-  image: ebicsbox:0.5.2
+  image: ebicsbox:0.5.3
   environment:
     - USERNAME=ebics
     - PASSWORD=istsuper

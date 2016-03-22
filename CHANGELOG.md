@@ -1,13 +1,20 @@
 # Changelog
 
-# 0.5.2
+## 0.5.3
+
+Minor features and optimizations regarding statements
+
+* Expose a unique statement id so clients can use it to prevent duplicates while importing
+* Optimize checksum calculation for statements, so similar looking entries are imported correctly
+
+## 0.5.2
 
 Bugfix release
 
 * Handle exceptions when creating multiple bank statements at once
 * Add a migration to clean up a previous migration fuckup and add webhook tokens to organizations
 
-# 0.5.1
+## 0.5.1
 
 Bugfix release
 
@@ -15,7 +22,7 @@ Bugfix release
 * Updated documentation
 * Updated docker compose file
 
-# 0.5.0
+## 0.5.0
 
 This release is a major rewrite of the way we handle incoming data on statements and transactions.
 We now embrace the concept of account statements which include multiple transactions. It allows us
@@ -33,7 +40,7 @@ distributed signature feature:
 * Users can add their subscriber id (only one) for each account via non-management API endpoint
 * Expose more data on accounts (include subscriber for current user)
 
-# 0.4.0
+## 0.4.0
 
 This release focuses on how to authenticate. There is an accompanying project to perform user
 on-boarding and managing core data. By switching to OAuth we can provide a nice UI without having
