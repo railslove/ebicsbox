@@ -1,6 +1,19 @@
 require_relative '../lib/pain'
 
 RSpec.describe Pain do
+  describe 'invalid PAIN data' do
+    it 'handles random string' do
+      expect{ described_class.from_xml('random string') }.to raise_error(Pain::UnknownInput)
+    end
+
+    it 'handles empty string' do
+      expect{ described_class.from_xml('') }.to raise_error(Pain::UnknownInput)
+    end
+
+    it 'handles nil' do
+      expect{ described_class.from_xml(nil) }.to raise_error(Pain::UnknownInput)
+    end
+  end
   describe 'SEPA Credits' do
     context "Version 03" do
       # Please check the file contents to understand where data is coming from
