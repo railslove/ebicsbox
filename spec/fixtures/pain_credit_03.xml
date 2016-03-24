@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.003.03" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:iso:std:iso:20022:tech:xsd:pain.001.003.03 pain.001.003.03.xsd">
+  <CstmrCdtTrfInitn> <!-- CustomerCreditTransferInitiation -->
+    <GrpHdr> <!-- GroupHeader -->
+      <MsgId>EBICS-BOX/A96029885148366AE95082</MsgId>  <!-- MessageID -->
+      <CreDtTm>2016-03-23T09:56:36+01:00</CreDtTm> <!-- ISO DateTime -->
+      <NbOfTxs>1</NbOfTxs> <!-- Number of transactions -->
+      <CtrlSum>1000.13</CtrlSum>
+      <!-- PartyIdentificationSEPA1 -->
+      <InitgPty>
+        <!-- Name -->
+        <Nm>QA Konto BV</Nm>
+      </InitgPty>
+    </GrpHdr>
+    
+    <!-- Payment Information -->
+    <PmtInf>
+      <!-- Payment Information Identification -->
+      <PmtInfId>EBICS-BOX/A96029885148366AE95082/1</PmtInfId>
+      <!-- PaymentMethodSCTCode -->
+      <PmtMtd>TRF</PmtMtd>
+      <!-- BatchBookingIndicator -->
+      <BtchBookg>false</BtchBookg>
+      <NbOfTxs>1</NbOfTxs>
+      <CtrlSum>1000.13</CtrlSum>
+
+      <!-- Payment Type Information -->
+      <PmtTpInf>
+        <!-- Service Level -->
+        <SvcLvl>
+          <!-- Code -->
+          <Cd>SEPA</Cd>
+        </SvcLvl>
+      </PmtTpInf>
+
+      <!-- Requested Execution Date -->
+      <ReqdExctnDt>2016-03-23</ReqdExctnDt>
+
+      <!-- Debtor - Auftraggeber der Überweisung -->
+      <Dbtr>
+        <Nm>QA Konto BV</Nm>
+        <!-- Postal Address - Adresse des Überweisenden -->
+        <PstlAdr />
+        <!-- Address Line: Adresszeile -->
+        <AdrLine />
+        <!-- Country - Ländercode (nach ISO 3166) -->
+        <Ctry />
+      </Dbtr>
+
+      <!-- Debtor Account: Konto des Überweisenden -->
+      <DbtrAcct>
+        <!-- Identification -->
+        <Id>
+          <IBAN>DE36250400900001234555</IBAN>
+        </Id>
+      </DbtrAcct>
+      <!-- Debtor Agent: Bank des Überweisenden -->
+      <DbtrAgt>
+        <!-- Financial Institution Identification: Eindeutige ID der Bank -->
+        <FinInstnId>
+          <BIC>XBANDECG</BIC>
+        </FinInstnId>
+      </DbtrAgt>
+
+      <!-- Charge Bearer: Entgeltverrechnung. Nur Konstante SLEV zugelassen -->
+      <ChrgBr>SLEV</ChrgBr>
+
+      <!-- Credit Transfer Transaction Information: Einzeltransaktion 1 -999.999 -->
+      <CdtTrfTxInf>
+        <!-- SEPA Payment identification -->
+        <PmtId>
+          <EndToEndId>veu-eref-31</EndToEndId>
+        </PmtId>
+
+        <!-- Amount -->
+        <Amt>
+          <!-- ActiveOrHistoricCurrencyAndAmountSEPA -->
+          <InstdAmt Ccy="EUR">1000.13</InstdAmt>
+        </Amt>
+        <CdtrAgt>
+          <FinInstnId>
+            <BIC>WIREDEMMXXX</BIC>
+          </FinInstnId>
+        </CdtrAgt>
+        <Cdtr>
+          <Nm>Max Mustermann</Nm>
+        </Cdtr>
+        <CdtrAcct>
+          <Id>
+            <IBAN>DE64512308000000064167</IBAN>
+          </Id>
+        </CdtrAcct>
+        <!-- Remittance information -->
+        <RmtInf>
+          <!-- Unstructured remittance information -->
+          <Ustrd>BV Test 1</Ustrd>
+        </RmtInf>
+      </CdtTrfTxInf>
+    </PmtInf>
+
+
+
+    <PmtInf>
+      <PmtInfId>EBICS-BOX/A96029885148366AE95082/2</PmtInfId>
+      <PmtMtd>TRF</PmtMtd>
+      <BtchBookg>false</BtchBookg>
+      <NbOfTxs>1</NbOfTxs>
+      <CtrlSum>2000.26</CtrlSum>
+      <PmtTpInf>
+        <SvcLvl>
+          <Cd>SEPA</Cd>
+        </SvcLvl>
+      </PmtTpInf>
+      <ReqdExctnDt>2016-03-23</ReqdExctnDt>
+      <Dbtr>
+        <Nm>QA Konto BV 2</Nm>
+      </Dbtr>
+      <DbtrAcct>
+        <Id>
+          <IBAN>DE36250400900001234555</IBAN>
+        </Id>
+      </DbtrAcct>
+      <DbtrAgt>
+        <FinInstnId>
+          <BIC>XBANDECG</BIC>
+        </FinInstnId>
+      </DbtrAgt>
+      <ChrgBr>SLEV</ChrgBr>
+      <CdtTrfTxInf>
+        <PmtId>
+          <EndToEndId>veu-eref-21</EndToEndId>
+        </PmtId>
+        <Amt>
+          <InstdAmt Ccy="EUR">2000.26</InstdAmt>
+        </Amt>
+        <CdtrAgt>
+          <FinInstnId>
+            <BIC>WIREDEMMXXX</BIC>
+          </FinInstnId>
+        </CdtrAgt>
+        <Cdtr>
+          <Nm>Sabine Mustermann</Nm>
+        </Cdtr>
+        <CdtrAcct>
+          <Id>
+            <IBAN>DE64512308000000064167</IBAN>
+          </Id>
+        </CdtrAcct>
+        <RmtInf>
+          <Ustrd>BV Test 2</Ustrd>
+        </RmtInf>
+      </CdtTrfTxInf>
+    </PmtInf>
+
+  </CstmrCdtTrfInitn>
+</Document>
