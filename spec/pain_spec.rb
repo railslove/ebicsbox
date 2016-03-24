@@ -29,6 +29,10 @@ RSpec.describe Pain do
           expect(subject[:id]).to eq('EBICS-BOX/A96029885148366AE95082')
         end
 
+        it "has type credit" do
+          expect(subject[:type]).to eq('credit')
+        end
+
         it "extracts the date when created" do
           expect(subject[:created_at]).to eq('2016-03-23T09:56:36+01:00')
         end
@@ -144,6 +148,10 @@ RSpec.describe Pain do
 
         it "extracts the document's id" do
           expect(subject[:id]).to eq('EBICS-BOX/091289075DAA0AD81C0659')
+        end
+
+        it "has type direct_debit" do
+          expect(subject[:type]).to eq('direct_debit')
         end
 
         it "extracts the date when created" do

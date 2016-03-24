@@ -11,6 +11,7 @@ module Pain
     def to_h(options = {})
       {
         id: get_content("./xmlns:GrpHdr/xmlns:MsgId"),
+        type: "direct_debit",
         created_at: get_content("./xmlns:GrpHdr/xmlns:CreDtTm"),
         transactions_count: get_content("./xmlns:GrpHdr/xmlns:NbOfTxs").to_i,
         total_amount: BigDecimal.new(get_content("./xmlns:GrpHdr/xmlns:CtrlSum")),
