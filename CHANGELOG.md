@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.4
+
+Bugfix for running latest migrations without complications
+
 ## 0.5.3
 
 Minor features and optimizations regarding statements
