@@ -2,6 +2,15 @@ module Epics
   module Box
     module Models
       RSpec.describe Transaction do
+
+        describe 'public api' do
+          describe 'instance' do
+            subject { described_class.new }
+
+            it { is_expected.to respond_to(:parsed_payload) }
+          end
+        end
+
         describe '#set_state_from' do
           context 'status changed' do
             skip 'triggers a changed event' do
@@ -58,6 +67,20 @@ module Epics
           it 'executes the correct ebics call' do
             transaction.execute!
             expect(client).to have_received(:public_send).with('test', anything)
+          end
+        end
+
+        describe '#parsed_payload' do
+          subject(:transaction) { Transaction.create(payload: 'my-pain') }
+
+          it 'uses the pain parser to get its data' do
+            expect(Pain).to receive(:from_xml).with('my-pain')
+            transaction.parsed_payload
+          end
+
+          it 'returns nil on invalid data' do
+            transaction.payload = ""
+            expect(transaction.parsed_payload).to be_nil
           end
         end
       end
