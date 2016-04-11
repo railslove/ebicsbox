@@ -19,9 +19,15 @@ module Epics
         # can fail and should not affect imports for other accounts.
         def self.fetch_new_statements(account_id, from = 30.days.ago.to_date, to = Date.today)
           account = Account.first!(id: account_id)
-          combined_mt940 = account.transport_client.STA(from.to_s(:db), to.to_s(:db))
-          chunks = Cmxl.parse(combined_mt940)
+          method = account.statements_format
 
+          if method == 'camt53'
+            combined_camt = account.transport_client.C53(from.to_s(:db), to.to_s(:db))
+            chunks = combined_camt.map{ |chunk| CamtParser::String.parse(chunk).statements }.flatten
+          else
+            combined_mt940 = account.transport_client.STA(from.to_s(:db), to.to_s(:db))
+            chunks = Cmxl.parse(combined_mt940)
+          end
           # Store all fetched bank statements for later usage
           import_stats = import_to_database(chunks, account)
 

@@ -45,10 +45,10 @@ module Epics
         end
 
         def self.find_or_create_bank_statement(raw_bank_statement, account)
-          BankStatement.find_or_create(account_id: account.id, sequence: raw_bank_statement.field(28).source) do |bs|
-            bs.remote_account = raw_bank_statement.field(25).source
-            bs.opening_balance = as_big_decimal(raw_bank_statement.field(60)) # this will be final or intermediate
-            bs.closing_balance = as_big_decimal(raw_bank_statement.field(62)) # this will be final or intermediate
+          BankStatement.find_or_create(account_id: account.id, sequence: raw_bank_statement.legal_sequence_number) do |bs|
+            bs.remote_account = raw_bank_statement.account_identification
+            bs.opening_balance = as_big_decimal(raw_bank_statement.opening_balance) # this will be final or intermediate
+            bs.closing_balance = as_big_decimal(raw_bank_statement.closing_balance) # this will be final or intermediate
             bs.transaction_count = raw_bank_statement.transactions.count
             bs.fetched_on = Date.today
             bs.content = raw_bank_statement.source
@@ -56,7 +56,7 @@ module Epics
         end
 
         def self.update_meta_data(raw_bank_statement, account)
-          balance = raw_bank_statement.field(62) # We have to handle both final and intermediary balances
+          balance = raw_bank_statement.closing_balance # We have to handle both final and intermediary balances
           if account.balance_date.blank? || account.balance_date <= balance.date
             account.set_balance(balance.date, balance.amount_in_cents)
           end

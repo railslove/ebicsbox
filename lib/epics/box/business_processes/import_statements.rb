@@ -1,4 +1,5 @@
 require 'cmxl'
+require 'camt_parser'
 
 require_relative '../models/account'
 require_relative '../models/bank_statement'
@@ -8,9 +9,15 @@ module Epics
   module Box
     module BusinessProcesses
       class ImportStatements
+        PARSERS = { 'mt940' => Cmxl, 'camt53' => CamtParser::String }
+
+        def self.parse_bank_statement(bank_statement)
+          parser = PARSERS.fetch(bank_statement.account.statements_format, Cmxl)
+          parser.parse(bank_statement.content).first.transactions
+        end
 
         def self.from_bank_statement(bank_statement)
-          bank_transactions = Cmxl.parse(bank_statement.content).first.transactions
+          bank_transactions = self.parse_bank_statement(bank_statement)
 
           # We need to pass down index and bank statement sequence to create better checksums
           statements = bank_transactions.each.with_index.map do |bank_transaction, i|
