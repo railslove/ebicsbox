@@ -9,11 +9,12 @@ module Epics
   module Box
     module BusinessProcesses
       class ImportStatements
-        PARSERS = { 'mt940' => Cmxl, 'camt53' => CamtParser::String }
+        PARSERS = { 'mt940' => Cmxl, 'camt53' => CamtParser::Format053::Statement }
 
         def self.parse_bank_statement(bank_statement)
           parser = PARSERS.fetch(bank_statement.account.statements_format, Cmxl)
-          parser.parse(bank_statement.content).first.transactions
+          result = parser.parse(bank_statement.content)
+          result.kind_of?(Array) ? result.first.transactions : result.transactions
         end
 
         def self.from_bank_statement(bank_statement)
@@ -82,10 +83,10 @@ module Epics
             name: transaction.name,
             information: transaction.information,
             description: transaction.description,
-            eref: transaction.sepa["EREF"],
-            mref: transaction.sepa["MREF"],
-            svwz: transaction.sepa["SVWZ"],
-            creditor_identifier: transaction.sepa["CRED"],
+            eref: transaction.respond_to?(:eref) ? transaction.eref : transaction.sepa["EREF"],
+            mref: transaction.respond_to?(:mref) ? transaction.mref : transaction.sepa["MREF"],
+            svwz: transaction.respond_to?(:svwz) ? transaction.svwz : transaction.sepa["SVWZ"],
+            creditor_identifier: transaction.respond_to?(:creditor_identifier) ? transaction.creditor_identifier : transaction.sepa["CRED"],
           }
         end
 
