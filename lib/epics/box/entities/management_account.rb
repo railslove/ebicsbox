@@ -16,6 +16,7 @@ module Epics
         expose :url, documentation: { type: "String", desc: "Bank's EBICS server URL" }
         expose :host, documentation: { type: "String", desc: "EBICS Host identifier" }
         expose :partner, documentation: { type: "String", desc: "EBICS partner identifier" }
+        expose :statements_format, documentation: { type: "String", desc: "Fetching method for statements (either 'mt940' or 'camt53')"}
 
         expose(:test_mode, documentation: { type: "Boolean", desc: "Whether this is a test account" }) do |account|
           account.mode == 'File'
