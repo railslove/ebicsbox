@@ -42,8 +42,8 @@ module Epics
 
           def import_to_database(chunks, account)
             chunks.map do |chunk|
-              beginBusinessProcesses::ImportBankStatement.from_cmxl(chunk, account)
-                bank_statement =
+              begin
+                bank_statement = BusinessProcesses::ImportBankStatement.from_cmxl(chunk, account)
                 res = BusinessProcesses::ImportStatements.from_bank_statement(bank_statement)
               rescue BusinessProcesses::ImportBankStatement::InvalidInput => ex
                 Box.logger.error { "[Jobs::FetchStatements] #{ex} account_id=#{account.id}" }
