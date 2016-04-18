@@ -1390,6 +1390,10 @@
           "type": "string",
           "description": "EBICS partner identifier"
         },
+        "statements_format": {
+          "type": "string",
+          "description": "Fetching method for statements (either 'mt940' or 'camt53')"
+        },
         "test_mode": {
           "type": "boolean",
           "description": "Whether this is a test account"

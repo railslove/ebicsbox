@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.0
+
+Integrated CAMT.053 parsing
+
+* It is now possible to switch between mt940 / camt53 for each account
+* Statements are fetched more frequently w/ camt53
+
+_Important_: Switching to C53 requires to remove old mt940 statements for the according account.
+Checksum calculation will not match C53 and mt940 statements!
+
 ## 0.5.4
 
 Bugfix for running latest migrations without complications
