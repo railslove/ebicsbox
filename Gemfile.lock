@@ -1,12 +1,14 @@
-PATH
-  remote: ../camt_parser/
+GIT
+  remote: https://github.com/railslove/camt_parser.git
+  revision: 751ab47a8af9595faa4aaa0b513e7eb63e832628
   specs:
     camt_parser (1.0.2)
       activesupport
       nokogiri
 
-PATH
-  remote: ../cmxl/
+GIT
+  remote: https://github.com/railslove/cmxl.git
+  revision: 45a606f9725c2511cf67aa4342dd5b12347f76bb
   specs:
     cmxl (0.1.3)
       rchardet19
