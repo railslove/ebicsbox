@@ -1,9 +1,8 @@
 GIT
   remote: https://github.com/railslove/camt_parser.git
-  revision: 751ab47a8af9595faa4aaa0b513e7eb63e832628
+  revision: 90780332f60caa9d5d0e92fef7974f1f0b5338cc
   specs:
     camt_parser (1.0.2)
-      activesupport
       nokogiri
 
 GIT
@@ -91,7 +90,7 @@ GEM
     jwt (1.5.4)
     method_source (0.8.2)
     mime-types (2.99)
-    minitest (5.8.3)
+    minitest (5.8.4)
     multi_json (1.11.2)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
