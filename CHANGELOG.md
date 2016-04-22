@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.1
+
+We're now using supervisord to spawn processes on startup
+
 ## 0.6.0
 
 Integrated CAMT.053 parsing
