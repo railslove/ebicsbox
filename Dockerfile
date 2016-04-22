@@ -1,6 +1,7 @@
 FROM yoyostile/railslove-jruby:9.0.5.0
 RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -
-RUN apt-get install -y git
+RUN apt-get update && apt-get install -y git supervisor python-pip
+RUN pip install supervisor-stdout
 
 # throw errors if Gemfile has been modified since Gemfile.lock
 RUN bundle config --global frozen 1
@@ -15,6 +16,7 @@ ADD Gemfile.lock /usr/ebicsbox/
 RUN bundle install
 
 ADD . /usr/ebicsbox
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 #RUN rake jruby:build
 
 # Clean up
@@ -31,4 +33,4 @@ RUN rm webpack.config.js
 RUN rm docker-compose.yml
 RUN rm replicated-compose.yml
 
-CMD ["bin/start", "all"]
+CMD ["/usr/bin/supervisord"]
