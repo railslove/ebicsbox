@@ -33,4 +33,4 @@ RUN rm webpack.config.js
 RUN rm docker-compose.yml
 RUN rm replicated-compose.yml
 
-CMD ["/usr/bin/supervisord"]
+CMD ["bin/start", "all"]

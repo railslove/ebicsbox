@@ -15,8 +15,6 @@ if [ "$1" = "worker" ]; then
 fi
 
 if [ "$1" = "all" ]; then
-  nohup /usr/local/bundle/bin/bundle exec clockwork lib/epics/scheduler/scheduler.rb &
-  nohup /usr/local/bin/ruby bin/worker &
-  /usr/local/bundle/bin/bundle exec puma config.ru -p $PORT
+  /usr/bin/supervisord
 fi
 exit 1
