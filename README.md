@@ -17,13 +17,12 @@ It offers a HTTP interface and can be integrated with different message queueing
 * ruby (jruby / ruby 2.2.x)
 * beanstalkd
 * postgres
-* webpack (npm install webpack -g)
 
 ## Development
 
 Run it:
 
-    $ forman start -f Procfile.dev
+    $ forman start
 
 If this is too noisy, you can prefix the command with ```RUBYOPT="-W0"``` which removes warnings
 raised by jruby and beaneater about uninitialized variables.
