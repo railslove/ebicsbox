@@ -10,7 +10,7 @@ It offers a HTTP interface and can be integrated with different message queueing
 ## Getting started
 
     $ createdb ebicsbox
-    $ sequel -m migrations postgres://localhost/ebicsbox
+    $ bin/migrate
 
 ## Prerequistes
 
