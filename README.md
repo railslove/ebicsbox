@@ -7,22 +7,22 @@ reconcilliation.
 
 It offers a HTTP interface and can be integrated with different message queueing systems
 
-## Getting started
-
-    $ createdb ebicsbox
-    $ bin/migrate
-
 ## Prerequistes
 
 * ruby (jruby / ruby 2.2.x)
 * beanstalkd
 * postgres
 
+## Getting started
+
+    $ createdb ebicsbox
+    $ bundle exec bin/migrate
+
 ## Development
 
 Run it:
 
-    $ forman start
+    $ foreman start
 
 If this is too noisy, you can prefix the command with ```RUBYOPT="-W0"``` which removes warnings
 raised by jruby and beaneater about uninitialized variables.
