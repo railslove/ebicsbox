@@ -2,6 +2,8 @@ module Epics
   module Box
     RSpec.describe Statement do
       describe '.paginated_by_account' do
+        before { DatabaseCleaner.strategy = :truncation, { only: ['statements'] } }
+        
         let(:account) { Account.create(iban: SecureRandom.uuid) }
         let!(:statements) { [nil, nil, nil].map { Statement.create(account_id: account.id) } }
 
