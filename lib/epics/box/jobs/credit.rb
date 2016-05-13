@@ -1,3 +1,10 @@
+require 'base64'
+
+require_relative '../../box'
+require_relative '../queue'
+require_relative '../models/event'
+require_relative '../models/transaction'
+
 module Epics
   module Box
     module Jobs

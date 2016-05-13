@@ -1,5 +1,6 @@
 require 'cmxl'
 require 'epics'
+require 'sequel'
 
 require_relative '../business_processes/import_bank_statement'
 require_relative '../business_processes/import_statements'

@@ -1,3 +1,4 @@
+require_relative '../../box'
 require_relative '../models/event'
 require_relative '../models/webhook_delivery'
 
