@@ -1,25 +1,25 @@
 require 'active_support/core_ext/string/strip'
 
 # Validations
-require 'epics/box/validations/unique_transaction'
+require_relative './validations/unique_transaction'
 
 # Helpers
-require 'epics/box/helpers/default'
-require 'epics/box/helpers/pagination'
+require_relative './helpers/default'
+require_relative './helpers/pagination'
 
 # Business processes
-require 'epics/box/business_processes/credit'
-require 'epics/box/business_processes/direct_debit'
-require 'epics/box/jobs/fetch_statements'
+require_relative './business_processes/credit'
+require_relative './business_processes/direct_debit'
+require_relative './jobs/fetch_statements'
 
 # Errors
-require 'epics/box/errors/business_process_failure'
+require_relative './errors/business_process_failure'
 
 # Models and entities
-require 'epics/box/models/account'
-require 'epics/box/entities/account'
-require 'epics/box/entities/statement'
-require 'epics/box/entities/transaction'
+require_relative './models/account'
+require_relative './entities/account'
+require_relative './entities/statement'
+require_relative './entities/transaction'
 
 # APIs
 require_relative 'apis/events'

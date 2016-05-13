@@ -1,5 +1,5 @@
-require 'epics/box/adapters/fake'
-require 'epics/box/adapters/file'
+require_relative '../adapters/fake'
+require_relative '../adapters/file'
 
 class Epics::Box::Subscriber < Sequel::Model
   self.raise_on_save_failure = true

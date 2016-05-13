@@ -1,4 +1,4 @@
-require 'epics/box/errors/business_process_failure'
+require_relative '../errors/business_process_failure'
 
 module Epics
   module Box

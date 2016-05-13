@@ -9,7 +9,7 @@ require 'bundler'
 Bundler.setup(:default, :development)
 
 # Load app
-require './lib/epics/box'
+require_relative '../lib/epics/box'
 
 # Start worker
 Epics::Box::Worker.new.process!

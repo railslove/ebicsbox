@@ -1,4 +1,5 @@
 $stdout.sync = true
+
 module Epics
   module Box
     class Worker

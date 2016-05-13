@@ -1,4 +1,4 @@
-require 'epics/box/models/account'
+require_relative './account'
 
 module Epics
   module Box

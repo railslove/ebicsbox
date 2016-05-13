@@ -1,8 +1,5 @@
-lib = File.expand_path("../..", __FILE__)
-$:.unshift(lib)
-
 # Load configuration
-require 'epics/box/configuration'
+require_relative './box/configuration'
 
 # Load dependencies
 # TODO: Remove them here and load where really used!
@@ -44,12 +41,12 @@ DB = Sequel.connect(Epics::Box.configuration.database_url, max_connections: 10)
 Sequel.extension :pg_json
 DB.extension :pg_json
 
-require "epics/box/server"
-require "epics/box/worker"
-require "epics/box/queue"
-require "epics/box/models/account"
-require "epics/box/models/organization"
-require "epics/box/models/statement"
-require "epics/box/models/subscriber"
-require "epics/box/models/transaction"
-require "epics/box/models/user"
+require_relative "./box/server"
+require_relative "./box/worker"
+require_relative "./box/queue"
+require_relative "./box/models/account"
+require_relative "./box/models/organization"
+require_relative "./box/models/statement"
+require_relative "./box/models/subscriber"
+require_relative "./box/models/transaction"
+require_relative "./box/models/user"

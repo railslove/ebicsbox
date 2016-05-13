@@ -1,14 +1,14 @@
 # Validations
-require 'epics/box/validations/unique_account'
-require 'epics/box/validations/active_account'
-require 'epics/box/validations/unique_subscriber'
+require_relative './validations/unique_account'
+require_relative './validations/active_account'
+require_relative './validations/unique_subscriber'
 
 # Helpers
-require 'epics/box/helpers/default'
+require_relative './helpers/default'
 
 # Entities
-require 'epics/box/entities/management_account'
-require 'epics/box/entities/user'
+require_relative './entities/management_account'
+require_relative './entities/user'
 
 module Epics
   module Box
