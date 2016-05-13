@@ -1,4 +1,6 @@
 require 'active_support/core_ext/string/strip'
+require 'grape'
+require 'ruby-swagger/grape/grape'
 
 # Validations
 require_relative './validations/unique_transaction'

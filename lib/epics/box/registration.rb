@@ -1,4 +1,5 @@
 require 'grape'
+require 'ruby-swagger/grape/grape'
 
 require_relative 'models/organization'
 require_relative 'entities/registration_organization'

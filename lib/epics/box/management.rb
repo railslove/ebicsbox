@@ -1,3 +1,7 @@
+require 'grape'
+require 'ruby-swagger/grape/grape'
+require 'sequel'
+
 # Validations
 require_relative './validations/unique_account'
 require_relative './validations/active_account'

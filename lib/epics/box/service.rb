@@ -1,3 +1,6 @@
+require 'grape'
+require 'ruby-swagger/grape/grape'
+
 # Helpers
 require_relative './helpers/default'
 

@@ -1,3 +1,5 @@
+require 'grape'
+
 require_relative '../box'
 require_relative './registration'
 require_relative './service'

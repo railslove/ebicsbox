@@ -1,3 +1,5 @@
+require 'base64'
+
 module Epics
   module Box
     module Jobs
