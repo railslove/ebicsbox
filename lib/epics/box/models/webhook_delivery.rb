@@ -1,4 +1,9 @@
 require 'benchmark'
+require 'json'
+require 'faraday'
+require 'sequel'
+
+require_relative './event'
 
 module Epics
   module Box

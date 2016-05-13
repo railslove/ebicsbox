@@ -1,3 +1,6 @@
+require 'json'
+require 'sequel'
+
 require_relative '../models/account'
 require_relative '../models/bank_statement'
 require_relative '../models/transaction'

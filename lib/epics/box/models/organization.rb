@@ -1,3 +1,6 @@
+require 'sequel'
+require 'securerandom'
+
 require_relative './account'
 
 module Epics
