@@ -12,7 +12,6 @@ gem 'grape-entity', '0.4.8'
 gem 'faraday'
 gem 'jdbc-postgres'
 gem 'nokogiri'
-gem 'pry'
 gem 'ruby-swagger'
 gem 'sepa_king'
 gem 'sequel'
@@ -36,4 +35,5 @@ group :development, :test do
   gem 'airborne'
   gem 'timecop'
   gem 'webmock'
+  gem 'pry'
 end
