@@ -1,3 +1,7 @@
+require 'grape'
+
+require_relative '../models/account'
+
 module Epics
   module Box
     class ActiveAccount < Grape::Validations::Base
