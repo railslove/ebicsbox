@@ -1,10 +1,9 @@
 require 'cmxl'
 
-require_relative '../lib/epics/box'
-require_relative '../lib/epics/box/models/statement'
-require_relative '../lib/epics/box/models/bank_statement'
-require_relative '../lib/epics/box/business_processes/import_bank_statement'
-require_relative '../lib/epics/box/business_processes/import_statements'
+require_relative '../box/models/statement'
+require_relative '../box/models/bank_statement'
+require_relative '../box/business_processes/import_bank_statement'
+require_relative '../box/business_processes/import_statements'
 
 Sequel.migration do
   up do
@@ -23,22 +22,22 @@ Sequel.migration do
     add_column :statements, :bank_statement_id, Integer
 
     # Reload sequel schemas
-    Epics::Box::BankStatement.set_dataset :bank_statements
-    Epics::Box::Statement.set_dataset :statements
+    Box::BankStatement.set_dataset :bank_statements
+    Box::Statement.set_dataset :statements
 
-    affected_statements_query = Epics::Box::Statement.where('raw_data IS NOT NULL')
+    affected_statements_query = Box::Statement.where('raw_data IS NOT NULL')
 
     # Build bank statements table from raw statements data
     affected_statements_query.all.each do |statement|
-      Epics::Box::BusinessProcesses::ImportBankStatement.import_all_from_mt940(statement.raw_data, statement.account)
+      Box::BusinessProcesses::ImportBankStatement.import_all_from_mt940(statement.raw_data, statement.account)
     end
 
     # Delete all statements which do not contain any valid data
     affected_statements_query.delete
 
     # Rebuild statements from bank statements
-    Epics::Box::BankStatement.all.each do |bank_statement|
-      Epics::Box::BusinessProcesses::ImportStatements.from_bank_statement(bank_statement)
+    Box::BankStatement.all.each do |bank_statement|
+      Box::BusinessProcesses::ImportStatements.from_bank_statement(bank_statement)
     end
 
     drop_column :statements, :raw_data
