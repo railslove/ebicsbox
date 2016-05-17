@@ -64,7 +64,7 @@ module Box
       self.submitted_at = DateTime.now
       self.save
       Box::Queue.check_subscriber_activation(id)
-    rescue Error::TechnicalError, Error::BusinessError => ex
+    rescue Epics::Error::TechnicalError, Epics::Error::BusinessError => ex
       Box.logger.error("Failed to init subscriber #{id}. Reason='#{ex.message}'")
       false
     end

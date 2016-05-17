@@ -3,7 +3,6 @@ require 'jwt'
 require 'rack'
 require 'uri'
 
-require_relative '../../box'
 require_relative '../models/user'
 require_relative '../models/organization'
 

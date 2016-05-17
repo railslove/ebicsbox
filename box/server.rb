@@ -1,18 +1,15 @@
 require 'grape'
 
-require_relative '../box'
-require_relative './registration'
-require_relative './service'
-require_relative './management'
-require_relative './content'
+require_relative './apis/content'
+require_relative './apis/management'
+require_relative './apis/registration'
+require_relative './apis/service'
 
-module Epics
-  module Box
-    class Server < Grape::API
-      mount Service
-      mount Management
-      mount Content
-      mount Registration
-    end
+module Box
+  class Server < Grape::API
+    mount Box::Apis::Service
+    mount Box::Apis::Management
+    mount Box::Apis::Content
+    mount Box::Apis::Registration
   end
 end
