@@ -7,12 +7,7 @@ tries = 3
 
 begin
   # Load app configuration
-  require_relative '../config/configuration'
-  configuration = Epics::Box::Configuration.new
-
-  # Setup database connection
-  require 'sequel'
-  DB ||= Sequel.connect(configuration.database_url, max_connections: 10)
+  require_relative '../config/bootstrap'
   Sequel.extension :migration, :core_extensions
 
   # Migrate to latest version
