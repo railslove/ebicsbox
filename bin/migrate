@@ -7,7 +7,7 @@ tries = 3
 
 begin
   # Load app configuration
-  require_relative '../lib/epics/box/configuration'
+  require_relative '../config/configuration'
   configuration = Epics::Box::Configuration.new
 
   # Setup database connection

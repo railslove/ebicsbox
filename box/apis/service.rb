@@ -2,10 +2,10 @@ require 'grape'
 require 'ruby-swagger/grape/grape'
 
 # Helpers
-require_relative './helpers/default'
+require_relative '../helpers/default'
 
-module Epics
-  module Box
+module Box
+  module Apis
     class Service < Grape::API
       format :json
       helpers Helpers::Default
@@ -21,12 +21,12 @@ module Epics
       end
       get '/' do
         {
-          documentation: Epics::Box.configuration.app_url + '/docs',
+          documentation: Box.configuration.app_url + '/docs',
           management: {
-            accounts: Epics::Box.configuration.app_url + "/management/accounts",
+            accounts: Box.configuration.app_url + "/management/accounts",
           },
           resources: {
-            accounts: Epics::Box.configuration.app_url + "/accounts",
+            accounts: Box.configuration.app_url + "/accounts",
           },
         }
       end

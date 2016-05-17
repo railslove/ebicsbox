@@ -1,31 +1,36 @@
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'lib'))
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-
+require 'grape'
 require 'rack/cors'
 
-# Load and run the app
-require_relative './lib/epics/box'
-require_relative './lib/epics/box/server'
-require_relative './lib/epics/box/middleware/license_validator'
-require_relative './lib/epics/box/middleware/connection_validator'
+require_relative './config/bootstrap'
+
+require_relative './box/apis/content'
+require_relative './box/apis/management'
+require_relative './box/apis/registration'
+require_relative './box/apis/service'
+
+require_relative './box/middleware/license_validator'
+require_relative './box/middleware/connection_validator'
+
+
+class AppServer < Grape::API
+  mount Box::Apis::Service
+  mount Box::Apis::Management
+  mount Box::Apis::Content
+  mount Box::Apis::Registration
+end
 
 box = Rack::Builder.app do
   use Rack::CommonLogger if ENV['RACK_ENV'] == 'production'
 
-  use Epics::Box::Middleware::LicenseValidator if ENV['REPLICATED_INTEGRATIONAPI']
-  use Epics::Box::Middleware::ConnectionValidator, DB
-  use Epics::Box.configuration.auth_provider
+  use Box::Middleware::LicenseValidator if ENV['REPLICATED_INTEGRATIONAPI']
+  use Box::Middleware::ConnectionValidator, DB
+  use Box.configuration.auth_provider
 
   use Rack::Cors do
     allow do
       origins '*'
       resource '*', :headers => :any, :methods => [:get, :post, :put, :delete, :options]
     end
-  end
-
-
-  map "/admin" do
-    use Rack::Static, urls: [""], root: "public", index: "index.html"
   end
 
   use Rack::Static, urls: ["/images", "/lib", "/fonts", "/js", "/css", "/swagger-ui.js"], root: "public/swagger"
@@ -46,7 +51,7 @@ box = Rack::Builder.app do
     }
   end
 
-  run Epics::Box::Server
+  run AppServer
 end
 
 run box

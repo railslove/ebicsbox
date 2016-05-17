@@ -3,19 +3,19 @@ require 'ruby-swagger/grape/grape'
 require 'sequel'
 
 # Validations
-require_relative './validations/unique_account'
-require_relative './validations/active_account'
-require_relative './validations/unique_subscriber'
+require_relative '../validations/unique_account'
+require_relative '../validations/active_account'
+require_relative '../validations/unique_subscriber'
 
 # Helpers
-require_relative './helpers/default'
+require_relative '../helpers/default'
 
 # Entities
-require_relative './entities/management_account'
-require_relative './entities/user'
+require_relative '../entities/management_account'
+require_relative '../entities/user'
 
-module Epics
-  module Box
+module Box
+  module Apis
     class Management < Grape::API
       format :json
       helpers Helpers::Default

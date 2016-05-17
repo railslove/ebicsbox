@@ -1,11 +1,11 @@
 require 'grape'
 require 'ruby-swagger/grape/grape'
 
-require_relative 'models/organization'
-require_relative 'entities/registration_organization'
+require_relative '../models/organization'
+require_relative '../entities/registration_organization'
 
-module Epics
-  module Box
+module Box
+  module Apis
     class Registration < Grape::API
       format :json
 

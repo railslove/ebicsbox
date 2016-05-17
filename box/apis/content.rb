@@ -3,31 +3,31 @@ require 'grape'
 require 'ruby-swagger/grape/grape'
 
 # Validations
-require_relative './validations/unique_transaction'
+require_relative '../validations/unique_transaction'
 
 # Helpers
-require_relative './helpers/default'
-require_relative './helpers/pagination'
+require_relative '../helpers/default'
+require_relative '../helpers/pagination'
 
 # Business processes
-require_relative './business_processes/credit'
-require_relative './business_processes/direct_debit'
-require_relative './jobs/fetch_statements'
+require_relative '../business_processes/credit'
+require_relative '../business_processes/direct_debit'
+require_relative '../jobs/fetch_statements'
 
 # Errors
-require_relative './errors/business_process_failure'
+require_relative '../errors/business_process_failure'
 
 # Models and entities
-require_relative './models/account'
-require_relative './entities/account'
-require_relative './entities/statement'
-require_relative './entities/transaction'
+require_relative '../models/account'
+require_relative '../entities/account'
+require_relative '../entities/statement'
+require_relative '../entities/transaction'
 
 # APIs
-require_relative 'apis/events'
+require_relative './events'
 
-module Epics
-  module Box
+module Box
+  module Apis
     class Content < Grape::API
       format :json
       helpers Helpers::Default
