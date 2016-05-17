@@ -1,6 +1,7 @@
 require 'cmxl'
 require 'camt_parser'
 
+require_relative '../../box'
 require_relative '../models/account'
 require_relative '../models/bank_statement'
 require_relative '../models/event'

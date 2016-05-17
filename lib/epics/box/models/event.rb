@@ -1,5 +1,8 @@
 require 'openssl'
+require 'sequel'
 
+require_relative '../queue'
+require_relative '../models/account'
 require_relative './webhook_delivery'
 
 module Epics

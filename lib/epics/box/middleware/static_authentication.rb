@@ -1,3 +1,5 @@
+require 'rack'
+
 require_relative '../models/user'
 require_relative '../models/organization'
 
@@ -19,7 +21,7 @@ module Epics
 
         def load_user_auth_data(request)
           access_token = request.params['access_token'] || request.env['HTTP_AUTHORIZATION'].to_s[/\A(?:token|Bearer) (.+)\z/, 1]
-          user = Epics::Box::User.find_by_access_token(access_token)
+          user = User.find_by_access_token(access_token)
           {
             'box.user' => user,
             'box.organization' => user.try(:organization),

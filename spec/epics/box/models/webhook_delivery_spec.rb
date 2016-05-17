@@ -1,3 +1,5 @@
+require 'faraday'
+
 require 'epics/box/models/event'
 require 'epics/box/models/webhook_delivery'
 

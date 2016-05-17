@@ -1,3 +1,5 @@
+require 'sequel'
+
 require_relative '../../../pain'
 
 require_relative './account'

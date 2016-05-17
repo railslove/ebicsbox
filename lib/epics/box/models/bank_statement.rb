@@ -1,4 +1,5 @@
 require 'securerandom'
+require 'sequel'
 
 module Epics
   module Box

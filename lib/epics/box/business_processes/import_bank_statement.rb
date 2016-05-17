@@ -3,6 +3,7 @@ require 'cmxl'
 require_relative '../models/account'
 require_relative '../models/bank_statement'
 
+
 module Epics
   module Box
     module BusinessProcesses
@@ -12,8 +13,8 @@ module Epics
         def self.import_all_from_mt940(raw_mt940, account)
           Cmxl.parse(raw_mt940).map do |raw_bank_statement|
             begin
-              BusinessProcesses::ImportBankStatement.from_cmxl(raw_bank_statement, account)
-            rescue BusinessProcesses::ImportBankStatement::InvalidInput => ex
+              from_cmxl(raw_bank_statement, account)
+            rescue InvalidInput => ex
               nil # ignore
             end
           end.compact

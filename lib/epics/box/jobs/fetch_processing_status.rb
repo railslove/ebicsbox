@@ -1,3 +1,9 @@
+require 'nokogiri'
+
+require_relative '../../box'
+require_relative '../models/account'
+require_relative '../models/transaction'
+
 module Epics
   module Box
     module Jobs

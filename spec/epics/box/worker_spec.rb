@@ -1,3 +1,5 @@
+require_relative '../../../lib/epics/box/worker'
+
 module Epics
   module Box
     RSpec.describe Worker do

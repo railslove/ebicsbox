@@ -1,5 +1,8 @@
+require 'grape'
+require 'ruby-swagger/grape/grape'
+
 # Helpers
-require 'epics/box/helpers/default'
+require_relative './helpers/default'
 
 module Epics
   module Box

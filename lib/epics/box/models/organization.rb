@@ -1,4 +1,7 @@
-require 'epics/box/models/account'
+require 'sequel'
+require 'securerandom'
+
+require_relative './account'
 
 module Epics
   module Box

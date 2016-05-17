@@ -1,3 +1,7 @@
+require_relative '../../box'
+require_relative '../queue'
+require_relative '../models/subscriber'
+
 module Epics
   module Box
     module Jobs

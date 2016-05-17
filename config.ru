@@ -5,6 +5,7 @@ require 'rack/cors'
 
 # Load and run the app
 require_relative './lib/epics/box'
+require_relative './lib/epics/box/server'
 require_relative './lib/epics/box/middleware/license_validator'
 require_relative './lib/epics/box/middleware/connection_validator'
 

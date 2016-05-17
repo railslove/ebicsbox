@@ -1,11 +1,11 @@
 require 'beaneater'
 
-require 'epics/box/jobs/credit'
-require 'epics/box/jobs/debit'
-require 'epics/box/jobs/fetch_processing_status'
-require 'epics/box/jobs/fetch_statements'
-require 'epics/box/jobs/webhook'
-require 'epics/box/jobs/check_activation'
+require_relative './jobs/credit'
+require_relative './jobs/debit'
+require_relative './jobs/fetch_processing_status'
+require_relative './jobs/fetch_statements'
+require_relative './jobs/webhook'
+require_relative './jobs/check_activation'
 
 Beaneater.configure do |config|
   config.job_parser = lambda { |body| JSON.parse(body, symbolize_names: true) }

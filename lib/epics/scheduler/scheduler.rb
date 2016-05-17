@@ -1,8 +1,5 @@
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', '..', '..', 'lib'))
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-
 require 'json'
-require 'epics/box'
+require_relative '../box'
 
 module Clockwork
   # TODO: Make these configurable

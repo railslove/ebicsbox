@@ -1,6 +1,6 @@
 require 'grape-entity'
 
-require 'epics/box/entities/subscriber'
+require_relative './subscriber'
 
 module Epics
   module Box

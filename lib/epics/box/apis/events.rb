@@ -1,4 +1,5 @@
 require 'active_support/core_ext/string/strip'
+require 'ruby-swagger/grape/grape'
 
 require_relative '../models/event'
 require_relative '../entities/event'

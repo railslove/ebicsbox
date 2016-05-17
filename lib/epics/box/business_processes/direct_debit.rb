@@ -1,4 +1,9 @@
-require 'epics/box/errors/business_process_failure'
+require 'base64'
+require 'securerandom'
+require 'sepa_king'
+
+require_relative '../errors/business_process_failure'
+require_relative '../queue'
 
 module Epics
   module Box

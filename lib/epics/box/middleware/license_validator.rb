@@ -1,3 +1,6 @@
+require 'faraday'
+require 'json'
+
 module Epics
   module Box
     module Middleware
