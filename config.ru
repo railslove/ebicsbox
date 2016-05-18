@@ -50,5 +50,5 @@ map '/docs' do
 end
 
 # Finally, load application and all its endpoints
-require_relative './box/server'
-run Box::Server
+require_relative './box/apis/base'
+run Box::Apis::Base
