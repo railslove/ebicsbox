@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-require_relative '../../box/apis/content'
+require_relative '../../../box/apis/v1/content'
 
 module Box
-  RSpec.describe Apis::Content do
+  RSpec.describe Apis::V1::Content do
     let(:organization) { Organization.create(name: 'Organization 1') }
     let(:account) { organization.add_account(name: 'Test') }
     let!(:event) { account.add_event(type: 'test') }

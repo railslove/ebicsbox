@@ -1,11 +1,11 @@
 require 'active_support/all'
 require 'spec_helper'
 
-require_relative '../../box/apis/content'
+require_relative '../../../box/apis/v1/content'
 
 module Box
   module Apis
-    RSpec.describe Content do
+    RSpec.describe V1::Content do
       let(:organization) { Organization.create(name: 'Organization 1') }
       let(:other_organization) { Organization.create(name: 'Organization 2') }
       let(:user) { User.create(organization_id: organization.id, name: 'Some user', access_token: 'orga-user') }

@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-require_relative '../../box/apis/registration'
-require_relative '../../config/configuration'
+require_relative '../../../box/apis/v1/registration'
+require_relative '../../../config/configuration'
 
 module Box
   module Apis
-    RSpec.describe Registration do
+    RSpec.describe V1::Registration do
       context 'registrations disabled' do
         before { allow_any_instance_of(Configuration).to receive(:registrations_allowed?).and_return(false) }
 
