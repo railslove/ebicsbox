@@ -3,8 +3,10 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 
-require 'epics/box'
 require 'timecop'
+
+require_relative '../config/bootstrap'
+
 
 Dir['spec/support/**/*.rb'].each { |f| require f }
 

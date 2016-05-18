@@ -67,7 +67,12 @@ see [docs.ebicsbox.apiary.io](http://docs.ebicsbox.apiary.io)
 ### Tests
 
 We are using RSpec to test this project. In order to execute all specs once, run ```bundle exec rspec```.
-If you are actively developing, you can execute specs automatically by running guard with ```bundle exec guard```.
+
+To migrate your test database run the following command:
+
+```bash
+  $ ENVIRONMENT=test bundle exec bin/migrate
+```
 
 ### Documentation
 

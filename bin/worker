@@ -8,8 +8,11 @@ Dotenv.load
 require 'bundler'
 Bundler.setup(:default, :development)
 
-# Load app
-require_relative '../lib/epics/box'
+# Make sure output is written immediately
+$stdout.sync = true
 
-# Start worker
-Epics::Box::Worker.new.process!
+# Start processing of queued jobs
+require_relative '../config/bootstrap'
+require_relative '../box/queue'
+
+Box::Queue.new.process!

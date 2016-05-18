@@ -1,11 +1,11 @@
 require 'airborne'
 
-require_relative '../../lib/epics/box/middleware/static_authentication'
-require_relative '../../lib/epics/box/server'
+require_relative '../../box/middleware/static_authentication'
+require_relative '../../box/server'
 
 Airborne.configure do |config|
   config.rack_app = Rack::Builder.app do
-    use Epics::Box::Middleware::StaticAuthentication
-    run Epics::Box::Server
+    use Box::Middleware::StaticAuthentication
+    run Box::Server
   end
 end

@@ -8,9 +8,7 @@ Dotenv.load
 require 'bundler'
 Bundler.setup(:default, :development)
 
-# Load app
-require_relative '../lib/epics/box'
-
 # Start pry session
+require_relative '../config/bootstrap'
 require 'pry'
 pry
