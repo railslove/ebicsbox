@@ -10,5 +10,9 @@ Bundler.setup(:default, :development)
 
 # Start pry session
 require_relative '../config/bootstrap'
+
+# Load all files for console
+Dir[File.join(File.dirname(__FILE__), '../box/**/*.rb')].map { |file| require_relative(file.gsub('bin/', '')) }
+
 require 'pry'
 pry
