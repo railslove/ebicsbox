@@ -16,6 +16,14 @@ module Box
       subscriber: :string,
     }
 
+    NEW_ACCOUNT_SPEC = {
+      name: :string,
+      iban: :string,
+      bic: :string,
+      status: :string,
+      subscriber: :string,
+    }
+
     ###
     ### GET /accounts
     ###
@@ -122,7 +130,95 @@ module Box
     ###
 
     describe 'POST: /accounts' do
+      context "when no valid access token is provided" do
+        it 'returns a 401' do
+          post "/accounts", {}, { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer invalid-token' }
+          expect_status 401
+        end
+      end
 
+      context 'invalid data' do
+        it 'returns a 401' do
+          post "/accounts", {}, { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_status 400
+        end
+
+        it 'specifies invalid fields' do
+          post "/accounts", {}, { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_json_types errors: {
+            name: :array_of_strings,
+            iban: :array_of_strings,
+            bic: :array_of_strings,
+            host: :array_of_strings,
+            partner: :array_of_strings,
+            url: :array_of_strings,
+            subscriber: :array_of_strings,
+          }
+        end
+
+        it 'provides a proper error message' do
+          post "/accounts", {}, { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_json message: "Validation of your request's payload failed!"
+        end
+
+        it 'does not allow two accounts with the same IBAN' do
+          account = Fabricate(:account, organization_id: organization.id)
+          payload = Fabricate.attributes_for(:account)
+          post "/accounts", payload.merge(subscriber: "SOMEUSER", iban: account.iban), { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_json 'errors.iban', ["must be unique"]
+        end
+
+        it 'handles bank related errors when setting up an account' do
+          allow_any_instance_of(Subscriber).to receive(:setup!).and_return(false)
+          payload = Fabricate.attributes_for(:account)
+          post "/accounts", payload.merge(subscriber: "SOMEUSER"), { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_json 'message', 'Failed to setup subscriber with your bank. Make sure your data is valid and retry!'
+        end
+      end
+
+      context 'valid data' do
+        before { allow_any_instance_of(Subscriber).to receive(:setup!).and_return(true) }
+
+        def do_request
+          payload = Fabricate.attributes_for(:account)
+          post "/accounts", payload.merge(subscriber: "SOMEUSER"), { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+        end
+
+        it 'returns a 201' do
+          do_request
+          expect_status 201
+        end
+
+        it 'returns a proper message' do
+          do_request
+          expect_json 'message', 'Account created successfully.'
+        end
+
+        it 'returns the newly created account' do
+          do_request
+          expect_json_types 'account', NEW_ACCOUNT_SPEC
+        end
+
+        it 'creates a new account' do
+          expect { do_request }.to change { Account.count }.by(1)
+        end
+
+        it 'creates a new subscriber' do
+          expect { do_request }.to change { Subscriber.count }.by(1)
+        end
+
+        it 'triggers an event' do
+          expect { do_request }.to change { Event.where(type: 'account_created').count }.by(1)
+        end
+
+        it 'allows two accounts with the same IBAN if in different organizations' do
+          other_organization = Fabricate(:organization)
+          account = Fabricate(:account, organization_id: other_organization.id)
+          payload = Fabricate.attributes_for(:account)
+          post "/accounts", payload.merge(subscriber: "SOMEUSER", iban: account.iban), { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_status 201
+        end
+      end
     end
 
     ###
