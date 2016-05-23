@@ -255,5 +255,61 @@ module Box
       end
     end
 
+
+    ###
+    ### GET /accounts/:iban/ini_letter
+    ###
+
+    describe 'GET: /accounts/:iban/ini_letter' do
+      let!(:account) { Fabricate(:activated_account, organization_id: organization.id) }
+
+      context "when no valid access token is provided" do
+        it 'returns a 401' do
+          get "/accounts/#{account.iban}/ini_letter", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer invalid-token' }
+          expect_status 401
+        end
+      end
+
+      context "when account does not exist" do
+        it 'returns a 404' do
+          get "/accounts/UNKNOWN_IBAN/ini_letter", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_status 404
+        end
+      end
+
+      context 'setup has not been performed' do
+        before { account.subscribers.first.update(activated_at: nil, user_id: user.id) }
+
+        it 'fails with an error status' do
+          get "/accounts/#{account.iban}/ini_letter", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_status 412
+        end
+
+        it 'fails with a meaningful error message' do
+          get "/accounts/#{account.iban}/ini_letter", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_json 'message', 'Subscriber setup not yet initiated'
+        end
+      end
+
+      context 'setup has been initiated before' do
+        before { account.subscribers.first.update(ini_letter: "INI LETTER", user_id: user.id) }
+
+        it 'returns a success code' do
+          get "/accounts/#{account.iban}/ini_letter", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_status 200
+        end
+
+        it 'returns data as html content' do
+          get "/accounts/#{account.iban}/ini_letter", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect(response.headers["Content-Type"]).to eq('text/html')
+        end
+
+        it 'returns the ini letter' do
+          get "/accounts/#{account.iban}/ini_letter", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect(response.body).to eq("INI LETTER")
+        end
+      end
+    end
+
   end
 end

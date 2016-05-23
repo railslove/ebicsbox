@@ -10,6 +10,12 @@ module Box
       class Accounts < Grape::API
         include ApiEndpoint
 
+        content_type :html, 'text/html'
+
+        rescue_from Sequel::NoMatchingRow do |e|
+          error!({ message: 'Your organization does not have an account with given IBAN!' }, 404)
+        end
+
         resource :accounts do
 
           ###
@@ -66,18 +72,25 @@ module Box
             requires :iban, type: String
           end
           get ':iban' do
-            begin
-              account = Box::Account.by_organization(current_organization).first!(iban: params[:iban])
-              present account, with: Entities::V2::Account
-            rescue Sequel::NoMatchingRow => ex
-              error!({ message: 'Your organization does not have an account with given IBAN!' }, 404)
-            end
+            account = Box::Account.by_organization(current_organization).first!(iban: params[:iban])
+            present account, with: Entities::V2::Account
           end
 
 
           ###
           ### GET /accounts/:iban/ini_letter
           ###
+
+          get ':iban/ini_letter' do
+            account = Box::Account.by_organization(current_organization).first!(iban: params[:iban])
+            subscriber = account.subscriber_for(current_user.id)
+            if subscriber.ini_letter.nil?
+              error!({ message: 'Subscriber setup not yet initiated!' }, 412)
+            else
+              content_type 'text/html'
+              subscriber.ini_letter
+            end
+          end
 
 
           ###
