@@ -1,18 +1,12 @@
 require 'grape'
 
-require_relative '../../helpers/default'
+require_relative './api_endpoint'
 
 module Box
   module Apis
     module V2
       class Service < Grape::API
-        helpers Helpers::Default
-
-        before do
-          if current_user.nil?
-            error!({ message: 'Unauthorized access. Please provide a valid access token!' }, 401)
-          end
-        end
+        include ApiEndpoint
 
         get do
           {

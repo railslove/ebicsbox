@@ -1,0 +1,148 @@
+require 'spec_helper'
+
+module Box
+  RSpec.describe Apis::V2::Transactions do
+    include_context 'valid user'
+
+    describe 'GET: /transactions' do
+      context "when no valid access token is provided" do
+        it 'returns a 404' do
+          get '/transactions', { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer invalid-token' }
+          expect_status 401
+        end
+      end
+
+      context "when no transactions are available" do
+        it 'returns a 200' do
+          get '/transactions', { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_status 200
+        end
+
+        it 'returns an empty array' do
+          get '/transactions', { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_json []
+        end
+      end
+
+      context "when transactions are available" do
+        include_context 'with account'
+
+        let!(:trx1) { account.add_statement(eref: 'trx-1') }
+
+        it 'returns a 200' do
+          get '/transactions', { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_status 200
+        end
+
+        it 'returns an array of those transactions' do
+          get '/transactions', { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_json '?', end_to_end_reference: 'trx-1'
+        end
+
+        it 'does not include transactions from accounts belonging to a different organization' do
+          other_orga = Box::Organization.create(name: 'Some other organization')
+          account = other_orga.add_account(organization_id: 2, iban: 'OTHERIBAN')
+          trx2 = account.add_statement(eref: 'trx-2')
+
+          get '/transactions', { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_json_sizes 1
+        end
+      end
+
+      describe 'pagination' do
+        include_context 'with account'
+
+        let!(:trx1) { account.add_statement(eref: 'trx-1', date: '2016-01-01') }
+        let!(:trx2) { account.add_statement(eref: 'trx-2', date: '2016-01-02') }
+
+        it 'returns multiple items by default' do
+          get "/transactions", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_json_sizes 2
+        end
+
+        it 'orders by decending date' do
+          get "/transactions", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_json '0', end_to_end_reference: 'trx-2'
+          expect_json '1', end_to_end_reference: 'trx-1'
+        end
+
+        it 'allows to specify items per page' do
+          get "/transactions?per_page=1", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_json_sizes 1
+        end
+
+        it 'allows to specify the page' do
+          get "/transactions?page=1&per_page=1", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_json '*', end_to_end_reference: 'trx-2'
+
+          get "/transactions?page=2&per_page=1", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_json '*', end_to_end_reference: 'trx-1'
+        end
+
+        it 'sets pagination headers' do
+          get "/transactions?per_page=1", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect(headers['Link']).to include("rel='next'")
+        end
+      end
+
+      context "when account filter is active" do
+        include_context 'with account'
+
+        let!(:second_account) { organization.add_account(name: 'Second account', iban: 'SECONDACCOUNT') }
+        let!(:first_transaction) { account.add_statement(eref: 'first-trx') }
+        let!(:other_transaction) { second_account.add_statement(eref: 'other-trx') }
+
+        it 'only returns transactions belonging to matching account' do
+          get "/transactions?iban=#{second_account.iban}", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_json_sizes 1
+          expect_json '0', end_to_end_reference: 'other-trx'
+        end
+
+        it 'does not return transactions not belonging to matching account' do
+          get "/transactions?iban=#{account.iban}", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_json_sizes 1
+          expect_json '0', end_to_end_reference: 'first-trx'
+        end
+
+        it 'allows to specify multiple accounts' do
+          get "/transactions?iban=#{account.iban},#{second_account.iban}", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_json_sizes 2
+        end
+      end
+
+      context "when date filter is active" do
+        include_context 'with account'
+
+        let!(:old) { account.add_statement(eref: 'trx-1', date: '2016-01-01') }
+        let!(:new) { account.add_statement(eref: 'trx-2', date: '2016-02-01') }
+
+        it 'allows to filter only by lower boundary date' do
+          get '/transactions?from=2016-02-01', { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_json '*', end_to_end_reference: 'trx-2'
+        end
+
+        it 'allows to filter only by upper boundary date' do
+          get '/transactions?to=2016-01-31', { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_json '*', end_to_end_reference: 'trx-1'
+        end
+
+        it 'allows to filter by upper and lower boundary date' do
+          get '/transactions?from=2016-01-30&to=2016-01-31', { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_json_sizes 0
+        end
+      end
+
+      context "when type filter is active" do
+        include_context 'with account'
+
+        let!(:debit) { account.add_statement(eref: 'trx-1', debit: true) }
+        let!(:credit) { account.add_statement(eref: 'trx-2', debit: false) }
+
+        it 'only returns transactions which match its type' do
+          get '/transactions?type=debit', { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          expect_json '*', type: 'debit'
+        end
+      end
+    end
+  end
+end
