@@ -4,11 +4,11 @@ module Box
   module Entities
     class Transaction < Grape::Entity
       expose(:account) { |statement| statement.account.iban }
-      expose :eref
-      expose :type
-      expose :status
-      expose :order_type
-      expose :ebics_transaction_id
+      expose(:eref)
+      expose(:type)
+      expose(:status)
+      expose(:order_type)
+      expose(:ebics_transaction_id)
       expose(:_links, documentation: { type: "Hash", desc: "Links to resources" }) do |trx|
         iban = trx.account.iban
         {
