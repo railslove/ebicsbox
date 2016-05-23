@@ -55,6 +55,11 @@ module Box
             post '/organizations', { name: "New Organization", user: { name: "John Doe" } }
             expect_json 'user.access_token', User.last.access_token
           end
+
+          it 'makes first user an admin user' do
+            post '/organizations', { name: "New Organization", user: { name: "John Doe" } }
+            expect(User.last.admin).to eq(true)
+          end
         end
 
         context 'valid data with preset management token' do
@@ -71,6 +76,11 @@ module Box
           it 'includes the preset management token in its response' do
             post '/organizations', { name: "New Organization", user: { name: "John Doe", access_token: 'some-token' } }
             expect_json 'user.access_token', 'some-token'
+          end
+
+          it 'makes first user an admin user' do
+            post '/organizations', { name: "New Organization", user: { name: "John Doe" } }
+            expect(User.last.admin).to eq(true)
           end
         end
 
