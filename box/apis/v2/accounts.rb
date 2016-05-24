@@ -97,6 +97,24 @@ module Box
           ### PUT /accounts/:iban
           ###
 
+          params do
+            optional :name, type: String, allow_blank: false, desc: 'Internal description of account'
+            optional :creditor_identifier, type: String, desc: 'Creditor identifier required for direct debits'
+            optional :callback_url, type: String, desc: 'URL to which webhooks are delivered'
+          end
+          put ':iban' do
+            account = current_organization.accounts_dataset.first!(iban: params[:iban])
+            account.set(declared(params, include_missing: false))
+            if !account.modified? || account.save
+              {
+                message: "Account updated successfully.",
+                account: Entities::V2::Account.represent(account),
+              }
+            else
+              error!({ message: 'Failed to update account' }, 400)
+            end
+          end
+
 
           ###
           ### DELETE /accounts/:iban
