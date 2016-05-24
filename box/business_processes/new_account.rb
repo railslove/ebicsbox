@@ -10,6 +10,11 @@ module Box
         # Remove it, so we can safely pass params to account create method
         subscriber = params.delete(:subscriber)
 
+        # Always create fake accounts in sandbox mode
+        if Box.configuration.sandbox?
+          params[:mode] = "Fake"
+        end
+
         DB.transaction do
           account = organization.add_account(params)
           subscriber = account.add_subscriber(user_id: user.id, remote_user_id: subscriber)

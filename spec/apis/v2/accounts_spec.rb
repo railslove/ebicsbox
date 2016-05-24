@@ -228,6 +228,18 @@ module Box
           post "/accounts", payload.merge(subscriber: "SOMEUSER", iban: account.iban), VALID_HEADERS
           expect_status 201
         end
+
+        it 'does not set fake mode for accounts created in regular mode' do
+          allow(Box.configuration).to receive(:sandbox?).and_return(false)
+          do_request
+          expect(Account.last.mode).to be_nil
+        end
+
+        it 'sets fake mode for accounts created in sandbox mode' do
+          allow(Box.configuration).to receive(:sandbox?).and_return(true)
+          do_request
+          expect(Account.last.mode).to eq('Fake')
+        end
       end
     end
 
