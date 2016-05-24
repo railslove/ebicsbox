@@ -11,7 +11,7 @@ module Box
         expose :iban
         expose :bic
         expose :type
-        expose :amount
+        expose :amount, as: "amount_in_cents"
         expose :date, as: "executed_on"
         expose(:reference) { |transaction| transaction[:svwz] || transaction[:information] }
         expose :eref, as: 'end_to_end_reference'
