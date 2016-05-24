@@ -4,22 +4,45 @@ module Box
   RSpec.describe Apis::V2::Transactions do
     include_context 'valid user'
 
+    TRANSACTION_SPEC = {
+      id: :string,
+      account: :string,
+      name: :string,
+      iban: :string,
+      bic: :string,
+      amount_in_cents: :integer,
+      executed_on: :date,
+      type: :string,
+      reference: :string,
+      end_to_end_reference: :string,
+    }
+
+    VALID_HEADERS = {
+      'Accept' => 'application/vnd.ebicsbox-v2+json',
+      'Authorization' => 'Bearer test-token'
+    }
+
+    INVALID_TOKEN_HEADER = {
+      'Accept' => 'application/vnd.ebicsbox-v2+json',
+      'Authorization' => 'Bearer invalid-token'
+    }
+
     describe 'GET: /transactions' do
       context "when no valid access token is provided" do
         it 'returns a 404' do
-          get '/transactions', { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer invalid-token' }
+          get '/transactions', INVALID_TOKEN_HEADER
           expect_status 401
         end
       end
 
       context "when no transactions are available" do
         it 'returns a 200' do
-          get '/transactions', { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          get '/transactions', VALID_HEADERS
           expect_status 200
         end
 
         it 'returns an empty array' do
-          get '/transactions', { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          get '/transactions', VALID_HEADERS
           expect_json []
         end
       end
@@ -27,15 +50,15 @@ module Box
       context "when transactions are available" do
         include_context 'with account'
 
-        let!(:trx1) { account.add_statement(eref: 'trx-1') }
+        let!(:trx1) { account.add_statement(Fabricate.attributes_for(:statement, eref: 'trx-1')) }
 
         it 'returns a 200' do
-          get '/transactions', { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          get '/transactions', VALID_HEADERS
           expect_status 200
         end
 
         it 'returns an array of those transactions' do
-          get '/transactions', { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          get '/transactions', VALID_HEADERS
           expect_json '?', end_to_end_reference: 'trx-1'
         end
 
@@ -44,8 +67,13 @@ module Box
           account = other_orga.add_account(organization_id: 2, iban: 'OTHERIBAN')
           trx2 = account.add_statement(eref: 'trx-2')
 
-          get '/transactions', { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          get '/transactions', VALID_HEADERS
           expect_json_sizes 1
+        end
+
+        it 'formats the response decument properly' do
+          get '/transactions', VALID_HEADERS
+          expect_json_types '0', TRANSACTION_SPEC
         end
       end
 
@@ -56,31 +84,31 @@ module Box
         let!(:trx2) { account.add_statement(eref: 'trx-2', date: '2016-01-02') }
 
         it 'returns multiple items by default' do
-          get "/transactions", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          get "/transactions", VALID_HEADERS
           expect_json_sizes 2
         end
 
         it 'orders by decending date' do
-          get "/transactions", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          get "/transactions", VALID_HEADERS
           expect_json '0', end_to_end_reference: 'trx-2'
           expect_json '1', end_to_end_reference: 'trx-1'
         end
 
         it 'allows to specify items per page' do
-          get "/transactions?per_page=1", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          get "/transactions?per_page=1", VALID_HEADERS
           expect_json_sizes 1
         end
 
         it 'allows to specify the page' do
-          get "/transactions?page=1&per_page=1", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          get "/transactions?page=1&per_page=1", VALID_HEADERS
           expect_json '*', end_to_end_reference: 'trx-2'
 
-          get "/transactions?page=2&per_page=1", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          get "/transactions?page=2&per_page=1", VALID_HEADERS
           expect_json '*', end_to_end_reference: 'trx-1'
         end
 
         it 'sets pagination headers' do
-          get "/transactions?per_page=1", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          get "/transactions?per_page=1", VALID_HEADERS
           expect(headers['Link']).to include("rel='next'")
         end
       end
@@ -93,19 +121,19 @@ module Box
         let!(:other_transaction) { second_account.add_statement(eref: 'other-trx') }
 
         it 'only returns transactions belonging to matching account' do
-          get "/transactions?iban=#{second_account.iban}", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          get "/transactions?iban=#{second_account.iban}", VALID_HEADERS
           expect_json_sizes 1
           expect_json '0', end_to_end_reference: 'other-trx'
         end
 
         it 'does not return transactions not belonging to matching account' do
-          get "/transactions?iban=#{account.iban}", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          get "/transactions?iban=#{account.iban}", VALID_HEADERS
           expect_json_sizes 1
           expect_json '0', end_to_end_reference: 'first-trx'
         end
 
         it 'allows to specify multiple accounts' do
-          get "/transactions?iban=#{account.iban},#{second_account.iban}", { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          get "/transactions?iban=#{account.iban},#{second_account.iban}", VALID_HEADERS
           expect_json_sizes 2
         end
       end
@@ -117,17 +145,17 @@ module Box
         let!(:new) { account.add_statement(eref: 'trx-2', date: '2016-02-01') }
 
         it 'allows to filter only by lower boundary date' do
-          get '/transactions?from=2016-02-01', { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          get '/transactions?from=2016-02-01', VALID_HEADERS
           expect_json '*', end_to_end_reference: 'trx-2'
         end
 
         it 'allows to filter only by upper boundary date' do
-          get '/transactions?to=2016-01-31', { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          get '/transactions?to=2016-01-31', VALID_HEADERS
           expect_json '*', end_to_end_reference: 'trx-1'
         end
 
         it 'allows to filter by upper and lower boundary date' do
-          get '/transactions?from=2016-01-30&to=2016-01-31', { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          get '/transactions?from=2016-01-30&to=2016-01-31', VALID_HEADERS
           expect_json_sizes 0
         end
       end
@@ -139,7 +167,7 @@ module Box
         let!(:credit) { account.add_statement(eref: 'trx-2', debit: false) }
 
         it 'only returns transactions which match its type' do
-          get '/transactions?type=debit', { 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token' }
+          get '/transactions?type=debit', VALID_HEADERS
           expect_json '*', type: 'debit'
         end
       end
