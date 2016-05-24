@@ -345,7 +345,7 @@ module Box
 
       context "when account belongs to another organization" do
         let!(:other_organization) { Fabricate(:organization) }
-        let!(:other_account) { other_organization.add_account(Fabricate.attributes_for(:account)) }
+        let!(:other_account) { other_organization.add_account(Fabricate.attributes_for(:account, iban: 'DE41405327214540168131')) }
 
         it 'returns a 404' do
           put "/accounts/#{other_account.iban}", { name: 'Internal Account' }, VALID_HEADERS
