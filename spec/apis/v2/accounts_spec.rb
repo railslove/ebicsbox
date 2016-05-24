@@ -389,6 +389,5 @@ module Box
         end
       end
     end
-
   end
 end

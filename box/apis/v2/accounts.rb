@@ -114,11 +114,6 @@ module Box
               error!({ message: 'Failed to update account' }, 400)
             end
           end
-
-
-          ###
-          ### DELETE /accounts/:iban
-          ###
         end
       end
     end
