@@ -26,8 +26,6 @@ RUN rm -rf pkg
 RUN rm -rf log
 RUN rm Procfile*
 RUN rm README*
-RUN rm package.json
-RUN rm webpack.config.js
 RUN rm docker-compose.yml
 RUN rm replicated-compose.yml
 
