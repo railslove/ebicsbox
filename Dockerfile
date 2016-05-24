@@ -1,5 +1,4 @@
-FROM yoyostile/railslove-jruby:9.0.5.0
-RUN curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -
+FROM yoyostile/railslove-jruby:9.1.0.0
 RUN apt-get update && apt-get install -y git supervisor python-pip
 RUN pip install supervisor-stdout
 
@@ -22,7 +21,6 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # Clean up
 RUN rm Dockerfile*
 RUN rm Rakefile
-RUN rm -rf ./node_modules
 RUN rm -rf .git
 RUN rm -rf pkg
 RUN rm -rf log
