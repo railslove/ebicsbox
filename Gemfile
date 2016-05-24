@@ -36,4 +36,6 @@ group :development, :test do
   gem 'timecop'
   gem 'webmock'
   gem 'pry'
+  gem 'fabrication'
+  gem 'faker'
 end
