@@ -43,6 +43,10 @@ module Box
       ENV['ENVIRONMENT'] == 'test'
     end
 
+    def sandbox?
+      ENV['SANDBOX'] == 'enabled'
+    end
+
     def registrations_allowed?
       ENV['ALLOW_REGISTRATIONS'] == 'enabled'
     end
