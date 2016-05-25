@@ -118,5 +118,31 @@ module Box
         end
       end
     end
+
+    describe 'config' do
+      let(:account) { Account.new }
+
+      it 'returns a configuration object' do
+        expect(account.config).to be_kind_of(Box::Account::Config)
+      end
+
+      describe '.activation_check_interval' do
+        context "when no value is specified" do
+          before { account.set(config: {}) }
+
+          it 'falls back to global default' do
+            expect(account.config.activation_check_interval).to eq(Box.configuration.activation_check_interval)
+          end
+        end
+
+        context "when a value is specified" do
+          before { account.set(config: { activation_check_interval: 10 }) }
+
+          it 'uses this value' do
+            expect(account.config.activation_check_interval).to eq(10)
+          end
+        end
+      end
+    end
   end
 end

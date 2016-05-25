@@ -55,9 +55,8 @@ module Box
       client.tubes[DEBIT_TUBE].put(payload)
     end
 
-    def self.check_subscriber_activation(subscriber_id, delayed = true)
-      options = delayed ? { delay: Box.configuration.activation_check_interval } : {}
-      client.tubes[ACTIVATION_TUBE].put({ subscriber_id: subscriber_id }, options)
+    def self.check_subscriber_activation(subscriber_id, interval)
+      client.tubes[ACTIVATION_TUBE].put({ subscriber_id: subscriber_id }, { delay: interval })
     end
 
 

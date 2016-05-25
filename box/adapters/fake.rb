@@ -14,7 +14,7 @@ module Box
       end
 
       def ini_letter(name)
-        "ini"
+        "Here would be the INI letter you would need to sign for your bank."
       end
 
       def INI

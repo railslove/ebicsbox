@@ -4,7 +4,8 @@ require 'json'
 module Box
   module Jobs
     RSpec.describe CheckActivation do
-      let(:subscriber) { Subscriber.create }
+      let(:account) { Account.create }
+      let(:subscriber) { account.add_subscriber({}) }
 
       def execute
         described_class.process!(subscriber_id: subscriber.id)

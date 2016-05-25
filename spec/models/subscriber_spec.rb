@@ -46,7 +46,7 @@ module Box
       end
 
       it 'queues an account activation job' do
-        expect(Box::Queue).to receive(:check_subscriber_activation).with(subject.id)
+        expect(Box::Queue).to receive(:check_subscriber_activation).with(subject.id, anything)
         subject.setup!
       end
     end

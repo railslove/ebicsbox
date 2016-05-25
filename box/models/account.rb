@@ -3,6 +3,18 @@ require 'securerandom'
 
 module Box
   class Account < Sequel::Model
+    class Config
+      attr_accessor :config
+      
+      def initialize(config_hash)
+        self.config = OpenStruct.new(config_hash)
+      end
+
+      def activation_check_interval
+        config.activation_check_interval || Box.configuration.activation_check_interval
+      end
+    end
+
     self.raise_on_save_failure = true
 
     NoTransportClient = Class.new(StandardError)
@@ -46,6 +58,10 @@ module Box
       limit(params[:per_page])
         .offset((params[:page] - 1) * params[:per_page])
         .order(:name)
+    end
+
+    def config
+      Config.new(super)
     end
 
     def transport_client

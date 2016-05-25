@@ -55,31 +55,16 @@ module Box
 
       context 'delay check by default' do
         it 'puts a new message onto the activation queue' do
-          expect { described_class.check_subscriber_activation(1) }.to change { tube.peek(:delayed) }
+          expect { described_class.check_subscriber_activation(1, 120) }.to change { tube.peek(:delayed) }
         end
 
         it 'puts only provided account id onto job' do
-          described_class.check_subscriber_activation(1)
+          described_class.check_subscriber_activation(1, 120)
           expect(tube.peek(:delayed).body).to eq(subscriber_id: 1)
         end
 
         it 'does not put anything on immediate execution tube' do
-          expect { described_class.check_subscriber_activation(1) }.to_not change { tube.peek(:ready) }
-        end
-      end
-
-      context 'can schedule immidiate check' do
-        it 'puts a new message onto the activation queue' do
-          expect { described_class.check_subscriber_activation(1, false) }.to change { tube.peek(:ready) }
-        end
-
-        it 'puts only provided account id onto job' do
-          described_class.check_subscriber_activation(1, false)
-          expect(tube.peek(:ready).body).to eq(subscriber_id: 1)
-        end
-
-        it 'does not put anything on delayed execution tube' do
-          expect { described_class.check_subscriber_activation(1, false) }.to_not change { tube.peek(:delayed) }
+          expect { described_class.check_subscriber_activation(1, 120) }.to_not change { tube.peek(:ready) }
         end
       end
     end
