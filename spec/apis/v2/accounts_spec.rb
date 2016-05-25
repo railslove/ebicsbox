@@ -229,16 +229,32 @@ module Box
           expect_status 201
         end
 
-        it 'does not set fake mode for accounts created in regular mode' do
-          allow(Box.configuration).to receive(:sandbox?).and_return(false)
-          do_request
-          expect(Account.last.mode).to be_nil
+        context "when regular server mode" do
+          before { allow(Box.configuration).to receive(:sandbox?).and_return(false) }
+
+          it 'does not set fake mode' do
+            do_request
+            expect(Account.last.mode).to be_nil
+          end
+
+          it 'does not set a custom activation interval' do
+            do_request
+            expect(Account.last.config.activation_check_interval).to eq(Box.configuration.activation_check_interval)
+          end
         end
 
-        it 'sets fake mode for accounts created in sandbox mode' do
-          allow(Box.configuration).to receive(:sandbox?).and_return(true)
-          do_request
-          expect(Account.last.mode).to eq('Fake')
+        context "when sandbox server mode" do
+          before { allow(Box.configuration).to receive(:sandbox?).and_return(true) }
+
+          it 'sets fake mode' do
+            do_request
+            expect(Account.last.mode).to eq('Fake')
+          end
+
+          it 'sets custom activation interval to zero' do
+            do_request
+            expect(Account.last.config.activation_check_interval).to eq(0)
+          end
         end
       end
     end
