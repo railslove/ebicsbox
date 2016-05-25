@@ -9,7 +9,7 @@ module Box
         if subscriber.activate!
           Box.logger.info("[Jobs::CheckActivation] Activated subscriber! subscriber_id=#{subscriber.id}")
         else
-          Queue.check_subscriber_activation(subscriber.id)
+          Queue.check_subscriber_activation(subscriber.id, subscriber.account.config.activation_check_interval)
           Box.logger.info("[Jobs::CheckActivation] Failed to activate subscriber! subscriber_id=#{subscriber.id}")
         end
       end
