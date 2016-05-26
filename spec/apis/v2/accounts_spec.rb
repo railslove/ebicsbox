@@ -251,9 +251,9 @@ module Box
             expect(Account.last.mode).to eq('Fake')
           end
 
-          it 'sets custom activation interval to zero' do
+          it 'sets custom activation interval to 3 seconds' do
             do_request
-            expect(Account.last.config.activation_check_interval).to eq(0)
+            expect(Account.last.config.activation_check_interval).to eq(3)
           end
         end
       end

@@ -13,7 +13,7 @@ module Box
         # Always create fake accounts in sandbox mode
         if Box.configuration.sandbox?
           params[:mode] = "Fake"
-          params[:config] = { activation_check_interval: 0 }
+          params[:config] = { activation_check_interval: 3 } # to let the transaction finish
         end
 
         DB.transaction do
