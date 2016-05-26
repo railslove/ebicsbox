@@ -3,6 +3,7 @@ require 'sequel'
 
 require_relative '../queue'
 require_relative '../models/account'
+require_relative '../models/organization'
 require_relative './webhook_delivery'
 
 module Box
