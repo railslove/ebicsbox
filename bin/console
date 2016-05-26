@@ -15,4 +15,6 @@ require_relative '../config/bootstrap'
 Dir[File.join(File.dirname(__FILE__), '../box/**/*.rb')].map { |file| require_relative(file.gsub('bin/', '')) }
 
 require 'pry'
-pry
+module Box
+  pry
+end
