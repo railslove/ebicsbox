@@ -2,6 +2,11 @@ module Box
   module Models
     RSpec.describe Transaction do
 
+      it 'automatically sets created_at timestamp' do
+        trx = Transaction.create
+        expect(trx.reload.created_at).to be_kind_of(Time)
+      end
+
       describe 'public api' do
         describe 'instance' do
           subject { described_class.new }
