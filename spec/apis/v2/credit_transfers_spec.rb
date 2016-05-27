@@ -6,7 +6,12 @@ module Box
     include_context 'with account'
 
     TRANSFER_SPEC = {
-
+      id: :string,
+      account: :string,
+      amount_in_cents: :integer,
+      end_to_end_reference: :string,
+      status: :string,
+      _links: :object,
     }
 
     VALID_HEADERS = {
@@ -55,7 +60,6 @@ module Box
 
         it 'returns includes the existing credit' do
           get '/credit_transfers', VALID_HEADERS
-          # expect(json_body).to eq('test')
           expect_json_sizes 1
         end
 

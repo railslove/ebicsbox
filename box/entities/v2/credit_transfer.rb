@@ -5,7 +5,7 @@ module Box
   module Entities
     module V2
       class CreditTransfer < Grape::Entity
-        # expose :public_id, as: "id"
+        expose :public_id, as: "id"
         expose(:account) { |transaction| transaction.account.iban }
         # expose :name
         # expose :iban
