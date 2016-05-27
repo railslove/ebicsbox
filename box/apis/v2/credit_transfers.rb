@@ -19,8 +19,6 @@ module Box
             optional :iban, type: Array[String], desc: "IBAN of an account", coerce_with: ->(value) { value.split(',') }
             optional :page, type: Integer, desc: "page through the results", default: 1
             optional :per_page, type: Integer, desc: "how many results per page", values: 1..100, default: 10
-            optional :from, type: Date, desc: "Date from which on to filter the results"
-            optional :to, type: Date, desc: "Date to which filter results"
           end
           get do
             query = Box::Transaction.by_organization(current_organization).credit_transfers.filtered(declared(params))
