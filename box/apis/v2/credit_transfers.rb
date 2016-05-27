@@ -53,7 +53,7 @@ module Box
           ###
 
           get ":id" do
-            credit_transfer = Box::Transaction.by_organization(current_organization).credit_transfers.find(id: params[:id])
+            credit_transfer = Box::Transaction.by_organization(current_organization).credit_transfers.first(public_id: params[:id])
             present credit_transfer, with: Entities::V2::CreditTransfer
           end
 

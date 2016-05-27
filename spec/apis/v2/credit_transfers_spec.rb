@@ -161,6 +161,29 @@ module Box
           expect_status 401
         end
       end
+
+      context "when credit does not exist" do
+        it 'returns a 404' do
+          get "/credit_transfers/UNKNOWN_ID", VALID_HEADERS
+          expect_status 404
+        end
+      end
+
+      context "when credit does exist" do
+        let!(:credit) { Fabricate(:credit, eref: 'my-credit', account_id: account.id) }
+
+        it 'returns a 200' do
+          id = credit.public_id
+          get "/credit_transfers/#{id}", VALID_HEADERS
+          expect_status 200
+        end
+
+        it 'exposes properly formatted data' do
+          get "/credit_transfers/#{credit.public_id}", VALID_HEADERS
+          expect_json_types TRANSFER_SPEC
+        end
+      end
+
     end
   end
 end
