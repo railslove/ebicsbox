@@ -8,9 +8,13 @@ module Box
     TRANSFER_SPEC = {
       id: :string,
       account: :string,
+      name: :string,
+      iban: :string,
+      bic: :string,
       amount_in_cents: :integer,
       end_to_end_reference: :string,
       status: :string,
+      reference: :string,
       _links: :object,
     }
 
