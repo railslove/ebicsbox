@@ -227,7 +227,7 @@ module Box
         end
 
         it 'allows same end_to_end_reference for two different accounts' do
-          other_account = Fabricate(:account, organization_id: account.organization_id)
+          other_account = Fabricate(:account, organization_id: account.organization_id, iban: 'DE41405327214540168131')
           credit = Fabricate(:credit, account_id: other_account.id, eref: 'my-credit-eref')
           post "/credit_transfers", valid_attributes.merge(end_to_end_reference: 'my-credit-eref'), VALID_HEADERS
           expect_status 201
