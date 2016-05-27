@@ -13,6 +13,7 @@ module Box
         expose :amount, as: "amount_in_cents"
         expose :eref, as: 'end_to_end_reference'
         expose(:reference) { |trx| trx.parsed_payload[:payments].first[:transactions].first[:remittance_information] }
+        expose(:executed_on) { |trx| trx.parsed_payload[:payments].first[:execution_date] }
         expose :status
         expose(:_links) do |transaction|
           iban = transaction.account.iban

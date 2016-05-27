@@ -15,6 +15,7 @@ module Box
       end_to_end_reference: :string,
       status: :string,
       reference: :string,
+      executed_on: :date,
       _links: :object,
     }
 
