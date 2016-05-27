@@ -38,5 +38,22 @@ module Box
       # TODO: Will be fixed upstream in the sepa_king gem by us
       fail BusinessProcessFailure.new({ base: e.message }, 'Invalid data')
     end
+
+    def self.v2_create!(user, account, params)
+      # EBICS requires a unix timestamp
+      params[:requested_date] = params[:execution_date].to_time.to_i
+
+      # Transform a few params
+      params[:amount] = params[:amount_in_cents]
+      params[:eref] = params[:end_to_end_reference]
+      params[:remittance_information] = params[:reference]
+
+      # Set urgent flag or fall back to SEPA
+      params[:service_level] = params[:urgent] ? 'URGP' : 'SEPA'
+
+      # Execute v1 method
+      create!(account, params, user)
+    end
+
   end
 end

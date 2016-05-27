@@ -27,5 +27,6 @@ end
 DB = Sequel.connect(Box.configuration.database_url, max_connections: 10)
 
 # Enable json extensions
+Sequel::Model.plugin :timestamps, update_on_create: true
 Sequel.extension :pg_json
 DB.extension :pg_json
