@@ -129,7 +129,7 @@ module Box
             before { statement.update(debit: false) }
 
             it 'sets correct transaction state' do
-              expect_any_instance_of(Transaction).to receive(:set_state_from).with('credit_received')
+              expect_any_instance_of(Transaction).to receive(:update_status).with('credit_received')
               exec_link_action
             end
           end
@@ -138,7 +138,7 @@ module Box
             before { statement.update(debit: true) }
 
             it 'sets correct transaction state' do
-              expect_any_instance_of(Transaction).to receive(:set_state_from).with('debit_received')
+              expect_any_instance_of(Transaction).to receive(:update_status).with('debit_received')
               exec_link_action
             end
           end

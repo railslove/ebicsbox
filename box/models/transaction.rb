@@ -32,10 +32,6 @@ module Box
         query = query.where(accounts__iban: params[:iban])
       end
 
-      # Filter by statement date
-      # query = query.where("transactions.date >= ?", params[:from]) if params[:from].present?
-      # query = query.where("transactions.date <= ?", params[:to]) if params[:to].present?
-
       query
     end
 
@@ -54,32 +50,36 @@ module Box
       where(account_id: account_id).limit(options[:per_page]).offset((options[:page] - 1) * options[:per_page]).reverse_order(:id)
     end
 
-    def set_state_from(action, reason_code = nil)
-      old_status = status
-      case
-      when action == "file_upload" && status == "created"
-        self.set(status: "file_upload")
-      when action == "es_verification" && status == "file_upload"
-        self.set(status: "es_verification")
-      when action == "order_hac_final_pos" && status == "es_verification"
-        self.set(status: "order_hac_final_pos")
-      when action == "order_hac_final_neg" && status == "es_verification"
-        self.set(status: "order_hac_final_neg")
-      when action == "credit_received" && type == "debit"
-        self.set(status: "funds_credited")
-      when action == "debit_received" && type == "credit"
-        self.set(status: "funds_debited")
-      when action == "debit_received" && type == "debit"
-        self.set(status: "funds_charged_back")
-      end
+    def history
+      super || []
+    end
 
-      self.save
+    def update_status(new_status, reason: nil)
+      old_status = status
+
+      update(
+        history: self.history << { at: Time.now, status: new_status, reason: reason},
+        status: get_status(new_status)
+      )
 
       if old_status != status
         Event.transaction_updated(self)
       end
 
-      self.status
+      return status
+    end
+
+    def get_status(new_status)
+      case
+        when new_status == "file_upload" && status == "created" then "file_upload"
+        when new_status == "es_verification" && status == "file_upload" then "es_verification"
+        when new_status == "order_hac_final_pos" && status == "es_verification" then "order_hac_final_pos"
+        when new_status == "order_hac_final_neg" && status == "es_verification" then "order_hac_final_neg"
+        when new_status == "credit_received" && type == "debit" then "funds_credited"
+        when new_status == "debit_received" && type == "credit" then "funds_debited"
+        when new_status == "debit_received" && type == "debit" then "funds_charged_back"
+        else status
+      end
     end
 
     def execute!
