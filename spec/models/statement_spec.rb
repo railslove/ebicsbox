@@ -2,18 +2,18 @@ module Box
   RSpec.describe Statement do
     describe '.paginated_by_account' do
       let(:account) { Account.create(iban: SecureRandom.uuid) }
-      let!(:statements) { [nil, nil, nil].map { Statement.create(account_id: account.id) } }
+      let!(:statements) { (1..3).map { |i| Statement.create(account_id: account.id, date: Date.today + i) } }
 
       it 'only account is required' do
-        expect(described_class.paginated_by_account(account_id: account.id).all).to eq(statements)
+        expect(described_class.paginated_by_account(account_id: account.id).all).to eq(statements.reverse)
       end
 
       it 'allows to limit the size of returned dataset' do
-        expect(described_class.paginated_by_account(account_id: account.id, per_page: 2).all).to eq(statements.take(2))
+        expect(described_class.paginated_by_account(account_id: account.id, per_page: 2).all).to eq(statements.reverse.take(2))
       end
 
       it 'allows to specify offset of returned dataset' do
-        expect(described_class.paginated_by_account(account_id: account.id, per_page: 2, page: 2).all).to eq([statements[2]])
+        expect(described_class.paginated_by_account(account_id: account.id, per_page: 2, page: 2).all).to eq([statements.reverse[2]])
       end
     end
 
