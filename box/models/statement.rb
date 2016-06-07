@@ -39,7 +39,7 @@ module Box
     def_dataset_method(:paginate) do |params|
       limit(params[:per_page])
         .offset((params[:page] - 1) * params[:per_page])
-        .reverse_order(:date)
+        .reverse_order(:date, :id)
     end
 
     def self.generic_filter(query, account_id: nil, transaction_id: nil, from: nil, to: nil, type: nil, **unused)

@@ -18,27 +18,29 @@ module Box
       end
 
       describe '.update_transaction' do
+        ACCOUNT_ID = 1
+
         def do_action(order_id = '0001')
-          described_class.update_transaction(1, { action: 'test', reason_code: 'none', ids: { 'OrderID' => order_id }})
+          described_class.update_transaction(ACCOUNT_ID, { action: 'test', reason_code: 'none', ids: { 'OrderID' => order_id }})
         end
 
         context 'transaction with order exists' do
-          let!(:transaction) { Transaction.create(ebics_order_id: '0001', status: 'new') }
+          let!(:transaction) { Transaction.create(account_id: ACCOUNT_ID, ebics_order_id: '0001', status: 'new') }
 
           it 'updates the transaction status' do
-            expect_any_instance_of(Transaction).to receive(:set_state_from).with('test', 'none')
+            expect_any_instance_of(Transaction).to receive(:update_status).with('test', reason: 'none')
             do_action
           end
 
           context 'transaction status changed' do
             it 'updates the transaction status' do
-              expect_any_instance_of(Transaction).to receive(:set_state_from).and_return('changed')
+              expect_any_instance_of(Transaction).to receive(:update_status).and_return('changed')
               do_action
             end
           end
 
           context 'transaction status did not change' do
-            before { allow_any_instance_of(Transaction).to receive(:set_state_from).and_return('new') }
+            before { allow_any_instance_of(Transaction).to receive(:update_status).and_return('new') }
 
             it 'does not trigger a webhook' do
               expect(Event).to_not receive(:transaction_updated)
@@ -49,7 +51,7 @@ module Box
 
         context 'no transaction with order id found' do
           it 'logs an info message' do
-            expect { do_action('0002') }.to have_logged_message('[Jobs::FetchProcessingStatus] No transactions with order id found. account_id=1 order_id=0002')
+            expect { do_action('0002') }.to have_logged_message('[Jobs::FetchProcessingStatus] Transaction not found. account_id=1 order_id=0002')
           end
         end
       end

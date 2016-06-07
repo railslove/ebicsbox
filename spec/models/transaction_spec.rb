@@ -15,12 +15,25 @@ module Box
         end
       end
 
-      describe '#set_state_from' do
+      describe '#update_status' do
+        subject { Transaction.create(status: "created") }
+
+        it 'tracks changes in history' do
+          expect { subject.update_status("test") }.to change { subject.reload.history }
+        end
+
+        it 'returns new status', verify_stubs: false do
+          subject.status = 'created'
+          allow(Event).to receive(:transaction_updated)
+          result = subject.update_status('file_upload')
+          expect(result).to eq('file_upload')
+        end
+
         context 'status changed' do
-          skip 'triggers a changed event' do
+          it 'triggers a changed event', verify_stubs: false do
             subject.status = 'created'
             expect(Event).to receive(:transaction_updated)
-            subject.set_state_from 'file_upload'
+            subject.update_status 'file_upload'
           end
         end
 
@@ -28,8 +41,22 @@ module Box
           it 'does not trigger a changed event' do
             subject.status = 'created'
             expect(Event).to_not receive(:transaction_updated)
-            subject.set_state_from 'test'
+            subject.update_status 'test'
           end
+        end
+      end
+
+      describe "#get_status", verify_stubs: false do
+        before { allow(Event).to receive(:transaction_updated) }
+
+        it "returns previous status on unexpected change" do
+          subject.status = 'created'
+          expect(subject.update_status("hello")).to eq("created")
+        end
+
+        it "returns new status on expected change" do
+          subject.status = 'created'
+          expect(subject.update_status("file_upload")).to eq("file_upload")
         end
       end
 

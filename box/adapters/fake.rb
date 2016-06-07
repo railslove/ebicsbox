@@ -57,7 +57,7 @@ module Box
         desc = trx.css("RmtInf Ustrd").text
         amount = (trx.css("Amt InstdAmt").text.to_f * 100).to_i
         transaction = Transaction[eref: eref]
-        transaction.set_state_from("debit_received", "credit")
+        transaction.update_status("debit_received", reason: "Auto accept fake credit transfers")
 
         statement = Statement.create({
           account_id: transaction.account_id,

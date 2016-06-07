@@ -50,9 +50,9 @@ module Box
           transaction.add_statement(statement)
 
           if statement.credit?
-            transaction.set_state_from("credit_received")
+            transaction.update_status("credit_received")
           elsif statement.debit?
-            transaction.set_state_from("debit_received")
+            transaction.update_status("debit_received")
           end
         end
       end

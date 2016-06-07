@@ -17,21 +17,18 @@ module Box
       end
 
       def self.update_transaction(account_id, info)
-        if order_id = info[:ids]["OrderID"]
-          # TODO: Scope this by account? Just as a security precaution?
-          if trx = Transaction[ebics_order_id: order_id]
-            # Extract this to transaction #set_state_from
-            old_status = trx.status
-            new_status = trx.set_state_from(info[:action], info[:reason_code])
-            if old_status != new_status
-              log(:debug, "Status changed. From #{old_status} to #{new_status}.", { account_id: account_id, ebics_order_id: order_id })
-            end
-            log(:info, "#{trx.pk} - #{info[:action]} for #{info[:ids]["OrderID"]} with #{info[:reason_code]}.", { account_id: account_id })
-          else
-            log(:info, "No transactions with order id found.", { account_id: account_id, order_id: order_id })
-          end
+        order_id = info[:ids]["OrderID"]
+        if trx = Transaction.first(ebics_order_id: info[:ids]["OrderID"], account_id: account_id)
+          trx.update_status(info[:action], reason: info[:reason_code])
+
+          log(:info, "Transaction status change.", {
+            account_id: account_id,
+            ebics_order_id: order_id,
+            transaction_id: trx.public_id,
+            status: info[:action]
+          })
         else
-          log(:debug, "No order id found.", { account_id: account_id, action: info[:action], reason: info[:reason_code], data: info[:ids] })
+          log(:info, "Transaction not found.", { account_id: account_id, order_id: order_id, info: info })
         end
       end
 
