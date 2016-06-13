@@ -4,7 +4,7 @@ require_relative '../../../box/apis/v1/content'
 
 module Box
   RSpec.describe Apis::V1::Content do
-    let(:organization) { Organization.create(name: 'Organization 1') }
+    let(:organization) { Fabricate(:organization) }
     let(:account) { organization.add_account(name: 'Test') }
     let!(:event) { account.add_event(type: 'test') }
     let!(:webhook_delivery) { event.add_webhook_delivery({}) }

@@ -9,7 +9,7 @@ require_relative '../../box/business_processes/import_statements'
 module Box
   module BusinessProcesses
     RSpec.describe ImportStatements do
-      let(:organization) { Organization.create(name: "Testorga") }
+      let(:organization) { Fabricate(:organization) }
       let(:account) { organization.add_account(host: "HOST", iban: "iban1234567") }
       let(:mt940_fixture) { 'single_valid.mt940' }
       let(:mt940) { File.read("spec/fixtures/#{mt940_fixture}") }
