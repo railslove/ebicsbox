@@ -5,7 +5,7 @@ Sequel.migration do
   up do
     Box::Organization.where('webhook_token IS NULL or webhook_token = ?', '').each do |orga|
       orga.webhook_token = SecureRandom.hex
-      orga.savegst
+      orga.save
     end
     alter_table(:organizations) do
       set_column_not_null :webhook_token
