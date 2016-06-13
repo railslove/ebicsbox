@@ -26,7 +26,9 @@ module Box
         data = JWT.decode(access_token, Box.configuration.jwt_secret, true, { algorithm: 'HS512', verify_jti: -> _ { validate_token(access_token) } }).first
         orga_data = data['organization']
 
-        organization = Organization.find_or_create(id: orga_data['sub'], name: orga_data['name'])
+        organization = Organization.find_or_create(id: orga_data['sub'], name: orga_data['name']) do |orga|
+          orga.webhook_token = SecureRandom.hex
+        end
         user = User.find_or_create(id: data['sub'], name: data['name'], organization_id: organization.id)
 
         {
