@@ -83,6 +83,7 @@ module Box
 
     def as_event_payload
       {
+        id: public_id,
         account_id: account_id,
         statement: Entities::Statement.represent(self).as_json,
       }

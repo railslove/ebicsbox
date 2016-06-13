@@ -64,6 +64,15 @@ module Box
           get "events/#{event.public_id}", { 'Authorization' => "token #{user.access_token}" }
           expect_json_types webhook_deliveries: :array
         end
+
+        it 'does not include public_id for payloads' do
+          event.payload = { 'public_id': 'asdf', 'whatever': 'payload' }
+          event.save
+          get "events/#{event.public_id}", { 'Authorization' => "token #{user.access_token}" }
+          expect_json 'payload.public_id', nil
+          expect_json_types 'payload.public_id', :null
+          expect_json 'payload.whatever', 'payload'
+        end
       end
     end
   end
