@@ -2,8 +2,10 @@
 spec = Gem::Specification.find_by_name 'ruby-swagger'
 load "#{spec.gem_dir}/lib/tasks/swagger.rake"
 
+require 'sequel'
 # Load application
 require './config/configuration'
+
 
 # namespace :jruby do
 #   desc 'Build jruby classes'
@@ -39,5 +41,24 @@ namespace :generate do
     end
 
     puts "Created the migration #{filename}"
+  end
+end
+
+
+namespace :db do
+  Sequel.extension :migration
+  DB = Sequel.connect(Box::Configuration.new.database_url)
+
+  desc "Perform migration up/down to VERSION"
+  task :to, :version do |_, args|
+    if args[:version].nil?
+      puts 'You must specify a migration version'
+      exit false
+    end
+
+    version = args[:version].to_i
+    raise "No VERSION was provided" if version.nil?
+    Sequel::Migrator.run(DB, "migrations", :target => version)
+    puts "<= sq:migrate:to version=[#{version}] executed"
   end
 end
