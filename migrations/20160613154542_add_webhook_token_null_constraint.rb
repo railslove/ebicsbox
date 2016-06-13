@@ -3,6 +3,7 @@ require_relative '../box/models/organization'
 
 Sequel.migration do
   up do
+    Box::Organization.set_dataset :organizations
     Box::Organization.where('webhook_token IS NULL or webhook_token = ?', '').each do |orga|
       orga.webhook_token = SecureRandom.hex
       orga.save
