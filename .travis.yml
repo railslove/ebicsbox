@@ -1,14 +1,14 @@
 language: ruby
 sudo: false
 rvm:
-- jruby-9.1.0.0
+- ruby-2.3.1
 cache:
 - bundler
 - apt
 addons:
   postgresql: '9.4'
 env:
-- TEST_DATABASE_URL="jdbc:postgresql://localhost/ebicsbox_test"
+- TEST_DATABASE_URL="postgresql://localhost/ebicsbox_test"
 before_install:
 - wget https://github.com/kr/beanstalkd/archive/v1.10.tar.gz
 - tar xf v1.10.tar.gz
@@ -20,10 +20,6 @@ before_script:
 - "./beanstalkd &"
 script:
 - bundle exec rspec spec
-matrix:
-  exclude:
-  - rvm: jruby-9.1.0.0
-    env: TEST_DATABASE_URL="postgres://localhost/ebicsbox_test"
 notifications:
   slack:
     secure: YrOEAsDDJkvSeHgrol8manF+ibs1EONkYzs9DUJnEJ+TiYZ8TEMwTb+SdgZsmndwdB/z2anZFXvoHvILzOZe9rIJ21cUvf/yY9DTdGp1s8xFoFvkkAF5HtciIJCfAQVKRHJdtsp25A/9h/JrZWOS98ZH9Fi/oBN4DUZzKDEVbg8=
