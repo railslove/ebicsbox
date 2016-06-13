@@ -1,4 +1,4 @@
-require 'SecureRandom'
+require 'securerandom'
 require_relative '../box/models/organization'
 
 Sequel.migration do
