@@ -23,14 +23,14 @@ module Box
     ]
     RETRY_THRESHOLD = 20
 
-    def self.retry_times
-      arr = (0..RETRY_THRESHOLD).inject([]) do |ary, retry_count|
-        ary << (retry_count ** 4) + 15 + (rand(30) * (retry_count + 1))
+    def self.delay_hash
+      (0..RETRY_THRESHOLD).inject({}) do |hsh, i|
+        hsh[i] = 30 + i ** 4
+        hsh
       end
-      Hash[(0...arr.size).zip arr]
     end
 
-    DELAY = retry_times
+    DELAY = delay_hash
 
     NoCallback = Class.new(StandardError)
 
