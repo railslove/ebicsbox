@@ -94,13 +94,13 @@ module Box
         end
 
         it 'schedules a delayed retry' do
-          expect(Queue).to receive(:trigger_webhook).with({ event_id: subject.id }, { delay: 30 })
+          expect(Queue).to receive(:trigger_webhook).with({ event_id: subject.id }, { delay: Box::Event::DELAY[4] })
           subject.delivery_failure!
         end
       end
 
       context 'above retry threshold' do
-        before { subject.webhook_retries = 10 }
+        before { subject.webhook_retries = Box::Event::RETRY_THRESHOLD }
 
         it 'sets status to failed' do
           expect { subject.delivery_failure! }.to change { subject.webhook_status }.to('failed')
