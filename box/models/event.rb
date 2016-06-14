@@ -21,19 +21,16 @@ module Box
       :subscriber_activated,
       :transaction_updated,
     ]
-    RETRY_THRESHOLD = 10
-    DELAY = {
-      0 => 0,
-      1 => 10,
-      2 => 10,
-      3 => 10,
-      4 => 30,
-      5 => 30,
-      6 => 30,
-      7 => 60,
-      8 => 300,
-      9 => 600,
-    }
+    RETRY_THRESHOLD = 20
+
+    def self.retry_times
+      arr = (0..RETRY_THRESHOLD).inject([]) do |ary, retry_count|
+        ary << (retry_count ** 4) + 15 + (rand(30) * (retry_count + 1))
+      end
+      Hash[(0...arr.size).zip arr]
+    end
+
+    DELAY = retry_times
 
     NoCallback = Class.new(StandardError)
 
