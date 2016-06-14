@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7
+
+We ditched jruby in favor of ruby. This is great news!
+
 ## 0.6.1
 
 We're now using supervisord to spawn processes on startup

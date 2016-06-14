@@ -15,8 +15,8 @@ module Box
 
     def database_url
       test? ?
-        (ENV['TEST_DATABASE_URL'] || 'jdbc:postgres://localhost/ebicsbox_test') :
-        (ENV['DATABASE_URL'] || 'jdbc:postgres://localhost/ebicsbox')
+        (ENV['TEST_DATABASE_URL'] || 'postgres://localhost/ebicsbox_test') :
+        (ENV['DATABASE_URL'] || 'postgres://localhost/ebicsbox')
     end
 
     def beanstalkd_url

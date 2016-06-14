@@ -1,4 +1,4 @@
-FROM yoyostile/railslove-jruby:9.1.0.0
+FROM ruby:2.3.1-onbuild
 RUN apt-get update && apt-get install -y git supervisor python-pip
 RUN pip install supervisor-stdout
 
