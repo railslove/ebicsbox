@@ -3,6 +3,7 @@ require 'grape'
 require_relative './accounts'
 require_relative './credit_transfers'
 require_relative './service'
+require_relative './events'
 require_relative './transactions'
 
 
@@ -14,6 +15,7 @@ module Box
         mount CreditTransfers
         mount Service
         mount Transactions
+        mount Events
       end
     end
   end
