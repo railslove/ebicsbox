@@ -94,7 +94,7 @@ module Box
         end
 
         it 'schedules a delayed retry' do
-          expect(Queue).to receive(:trigger_webhook).with({ event_id: subject.id }, { delay: Box::Event::DELAY[4] })
+          expect(Queue).to receive(:trigger_webhook).with({ event_id: subject.id }, { delay: subject.delay_for(4) })
           subject.delivery_failure!
         end
       end
