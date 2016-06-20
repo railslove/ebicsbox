@@ -45,7 +45,7 @@ module Box
           params do
             requires :account, type: String, desc: "the account to use"
             requires :name, type: String, desc: "the customers name"
-            requires :bic , type: String, desc: "the customers bic"
+            optional :bic , type: String, desc: "the customers bic"
             requires :iban, type: String, desc: "the customers iban"
             requires :amount_in_cents, type: Integer, desc: "amount to credit (charged in cents)", values: 1..1200000000
             requires :end_to_end_reference, type: String, desc: "unique end to end reference", unique_transaction_eref: true
