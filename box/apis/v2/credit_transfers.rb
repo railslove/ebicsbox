@@ -47,7 +47,7 @@ module Box
             requires :name, type: String, desc: "the customers name"
             requires :bic , type: String, desc: "the customers bic"
             requires :iban, type: String, desc: "the customers iban"
-            requires :amount_in_cents, type: Integer, desc: "amount to credit (charged in cents)", values: 1..12000000
+            requires :amount_in_cents, type: Integer, desc: "amount to credit (charged in cents)", values: 1..1200000000
             requires :end_to_end_reference, type: String, desc: "unique end to end reference", unique_transaction_eref: true
             optional :reference, type: String, length: 140, desc: "description of the transaction (max. 140 char)"
             optional :execution_date, type: Date, desc: "requested execution date", default: -> { Date.today }

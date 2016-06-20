@@ -128,7 +128,7 @@ module Box
             requires :name, type: String, desc: "the customers name"
             requires :bic, type: String, desc: "the customers bic" # TODO validate / clearer
             requires :iban, type: String, desc: "the customers iban" # TODO validate
-            requires :amount, type: Integer, desc: "amount to debit (positive, charged in cents)", values: 1..12000000
+            requires :amount, type: Integer, desc: "amount to debit (positive, charged in cents)", values: 1..1200000000
             requires :eref, type: String, desc: "end to end id", unique_transaction: true
             requires :mandate_id, type: String, desc: "ID of the SEPA mandate (max. 35 char)"
             requires :mandate_signature_date, type: Integer, desc: "when the mandate was signed by the customer"
