@@ -3,6 +3,8 @@ require 'grape'
 require_relative './api_endpoint'
 require_relative '../../business_processes/new_account'
 require_relative '../../entities/v2/account'
+require_relative '../../validations/unique_account'
+
 
 module Box
   module Apis

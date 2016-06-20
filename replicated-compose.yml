@@ -2,7 +2,7 @@
 ---
 replicated_api_version: "1.0.0"
 name: "EBICS::Box"
-version: "0.0.77"
+version: "0.0.79"
 release_notes: ""
 components:
 - name: Postgresql
@@ -51,7 +51,7 @@ components:
   containers:
   - source: replicated
     image_name: ebicsbox
-    version: 0.1.25
+    version: 0.7.1
     config_files: []
     customer_files: []
     env_vars:
@@ -62,13 +62,9 @@ components:
     - name: BEANSTALKD_URL
       static_val: "{{repl InterfaceAddress \"docker0\" }}:11300"
     - name: DATABASE_URL
-      static_val: "jdbc:postgresql://{{repl InterfaceAddress \"docker0\" }}/ebicsbox?user=ebicsbox&password=mysecretpassword"
+      static_val: "postgresql://{{repl InterfaceAddress \"docker0\" }}/ebicsbox?user=ebicsbox&password=mysecretpassword"
     - name: EBICS_CLIENT
       static_val: "Epics::Client"
-    - name: JRUBY_OPTS
-      static_val: "-J-Xmx384m"
-    - name: JAVA_OPTS
-      static_val: "-Djava.security.egd=file:/dev/./urandom"
     - name: PORT
       static_val: "5000"
     - name: RACK_ENV

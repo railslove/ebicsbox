@@ -32,11 +32,11 @@ module Box
           amount: params[:amount]
         )
       else
-        fail(BusinessProcessFailure.new(sct.errors))
+        fail(Box::BusinessProcessFailure.new(sct.errors))
       end
     rescue ArgumentError => e
       # TODO: Will be fixed upstream in the sepa_king gem by us
-      fail BusinessProcessFailure.new({ base: e.message }, 'Invalid data')
+      fail Box::BusinessProcessFailure.new({ base: e.message }, 'Invalid data')
     end
 
     def self.v2_create!(user, account, params)

@@ -4,6 +4,8 @@ require_relative './api_endpoint'
 require_relative '../../entities/v2/credit_transfer'
 require_relative '../../validations/unique_transaction_eref'
 require_relative '../../validations/length'
+require_relative '../../errors/business_process_failure'
+
 
 module Box
   module Apis
@@ -12,7 +14,7 @@ module Box
         include ApiEndpoint
 
         resource :credit_transfers do
-          rescue_from BusinessProcessFailure do |e|
+          rescue_from Box::BusinessProcessFailure do |e|
             error!({ message: 'Failed to initiate credit transfer.', errors: e.errors }, 400)
           end
 

@@ -55,7 +55,7 @@ module Box
           error!({ message: 'The account has not been activated. Please activate before submitting requests!' }, 412)
         end
 
-        rescue_from BusinessProcessFailure do |e|
+        rescue_from Box::BusinessProcessFailure do |e|
           error!({ message: 'Failed to initiate a business process.', errors: e.errors }, 400)
         end
 
