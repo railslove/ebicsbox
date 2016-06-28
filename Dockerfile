@@ -1,5 +1,5 @@
-FROM ruby:2.3.1-onbuild
-RUN apt-get update && apt-get install -y git supervisor python-pip
+FROM yoyostile/railslove-ruby:2.3.1
+RUN apt-get update && apt-get install -y git supervisor python-pip zlib1g-dev libpq-dev
 RUN pip install supervisor-stdout
 
 # throw errors if Gemfile has been modified since Gemfile.lock
