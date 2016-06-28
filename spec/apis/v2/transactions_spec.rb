@@ -63,7 +63,7 @@ module Box
         end
 
         it 'does not include transactions from accounts belonging to a different organization' do
-          other_orga = Box::Organization.create(name: 'Some other organization')
+          other_orga = Fabricate(:organization)
           account = other_orga.add_account(organization_id: 2, iban: 'OTHERIBAN')
           trx2 = account.add_statement(eref: 'trx-2')
 

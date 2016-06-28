@@ -4,6 +4,8 @@ require_relative './api_endpoint'
 require_relative '../../entities/v2/credit_transfer'
 require_relative '../../validations/unique_transaction_eref'
 require_relative '../../validations/length'
+require_relative '../../errors/business_process_failure'
+
 
 module Box
   module Apis
@@ -12,7 +14,7 @@ module Box
         include ApiEndpoint
 
         resource :credit_transfers do
-          rescue_from BusinessProcessFailure do |e|
+          rescue_from Box::BusinessProcessFailure do |e|
             error!({ message: 'Failed to initiate credit transfer.', errors: e.errors }, 400)
           end
 
@@ -43,9 +45,9 @@ module Box
           params do
             requires :account, type: String, desc: "the account to use"
             requires :name, type: String, desc: "the customers name"
-            requires :bic , type: String, desc: "the customers bic"
+            optional :bic , type: String, desc: "the customers bic"
             requires :iban, type: String, desc: "the customers iban"
-            requires :amount_in_cents, type: Integer, desc: "amount to credit (charged in cents)", values: 1..12000000
+            requires :amount_in_cents, type: Integer, desc: "amount to credit (charged in cents)", values: 1..1200000000
             requires :end_to_end_reference, type: String, desc: "unique end to end reference", unique_transaction_eref: true
             optional :reference, type: String, length: 140, desc: "description of the transaction (max. 140 char)"
             optional :execution_date, type: Date, desc: "requested execution date", default: -> { Date.today }

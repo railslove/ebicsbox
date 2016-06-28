@@ -59,7 +59,7 @@ module Box
         end
 
         context 'existing organization and user' do
-          let!(:organization) { Box::Organization.create(id: 1, name: "Test Orga") }
+          let!(:organization) { Fabricate(:organization) }
           let!(:user) { Box::User.create(id: 1, name: "Test User", organization: organization) }
           let(:token_payload) { generate_token(user, organization) }
 
@@ -95,7 +95,7 @@ module Box
         end
 
         context 'existing organization but user is new' do
-          let!(:organization) { Box::Organization.create(id: 1, name: "Test Orga") }
+          let!(:organization) { Fabricate(:organization) }
           let!(:user) { double(id: 2, name: "New user") }
           let(:token_payload) { generate_token(user, organization) }
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7
+
+We ditched jruby in favor of ruby. This is great news!
+API Changes for V2:
+* Events are now availabe for V2
+* Credits higher than 120.000€ are now allowed
+* Bic-less transactions are now allowed - be careful, your bank may get angry
+
+
 ## 0.6.1
 
 We're now using supervisord to spawn processes on startup

@@ -21,19 +21,8 @@ module Box
       :subscriber_activated,
       :transaction_updated,
     ]
-    RETRY_THRESHOLD = 10
-    DELAY = {
-      0 => 0,
-      1 => 10,
-      2 => 10,
-      3 => 10,
-      4 => 30,
-      5 => 30,
-      6 => 30,
-      7 => 60,
-      8 => 300,
-      9 => 600,
-    }
+
+    RETRY_THRESHOLD = 20
 
     NoCallback = Class.new(StandardError)
 
@@ -102,9 +91,13 @@ module Box
       if webhook_retries >= RETRY_THRESHOLD
         set(webhook_status: 'failed')
       else
-        Queue.trigger_webhook({ event_id: id }, { delay: DELAY[webhook_retries] })
+        Queue.trigger_webhook({ event_id: id }, { delay: delay_for(webhook_retries) })
       end
       save
+    end
+
+    def delay_for(attempt)
+      5 * ((attempt - 1) ** 2)
     end
 
     def to_webhook_payload

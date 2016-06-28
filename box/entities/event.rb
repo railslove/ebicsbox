@@ -10,7 +10,10 @@ module Box
         event.account.try(:iban)
       end
       expose :type
-      expose :payload
+      expose(:payload) do |event|
+        event.payload.delete 'public_id'
+        event.payload
+      end
       expose :triggered_at
       expose :signature
       expose :webhook_status

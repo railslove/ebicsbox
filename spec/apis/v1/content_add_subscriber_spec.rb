@@ -4,7 +4,7 @@ require_relative '../../../box/apis/v1/content'
 
 module Box
   RSpec.describe Apis::V1::Content do
-    let(:organization) { Organization.create(name: 'Organization 1') }
+    let(:organization) { Fabricate(:organization) }
     let(:account) { organization.add_account(name: 'Test', iban: 'TEST', mode: "Fake") }
     let!(:user) { User.create(organization_id: organization.id, name: 'Some user', access_token: 'orga-user') }
     let!(:another_user) { User.create(organization_id: organization.id, name: 'Another user') }

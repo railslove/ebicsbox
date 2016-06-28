@@ -172,7 +172,7 @@ module Box
             account: :array_of_strings,
             name: :array_of_strings,
             iban: :array_of_strings,
-            bic: :array_of_strings,
+            bic: :array_or_null,
             amount_in_cents: :array_of_strings,
             end_to_end_reference: :array_of_strings,
           }
@@ -219,6 +219,16 @@ module Box
         it 'triggers a credit transfer' do
           expect(Credit).to receive(:create!)
           post "/credit_transfers", valid_attributes, VALID_HEADERS
+        end
+
+        it 'triggers a credit transfer without bic' do
+          expect(Credit).to receive(:create!)
+          post "/credit_transfers", valid_attributes.reject{ |k,_| k == :bic }, VALID_HEADERS
+        end
+
+        it 'transactions without bic should be valid' do
+          expect(Queue).to receive(:execute_credit)
+          post "/credit_transfers", valid_attributes.reject{ |k,_| k == :bic }, VALID_HEADERS
         end
 
         it 'transforms parameters so they are understood by credit business process' do

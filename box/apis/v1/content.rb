@@ -55,7 +55,7 @@ module Box
           error!({ message: 'The account has not been activated. Please activate before submitting requests!' }, 412)
         end
 
-        rescue_from BusinessProcessFailure do |e|
+        rescue_from Box::BusinessProcessFailure do |e|
           error!({ message: 'Failed to initiate a business process.', errors: e.errors }, 400)
         end
 
@@ -128,7 +128,7 @@ module Box
             requires :name, type: String, desc: "the customers name"
             requires :bic, type: String, desc: "the customers bic" # TODO validate / clearer
             requires :iban, type: String, desc: "the customers iban" # TODO validate
-            requires :amount, type: Integer, desc: "amount to debit (positive, charged in cents)", values: 1..12000000
+            requires :amount, type: Integer, desc: "amount to debit (positive, charged in cents)", values: 1..1200000000
             requires :eref, type: String, desc: "end to end id", unique_transaction: true
             requires :mandate_id, type: String, desc: "ID of the SEPA mandate (max. 35 char)"
             requires :mandate_signature_date, type: Integer, desc: "when the mandate was signed by the customer"
@@ -160,9 +160,9 @@ module Box
           params do
             requires :account, type: String, desc: "the account to use"
             requires :name, type: String, desc: "the customers name"
-            requires :bic , type: String, desc: "the customers bic"
+            optional :bic , type: String, desc: "the customers bic"
             requires :iban, type: String, desc: "the customers iban"
-            requires :amount, type: Integer, desc: "amount to credit (charged in cents)", values: 1..12000000
+            requires :amount, type: Integer, desc: "amount to credit (charged in cents)", values: 1..1200000000
             requires :eref, type: String, desc: "end to end id", unique_transaction: true
             optional :remittance_information, type: String, desc: "description of the transaction (max. 140 char)"
             optional :requested_date, type: Integer, desc: "requested execution date"

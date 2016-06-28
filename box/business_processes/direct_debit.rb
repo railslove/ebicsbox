@@ -37,11 +37,11 @@ module Box
           instrument: params[:instrument]
         )
       else
-        fail BusinessProcessFailure.new(sdd.errors)
+        fail Box::BusinessProcessFailure.new(sdd.errors)
       end
     rescue ArgumentError => e
       # TODO: Will be fixed upstream in the sepa_king gem by us
-      fail BusinessProcessFailure.new({base: e.message}, 'Invalid data')
+      fail Box::BusinessProcessFailure.new({base: e.message}, 'Invalid data')
     end
   end
 end

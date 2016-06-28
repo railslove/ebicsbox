@@ -38,7 +38,7 @@ module Box
         end
 
         describe 'authenticated user via query parameter' do
-          let!(:organization) { Box::Organization.create(name: "Test Orga") }
+          let!(:organization) { Fabricate(:organization) }
           let!(:user) { Box::User.create(name: "Test User", access_token: 'test-token', organization: organization) }
 
           it 'returns a user' do
@@ -55,7 +55,7 @@ module Box
         end
 
         describe 'authenticated user via legacy header' do
-          let!(:organization) { Box::Organization.create(name: "Test Orga") }
+          let!(:organization) { Fabricate(:organization) }
           let!(:user) { Box::User.create(name: "Test User", access_token: 'test-token', organization: organization) }
 
           it 'returns a user' do
@@ -74,7 +74,7 @@ module Box
         end
 
         describe 'authenticated user via bearer token header' do
-          let!(:organization) { Box::Organization.create(name: "Test Orga") }
+          let!(:organization) { Fabricate(:organization) }
           let!(:user) { Box::User.create(name: "Test User", access_token: 'test-token', organization: organization) }
 
           it 'returns a user' do
