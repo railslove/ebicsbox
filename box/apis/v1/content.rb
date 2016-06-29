@@ -160,7 +160,7 @@ module Box
           params do
             requires :account, type: String, desc: "the account to use"
             requires :name, type: String, desc: "the customers name"
-            optional :bic , type: String, desc: "the customers bic"
+            optional :bic , type: String, desc: "the customers bic", allow_blank: false
             requires :iban, type: String, desc: "the customers iban"
             requires :amount, type: Integer, desc: "amount to credit (charged in cents)", values: 1..1200000000
             requires :eref, type: String, desc: "end to end id", unique_transaction: true

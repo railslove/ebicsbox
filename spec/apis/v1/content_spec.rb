@@ -197,6 +197,15 @@ module Box
           remittance_information: 'Just s abasic test credit'
         }}
 
+        let(:bicless_payload) { {
+          name: 'Some person',
+          amount: 123,
+          iban: 'AL90208110080000001039531801',
+          bic: '',
+          eref: SecureRandom.hex,
+          remittance_information: 'Just s abasic test credit'
+        }}
+
         context 'account does not exist' do
           it 'fails with a proper error message' do
             post "NOT_EXISTING/credits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
@@ -252,6 +261,11 @@ module Box
               post "#{account.iban}/credits", { some: 'data' }, { 'Authorization' => "token #{user.access_token}" }
               expect_json_types errors: :object
             end
+
+            it 'returns a proper error message with empty bic in payload' do
+              post "#{account.iban}/credits", bicless_payload, { 'Authorization' => "token #{user.access_token}" }
+              expect_json 'message', 'Validation of your request\'s payload failed!'
+            end
           end
 
           context 'valid data' do
@@ -262,6 +276,11 @@ module Box
 
             it 'returns a proper message' do
               post "#{account.iban}/credits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
+              expect_json 'message', 'Credit has been initiated successfully!'
+            end
+
+            it 'returns a proper message without bic in payload' do
+              post "#{account.iban}/credits", bicless_payload.reject{ |k,_v| k.to_s == 'bic'}, { 'Authorization' => "token #{user.access_token}" }
               expect_json 'message', 'Credit has been initiated successfully!'
             end
 
