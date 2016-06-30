@@ -27,6 +27,26 @@ module Box
         )
       end
 
+      def self.v2_create!(account, params, user)
+      sdd = SEPA::DirectDebit.new(account.pain_attributes_hash).tap do |debit|
+        debit.message_identification= "EBICS-BOX/#{SecureRandom.hex(11).upcase}"
+        debit.add_transaction(
+          name: params[:name],
+          bic: params[:bic],
+          iban: params[:iban],
+          amount: params[:amount] / 100.0,
+          instruction: params[:instruction],
+          mandate_id: params[:mandate_id],
+          mandate_date_of_signature: Time.at(params[:mandate_signature_date]).to_date,
+          local_instrument: params[:instrument],
+          sequence_type: params[:sequence_type],
+          reference: params[:eref],
+          remittance_information: params[:remittance_information],
+          requested_date: Time.at(params[:requested_date]).to_date,
+          batch_booking: true
+        )
+      end
+
       if sdd.valid?
         Queue.execute_debit(
           account_id: account.id,
