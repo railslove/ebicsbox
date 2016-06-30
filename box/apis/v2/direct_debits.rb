@@ -1,7 +1,7 @@
 require 'grape'
 
 require_relative './api_endpoint'
-require_relative '../../entities/v2/credit_transfer'
+require_relative '../../entities/v2/direct_debits'
 require_relative '../../validations/unique_transaction_eref'
 require_relative '../../validations/length'
 require_relative '../../errors/business_process_failure'
@@ -55,7 +55,7 @@ module Box
           end
           post do
             account = current_organization.find_account!(params[:account])
-            Debit.v2_create!(current_user, account, declared(params))
+            DirectDebit.create!(account, declared(params), current_user)
             { message: 'Direct debit has been initiated successfully!' }
           end
 
@@ -67,7 +67,7 @@ module Box
           get ":iban" do
             if params[:iban].to_s.match(/([a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}?)/i)
               direct_debits = Box::Transaction.by_organization(current_organization).direct_debits.first!(public_id: params[:iban])
-              present credit_transfer, with: Entities::V2::DirectDebits
+              present direct_debits, with: Entities::V2::DirectDebits
             else
               fail Sequel::NoMatchingRow
             end
