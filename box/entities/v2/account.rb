@@ -6,7 +6,7 @@ module Box
     module V2
       class Account < Grape::Entity
         expose :name, documentation: { type: "String", desc: "Name appearing on customer statements" }
-        expose :descriptor, documentation: { type: "String", desc: "Internal descriptor8" }
+        expose :descriptor, documentation: { type: "String", desc: "Internal descriptor" }
         expose :iban
         expose :bic
         expose :balance_date
