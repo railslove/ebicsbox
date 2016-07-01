@@ -11,13 +11,8 @@ module Box
     SUPPORTED_TYPES = [
       :account_created,
       :debit_created,
-      :debit_failed,
-      :debit_succeeded,
       :credit_created,
-      :credit_failed,
-      :credit_suceeded,
       :statement_created,
-      :statement_updated,
       :subscriber_activated,
       :transaction_updated,
     ]
