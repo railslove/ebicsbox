@@ -396,9 +396,13 @@ module Box
 
         it 'cannot change subscriber'
 
-        it 'allows changes of addressor'
+        it 'allows changes of internal descriptor' do
+          expect {
+            put "/accounts/#{account.iban}", { descriptor: 'FooBar'}, VALID_HEADERS
+          }.to change { account.reload.descriptor }.to('FooBar')
+        end
 
-        it 'allows changes of internal display name' do
+        it 'allows changes of name' do
           expect {
             put "/accounts/#{account.iban}", { name: 'new-name' }, VALID_HEADERS
           }.to change { account.reload.name }

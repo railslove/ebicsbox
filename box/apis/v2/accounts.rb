@@ -101,7 +101,8 @@ module Box
           ###
 
           params do
-            optional :name, type: String, allow_blank: false, desc: 'Internal description of account'
+            optional :name, type: String, allow_blank: false, desc: 'Name of account'
+            optional :descriptor, type: String, allow_blank: false, desc: 'Internal descriptor of account'
             optional :creditor_identifier, type: String, desc: 'Creditor identifier required for direct debits'
             optional :callback_url, type: String, desc: 'URL to which webhooks are delivered'
           end
