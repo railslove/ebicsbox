@@ -7,7 +7,7 @@ reconcilliation.
 
 It offers a HTTP interface and can be integrated with different message queueing systems
 
-## Prerequistes
+## Prerequisites
 
 * ruby (jruby / ruby 2.2.x)
 * beanstalkd
