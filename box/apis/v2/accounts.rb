@@ -41,13 +41,14 @@ module Box
           ###
 
           params do
-            requires :name, type: String, allow_blank: false, desc: 'Internal description of account'
+            requires :name, type: String, allow_blank: false, desc: 'Name of the account'
             requires :iban, type: String, unique_account: true, allow_blank: false, desc: 'IBAN'
             requires :bic, type: String, allow_blank: false, desc: 'BIC'
             requires :host, type: String, desc: 'EBICS HOSTID as provided by financial institution'
             requires :partner, type: String, desc: 'EBICS PARTNERID as provided by financial institution'
             requires :url, type: String, desc: 'EBICS server url'
             requires :subscriber, type: String, desc: 'EBICS subscriber as provided by financial institution'
+            optional :descriptor, type: String, allow_blank: false, desc: 'Internal descriptor of account'
             optional :creditor_identifier, type: String, desc: 'Creditor identifier required for direct debits'
             optional :callback_url, type: String, desc: 'URL to which webhooks are delivered'
           end
