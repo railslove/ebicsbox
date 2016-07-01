@@ -59,9 +59,31 @@ transaction02 = Box::Transaction.create(
   ebics_transaction_id: "444",
   status: "completed",
   account_id: account.id,
-  amount: "134346099",
+  amount: "5543299",
   user_id: user.id)
 
 puts "Debit Transaction created: " + transaction02.to_s
+
+transaction03 = Box::Transaction.create(
+  type: "debit",
+  ebics_order_id: "555",
+  ebics_transaction_id: "666",
+  status: "completed",
+  account_id: account.id,
+  amount: "13447472",
+  user_id: user.id)
+
+puts "Debit Transaction created: " + transaction03.to_s
+
+transaction04 = Box::Transaction.create(
+  type: "debit",
+  ebics_order_id: "777",
+  ebics_transaction_id: "888",
+  status: "completed",
+  account_id: account.id,
+  amount: "18889",
+  user_id: user.id)
+
+puts "Debit Transaction created: " + transaction04.to_s
 
 puts "seed_data is created succesfully"
