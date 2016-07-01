@@ -5,12 +5,19 @@ require_relative '../webhook_delivery'
 module Box
   module Entities
     module V2
+      MAPPED_TYPES = {
+        'account_created' => 'account_created',
+        'debit_created' => 'direct_debit_created',
+        'credit_created' => 'credit_transfer_created',
+        'statement_created' => 'transaction_created',
+        'subscriber_activated' => 'account_activated',
+      }
       class Event < Grape::Entity
         expose :public_id, as: 'id'
         expose(:account, documentation: { type: "String", desc: "Display name for given bank account" }) do |event|
           event.account.try(:iban)
         end
-        expose :type
+        expose(:type) { |event| MAPPED_TYPES[event.type] }
         expose :payload
         expose :triggered_at
         expose :signature
