@@ -7,8 +7,8 @@ module Box
     module V2
       MAPPED_TYPES = {
         'account_created' => 'account_created',
-        'debit_created' => 'direct_debit_created',
-        'credit_created' => 'credit_transfer_created',
+        'debit_created' => 'debit_created',
+        'credit_created' => 'credit_created',
         'statement_created' => 'transaction_created',
         'subscriber_activated' => 'account_activated',
       }

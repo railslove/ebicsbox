@@ -12,14 +12,14 @@ module Box
             expect(described_class.represent(event).as_json).to match(hash_including(type: "account_activated"))
           end
 
-          it "transforms debit_created to direct_debit_created" do
+          it "does not transforms debit_created" do
             event = Box::Event.new(type: "debit_created")
-            expect(described_class.represent(event).as_json).to match(hash_including(type: "direct_debit_created"))
+            expect(described_class.represent(event).as_json).to match(hash_including(type: "debit_created"))
           end
 
-          it "transforms credit_created to credit_transfer_created" do
+          it "does not transforms credit_created" do
             event = Box::Event.new(type: "credit_created")
-            expect(described_class.represent(event).as_json).to match(hash_including(type: "credit_transfer_created"))
+            expect(described_class.represent(event).as_json).to match(hash_including(type: "credit_created"))
           end
 
           it "transforms statement_created to transaction_created" do
