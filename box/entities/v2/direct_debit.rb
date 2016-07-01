@@ -1,4 +1,3 @@
-
 require 'grape-entity'
 require_relative './transaction'
 
@@ -19,7 +18,7 @@ module Box
         expose(:_links) do |transaction|
           iban = transaction.account.iban
           {
-            self: Box.configuration.app_url + "/direct?debits/#{transaction.id}",
+            self: Box.configuration.app_url + "/direct_debits/#{transaction.id}",
             account: Box.configuration.app_url + "/accounts/#{iban}/",
           }
         end
