@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+require 'sequel'
+require './config/configuration'
+
+DB = Sequel.connect(Box::Configuration.new.database_url)
+
+require './box/models/user'
+require './box/models/organization'
+
+organization = Box::Organization.create(name: "Musterfirma", webhook_token: "9e7756bb7d52709c18c0de6ba9b1f298")
+user = Box::User.create(name: "Max Mustermann", organization: organization, access_token: "83ea13d542b3249c3edd2c79d2943ee7", admin: true)
+
+
+puts "seed_data is created succesfully"
