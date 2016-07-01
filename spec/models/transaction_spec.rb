@@ -24,7 +24,6 @@ module Box
 
         it 'returns new status', verify_stubs: false do
           subject.status = 'created'
-          allow(Event).to receive(:transaction_updated)
           result = subject.update_status('file_upload')
           expect(result).to eq('file_upload')
         end
@@ -32,7 +31,6 @@ module Box
         context 'status changed' do
           it 'triggers a changed event', verify_stubs: false do
             subject.status = 'created'
-            expect(Event).to receive(:transaction_updated)
             subject.update_status 'file_upload'
           end
         end
@@ -40,15 +38,12 @@ module Box
         context 'status did not change' do
           it 'does not trigger a changed event' do
             subject.status = 'created'
-            expect(Event).to_not receive(:transaction_updated)
             subject.update_status 'test'
           end
         end
       end
 
       describe "#get_status", verify_stubs: false do
-        before { allow(Event).to receive(:transaction_updated) }
-
         it "returns previous status on unexpected change" do
           subject.status = 'created'
           expect(subject.update_status("hello")).to eq("created")

@@ -53,7 +53,7 @@ module Box
           end
 
           it 'creates associated events' do
-            expect { Jobs::Credit.process!(@job.body) }.to change { Event.all.map(&:type).sort }.to(["credit_created", "statement_created", "transaction_updated"])
+            expect { Jobs::Credit.process!(@job.body) }.to change { Event.all.map(&:type).sort }.to(["credit_created", "statement_created"])
           end
         end
       end
