@@ -13,22 +13,22 @@ require './box/models/organization'
 require './box/models/account'
 require './box/models/transaction'
 
-organization = Box::Organization.create(
+organization = Box::Organization.new(
   name: "Musterfirma", 
   webhook_token: "9e7756bb7d52709c18c0de6ba9b1f298"
   )
 
-puts "Organization created: " + organization.to_s
+puts "Organization created: " + organization.save.valid?.to_s
 
-user = Box::User.create(
+user = Box::User.new(
   name: "Meister Mustermann", 
   organization_id: organization.id, 
   access_token: "83ea13d542b3249c3edd2c79d2943ee7", 
   admin: true)
 
-puts "User created: " + user.to_s
+puts "User created: " + user.save.valid?.to_s
 
-account = Box::Account.create(
+account = Box::Account.new(
   iban: "DE48111122223333444456", 
   bic: "KFDMBANKXYZ", 
   creditor_identifier: "DE98ZZZ09999999999", 
@@ -40,50 +40,23 @@ account = Box::Account.create(
   balance_in_cents: "5300237",
   balance_date: DateTime.now)
 
-puts "Account created: " + account.to_s
+puts "Account created: " + account.save.valid?.to_s
+
+status = %w(completed)
+type = %(credit debit)
+
+
+10.times do
             
-transaction01 = Box::Transaction.create(
-  type: "credit",
-  ebics_order_id: "111",
-  ebics_transaction_id: "222",
-  status: "completed",
-  account_id: account.id,
-  amount: "100099",
-  user_id: user.id)
+  transaction = Box::Transaction.new(
+    type: type[rand(type.length)],
+    ebics_order_id: rand.to_s[2..4],
+    ebics_transaction_id: rand.to_s[2..4],
+    status: status[rand(status.length)],
+    account_id: account.id,
+    amount: rand.to_s[2..6],
+    user_id: user.id)
 
-puts "Credit Transaction created: " + transaction01.to_s
+  puts "Credit Transaction created: " + transaction.save.valid?.to_s
 
-transaction02 = Box::Transaction.create(
-  type: "debit",
-  ebics_order_id: "333",
-  ebics_transaction_id: "444",
-  status: "completed",
-  account_id: account.id,
-  amount: "5543299",
-  user_id: user.id)
-
-puts "Debit Transaction created: " + transaction02.to_s
-
-transaction03 = Box::Transaction.create(
-  type: "debit",
-  ebics_order_id: "555",
-  ebics_transaction_id: "666",
-  status: "completed",
-  account_id: account.id,
-  amount: "13447472",
-  user_id: user.id)
-
-puts "Debit Transaction created: " + transaction03.to_s
-
-transaction04 = Box::Transaction.create(
-  type: "debit",
-  ebics_order_id: "777",
-  ebics_transaction_id: "888",
-  status: "completed",
-  account_id: account.id,
-  amount: "18889",
-  user_id: user.id)
-
-puts "Debit Transaction created: " + transaction04.to_s
-
-puts "seed_data is created succesfully"
+end

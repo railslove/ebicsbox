@@ -6,7 +6,6 @@ require_relative '../../validations/unique_transaction_eref'
 require_relative '../../validations/length'
 require_relative '../../errors/business_process_failure'
 
-
 module Box
   module Apis
     module V2
@@ -27,13 +26,13 @@ module Box
           ###
 
           params do
-            optional :iban, type: String, desc: "IBAN of an account"
+            optional :iban, type: String, desc: 'IBAN of an account'
             # optional :from, type: Date, desc: "direct debits after that date"
             # optional :to, type: Date, desc: "direct debits before that date"
             # optional :status, type: String, desc: "status of direct debit"
             # optional :type, type: String, desc: "type of direct debit"
-            optional :page, type: Integer, desc: "page through the results", default: 1
-            optional :per_page, type: Integer, desc: "how many results per page", values: 1..100, default: 25
+            optional :page, type: Integer, desc: 'page through the results', default: 1
+            optional :per_page, type: Integer, desc: 'how many results per page', values: 1..100, default: 25
           end
           get do
             query = Box::Transaction.by_organization(current_organization).direct_debits.filtered(declared(params))
