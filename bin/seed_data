@@ -29,7 +29,7 @@ user = Box::User.new(
 puts "User created: " + user.save.valid?.to_s
 
 account = Box::Account.new(
-  iban: "DE48111122223333444567", 
+  iban: "DE89370400440532013000", 
   bic: "KFDMBANKXYZ", 
   creditor_identifier: "DE98ZZZ09999999999", 
   name: "FakeAccount",
@@ -41,6 +41,13 @@ account = Box::Account.new(
   balance_date: DateTime.now)
 
 puts "Account created: " + account.save.valid?.to_s
+
+subscriber = Box::Subscriber.new(
+  account_id: account.id,
+  user_id: user.id,
+  activated_at: DateTime.now)
+
+puts 'Subscriber created: ' + subscriber.save.valid?.to_s
 
 status = %w(file_upload es_verification)
 type = %w(credit debit order_hac_final_pos order_hac_final_neg funds_credited funds_debited funds_charged_back)

@@ -51,15 +51,14 @@ module Box
             requires :iban, type: String, desc: 'the recipient iban'
             requires :bic, type: String, desc: 'recipient bic'
             requires :amount_in_cents, type: Integer, desc: "amount to debit in cents", values: 1..1200000000
-            optional :reference, type: String, length: 140, desc: "Message for your customer's statement"
-            requires :mandate_id, type: String, desc: "unique id presented to customer", unique_transaction_eref: true
-            optional :mandate_signature_date, type: Date, desc: "2016-05-01", default: -> { Date.today }
+            requires :reference, type: String, length: 140, desc: "Message for your customer's statement"
+            requires :end_to_end_reference, type: String, desc: "unique id", unique_transaction_eref: true
+            requires :mandate_id, type: String, desc: "unique id presented to customer" # max 35 digits
+            requires :mandate_signature_date, type: Date, desc: "2016-05-01"
           end
           post do
-            require 'byebug'
-            byebug
             account = current_organization.find_account!(params[:account])
-            DirectDebit.create!(account, declared(params), current_user)
+            DirectDebit.v2_create!(account, declared(params), current_user)
             { message: 'Direct debit has been initiated successfully!' }
           end
 
