@@ -21,6 +21,7 @@ module Box
             self: Box.configuration.app_url + "/credit_transfers/#{transaction.id}",
             account: Box.configuration.app_url + "/accounts/#{iban}/",
           }
+        end
       end
     end
   end

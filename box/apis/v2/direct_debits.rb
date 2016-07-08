@@ -45,22 +45,23 @@ module Box
           ### POST /direct_debits
           ###
 
-          # params do
-          #   requires :account, type: String, desc: "the account to use"
-          #   requires :name, type: String, desc: "the customers name"
-          #   requires :iban, type: String, desc: "the customers iban"
-          #   requires :amount_in_cents, type: Integer, desc: "amount to debit (charged in cents)", values: 1..1200000000
-          #   requires :end_to_end_reference, type: String, desc: "unique end to end reference", unique_transaction_eref: true
-          #   optional :bic , type: String, desc: "the customers bic", allow_blank: false
-          #   optional :reference, type: String, length: 140, desc: "description of the transaction (max. 140 char)"
-          #   optional :execution_date, type: Date, desc: "requested execution date", default: -> { Date.today }
-          #   optional :urgent, type: Boolean, desc: "requested execution date", default: false
-          # end
-          # post do
-          #   account = current_organization.find_account!(params[:account])
-          #   DirectDebit.create!(account, declared(params), current_user)
-          #   { message: 'Direct debit has been initiated successfully!' }
-          # end
+          params do
+            requires :account, type: String, desc: 'YOURACCOUNTIBAN'
+            requires :name, type: String, desc: 'the recipient name'
+            requires :iban, type: String, desc: 'the recipient iban'
+            requires :bic, type: String, desc: 'recipient bic'
+            requires :amount_in_cents, type: Integer, desc: "amount to debit in cents", values: 1..1200000000
+            optional :reference, type: String, length: 140, desc: "Message for your customer's statement"
+            requires :mandate_id, type: String, desc: "unique id presented to customer", unique_transaction_eref: true
+            optional :mandate_signature_date, type: Date, desc: "2016-05-01", default: -> { Date.today }
+          end
+          post do
+            require 'byebug'
+            byebug
+            account = current_organization.find_account!(params[:account])
+            DirectDebit.create!(account, declared(params), current_user)
+            { message: 'Direct debit has been initiated successfully!' }
+          end
 
 
           # ###
