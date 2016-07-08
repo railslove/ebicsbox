@@ -67,14 +67,14 @@ module Box
           # ### GET /direct_debits/:id
           # ###
 
-          # get ":iban" do
-          #   if params[:iban].to_s.match(/([a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}?)/i)
-          #     direct_debits = Box::Transaction.by_organization(current_organization).direct_debits.first!(public_id: params[:iban])
-          #     present direct_debits, with: Entities::V2::DirectDebits
-          #   else
-          #     fail Sequel::NoMatchingRow
-          #   end
-          # end
+          get ":id" do
+            if params[:id].to_s.match(/([a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}?)/i)
+              direct_debits = Box::Transaction.by_organization(current_organization).direct_debits.first!(public_id: params[:id])
+              present direct_debits, with: Entities::V2::DirectDebit
+            else
+              fail Sequel::NoMatchingRow
+            end
+          end
 
         end
       end
