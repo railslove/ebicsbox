@@ -27,10 +27,6 @@ module Box
 
           params do
             optional :iban, type: String, desc: 'IBAN of an account'
-            # optional :from, type: Date, desc: "direct debits after that date"
-            # optional :to, type: Date, desc: "direct debits before that date"
-            # optional :status, type: String, desc: "status of direct debit"
-            # optional :type, type: String, desc: "type of direct debit"
             optional :page, type: Integer, desc: 'page through the results', default: 1
             optional :per_page, type: Integer, desc: 'how many results per page', values: 1..100, default: 25
           end
@@ -39,7 +35,6 @@ module Box
             setup_pagination_header(query.count)
             present query.paginate(declared(params)).all, with: Entities::V2::DirectDebit
           end
-
 
           ###
           ### POST /direct_debits
@@ -62,7 +57,6 @@ module Box
             { message: 'Direct debit has been initiated successfully!' }
           end
 
-
           # ###
           # ### GET /direct_debits/:id
           # ###
@@ -75,7 +69,6 @@ module Box
               fail Sequel::NoMatchingRow
             end
           end
-
         end
       end
     end
