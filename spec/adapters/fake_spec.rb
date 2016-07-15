@@ -63,9 +63,9 @@ module Box
             @job = Queue.client.tubes[Queue::CREDIT_TUBE].reserve
           end
 
-          it 'sets amount correct' do
+          it 'sets correct statement account' do
             Jobs::Credit.process!(@job.body)
-            expect(Transaction.last.amount).to eq(251_995)
+            expect(Statement.last.amount).to eq(251_995)
           end
         end
       end
