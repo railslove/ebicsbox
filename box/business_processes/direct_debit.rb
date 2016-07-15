@@ -62,9 +62,6 @@ module Box
         )
       end
 
-      require 'byebug'
-      byebug
-      
       if sdd.valid?
         Queue.execute_debit(
           account_id: account.id,
