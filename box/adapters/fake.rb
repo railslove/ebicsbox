@@ -55,7 +55,7 @@ module Box
         trx = doc.css("Document CstmrCdtTrfInitn PmtInf CdtTrfTxInf")
         eref = trx.css("PmtId EndToEndId").text
         desc = trx.css("RmtInf Ustrd").text
-        amount = (trx.css("Amt InstdAmt").text.to_f * 100).round.to_i
+        amount = (trx.css("Amt InstdAmt").text.to_f * 100).ceil
         transaction = Transaction[eref: eref]
         transaction.update_status("debit_received", reason: "Auto accept fake credit transfers")
 
