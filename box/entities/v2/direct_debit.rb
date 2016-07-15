@@ -13,12 +13,13 @@ module Box
         expose(:amount, as: 'amount_in_cents')
         expose(:reference) { |trx| trx.parsed_payload[:payments].first[:transactions].first[:remittance_information] }
         expose(:eref, as: 'mandate_id')
-        expose(:mandate_signature_date)
+        expose(:mandate_signature_date) { |trx| trx.created_at } # ???????????????????? @Max: please verify!!!
+        expose(:eref, as: 'end_to_end_reference')
         expose(:status)
         expose(:_links) do |transaction|
           iban = transaction.account.iban
           {
-            self: Box.configuration.app_url + "/credit_transfers/#{transaction.id}",
+            self: Box.configuration.app_url + "/direct_debits/#{transaction.id}",
             account: Box.configuration.app_url + "/accounts/#{iban}/",
           }
         end
