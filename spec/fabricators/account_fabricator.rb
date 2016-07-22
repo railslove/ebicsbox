@@ -32,6 +32,7 @@ BICS = [
 
 Fabricator(:account, from: 'Box::Account') do
   name { Faker::Company.name }
+  descriptor { Faker::Company.name }
   iban { FAKE_IBANS.sample }
   bic { BICS.sample }
 

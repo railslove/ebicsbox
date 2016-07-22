@@ -1,6 +1,7 @@
 <table>
 <tr>
   <th>Name</th>
+  <th>Bezeichnung</th>
   <th>IBAN</th>
   <th>BIC</th>
   <th>Active?</th>
@@ -9,6 +10,7 @@
 <% @accounts.each do |account| %>
 <tr>
   <td><%= account.name %> </td>
+  <td><%= account.descriptor %> </td>
   <td><%= account.iban %></td>
   <td><%= account.bic %></td>
   <td>
