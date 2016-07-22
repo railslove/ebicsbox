@@ -56,6 +56,18 @@ module Box
             expect { Jobs::Credit.process!(@job.body) }.to change { Event.all.map(&:type).sort }.to(["credit_created", "statement_created"])
           end
         end
+
+        context 'amounts' do
+          before do
+            Credit.create!(account, valid_payload.merge(amount: 251_995), user)
+            @job = Queue.client.tubes[Queue::CREDIT_TUBE].reserve
+          end
+
+          it 'sets correct statement account' do
+            Jobs::Credit.process!(@job.body)
+            expect(Statement.last.amount).to eq(251_995)
+          end
+        end
       end
     end
   end

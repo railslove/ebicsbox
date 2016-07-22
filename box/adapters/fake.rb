@@ -51,11 +51,10 @@ module Box
       def CCT(pain)
         doc = Nokogiri::XML(pain)
         ["TRX#{SecureRandom.hex(6)}", "N#{SecureRandom.hex(6)}"]
-        amount = doc.css("Document CstmrCdtTrfInitn GrpHdr CtrlSum").text.to_f
         trx = doc.css("Document CstmrCdtTrfInitn PmtInf CdtTrfTxInf")
         eref = trx.css("PmtId EndToEndId").text
         desc = trx.css("RmtInf Ustrd").text
-        amount = (trx.css("Amt InstdAmt").text.to_f * 100).to_i
+        amount = trx.css("Amt InstdAmt").text.gsub(/\./, '').to_i
         transaction = Transaction[eref: eref]
         transaction.update_status("debit_received", reason: "Auto accept fake credit transfers")
 
