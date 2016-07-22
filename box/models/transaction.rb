@@ -55,16 +55,12 @@ module Box
     end
 
     def update_status(new_status, reason: nil)
-      old_status = status
-
       update(
         history: self.history << { at: Time.now, status: new_status, reason: reason},
         status: get_status(new_status)
       )
 
-      if old_status != status
-        Event.transaction_updated(self)
-      end
+      # TODO: Log credit and debit success / failures
 
       return status
     end

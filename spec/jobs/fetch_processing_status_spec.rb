@@ -38,15 +38,6 @@ module Box
               do_action
             end
           end
-
-          context 'transaction status did not change' do
-            before { allow_any_instance_of(Transaction).to receive(:update_status).and_return('new') }
-
-            it 'does not trigger a webhook' do
-              expect(Event).to_not receive(:transaction_updated)
-              do_action
-            end
-          end
         end
 
         context 'no transaction with order id found' do
