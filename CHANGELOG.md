@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.1
+
+Make scheduler intervals configurable.
+
+* Set interval between retrieval of bank statements via UPDATE_BANK_STATEMENTS_INTERVAL (in minutes / default: 30)
+* Set interval between retrieval of processing status reports via UPDATE_PROCESSING_STATUS_INTERVAL (in minutes / default: 300)
+
 ## 0.7
 
 We ditched jruby in favor of ruby. This is great news!
