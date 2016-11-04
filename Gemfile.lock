@@ -180,6 +180,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activesupport
   airborne
   beaneater (~> 1.0.0)
   byebug

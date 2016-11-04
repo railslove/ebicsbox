@@ -1,4 +1,5 @@
 require 'beaneater'
+require 'active_support/core_ext/array'
 
 require_relative './jobs/credit'
 require_relative './jobs/debit'

@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 ruby '2.3.1'
 
 gem 'rake'
+gem 'activesupport'
 gem 'beaneater', '~> 1.0.0'
 gem 'clockwork'
 gem 'cmxl', git: 'https://github.com/railslove/cmxl.git'
