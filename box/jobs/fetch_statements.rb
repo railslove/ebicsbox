@@ -1,3 +1,4 @@
+require 'active_support/all'
 require 'camt_parser'
 require 'cmxl'
 require 'epics'
