@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.1.1
+
+* Bugfix in FetchStatements Worker
+
 ## 0.7.1
 
 Make scheduler intervals configurable.
