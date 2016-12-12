@@ -2,7 +2,7 @@
 ---
 replicated_api_version: "1.0.0"
 name: "EBICS::Box"
-version: "0.0.79"
+version: "0.0.81"
 release_notes: ""
 components:
 - name: Postgresql
@@ -35,7 +35,7 @@ components:
 - name: Beanstalkd
   containers:
   - source: public
-    image_name: "michaelcontento/beanstalkd"
+    image_name: "yoyostile/beanstalkd"
     version: latest
     publish_events:
     - name: Container Beanstalkd started
@@ -51,7 +51,7 @@ components:
   containers:
   - source: replicated
     image_name: ebicsbox
-    version: 0.7.1
+    version: 0.7.1.1
     config_files: []
     customer_files: []
     env_vars:
