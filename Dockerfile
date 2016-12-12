@@ -1,6 +1,5 @@
 FROM yoyostile/railslove-ruby:2.3.1
-RUN apt-get update && apt-get install -y git supervisor python-pip zlib1g-dev libpq-dev
-RUN pip install supervisor-stdout
+RUN apt-get update && apt-get install -y git supervisor build-essential zlib1g-dev libpq-dev
 
 # throw errors if Gemfile has been modified since Gemfile.lock
 RUN bundle config --global frozen 1

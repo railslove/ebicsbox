@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.1.2
+
+* Bugfix for new supervisord version and problems logging to stdout
+
 ## 0.7.1.1
 
 * Bugfix in FetchStatements Worker

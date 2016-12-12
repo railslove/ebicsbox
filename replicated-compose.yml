@@ -2,7 +2,7 @@
 ---
 replicated_api_version: "1.0.0"
 name: "EBICS::Box"
-version: "0.0.81"
+version: "0.0.82"
 release_notes: ""
 components:
 - name: Postgresql
@@ -51,7 +51,7 @@ components:
   containers:
   - source: replicated
     image_name: ebicsbox
-    version: 0.7.1.1
+    version: 0.7.1.2
     config_files: []
     customer_files: []
     env_vars:
