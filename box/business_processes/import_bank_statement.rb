@@ -45,7 +45,10 @@ module Box
       end
 
       def self.find_or_create_bank_statement(raw_bank_statement, account)
-        BankStatement.find_or_create(account_id: account.id, sequence: (raw_bank_statement.try(:electronic_sequence_number) || raw_bank_statement.legal_sequence_number)) do |bs|
+        BankStatement.find_or_create(
+            account_id: account.id,
+            sequence: (raw_bank_statement.try(:electronic_sequence_number) || raw_bank_statement.legal_sequence_number),
+            year: self.extract_year_from_bank_statement(raw_bank_statement)) do |bs|
           bs.remote_account = raw_bank_statement.account_identification.source
           bs.opening_balance = as_big_decimal(raw_bank_statement.opening_or_intermediary_balance) # this will be final or intermediate
           bs.closing_balance = as_big_decimal(raw_bank_statement.closing_or_intermediary_balance) # this will be final or intermediate
@@ -65,6 +68,11 @@ module Box
       def self.as_big_decimal(input)
         return if input.nil?
         (input.amount * input.sign).to_d
+      end
+
+      def self.extract_year_from_bank_statement(raw_bank_statement)
+        first_transaction = raw_bank_statement.transactions.first
+        first_transaction&.date&.year
       end
     end
   end

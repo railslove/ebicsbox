@@ -11,6 +11,9 @@ module Box
     RSpec.describe ImportStatements do
       let(:organization) { Fabricate(:organization) }
       let(:account) { organization.add_account(host: "HOST", iban: "iban1234567") }
+      let(:camt_account) { organization.add_account(host: "HOST", iban: "iban1234567", statements_format: 'camt53') }
+      let(:camt_fixture) { 'camt_statement.xml' }
+      let(:camt) { File.read("spec/fixtures/#{camt_fixture}") }
       let(:mt940_fixture) { 'single_valid.mt940' }
       let(:mt940) { File.read("spec/fixtures/#{mt940_fixture}") }
 
@@ -81,7 +84,7 @@ module Box
         end
 
         context 'the statement was already imported' do
-          # This is a precalculated SHA based on our algorythm
+          # This is a precalculated SHA based on our algorithm
           before { Statement.create(sha: 'a83041608974d854ef26f649a2a74c6af9688e327d2c4cf8fdf039f07755b521', account_id: account.id) }
 
           it 'does not create a statement' do
@@ -104,6 +107,26 @@ module Box
             expect(Event).to receive(:publish).with(:statement_created, anything)
             exec_create_action
           end
+        end
+      end
+
+      describe 'duplicated bank statement number' do
+        let!(:cmxl_2016) { File.read("spec/fixtures/duplicated_sequence_number_2016.mt940") }
+        let!(:cmxl_2017) { File.read("spec/fixtures/duplicated_sequence_number_2017.mt940") }
+
+        it 'imports even if statement number is duplicated' do
+          bank_statement = ImportBankStatement.from_mt940(cmxl_2016, account)
+          expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(4)
+          bank_statement = ImportBankStatement.from_mt940(cmxl_2017, account)
+          expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(2)
+        end
+      end
+
+      describe 'camt bank statement import' do
+        it 'imports camt statements' do
+          parsed_camt = CamtParser::String.parse(camt).statements
+          bank_statement = ImportBankStatement.from_cmxl(parsed_camt.first, camt_account)
+          expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(4)
         end
       end
 

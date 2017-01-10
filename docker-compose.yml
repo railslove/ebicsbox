@@ -1,5 +1,5 @@
 db:
-  image: postgres
+  image: postgres:9.6.1-alpine
   environment:
     - POSTGRES_PASSWORD=mysecretpassword
     - POSTGRES_USER=ebicsbox

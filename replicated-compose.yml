@@ -2,14 +2,14 @@
 ---
 replicated_api_version: "1.0.0"
 name: "EBICS::Box"
-version: "0.0.82"
+version: "0.0.83"
 release_notes: ""
 components:
 - name: Postgresql
   containers:
   - source: public
     image_name: "postgres"
-    version: latest
+    version: 9.6.1-alpine
     publish_events:
     - name: Container Postgres started
       trigger: container-start
@@ -51,7 +51,7 @@ components:
   containers:
   - source: replicated
     image_name: ebicsbox
-    version: 0.7.1.2
+    version: 0.7.2
     config_files: []
     customer_files: []
     env_vars:

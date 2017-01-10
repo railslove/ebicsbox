@@ -4,7 +4,7 @@ module Epics
   module Box
     class Worker
       def initialize
-        @queue ||= Queue.new
+        @queue ||= Box::Queue.new
       end
 
       def process!
