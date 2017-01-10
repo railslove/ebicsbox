@@ -11,6 +11,9 @@ module Box
     RSpec.describe ImportStatements do
       let(:organization) { Fabricate(:organization) }
       let(:account) { organization.add_account(host: "HOST", iban: "iban1234567") }
+      let(:camt_account) { organization.add_account(host: "HOST", iban: "iban1234567", statements_format: 'camt53') }
+      let(:camt_fixture) { 'camt_statement.xml' }
+      let(:camt) { File.read("spec/fixtures/#{camt_fixture}") }
       let(:mt940_fixture) { 'single_valid.mt940' }
       let(:mt940) { File.read("spec/fixtures/#{mt940_fixture}") }
 
@@ -116,6 +119,14 @@ module Box
           expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(4)
           bank_statement = ImportBankStatement.from_mt940(cmxl_2017, account)
           expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(2)
+        end
+      end
+
+      describe 'camt bank statement import' do
+        it 'imports camt statements' do
+          parsed_camt = CamtParser::String.parse(camt).statements
+          bank_statement = ImportBankStatement.from_cmxl(parsed_camt.first, camt_account)
+          expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(4)
         end
       end
 
