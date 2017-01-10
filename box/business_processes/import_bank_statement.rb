@@ -45,11 +45,10 @@ module Box
       end
 
       def self.find_or_create_bank_statement(raw_bank_statement, account)
-        year = self.extract_year_from_bank_statement(raw_bank_statement)
         BankStatement.find_or_create(
             account_id: account.id,
             sequence: (raw_bank_statement.try(:electronic_sequence_number) || raw_bank_statement.legal_sequence_number),
-            year: year) do |bs|
+            year: self.extract_year_from_bank_statement(raw_bank_statement)) do |bs|
           bs.remote_account = raw_bank_statement.account_identification.source
           bs.opening_balance = as_big_decimal(raw_bank_statement.opening_or_intermediary_balance) # this will be final or intermediate
           bs.closing_balance = as_big_decimal(raw_bank_statement.closing_or_intermediary_balance) # this will be final or intermediate
