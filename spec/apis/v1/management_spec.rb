@@ -121,6 +121,11 @@ module Box
           it 'ignores iban if it did not change' do
             expect { put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name' }, { 'Authorization' => "Bearer #{user.access_token}" } }.to change { account.reload.name }
           end
+
+          it 'ignores the access_token attribute' do
+            expect { put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name', access_token: user.access_token } }.to change {
+              account.reload.name }
+          end
         end
 
         context 'inactive account' do

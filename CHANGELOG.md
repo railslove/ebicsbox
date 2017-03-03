@@ -1,9 +1,13 @@
 # Changelog
 
+## 0.7.2.1
+
+* Ignore access_token attribute in accounts#update V1 API call
+
 ## 0.7.2
 
 * bound postgresql to version 9.6.1 (be careful! manual migration or local overriding of this is necessary)
-* BankStatements are bound to a year now, as some banking institutes tend to reuse their bank statement sequence number every year 
+* BankStatements are bound to a year now, as some banking institutes tend to reuse their bank statement sequence number every year
 
 ## 0.7.1.2
 

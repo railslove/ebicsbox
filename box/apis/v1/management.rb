@@ -136,7 +136,7 @@ module Box
             put ':id' do
               begin
                 account = current_organization.accounts_dataset.first!(iban: params[:id])
-                account.set(params.except('id', 'state'))
+                account.set(params.except('id', 'state', 'access_token'))
                 if !account.modified? || account.save
                   present account, with: Entities::ManagementAccount
                 else
