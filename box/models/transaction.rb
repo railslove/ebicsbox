@@ -24,6 +24,10 @@ module Box
       where(type: 'credit')
     end
 
+    def_dataset_method(:direct_debits) do
+      where(type: 'debit')
+    end
+
     def_dataset_method(:filtered) do |params|
       query = self
 
