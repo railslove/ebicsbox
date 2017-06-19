@@ -1,6 +1,5 @@
 source 'https://rubygems.org'
 
-ruby '2.3.1'
 
 gem 'rake'
 gem 'activesupport'
@@ -15,7 +14,7 @@ gem 'nokogiri'
 gem 'ruby-swagger'
 gem 'sepa_king'
 gem 'sequel'
-gem 'puma'
+gem 'puma', '~>3.8.0'
 gem 'jwt'
 gem 'rack-cors', require: false
 
