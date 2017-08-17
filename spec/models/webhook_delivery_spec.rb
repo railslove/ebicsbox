@@ -127,8 +127,6 @@ module Box
     end
 
     context 'payload signature' do
-      before { allow_any_instance_of(Event).to receive(:callback_url).and_return('http://mycallback.url') }
-
       it 'signs the request according to its payload' do
         response, _execution_time = subject.execute_request
         hmac = response.to_hash[:request_headers]['X-Signature']
