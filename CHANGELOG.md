@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.2.2
+
+* Fix webhook signature mechanism 
+
 ## 0.7.2.1
 
 * Ignore access_token attribute in accounts#update V1 API call
