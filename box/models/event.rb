@@ -54,17 +54,16 @@ module Box
       event = new(
         type: event_type,
         payload: Sequel.pg_json(payload.stringify_keys),
-        signature: signature(payload),
         account_id: payload[:account_id],
       )
       event.save
       Queue.trigger_webhook(event_id: event.id)
     end
 
-    def self.signature(payload)
+    def sign!(json_payload)
       digest = OpenSSL::Digest.new('sha1')
-      secret = Account[payload[:account_id]].organization.webhook_token
-      'sha1=' + OpenSSL::HMAC.hexdigest(digest, secret, payload.to_s)
+      secret = account.organization.webhook_token
+      'sha1=' + OpenSSL::HMAC.hexdigest(digest, secret, json_payload)
     end
 
     def callback_url

@@ -2,10 +2,13 @@ require 'faraday'
 
 module Box
   RSpec.describe WebhookDelivery do
-    let(:event) { Event.create type: 'test' }
+    let(:organization) { Fabricate(:organization) }
+    let(:account) { Fabricate(:account, organization: organization) }
+    let(:event) { Event.create type: 'test', payload: { foo: :bar }, account: account }
 
     before do
       subject.event = event
+      stub_request(:post, "https://myapp.url/webhooks")
       @request = stub_request(:post, "http://mycallback.url/")
     end
 
@@ -49,6 +52,8 @@ module Box
       end
 
       context 'no callback url defined' do
+        before { allow_any_instance_of(Account).to receive(:try).with(:callback_url).and_return(nil) }
+
         it 'raises an exception' do
           expect { subject.execute_request }.to raise_error(Event::NoCallback)
         end
@@ -118,6 +123,16 @@ module Box
             subject.deliver
           end
         end
+      end
+    end
+
+    context 'payload signature' do
+      before { allow_any_instance_of(Event).to receive(:callback_url).and_return('http://mycallback.url') }
+
+      it 'signs the request according to its payload' do
+        response, _execution_time = subject.execute_request
+        hmac = response.to_hash[:request_headers]['X-Signature']
+        expect(hmac).to eq(event.sign!(event.to_webhook_payload.to_json))
       end
     end
 

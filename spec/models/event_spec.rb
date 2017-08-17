@@ -39,17 +39,17 @@ module Box
       # Signature for specs is defined in support configuration
 
       it 'returns a signature for given payload' do
-        expect(described_class.signature(some: 'payload')).to eq('sha1=b6a7ebbd7ae723c465a82fa7e53018e8a5997df0')
+        expect(subject.sign!({ some: 'payload' }.to_json)).to eq('sha1=9a7d4d2164cd8705736840bfb187f6580925501f')
       end
 
       it 'always generates the same signature with a given payload' do
-        signatures = Array.new(5).map { described_class.signature(some: 'payload') }
+        signatures = Array.new(5).map { subject.sign!({ some: 'payload' }.to_json) }
         expect(signatures.uniq.size).to eq(1)
       end
 
       it 'generates different signatures for different payloads' do
-        sig_1 = described_class.signature(some: 'payload')
-        sig_2 = described_class.signature(some: 'other payload')
+        sig_1 = subject.sign!({ some: 'payload' }.to_json)
+        sig_2 = subject.sign!({ some: 'other payload' }.to_json)
         expect(sig_1).to_not eq(sig_2)
       end
     end
