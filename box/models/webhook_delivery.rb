@@ -41,7 +41,7 @@ module Box
           response = conn.post do |req|
             req.url URI(event.callback_url).path
             req.headers['Content-Type'] = 'application/json'
-            req.headers['X-Signature'] = event.sign!(body)
+            req.headers['X-Signature'] = event.sign_body(body)
             req.body = body
           end
         end

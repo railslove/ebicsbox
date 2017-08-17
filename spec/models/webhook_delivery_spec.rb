@@ -132,7 +132,7 @@ module Box
       it 'signs the request according to its payload' do
         response, _execution_time = subject.execute_request
         hmac = response.to_hash[:request_headers]['X-Signature']
-        expect(hmac).to eq(event.sign!(event.to_webhook_payload.to_json))
+        expect(hmac).to eq(event.sign_body(event.to_webhook_payload.to_json))
       end
     end
 
