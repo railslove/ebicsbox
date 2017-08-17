@@ -11,18 +11,18 @@ module Box
       end
 
       def call(env)
-        env[:request_headers][SIGNATURE_HEADER] ||= signature_header(env).to_s if secret
+        env[:request_headers][SIGNATURE_HEADER] ||= sign(env[:body]).to_s if secret
         @app.call(env)
       end
 
       private
 
-      def signature_header(env)
-        'sha1=' + OpenSSL::HMAC.hexdigest(digest, secret, env[:body])
+      def sign(msg)
+        'sha1=' + OpenSSL::HMAC.hexdigest(digest, secret, msg)
       end
 
       def digest
-        @digest ||= OpenSSL::Digest.new('sha1')
+        OpenSSL::Digest.new('sha1')
       end
 
       def secret
@@ -32,4 +32,4 @@ module Box
   end
 end
 
-Faraday::Request.register_middleware signer: ->{ Box::Middleware::Signer }
+Faraday::Request.register_middleware signer: -> { Box::Middleware::Signer }

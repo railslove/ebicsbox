@@ -38,11 +38,10 @@ module Box
       begin
         execution_time = Benchmark.realtime do
           conn = build_connection(event.callback_url)
-          body = event.to_webhook_payload.to_json
           response = conn.post do |req|
             req.url URI(event.callback_url).path
             req.headers['Content-Type'] = 'application/json'
-            req.body = body
+            req.body = event.to_webhook_payload.to_json
           end
         end
       rescue Faraday::TimeoutError, Faraday::ConnectionFailed, Faraday::Error => ex
