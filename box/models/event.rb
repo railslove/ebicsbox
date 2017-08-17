@@ -60,12 +60,6 @@ module Box
       Queue.trigger_webhook(event_id: event.id)
     end
 
-    def sign_body(json_payload)
-      digest = OpenSSL::Digest.new('sha1')
-      secret = account.organization.webhook_token
-      'sha1=' + OpenSSL::HMAC.hexdigest(digest, secret, json_payload)
-    end
-
     def callback_url
       account.try(:callback_url) || raise(NoCallback)
     end
