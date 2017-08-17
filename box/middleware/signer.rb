@@ -18,7 +18,7 @@ module Box
       private
 
       def sign(msg)
-        'sha1=' + OpenSSL::HMAC.hexdigest(digest, secret, msg)
+        'sha1=' + OpenSSL::HMAC.hexdigest(digest, secret, msg.to_s)
       end
 
       def digest
