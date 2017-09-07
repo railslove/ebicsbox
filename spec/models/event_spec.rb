@@ -35,25 +35,6 @@ module Box
       it 'logs it to replicated audit log'
     end
 
-    describe ".signature" do
-      # Signature for specs is defined in support configuration
-
-      it 'returns a signature for given payload' do
-        expect(described_class.signature(some: 'payload')).to eq('sha1=b6a7ebbd7ae723c465a82fa7e53018e8a5997df0')
-      end
-
-      it 'always generates the same signature with a given payload' do
-        signatures = Array.new(5).map { described_class.signature(some: 'payload') }
-        expect(signatures.uniq.size).to eq(1)
-      end
-
-      it 'generates different signatures for different payloads' do
-        sig_1 = described_class.signature(some: 'payload')
-        sig_2 = described_class.signature(some: 'other payload')
-        expect(sig_1).to_not eq(sig_2)
-      end
-    end
-
     describe "default values" do
       subject { described_class.create }
 

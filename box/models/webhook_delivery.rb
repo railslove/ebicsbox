@@ -4,6 +4,7 @@ require 'faraday'
 require 'sequel'
 
 require_relative './event'
+require_relative '../middleware/signer'
 
 module Box
   class WebhookDelivery < Sequel::Model
@@ -40,7 +41,6 @@ module Box
           response = conn.post do |req|
             req.url URI(event.callback_url).path
             req.headers['Content-Type'] = 'application/json'
-            req.headers['X-Signature'] = event.signature if event.signature
             req.body = event.to_webhook_payload.to_json
           end
         end
@@ -83,6 +83,7 @@ module Box
       uri = URI(callback_url)
       Faraday.new("#{uri.scheme}://#{uri.host}") do |c|
         c.basic_auth *auth if auth
+        c.request :signer, secret: event.account.organization.webhook_token
         c.adapter Faraday.default_adapter
       end
     end
