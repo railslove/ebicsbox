@@ -20,3 +20,7 @@ node_modules
 application.js
 public
 epics-box.war
+.rubocop.yml
+.rubocop_todo.yml
+.ruby-version
+/bin/seed_data

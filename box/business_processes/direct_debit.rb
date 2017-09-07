@@ -43,5 +43,40 @@ module Box
       # TODO: Will be fixed upstream in the sepa_king gem by us
       fail Box::BusinessProcessFailure.new({base: e.message}, 'Invalid data')
     end
+
+    def self.v2_create!(account, params, user)
+      
+      sdd = SEPA::DirectDebit.new(account.pain_attributes_hash).tap do |debit|
+        debit.message_identification= "EBICS-BOX/#{SecureRandom.hex(11).upcase}"
+        debit.add_transaction(
+          name: params[:name],
+          bic: params[:bic],
+          iban: params[:iban],  
+          amount: params[:amount_in_cents] / 100.0,
+          mandate_id: params[:mandate_id],
+          mandate_date_of_signature: params[:mandate_signature_date],
+          reference: params[:end_to_end_reference],
+          batch_booking: true,
+          local_instrument: 'COR1',
+          sequence_type: 'FRST'
+        )
+      end
+
+      if sdd.valid?
+        Queue.execute_debit(
+          account_id: account.id,
+          user_id: user.id,
+          payload: Base64.strict_encode64(sdd.to_xml),
+          amount: params[:amount],
+          eref: params[:eref],
+          instrument: params[:instrument]
+        )
+      else
+        fail Box::BusinessProcessFailure.new(sdd.errors)
+      end
+    rescue ArgumentError => e
+      # TODO: Will be fixed upstream in the sepa_king gem by us
+      fail Box::BusinessProcessFailure.new({base: e.message}, 'Invalid data')
+    end
   end
 end
