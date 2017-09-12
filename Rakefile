@@ -1,11 +1,6 @@
-# Load swagger rake task
-spec = Gem::Specification.find_by_name 'ruby-swagger'
-load "#{spec.gem_dir}/lib/tasks/swagger.rake"
-
 require 'sequel'
 # Load application
 require './config/configuration'
-
 
 # namespace :jruby do
 #   desc 'Build jruby classes'

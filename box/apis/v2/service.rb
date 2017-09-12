@@ -8,6 +8,9 @@ module Box
       class Service < Grape::API
         include ApiEndpoint
 
+        desc 'Service',
+          hidden: true
+
         get do
           {
             version: 'v2'

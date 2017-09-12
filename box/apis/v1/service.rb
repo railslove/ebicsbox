@@ -1,5 +1,4 @@
 require 'grape'
-require 'ruby-swagger/grape/grape'
 
 # Helpers
 require_relative '../../helpers/default'
@@ -17,9 +16,6 @@ module Box
           end
         end
 
-        api_desc 'Renders homepage with most relevant information' do
-          tags 'Service'
-        end
         get '/' do
           {
             documentation: Box.configuration.app_url + '/docs',
