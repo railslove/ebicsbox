@@ -1,5 +1,4 @@
 require 'grape'
-require 'ruby-swagger/grape/grape'
 require 'sequel'
 
 # Validations
@@ -46,41 +45,21 @@ module Box
             end
           end
 
-          api_desc 'Entry point for management area' do
-            hidden true
-          end
           get '/' do
             { message: 'not yet implemented' }
           end
 
           resource :accounts do
-            api_desc 'Retrieve a list of all onboarded accounts' do
-              api_name 'management_accounts'
-              tags 'Management'
-              response Entities::ManagementAccount, isArray: true
-              headers AUTH_HEADERS
-              errors DEFAULT_ERROR_RESPONSES
-            end
             get do
               accounts = current_organization.accounts_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
               present accounts, with: Entities::ManagementAccount
             end
 
-            api_desc 'Retrieve a single account by its IBAN' do
-              api_name 'management_account'
-              tags 'Management'
-              response Entities::ManagementAccount
-              headers AUTH_HEADERS
-              errors DEFAULT_ERROR_RESPONSES
-            end
             get ':id' do
               account = current_organization.accounts_dataset.first!({ iban: params[:id] })
               present account, with: Entities::ManagementAccount, type: 'full'
             end
 
-            api_desc 'Create a new account' do
-              tags 'Management'
-            end
             params do
               requires :name, type: String, unique_account: true, allow_blank: false, desc: 'Internal description of account'
               requires :iban, type: String, unique_account: true, allow_blank: false, desc: 'IBAN'
@@ -102,9 +81,6 @@ module Box
               end
             end
 
-            api_desc 'Submit a newly created account?' do
-              tags 'Management'
-            end
             put ':id/submit' do
               begin
                 account = current_organization.accounts_dataset.first!({ iban: params[:id] })
@@ -118,9 +94,6 @@ module Box
               end
             end
 
-            api_desc 'Update an existing account' do
-              tags 'Management'
-            end
             params do
               optional :name, type: String, unique_account: true, allow_blank: false, desc: 'Internal description of account'
               optional :iban, type: String, unique_account: true, active_account: false, allow_blank: false, desc: 'IBAN'
@@ -149,12 +122,6 @@ module Box
           end
 
           resource 'accounts/:account_id/subscribers' do
-            api_desc 'Fetch an account\'s INI letter' do
-              api_name 'management_account_ini_letter'
-              tags 'Management'
-              headers AUTH_HEADERS
-              errors DEFAULT_ERROR_RESPONSES
-            end
             get ':id/ini_letter' do
               subscriber = Subscriber.join(:accounts, id: :account_id).where(organization_id: current_organization.id, iban: params[:account_id]).first!(Sequel.qualify(:subscribers, :id) => params[:id])
               if subscriber.ini_letter.nil?
@@ -165,24 +132,11 @@ module Box
               end
             end
 
-            api_desc 'Retrieve a list of all subscribers for given account' do
-              api_name 'management_account_subscribers'
-              tags 'Management'
-              response Entities::Subscriber, isArray: true
-              headers AUTH_HEADERS
-              errors DEFAULT_ERROR_RESPONSES
-            end
             get do
               account = current_organization.accounts_dataset.first!(iban: params[:account_id])
               present account.subscribers, with: Entities::Subscriber
             end
 
-            api_desc 'Add a subscriber to given account' do
-              api_name 'management_account_subscriber_create'
-              tags 'Management'
-              headers AUTH_HEADERS
-              errors DEFAULT_ERROR_RESPONSES
-            end
             params do
               requires :user_id, type: Integer, desc: "Internal user identifier to associate the subscriber with"
               requires :ebics_user, type: String, unique_subscriber: true, desc: "EBICS user to represent"
@@ -209,36 +163,16 @@ module Box
           end
 
           resource :users do
-            api_desc 'Retrieve a list of all users' do
-              api_name 'management_users'
-              tags 'Management'
-              response Entities::User, isArray: true
-              headers AUTH_HEADERS
-              errors DEFAULT_ERROR_RESPONSES
-            end
             get do
               users = current_organization.users_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
               present users, with: Entities::User
             end
 
-            api_desc 'Retrieve a single user by its identifier' do
-              api_name 'management_user'
-              tags 'Management'
-              response Entities::User
-              headers AUTH_HEADERS
-              errors DEFAULT_ERROR_RESPONSES
-            end
             get ':id' do
               user = current_organization.users_dataset.first!({ id: params[:id] })
               present user, with: Entities::User, type: 'full'
             end
 
-            api_desc 'Create a new user instance' do
-              api_name 'management_user_create'
-              tags 'Management'
-              headers AUTH_HEADERS
-              errors DEFAULT_ERROR_RESPONSES
-            end
             params do
               requires :name, type: String, desc: "The user's display name"
               optional :token, type: String, desc: 'Set a custom access token'

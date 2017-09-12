@@ -23,12 +23,18 @@ module Box
           ###
           ### GET /accounts
           ###
+          desc "Fetch a list of accounts",
+            is_array: true,
+            headers: AUTH_HEADERS,
+            success: Entities::V2::Account,
+            failure: DEFAULT_ERROR_RESPONSES
 
           params do
             optional :page, type: Integer, desc: "page through the results", default: 1
             optional :per_page, type: Integer, desc: "how many results per page", values: 1..100, default: 10
             optional :status, type: String, desc: "Filter accounts by their activation status", default: 'all'
           end
+
           get do
             query = Account.by_organization(current_organization).filtered(declared(params))
             setup_pagination_header(query.count)
@@ -39,9 +45,14 @@ module Box
           ###
           ### POST /accounts
           ###
+          desc "Create a new account",
+            headers: AUTH_HEADERS,
+            success: Message,
+            body_name: 'body',
+            failure: DEFAULT_ERROR_RESPONSES
 
           params do
-            requires :name, type: String, allow_blank: false, desc: 'Name of the account'
+            requires :name, type: String, allow_blank: false, desc: 'Name of the account', documentation: { param_type: 'body' }
             requires :iban, type: String, unique_account: true, allow_blank: false, desc: 'IBAN'
             requires :bic, type: String, allow_blank: false, desc: 'BIC'
             requires :host, type: String, desc: 'EBICS HOSTID as provided by financial institution'
@@ -71,6 +82,11 @@ module Box
           ### GET /accounts/:iban
           ###
 
+          desc "Fetch an account",
+            headers: AUTH_HEADERS,
+            success: Entities::V2::Account,
+            failure: DEFAULT_ERROR_RESPONSES
+
           params do
             requires :iban, type: String
           end
@@ -83,6 +99,11 @@ module Box
           ###
           ### GET /accounts/:iban/ini_letter
           ###
+
+          desc "Fetch the ini letter of an account",
+            headers: AUTH_HEADERS,
+            failure: DEFAULT_ERROR_RESPONSES,
+            produces: ['text/html']
 
           get ':iban/ini_letter' do
             account = Box::Account.by_organization(current_organization).first!(iban: params[:iban])
@@ -100,8 +121,14 @@ module Box
           ### PUT /accounts/:iban
           ###
 
+          desc "Update an account",
+            success: Entities::V2::Account,
+            headers: AUTH_HEADERS,
+            failure: DEFAULT_ERROR_RESPONSES,
+            body_name: 'body'
+
           params do
-            optional :name, type: String, allow_blank: false, desc: 'Name of account'
+            optional :name, type: String, allow_blank: false, desc: 'Name of account', documentation: { param_type: 'body' }
             optional :descriptor, type: String, allow_blank: false, desc: 'Internal descriptor of account'
             optional :creditor_identifier, type: String, desc: 'Creditor identifier required for direct debits'
             optional :callback_url, type: String, desc: 'URL to which webhooks are delivered'

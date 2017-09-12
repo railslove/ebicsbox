@@ -1,5 +1,4 @@
 require 'grape'
-require 'ruby-swagger/grape/grape'
 
 require_relative '../../models/organization'
 require_relative '../../entities/registration_organization'
@@ -23,10 +22,6 @@ module Box
           }, 400)
         end
 
-        api_desc 'Create a new organization' do
-          api_name 'registration_organization'
-          tags 'Registration'
-        end
         params do
           requires :name, type: String, desc: "The organization's display name"
           requires :user, type: Hash do
