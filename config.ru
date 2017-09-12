@@ -28,12 +28,7 @@ use Rack::Cors do
 end
 
 # Deliver assets
-use Rack::Static, urls: ["/images", "/lib", "/fonts", "/js", "/css", "/swagger-ui.js"], root: "public/swagger"
-
-# Deliver generated swagger api specification
-use Rack::Static, urls: ["/swagger.json"], root: "doc/swagger", header_rules: [
-  [:all, {'Access-Control-Allow-Origin' => '*'}]
-]
+use Rack::Static, urls: ["/swagger-ui-standalone-preset.js", "/swagger-ui-bundle.js", "/swagger-ui-standalone-preset.js", "/swagger-ui.css", "/swagger-ui.js"], root: "public/swagger"
 
 # Deliver html/json documentation template
 map '/docs' do
