@@ -7,6 +7,7 @@ require_relative './credit_transfers'
 require_relative './service'
 require_relative './events'
 require_relative './transactions'
+require_relative './management'
 
 
 module Box
