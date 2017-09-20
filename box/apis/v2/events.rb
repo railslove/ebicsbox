@@ -1,5 +1,6 @@
 require 'grape'
 
+require_relative './api_endpoint'
 require_relative '../../models/event'
 require_relative '../../entities/v2/event'
 
