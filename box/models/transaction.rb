@@ -14,31 +14,32 @@ module Box
     many_to_one :user
     one_to_many :statements
 
-    def_dataset_method(:by_organization) do |organization|
-      left_join(:accounts, id: :account_id)
-      .where(accounts__organization_id: organization.id)
-      .select_all(:transactions)
-    end
+    dataset_module do
+      where(:credit_transfers, type: 'credit')
 
-    def_dataset_method(:credit_transfers) do
-      where(type: 'credit')
-    end
-
-    def_dataset_method(:filtered) do |params|
-      query = self
-
-      # Filter by account id
-      if params[:iban].present?
-        query = query.where(accounts__iban: params[:iban])
+      def by_organization(organization)
+        left_join(:accounts, id: :account_id)
+        .where(accounts__organization_id: organization.id)
+        .select_all(:transactions)
       end
 
-      query
-    end
+      def filtered(params)
+        query = self
 
-    def_dataset_method(:paginate) do |params|
-      limit(params[:per_page])
-        .offset((params[:page] - 1) * params[:per_page])
-        .reverse_order(:id)
+        # Filter by account id
+        if params[:iban].present?
+          query = query.where(accounts__iban: params[:iban])
+        end
+
+        query
+      end
+
+      def paginate(params)
+        limit(params[:per_page])
+          .offset((params[:page] - 1) * params[:per_page])
+          .reverse_order(:id)
+      end
+
     end
 
     def self.count_by_account(account_id, options = {})
