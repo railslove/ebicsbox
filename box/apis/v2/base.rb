@@ -21,6 +21,7 @@ module Box
         mount Service
         mount Transactions
         mount Events
+        mount Management
 
         add_swagger_documentation \
           doc_version: 'v2',
