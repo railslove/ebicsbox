@@ -1,4 +1,4 @@
-FROM yoyostile/railslove-ruby:2.3.1
+FROM ruby:2.3.1
 RUN apt-get update && apt-get install -y git supervisor build-essential zlib1g-dev libpq-dev
 
 # throw errors if Gemfile has been modified since Gemfile.lock
@@ -15,7 +15,6 @@ RUN bundle install
 
 ADD . /usr/ebicsbox
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-#RUN rake jruby:build
 
 # Clean up
 RUN rm Dockerfile*
