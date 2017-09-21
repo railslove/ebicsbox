@@ -12,34 +12,37 @@ module Box
     many_to_one :bank_statement
     many_to_one :transaction
 
-    def_dataset_method(:by_organization) do |organization|
-      left_join(:accounts, id: :account_id)
-      .where(accounts__organization_id: organization.id)
-      .select_all(:statements)
-    end
-
-    def_dataset_method(:filtered) do |params|
-      query = self
-
-      # Filter by account id
-      if params[:iban].present?
-        query = query.where(accounts__iban: params[:iban])
+    dataset_module do
+      def by_organization(organization)
+        left_join(:accounts, id: :account_id)
+        .where(accounts__organization_id: organization.id)
+        .select_all(:statements)
       end
 
-      # Filter by statement date
-      query = query.where("statements.date >= ?", params[:from]) if params[:from].present?
-      query = query.where("statements.date <= ?", params[:to]) if params[:to].present?
+      def filtered(params)
+        query = self
 
-      # Filter by type
-      query = query.where(debit: params[:type] == 'debit') if params[:type].present?
+        # Filter by account id
+        if params[:iban].present?
+          query = query.where(accounts__iban: params[:iban])
+        end
 
-      query
-    end
+        # Filter by statement date
+        query = query.where{ statements__date >= params[:from] } if params[:from].present?
+        query = query.where{ statements__date <= params[:to] } if params[:to].present?
 
-    def_dataset_method(:paginate) do |params|
-      limit(params[:per_page])
+        # Filter by type
+        query = query.where(debit: params[:type] == 'debit') if params[:type].present?
+
+        query
+      end
+
+      def paginate(params)
+        limit(params[:per_page])
         .offset((params[:page] - 1) * params[:per_page])
         .reverse_order(:date, :id)
+      end
+
     end
 
     def self.generic_filter(query, account_id: nil, transaction_id: nil, from: nil, to: nil, type: nil, **unused)
@@ -50,8 +53,8 @@ module Box
       query = query.where(transaction_id: transaction_id) if transaction_id.present?
 
       # Filter by statement date
-      query = query.where("statements.date >= ?", from) if from.present?
-      query = query.where("statements.date <= ?", to) if to.present?
+      query = query.where{ statements__date >= from} if from.present?
+      query = query.where{ statements__date <= to} if to.present?
 
       # Filter by type
       query = query.where(debit: type == 'debit') if type.present?

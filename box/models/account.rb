@@ -5,7 +5,7 @@ module Box
   class Account < Sequel::Model
     class Config
       attr_accessor :config
-      
+
       def initialize(config_hash)
         self.config = OpenStruct.new(config_hash)
       end
@@ -37,27 +37,27 @@ module Box
     one_to_many :transactions
     many_to_one :organization
 
-    def_dataset_method(:by_organization) do |organization|
-      where(organization_id: organization.id)
-    end
-
-    def_dataset_method(:filtered) do |params|
-      query = self
-
-      # Filter by status
-      query = case params[:status]
-        when 'activated' then query.left_join(:subscribers, account_id: :id).exclude(subscribers__activated_at: nil)
-        when 'not_activated' then query.left_join(:subscribers, account_id: :id).where(subscribers__activated_at: nil)
-        else query
+    dataset_module do
+      def by_organization(organization)
+        where(organization_id: organization.id)
       end
 
-      query
-    end
+      def filtered(params)
+        query = self
+        # Filter by status
+        query = case params[:status]
+          when 'activated' then query.left_join(:subscribers, account_id: :id).exclude(subscribers__activated_at: nil)
+          when 'not_activated' then query.left_join(:subscribers, account_id: :id).where(subscribers__activated_at: nil)
+          else query
+        end
+        query
+      end
 
-    def_dataset_method(:paginate) do |params|
-      limit(params[:per_page])
-        .offset((params[:page] - 1) * params[:per_page])
-        .order(:name)
+      def paginate(params)
+        limit(params[:per_page])
+          .offset((params[:page] - 1) * params[:per_page])
+          .order(:name)
+      end
     end
 
     def config

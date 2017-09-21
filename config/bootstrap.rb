@@ -26,6 +26,10 @@ end
 # Init database connection
 DB = Sequel.connect(Box.configuration.database_url, max_connections: 10)
 
+# enable histoic symbol splitting to create qualified and/or aliased identifiers
+# https://github.com/jeremyevans/sequel/blob/master/doc/release_notes/5.0.0.txt#L18
+# ToDo: update code to support default and disable split_symbols
+Sequel.split_symbols = true
 # Enable json extensions
 Sequel::Model.plugin :timestamps, update_on_create: true
 Sequel.extension :pg_json
