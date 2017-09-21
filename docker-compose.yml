@@ -8,13 +8,13 @@ db:
   volumes:
     - /tmp/data-postgresql:/var/lib/postgresql/data
 queue:
-  image: yoyostile/beanstalkd
+  image: railslove/beanstalkd
   expose:
     - "11300"
   volumes:
     - /tmp/data-beanstalkd:/data
 app:
-  image: ebicsbox:0.7.1.2
+  image: ebicsbox
   environment:
     - USERNAME=ebics
     - PASSWORD=istsuper
@@ -24,7 +24,6 @@ app:
     - "RACK_ENV=production"
     - "VIRTUAL_HOST=ebicsbox"
     - "PASSPHRASE=asdasdasdasdasd"
-    - "SECRET_TOKEN=sehrlangersecrettokenistsecret1234"
   links:
     - db
     - queue
