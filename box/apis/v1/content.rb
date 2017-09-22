@@ -78,14 +78,14 @@ module Box
           present accounts, with: Entities::Account, include: params[:include]
         end
 
-        resource ':account' do
-          params do
-            requires :account, type: String, desc: "the account to use"
-          end
-          get do
-            present account, with: Entities::Account
-          end
+        params do
+          requires :account, type: String, desc: "the account to use"
+        end
+        get ':account', requirements: { account: /[A-Z]{2}.*/ } do
+          present account, with: Entities::Account
+        end
 
+        resource ':account' do
           params do
             requires :account, type: String, desc: "the account to use"
             requires :name, type: String, desc: "the customers name"
