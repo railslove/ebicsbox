@@ -76,20 +76,11 @@ To migrate your test database run the following command:
 
 ### Documentation
 
-Our goal is to provide an always up-to-date documentation from within the app. In a good
-world the app would automatically generate docs on the fly, but this is somewhat not
-possible for v1 and grape-swagger.
-
-For the time being static files must be generated for v2
-
-```
-curl -k -X GET --header "Accept: application/vnd.ebicsbox-v2+json"  "http://localhost:9292/swagger_doc" > public/swagger/doc/swagger-v2.json
-```
-
-Once we've successfully dropped v1 or made it the second version choice,
-we can fetch uptodate docs at runtime http://YOUR-HOST//swagger_doc
+Our goal is to provide an always up-to-date documentation from within the app.
 
 Documentation is available at http://YOUR-HOST/docs
+
+> v1 docs are not maintained anymore and are just available as static swagger file
 
 ## Contributing
 
