@@ -32,7 +32,6 @@ module Box
         expose(:_links) do |account, options|
           {
             self: Box.configuration.app_url + "/accounts/#{account.iban}",
-            statements: Box.configuration.app_url + "/statements?iban=#{account.iban}",
             transactions: Box.configuration.app_url + "/transactions?iban=#{account.iban}",
             ini_letter: Box.configuration.app_url + "/accounts/#{account.iban}/ini_letter",
           }
