@@ -6,6 +6,22 @@ module Box
   module Apis
     module V2
       module ApiEndpoint
+        class Message < Grape::Entity
+          expose(:message)
+        end
+
+        DEFAULT_ERROR_RESPONSES = [
+          [400, "Invalid request", Message],
+          [401, "Not authorized to access this resource", Message],
+          [404, "No account with given IBAN found", Message],
+          [412, "EBICS account credentials not yet activated", Message]
+        ]
+
+        AUTH_HEADERS = {
+          'Authorization' => { description: 'OAuth 2 Bearer token', required: true, default: "Bearer " },
+          'Accept' => { description: 'Version', required: true, default: "application/vnd.ebicsbox-v2+json" }
+        }
+
         extend ActiveSupport::Concern
 
         included do

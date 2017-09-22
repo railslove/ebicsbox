@@ -9,7 +9,7 @@ It offers a HTTP interface and can be integrated with different message queueing
 
 ## Prerequisites
 
-* ruby (jruby / ruby 2.2.x)
+* ruby (jruby / ruby 2.3.x)
 * beanstalkd
 * postgres
 
@@ -76,12 +76,18 @@ To migrate your test database run the following command:
 
 ### Documentation
 
-Our goal is to provide an always up-to-date documentation from within the app. In order to achieve
-this, we have rake tasks which extract inline documentation and generate swagger formatted files
-which again can be used to auto-generate a UI.
+Our goal is to provide an always up-to-date documentation from within the app. In a good
+world the app would automatically generate docs on the fly, but this is somewhat not
+possible for v1 and grape-swagger.
 
-To update the existing documentation run ```bin/update_docs``` from the root of the project.
-It will update the existing documentation with changes from the project.
+For the time being static files must be generated for v2
+
+```
+curl -k -X GET --header "Accept: application/vnd.ebicsbox-v2+json"  "http://localhost:9292/swagger_doc" > public/swagger/doc/swagger-v2.json
+```
+
+Once we've successfully dropped v1 or made it the second version choice,
+we can fetch uptodate docs at runtime http://YOUR-HOST//swagger_doc
 
 Documentation is available at http://YOUR-HOST/docs
 

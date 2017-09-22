@@ -1,6 +1,5 @@
 require 'active_support/core_ext/string/strip'
 require 'grape'
-require 'ruby-swagger/grape/grape'
 
 # Validations
 require_relative '../../validations/unique_transaction'
@@ -71,13 +70,6 @@ module Box
 
         include Apis::V1::Events
 
-        api_desc 'Returns a list of all accessible accounts' do
-          api_name 'accounts'
-          tags 'Accessible resources'
-          response Entities::Account, isArray: true
-          headers AUTH_HEADERS
-          errors DEFAULT_ERROR_RESPONSES
-        end
         params do
           optional :include, type: Array[String], desc: "Additional data to include. Can be one of: subscriber"
         end
@@ -87,13 +79,6 @@ module Box
         end
 
         resource ':account' do
-          api_desc 'Returns detaild information about a single account' do
-            api_name 'accounts_show'
-            tags 'Account specific endpoints'
-            response Entities::Account
-            headers AUTH_HEADERS
-            errors DEFAULT_ERROR_RESPONSES
-          end
           params do
             requires :account, type: String, desc: "the account to use"
           end
@@ -101,28 +86,6 @@ module Box
             present account, with: Entities::Account
           end
 
-          api_desc "Debit a customer's bank account" do
-            api_name 'accounts_debit'
-            tags 'Account specific endpoints'
-            detail <<-USAGE.strip_heredoc
-              Creating a debit by parameter should be the preferred way for low-volume transactions esp. for use
-              cases where the PAIN XML isn't generated before. Transactions can be transmitted either as ```CD1```
-              or ```CDD``` depending on the order types your bank is offering you, the ```order_type``` parameter
-              lets you choose among them.
-
-              sequence_type
-
-              * OOFF - one-off debit
-              * FRST - first debit
-              * RCUR - recurring debit
-              * FNAL - final debit
-
-              Once validated, transactions are transmitted asynchronously to the banking system.
-              Errors that happen eventually are delivered via Webhooks.
-            USAGE
-            headers AUTH_HEADERS
-            errors DEFAULT_ERROR_RESPONSES
-          end
           params do
             requires :account, type: String, desc: "the account to use"
             requires :name, type: String, desc: "the customers name"
@@ -144,19 +107,6 @@ module Box
             { message: 'Direct debit has been initiated successfully!' }
           end
 
-          api_desc "Credit a customer's bank account" do
-            api_name 'account_credit'
-            tags 'Account specific endpoints'
-            detail <<-USAGE.strip_heredoc
-              Creating a credit by parameter should be the preferred way for low-volume transactions
-              esp. for use cases where the PAIN XML isn't generated before.
-
-              Once validated, transactions are transmitted asynchronously to the banking system. Errors
-              that happen eventually are delivered via Webhooks.
-            USAGE
-            headers AUTH_HEADERS
-            errors DEFAULT_ERROR_RESPONSES
-          end
           params do
             requires :account, type: String, desc: "the account to use"
             requires :name, type: String, desc: "the customers name"
@@ -174,18 +124,6 @@ module Box
             { message: 'Credit has been initiated successfully!' }
           end
 
-          api_desc "Retrieve all account statements" do
-            api_name 'accounts_statements'
-            tags 'Account specific endpoints'
-            detail <<-USAGE.strip_heredoc
-              Transactions are imported on a daily basis and stored so they can be easily retrieved
-              and searched for a timeframe that exceeds the usual timeframe your bank will hold them
-              on record for you. Besides pulling plain lists it is also possible to filter by eref or
-              remittance_infomation.
-            USAGE
-            headers AUTH_HEADERS
-            errors DEFAULT_ERROR_RESPONSES
-          end
           params do
             requires :account, type: String, desc: "IBAN for an existing account"
             optional :transaction_id, type: Integer, desc: "filter all statements by a specific transaction id"
@@ -203,12 +141,6 @@ module Box
             present statements, with: Entities::Statement
           end
 
-          api_desc "Retrieve all executed orders" do
-            api_name 'accounts_transactions'
-            tags 'Account specific endpoints'
-            headers AUTH_HEADERS
-            errors DEFAULT_ERROR_RESPONSES
-          end
           params do
             requires :account, type: String, desc: "IBAN for an existing account"
             optional :page, type: Integer, desc: "page through the results", default: 1
@@ -221,13 +153,6 @@ module Box
             present transactions, with: Entities::Transaction
           end
 
-          api_desc "Add a new account subscriber" do
-            api_name 'accounts_add_subscriber'
-            tags 'Account specific endpoints'
-            headers AUTH_HEADERS
-            errors DEFAULT_ERROR_RESPONSES
-            hidden true
-          end
           params do
             requires :ebics_user, type: String, desc: "IBAN for an existing account"
           end
@@ -242,13 +167,6 @@ module Box
           end
 
           namespace :import do
-            api_desc "Manually import statements for a given timeframe" do
-              api_name 'accounts_import_statements'
-              detail "Use this endpoint to manually import statements. This might be useful if another system fetched data via STA and you now need to get this data again."
-              tags 'Account specific endpoints'
-              headers AUTH_HEADERS
-              errors DEFAULT_ERROR_RESPONSES
-            end
             params do
               requires :account, type: String, desc: "IBAN for an existing account"
               requires :from, type: Date, desc: "Date from which on to filter the results"

@@ -26,6 +26,12 @@ module Box
           ### GET /credit_transfers
           ###
 
+          desc "Fetch a list of credit transfers",
+            is_array: true,
+            headers: AUTH_HEADERS,
+            success: Entities::V2::CreditTransfer,
+            failure: DEFAULT_ERROR_RESPONSES
+
           params do
             optional :iban, type: Array[String], desc: "IBAN of an account", coerce_with: ->(value) { value.split(',') }
             optional :page, type: Integer, desc: "page through the results", default: 1
@@ -42,8 +48,21 @@ module Box
           ### POST /credit_transfers
           ###
 
+          desc "Create a credit transfer",
+            headers: AUTH_HEADERS,
+            success: Message,
+            body_name: 'body',
+            failure: DEFAULT_ERROR_RESPONSES,
+            detail: <<-USAGE.strip_heredoc
+              Creating a credit by parameter should be the preferred way for low-volume transactions
+              esp. for use cases where the PAIN XML isn't generated before.
+
+              Once validated, transactions are transmitted asynchronously to the banking system. Errors
+              that happen eventually are delivered via Webhooks.
+            USAGE
+
           params do
-            requires :account, type: String, desc: "the account to use"
+            requires :account, type: String, desc: "the account to use", documentation: { param_type: 'body' }
             requires :name, type: String, desc: "the customers name"
             optional :bic , type: String, desc: "the customers bic", allow_blank: false
             requires :iban, type: String, desc: "the customers iban"
@@ -53,6 +72,7 @@ module Box
             optional :execution_date, type: Date, desc: "requested execution date", default: -> { Date.today }
             optional :urgent, type: Boolean, desc: "requested execution date", default: false
           end
+
           post do
             account = current_organization.find_account!(params[:account])
             Credit.v2_create!(current_user, account, declared(params))
@@ -63,6 +83,11 @@ module Box
           ###
           ### GET /credit_transfers/:id
           ###
+
+          desc "Fetch a credit transfer",
+            headers: AUTH_HEADERS,
+            success: Entities::V2::CreditTransfer,
+            failure: DEFAULT_ERROR_RESPONSES
 
           get ":id" do
             if params[:id].to_s.match(/([a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}?)/i)
