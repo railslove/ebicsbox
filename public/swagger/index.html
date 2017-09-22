@@ -75,7 +75,7 @@ window.onload = function() {
   // Build a system
   const ui = SwaggerUIBundle({
     urls: [
-      {url: "/doc/swagger-v2.json", name: "application/vnd.ebicsbox-v2+json"},
+      {url: "/swagger_doc", name: "application/vnd.ebicsbox-v2+json"},
       {url: "/doc/swagger-v1.json", name: "application/vnd.ebicsbox-v1+json"}
     ],
     onComplete: function(swaggerApi, swaggerUi){ debugger },
