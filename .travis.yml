@@ -22,4 +22,6 @@ script:
 - bundle exec rspec spec
 notifications:
   slack:
+    on_success: change
+    on_failure: always
     secure: YrOEAsDDJkvSeHgrol8manF+ibs1EONkYzs9DUJnEJ+TiYZ8TEMwTb+SdgZsmndwdB/z2anZFXvoHvILzOZe9rIJ21cUvf/yY9DTdGp1s8xFoFvkkAF5HtciIJCfAQVKRHJdtsp25A/9h/JrZWOS98ZH9Fi/oBN4DUZzKDEVbg8=
