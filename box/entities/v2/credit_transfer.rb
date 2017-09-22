@@ -18,7 +18,7 @@ module Box
         expose(:_links) do |transaction|
           iban = transaction.account.iban
           {
-            self: Box.configuration.app_url + "/credit_transfers/#{transaction.id}",
+            self: Box.configuration.app_url + "/credit_transfers/#{transaction.public_id}",
             account: Box.configuration.app_url + "/accounts/#{iban}/",
           }
         end
