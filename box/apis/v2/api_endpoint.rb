@@ -18,9 +18,8 @@ module Box
         ]
 
         AUTH_HEADERS = {
-
           'Authorization' => { description: 'OAuth 2 Bearer token', required: true, default: "Bearer " },
-          'Accept' => { description: 'Version', required: true, default: "application/vnd.ebicsbox.v2+json" }
+          'Accept' => { description: 'Version', required: true, default: "application/vnd.ebicsbox-v2+json" }
         }
 
         extend ActiveSupport::Concern

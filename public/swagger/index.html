@@ -74,7 +74,11 @@ window.onload = function() {
 
   // Build a system
   const ui = SwaggerUIBundle({
-    url: "/swagger_doc",
+    urls: [
+      {url: "/doc/swagger-v2.json", name: "application/vnd.ebicsbox-v2+json"},
+      {url: "/doc/swagger-v1.json", name: "application/vnd.ebicsbox-v1+json"}
+    ],
+    onComplete: function(swaggerApi, swaggerUi){ debugger },
     dom_id: '#swagger-ui',
     deepLinking: true,
     presets: [

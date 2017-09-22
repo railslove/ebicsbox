@@ -28,7 +28,14 @@ use Rack::Cors do
 end
 
 # Deliver assets
-use Rack::Static, urls: ["/swagger-ui-standalone-preset.js", "/swagger-ui-bundle.js", "/swagger-ui-standalone-preset.js", "/swagger-ui.css", "/swagger-ui.js"], root: "public/swagger"
+use Rack::Static, urls: [
+  "/swagger-ui-standalone-preset.js",
+  "/swagger-ui-bundle.js",
+  "/swagger-ui-standalone-preset.js",
+  "/swagger-ui.css",
+  "/swagger-ui.js",
+  '/doc/swagger-v1.json',
+  '/doc/swagger-v2.json'], root: "public/swagger"
 
 # Deliver html/json documentation template
 map '/docs' do
