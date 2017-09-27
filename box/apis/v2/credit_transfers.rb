@@ -33,7 +33,7 @@ module Box
             failure: DEFAULT_ERROR_RESPONSES
 
           params do
-            optional :iban, type: Array[String], desc: "IBAN of an account", coerce_with: ->(value) { value.split(',') }
+            optional :iban, type: Array[String], desc: "IBAN of an account", coerce_with: ->(value) { value.split(',') }, documentation: { param_type: 'query' }
             optional :page, type: Integer, desc: "page through the results", default: 1
             optional :per_page, type: Integer, desc: "how many results per page", values: 1..100, default: 10
           end
@@ -88,7 +88,9 @@ module Box
             headers: AUTH_HEADERS,
             success: Entities::V2::CreditTransfer,
             failure: DEFAULT_ERROR_RESPONSES
-
+          params do
+            requires :id, type: String
+          end
           get ":id" do
             if params[:id].to_s.match(/([a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}?)/i)
               credit_transfer = Box::Transaction.by_organization(current_organization).credit_transfers.first!(public_id: params[:id])
