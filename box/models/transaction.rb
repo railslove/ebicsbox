@@ -96,7 +96,7 @@ module Box
 
     def as_event_payload
       {
-        id: id,
+        id: public_id,
         account_id: account_id,
         transaction: {
           id: id,
