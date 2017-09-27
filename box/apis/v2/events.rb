@@ -1,5 +1,6 @@
 require 'grape'
 
+require_relative './api_endpoint'
 require_relative '../../models/event'
 require_relative '../../entities/v2/event'
 
@@ -49,6 +50,9 @@ module Box
               encountered. After 10 attempts, the system will stop to any retries.
             USAGE
 
+          params do
+            requires :id, type: String
+          end
           get ':id' do
             event = Box::Event.by_organization(current_organization).first!(public_id: params[:id])
             present event, with: Entities::V2::Event, type: 'full'

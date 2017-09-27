@@ -43,6 +43,17 @@ Set the following environment variables:
 * DATABASE_URL
 * BEANSTALKD_URL
 * PASSPHRASE
+* SANDBOX
+  - "enabled"
+* AUTH_SERVICE
+  - "static": 
+  - [default (oauth)]:  
+* OAUTH_SERVER
+* JWT_SECRET
+* ALLOW_REGISTRATIONS
+  - "enabled"
+
+see config/configuration.rb
 
 you can store these in a local .env file for development.
 
