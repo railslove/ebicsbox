@@ -9,6 +9,7 @@ require_relative './user'
 
 module Box
   class Transaction < Sequel::Model
+    plugin :dirty
 
     many_to_one :account
     many_to_one :user
@@ -55,12 +56,14 @@ module Box
     end
 
     def update_status(new_status, reason: nil)
-      update(
-        history: self.history << { at: Time.now, status: new_status, reason: reason},
-        status: get_status(new_status)
-      )
+      self.status = get_status(new_status)
 
-      # TODO: Log credit and debit success / failures
+      if column_changed?(:status)
+        update(
+          history: history.dup << { at: Time.now, status: status, reason: reason}
+        )
+        Event.method("#{type}_status_changed").call(self)
+      end
 
       return status
     end

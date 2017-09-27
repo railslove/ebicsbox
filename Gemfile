@@ -27,7 +27,7 @@ if ENV['EBICS_CLIENT'] == 'Blebics::Client'
 else
   gem 'pg'
   gem 'byebug'
-  gem 'epics', '~> 1.4.0'
+  gem 'epics', '~> 1.5.0'
 end
 
 
