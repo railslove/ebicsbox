@@ -69,7 +69,7 @@ module Box
         * Transaction Import - `STA` or `C53`
         * Usage protocols - `HAC`
         * Credits - `CCT`
-        * Debits - `CDD` or `B2B`
+        * Debits - `CDD`
 
         Furthermore to process direct debits you'll have to obtain a Creditor Identification Number from the [Bundesbank](http://www.bundesbank.de/Navigation/DE/Aufgaben/Unbarer_Zahlungsverkehr/SEPA/Glaeubiger_Identifikationsnummer/glaeubiger_identifikationsnummer.html) and sign some additional contracts with your bank.
         USAGE

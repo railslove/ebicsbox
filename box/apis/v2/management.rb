@@ -28,23 +28,56 @@ module Box
             end
           end
 
+          desc 'Service', hidden: true
           get '/' do
             { message: 'not yet implemented' }
           end
 
           resource :accounts do
+            ###
+            ### GET /management/accounts
+            ###
+            desc 'Retrieve a list of all onboarded accounts',
+              tags: ['account management'],
+              is_array: true,
+              headers: AUTH_HEADERS,
+              success: Entities::V2::Account,
+              failure: DEFAULT_ERROR_RESPONSES
+
             get do
               accounts = current_organization.accounts_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
               present accounts, with: Entities::ManagementAccount
             end
 
-            get ':id' do
-              account = current_organization.accounts_dataset.first!({ iban: params[:id] })
+            ###
+            ### GET /management/accounts/DExx
+            ###
+            desc 'Retrieve a single account by its IBAN',
+              tags: ['account management'],
+              headers: AUTH_HEADERS,
+              success: Entities::V2::Account,
+              failure: DEFAULT_ERROR_RESPONSES
+            params do
+              requires :iban, type: String
+            end
+
+            get ':iban' do
+              account = current_organization.accounts_dataset.first!(params.slice(:iban))
               present account, with: Entities::ManagementAccount, type: 'full'
             end
 
+            ###
+            ### POST /management/accounts
+            ###
+            desc 'Create a new account',
+              tags: ['account management'],
+              body_name: 'body',
+              headers: AUTH_HEADERS,
+              success: Entities::V2::Account,
+              failure: DEFAULT_ERROR_RESPONSES
+
             params do
-              requires :name, type: String, unique_account: true, allow_blank: false, desc: 'Internal description of account'
+              requires :name, type: String, unique_account: true, allow_blank: false, desc: 'Internal description of account', documentation: { param_type: 'body' }
               requires :iban, type: String, unique_account: true, allow_blank: false, desc: 'IBAN'
               requires :bic, type: String, allow_blank: false, desc: 'BIC'
               optional :bankname, type: String, desc: 'Name of bank (for internal purposes)'
@@ -64,9 +97,18 @@ module Box
               end
             end
 
-            put ':id/submit' do
+            desc 'Setup a newly created account',
+              tags: ['account management'],
+              headers: AUTH_HEADERS,
+              success: Message,
+              failure: DEFAULT_ERROR_RESPONSES
+
+            params do
+              requires :iban, type: String
+            end
+            put ':iban/setup' do
               begin
-                account = current_organization.accounts_dataset.first!({ iban: params[:id] })
+                account = current_organization.accounts_dataset.first!(params.slice(:iban))
                 account.setup!
               rescue Account::AlreadyActivated
                 error!({ message: "Account is already activated" }, 400)
@@ -77,9 +119,15 @@ module Box
               end
             end
 
+            desc 'Update an existing account',
+              tags: ['account management'],
+              headers: AUTH_HEADERS,
+              success: Entities::ManagementAccount,
+              failure: DEFAULT_ERROR_RESPONSES
+
             params do
-              optional :name, type: String, unique_account: true, allow_blank: false, desc: 'Internal description of account'
-              optional :iban, type: String, unique_account: true, active_account: false, allow_blank: false, desc: 'IBAN'
+              optional :name, type: String, unique_account: true, allow_blank: false, desc: 'Internal description of account', documentation: { param_type: 'body' }
+              requires :iban, type: String, unique_account: true, active_account: false, allow_blank: false, desc: 'IBAN'
               optional :bic, type: String, active_account: false, allow_blank: false, desc: 'BIC'
               optional :bankname, type: String, desc: 'Name of bank (for internal purposes)'
               optional :creditor_identifier, type: String, desc: 'creditor_identifier'
@@ -89,7 +137,7 @@ module Box
               optional :url, type: String, desc: 'url'
               optional :mode, type: String, desc: 'mode'
             end
-            put ':id' do
+            put ':iban' do
               begin
                 account = current_organization.accounts_dataset.first!(iban: params[:id])
                 account.set(params.except('id', 'state', 'access_token'))
@@ -104,9 +152,12 @@ module Box
             end
           end
 
-          resource 'accounts/:account_id/subscribers' do
+          resource 'accounts/:iban/subscribers' do
+            desc 'Fetch an account\'s INI letter',
+              tags: ['subscriber management']
+
             get ':id/ini_letter' do
-              subscriber = Subscriber.join(:accounts, id: :account_id).where(organization_id: current_organization.id, iban: params[:account_id]).first!(Sequel.qualify(:subscribers, :id) => params[:id])
+              subscriber = Subscriber.join(:accounts, id: :account_id).where(organization_id: current_organization.id, iban: params[:iban]).first!(Sequel.qualify(:subscribers, :id) => params[:id])
               if subscriber.ini_letter.nil?
                 error!({ message: 'Subscriber setup not yet initiated!' }, 412)
               else
@@ -115,26 +166,34 @@ module Box
               end
             end
 
+            desc 'Retrieve a list of all subscribers for given account',
+              tags: ['subscriber management'],
+              headers: AUTH_HEADERS,
+              success: Entities::Subscriber,
+              failure: DEFAULT_ERROR_RESPONSES
             get do
-              account = current_organization.accounts_dataset.first!(iban: params[:account_id])
+              account = current_organization.accounts_dataset.first!(params.slice(:iban))
               present account.subscribers, with: Entities::Subscriber
             end
 
+            desc 'Add a subscriber to given account',
+              tags: ['subscriber management'],
+              body_name: 'body',
+              headers: AUTH_HEADERS,
+              success: Entities::Subscriber,
+              failure: DEFAULT_ERROR_RESPONSES
             params do
-              requires :user_id, type: Integer, desc: "Internal user identifier to associate the subscriber with"
+              requires :user_id, type: Integer, desc: "Internal user identifier to associate the subscriber with", documentation: { param_type: 'body' }
               requires :ebics_user, type: String, unique_subscriber: true, desc: "EBICS user to represent"
             end
             post do
-              account = current_organization.accounts_dataset.first!(iban: params[:account_id])
+              account = current_organization.accounts_dataset.first!(params.slice(:iban))
               declared_params = declared(params)
               ebics_user = declared_params.delete(:ebics_user)
               subscriber = account.add_subscriber(declared_params.merge(remote_user_id: ebics_user))
               if subscriber
                 if subscriber.setup!
-                  {
-                    message: 'Subscriber has been created and setup successfully! Please fetch INI letter, sign it, and submit it to your bank.',
-                    subscriber: Entities::Subscriber.represent(subscriber),
-                  }
+                  present account.subscribers, with: Entities::Subscriber
                 else
                   subscriber.destroy
                   error!({ message: 'Failed to setup subscriber. Make sure your data is valid and retry!' }, 412)
@@ -146,27 +205,41 @@ module Box
           end
 
           resource :users do
+            desc 'Retrieve a list of all users',
+              tags: ['user management'],
+              is_array: true,
+              headers: AUTH_HEADERS,
+              success: Entities::User,
+              failure: DEFAULT_ERROR_RESPONSES
             get do
               users = current_organization.users_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
               present users, with: Entities::User
             end
 
+            desc 'Retrieve a single user by its identifier',
+              tags: ['user management'],
+              headers: AUTH_HEADERS,
+              success: Entities::User,
+              failure: DEFAULT_ERROR_RESPONSES
             get ':id' do
               user = current_organization.users_dataset.first!({ id: params[:id] })
               present user, with: Entities::User, type: 'full'
             end
 
+            desc 'Create a new user instance',
+              tags: ['user management'],
+              body_name: 'body',
+              headers: AUTH_HEADERS,
+              success: Entities::User,
+              failure: DEFAULT_ERROR_RESPONSES
             params do
-              requires :name, type: String, desc: "The user's display name"
+              requires :name, type: String, desc: "The user's display name", documentation: { param_type: 'body' }
               optional :token, type: String, desc: 'Set a custom access token'
             end
             post do
               token = params[:token] || SecureRandom.hex
               if user = current_organization.add_user(name: params[:name], access_token: token)
-                {
-                  message: 'User has been created successfully!',
-                  user: Entities::User.represent(user, include_token: true),
-                }
+                present user, with: Entities::User, include_token: true
               else
                 error!({ message: 'Failed to create user' }, 400)
               end
