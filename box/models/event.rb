@@ -14,6 +14,8 @@ module Box
       :credit_created,
       :statement_created,
       :subscriber_activated,
+      :credit_status_changed,
+      :debit_status_changed
     ]
 
     RETRY_THRESHOLD = 20
