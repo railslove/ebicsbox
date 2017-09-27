@@ -16,22 +16,44 @@ module Box
       end
 
       describe '#update_status' do
-        subject { Transaction.create(status: "created") }
+        subject { Transaction.create(type: 'debit', status: 'created') }
 
-        it 'tracks changes in history' do
-          expect { subject.update_status("test") }.to change { subject.reload.history }
+        it 'tracks no changes in history' do
+          expect{ subject.update_status("test") }.to_not change{ subject.reload.history }
         end
 
-        it 'returns new status', verify_stubs: false do
-          subject.status = 'created'
-          result = subject.update_status('file_upload')
-          expect(result).to eq('file_upload')
-        end
+        describe 'when the status actually changes' do
+          subject { Transaction.create(type: 'debit', status: 'created', account_id: account.id) }
+          let(:account) { Fabricate(:account) }
 
-        context 'status changed' do
-          it 'triggers a changed event', verify_stubs: false do
+          before do
+            allow(Event).to receive(:debit_status_changed)
+          end
+
+          it 'publishes an event when status changes' do
+            subject.update_status("file_upload")
+
+            expect(Event).to have_received(:debit_status_changed).with(subject)
+          end
+
+          it 'tracks changes in history' do
+            expect(subject.history).to be_empty
+
+            subject.update_status("file_upload")
+
+            expect(subject.reload.history).to include(hash_including('at', 'status', 'reason'))
+          end
+          it 'returns new status', verify_stubs: false do
             subject.status = 'created'
-            subject.update_status 'file_upload'
+            result = subject.update_status('file_upload')
+            expect(result).to eq('file_upload')
+          end
+
+          context 'status changed' do
+            it 'triggers a changed event', verify_stubs: false do
+              subject.status = 'created'
+              subject.update_status 'file_upload'
+            end
           end
         end
 
@@ -46,12 +68,12 @@ module Box
       describe "#get_status", verify_stubs: false do
         it "returns previous status on unexpected change" do
           subject.status = 'created'
-          expect(subject.update_status("hello")).to eq("created")
+          expect(subject.get_status("hello")).to eq("created")
         end
 
         it "returns new status on expected change" do
           subject.status = 'created'
-          expect(subject.update_status("file_upload")).to eq("file_upload")
+          expect(subject.get_status("file_upload")).to eq("file_upload")
         end
       end
 
