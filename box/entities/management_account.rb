@@ -25,8 +25,8 @@ module Box
 
       expose(:_links, documentation: { type: "Hash", desc: "Links to resources" }) do |account, options|
         {
-          self: Box.configuration.app_url + "/management/#{account.iban}",
-          subscribers: Box.configuration.app_url + "/management/#{account.iban}/subscribers",
+          self: Box.configuration.app_url + "/management/accounts/#{account.iban}",
+          subscribers: Box.configuration.app_url + "/management/accounts/#{account.iban}/subscribers",
         }
       end
     end
