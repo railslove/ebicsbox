@@ -8,6 +8,10 @@ module Box
     let(:other_organization) { Fabricate(:organization) }
     let(:user) { User.create(organization_id: organization.id, name: 'Some user', access_token: 'orga-user', admin: true) }
 
+    VALID_HEADERS = {
+      'Accept' => 'application/vnd.ebicsbox-v2+json'
+    }
+
     describe 'Access' do
       context 'Unauthorized user' do
         it 'returns a 401 unauthorized code' do
@@ -25,14 +29,14 @@ module Box
         before { user.update(admin: false) }
 
         it 'denies access to the app' do
-          get 'management/', { 'Authorization' => "Bearer #{user.access_token}" }
+          get 'management/', VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
           expect_status 401
         end
       end
 
       context 'admin user' do
         it 'grants access to the app' do
-          get 'management/', { 'Authorization' => "Bearer #{user.access_token}" }
+          get 'management/', VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
           expect_status 200
         end
       end
@@ -40,7 +44,7 @@ module Box
 
     describe 'POST /accounts' do
       context 'invalid body' do
-        before { post 'management/accounts', {}, { 'Authorization' => "Bearer #{user.access_token}" } }
+        before { post 'management/accounts', {}, VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}") }
 
         it 'rejects empty posts' do
           expect_status 400
@@ -61,7 +65,7 @@ module Box
 
       context 'valid body' do
         def do_request
-          post 'management/accounts', { name: 'Test account', iban: 'my-iban', bic: 'my-iban' }, { 'Authorization' => "Bearer #{user.access_token}" }
+          post 'management/accounts', { name: 'Test account', iban: 'my-iban', bic: 'my-iban' }, VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
         end
 
         it 'stores new minimal accounts' do
@@ -75,6 +79,37 @@ module Box
       end
     end
 
+    describe 'GET /accounts/:id' do
+      let(:account) { Account.create(name: 'name', iban: 'old-iban', bic: 'old-bic', organization_id: organization.id) }
+      let(:other_account) { Account.create(name: 'name', iban: 'iban-2', bic: 'bic-2', organization_id: other_organization.id) }
+
+      before { user }
+
+      context 'no account with given IBAN exist' do
+        it 'returns an error' do
+          get "management/accounts/NOTEXISTING", VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
+          expect_status 400
+        end
+
+        it 'returns a proper error message' do
+          get "management/accounts/NOTEXISTING", VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
+          expect_json 'message', 'Your organization does not have an account with given IBAN!'
+        end
+      end
+
+      context 'account with given IBAN belongs to another organization' do
+        it 'denies updates to inaccesible accounts' do
+          get "management/accounts/#{other_account.iban}", VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
+          expect_status 400
+        end
+
+        it 'returns a proper error message' do
+          get "management/accounts/#{other_account.iban}", VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
+          expect_json 'message', 'Your organization does not have an account with given IBAN!'
+        end
+      end
+    end
+
     describe 'PUT /accounts/:id' do
       let(:account) { Account.create(name: 'name', iban: 'old-iban', bic: 'old-bic', organization_id: organization.id) }
       let(:other_account) { Account.create(name: 'name', iban: 'iban-2', bic: 'bic-2', organization_id: other_organization.id) }
@@ -83,24 +118,24 @@ module Box
 
       context 'no account with given IBAN exist' do
         it 'returns an error' do
-          put "management/accounts/NOTEXISTING", {}, { 'Authorization' => "Bearer #{user.access_token}" }
+          put "management/accounts/NOTEXISTING", {}, VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
           expect_status 400
         end
 
         it 'returns a proper error message' do
-          put "management/accounts/NOTEXISTING", {}, { 'Authorization' => "Bearer #{user.access_token}" }
+          put "management/accounts/NOTEXISTING", {}, VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
           expect_json 'message', 'Your organization does not have an account with given IBAN!'
         end
       end
 
       context 'account with given IBAN belongs to another organization' do
         it 'denies updates to inaccesible accounts' do
-          put "management/accounts/#{other_account.iban}", {}, { 'Authorization' => "Bearer #{user.access_token}" }
+          put "management/accounts/#{other_account.iban}", {}, VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
           expect_status 400
         end
 
         it 'returns a proper error message' do
-          put "management/accounts/#{other_account.iban}", {}, { 'Authorization' => "Bearer #{user.access_token}" }
+          put "management/accounts/#{other_account.iban}", {}, VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
           expect_json 'message', 'Your organization does not have an account with given IBAN!'
         end
       end
@@ -109,32 +144,20 @@ module Box
         before { account.add_subscriber(activated_at: 1.hour.ago) }
 
         it 'cannot change iban' do
-          expect { put "management/accounts/#{account.iban}", { iban: 'new-iban' }, { 'Authorization' => "Bearer #{user.access_token}" } }.to_not change { account.reload.iban }
+          expect { put "management/accounts/#{account.iban}", { iban: 'new-iban' }, VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}") }.to_not change { account.reload.iban }
         end
 
         it 'cannot change bic' do
-          expect { put "management/accounts/#{account.iban}", { bic: 'new-bic' }, { 'Authorization' => "Bearer #{user.access_token}" } }.to_not change { account.reload.bic }
+          expect { put "management/accounts/#{account.iban}", { bic: 'new-bic' }, VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}") }.to_not change { account.reload.bic }
         end
 
         it 'ignores iban if it did not change' do
-          expect { put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name' }, { 'Authorization' => "Bearer #{user.access_token}" } }.to change { account.reload.name }
+          expect { put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name' }, VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}") }.to change { account.reload.name }
         end
 
         it 'ignores the access_token attribute' do
           expect { put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name', access_token: user.access_token } }.to change {
             account.reload.name }
-        end
-      end
-
-      context 'inactive account' do
-        before { account.subscribers_dataset.update(activated_at: nil) }
-
-        it 'can change iban' do
-          expect { put "management/accounts/#{account.iban}", { iban: 'new-iban' }, { 'Authorization' => "Bearer #{user.access_token}" } }.to change { account.reload.iban }
-        end
-
-        it 'can change iban' do
-          expect { put "management/accounts/#{account.iban}", { bic: 'new-bic' }, { 'Authorization' => "Bearer #{user.access_token}" } }.to change { account.reload.bic }
         end
       end
     end
@@ -144,7 +167,7 @@ module Box
 
       context 'without subscribers' do
         it 'returns an empty array' do
-          get "management/accounts/#{account.iban}/subscribers", { 'Authorization' => "Bearer #{user.access_token}" }
+          get "management/accounts/#{account.iban}/subscribers", VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
           expect_json []
         end
       end
@@ -153,7 +176,7 @@ module Box
         before { account.add_subscriber(user_id: user.id, remote_user_id: 'test') }
 
         it 'returns a representation of account subscribers' do
-          get "management/accounts/#{account.iban}/subscribers", { 'Authorization' => "Bearer #{user.access_token}" }
+          get "management/accounts/#{account.iban}/subscribers", VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
           expect_json '0.ebics_user', 'test'
         end
       end
@@ -171,7 +194,7 @@ module Box
         organization_id: organization.id) }
 
       def perform_request
-        post "management/accounts/#{account.iban}/subscribers", data, { 'Authorization' => "Bearer #{user.access_token}" }
+        post "management/accounts/#{account.iban}/subscribers", data, VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
       end
 
       context 'missing attributes' do
@@ -237,21 +260,14 @@ module Box
       context 'valid data' do
         let(:data) { { ebics_user: "test", user_id: user.id } }
 
-        # before { stub_request(:post, /url/).to_return(status: 200, body: '') }
-
         it 'returns a success code' do
           perform_request
           expect_status 201
         end
 
-        it 'returns a meaningful message' do
-          perform_request
-          expect_json 'message', 'Subscriber has been created and setup successfully! Please fetch INI letter, sign it, and submit it to your bank.'
-        end
-
         it 'returns a representation of the subscriber' do
           perform_request
-          expect_json 'subscriber.ebics_user', 'test'
+          expect_json 'ebics_user', 'test'
         end
       end
     end
@@ -260,7 +276,7 @@ module Box
       let(:account) { Account.create(name: 'name', iban: 'iban', organization_id: organization.id) }
 
       def perform_request
-        get "management/accounts/#{account.iban}/subscribers/#{subscriber.id}/ini_letter", { 'Authorization' => "Bearer #{user.access_token}" }
+        get "management/accounts/#{account.iban}/subscribers/#{subscriber.id}/ini_letter", VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
       end
 
       context 'setup has not been performed' do
@@ -301,7 +317,7 @@ module Box
       before { organization.add_user(name: 'Test User', access_token: 'secret') }
 
       def perform_request(data = {})
-        get "management/users", { 'Authorization' => "Bearer #{user.access_token}" }
+        get "management/users", VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
       end
 
       it "does not include the user's access token" do
@@ -314,7 +330,7 @@ module Box
       before { user }
 
       def perform_request(data = {})
-        post "management/users", { name: "Another Test User" }.merge(data), { 'Authorization' => "Bearer #{user.access_token}" }
+        post "management/users", { name: "Another Test User" }.merge(data), VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
       end
 
       it 'creates a new user for the organization' do
@@ -323,12 +339,12 @@ module Box
 
       it 'auto generates an access token if none is provided' do
         perform_request(token: nil)
-        expect_json_types 'user.access_token', :string
+        expect_json_types 'access_token', :string
       end
 
       it 'uses the provided access token' do
         perform_request(token: 'secret')
-        expect_json 'user.access_token', 'secret'
+        expect_json 'access_token', 'secret'
       end
     end
   end
