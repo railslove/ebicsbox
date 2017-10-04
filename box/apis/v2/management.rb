@@ -42,7 +42,8 @@ module Box
               is_array: true,
               headers: AUTH_HEADERS,
               success: Entities::V2::Account,
-              failure: DEFAULT_ERROR_RESPONSES
+              failure: DEFAULT_ERROR_RESPONSES,
+              produces: ['application/vnd.ebicsbox-v2+json']
 
             get do
               accounts = current_organization.accounts_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
@@ -56,14 +57,19 @@ module Box
               tags: ['account management'],
               headers: AUTH_HEADERS,
               success: Entities::V2::Account,
-              failure: DEFAULT_ERROR_RESPONSES
+              failure: DEFAULT_ERROR_RESPONSES,
+              produces: ['application/vnd.ebicsbox-v2+json']
             params do
               requires :iban, type: String
             end
 
             get ':iban' do
-              account = current_organization.accounts_dataset.first!(params.slice(:iban))
-              present account, with: Entities::ManagementAccount, type: 'full'
+              begin
+                account = current_organization.accounts_dataset.first!(iban: params[:iban])
+                present account, with: Entities::ManagementAccount, type: 'full'
+              rescue Sequel::NoMatchingRow
+                error!({ message: 'Your organization does not have an account with given IBAN!' }, 400)
+              end
             end
 
             ###
@@ -74,7 +80,8 @@ module Box
               body_name: 'body',
               headers: AUTH_HEADERS,
               success: Entities::V2::Account,
-              failure: DEFAULT_ERROR_RESPONSES
+              failure: DEFAULT_ERROR_RESPONSES,
+              produces: ['application/vnd.ebicsbox-v2+json']
 
             params do
               requires :name, type: String, unique_account: true, allow_blank: false, desc: 'Internal description of account', documentation: { param_type: 'body' }
@@ -101,14 +108,15 @@ module Box
               tags: ['account management'],
               headers: AUTH_HEADERS,
               success: Message,
-              failure: DEFAULT_ERROR_RESPONSES
+              failure: DEFAULT_ERROR_RESPONSES,
+              produces: ['application/vnd.ebicsbox-v2+json']
 
             params do
               requires :iban, type: String
             end
             put ':iban/setup' do
               begin
-                account = current_organization.accounts_dataset.first!(params.slice(:iban))
+                account = current_organization.accounts_dataset.first!(iban: params[:iban])
                 account.setup!
               rescue Account::AlreadyActivated
                 error!({ message: "Account is already activated" }, 400)
@@ -123,12 +131,11 @@ module Box
               tags: ['account management'],
               headers: AUTH_HEADERS,
               success: Entities::ManagementAccount,
-              failure: DEFAULT_ERROR_RESPONSES
+              failure: DEFAULT_ERROR_RESPONSES,
+              produces: ['application/vnd.ebicsbox-v2+json']
 
             params do
               optional :name, type: String, unique_account: true, allow_blank: false, desc: 'Internal description of account', documentation: { param_type: 'body' }
-              requires :iban, type: String, unique_account: true, active_account: false, allow_blank: false, desc: 'IBAN'
-              optional :bic, type: String, active_account: false, allow_blank: false, desc: 'BIC'
               optional :bankname, type: String, desc: 'Name of bank (for internal purposes)'
               optional :creditor_identifier, type: String, desc: 'creditor_identifier'
               optional :callback_url, type: String, desc: 'callback_url'
@@ -139,8 +146,8 @@ module Box
             end
             put ':iban' do
               begin
-                account = current_organization.accounts_dataset.first!(iban: params[:id])
-                account.set(params.except('id', 'state', 'access_token'))
+                account = current_organization.accounts_dataset.first!(iban: params[:iban])
+                account.set(params.except('id', 'state', 'access_token', 'iban', 'bic'))
                 if !account.modified? || account.save
                   present account, with: Entities::ManagementAccount
                 else
@@ -170,9 +177,10 @@ module Box
               tags: ['subscriber management'],
               headers: AUTH_HEADERS,
               success: Entities::Subscriber,
-              failure: DEFAULT_ERROR_RESPONSES
+              failure: DEFAULT_ERROR_RESPONSES,
+              produces: ['application/vnd.ebicsbox-v2+json']
             get do
-              account = current_organization.accounts_dataset.first!(params.slice(:iban))
+              account = current_organization.accounts_dataset.first!(iban: params[:iban])
               present account.subscribers, with: Entities::Subscriber
             end
 
@@ -181,19 +189,20 @@ module Box
               body_name: 'body',
               headers: AUTH_HEADERS,
               success: Entities::Subscriber,
-              failure: DEFAULT_ERROR_RESPONSES
+              failure: DEFAULT_ERROR_RESPONSES,
+              produces: ['application/vnd.ebicsbox-v2+json']
             params do
               requires :user_id, type: Integer, desc: "Internal user identifier to associate the subscriber with", documentation: { param_type: 'body' }
               requires :ebics_user, type: String, unique_subscriber: true, desc: "EBICS user to represent"
             end
             post do
-              account = current_organization.accounts_dataset.first!(params.slice(:iban))
+              account = current_organization.accounts_dataset.first!(iban: params[:iban])
               declared_params = declared(params)
               ebics_user = declared_params.delete(:ebics_user)
               subscriber = account.add_subscriber(declared_params.merge(remote_user_id: ebics_user))
               if subscriber
                 if subscriber.setup!
-                  present account.subscribers, with: Entities::Subscriber
+                  present subscriber, with: Entities::Subscriber
                 else
                   subscriber.destroy
                   error!({ message: 'Failed to setup subscriber. Make sure your data is valid and retry!' }, 412)
@@ -210,7 +219,8 @@ module Box
               is_array: true,
               headers: AUTH_HEADERS,
               success: Entities::User,
-              failure: DEFAULT_ERROR_RESPONSES
+              failure: DEFAULT_ERROR_RESPONSES,
+              produces: ['application/vnd.ebicsbox-v2+json']
             get do
               users = current_organization.users_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
               present users, with: Entities::User
@@ -220,7 +230,8 @@ module Box
               tags: ['user management'],
               headers: AUTH_HEADERS,
               success: Entities::User,
-              failure: DEFAULT_ERROR_RESPONSES
+              failure: DEFAULT_ERROR_RESPONSES,
+              produces: ['application/vnd.ebicsbox-v2+json']
             get ':id' do
               user = current_organization.users_dataset.first!({ id: params[:id] })
               present user, with: Entities::User, type: 'full'
@@ -231,7 +242,8 @@ module Box
               body_name: 'body',
               headers: AUTH_HEADERS,
               success: Entities::User,
-              failure: DEFAULT_ERROR_RESPONSES
+              failure: DEFAULT_ERROR_RESPONSES,
+              produces: ['application/vnd.ebicsbox-v2+json']
             params do
               requires :name, type: String, desc: "The user's display name", documentation: { param_type: 'body' }
               optional :token, type: String, desc: 'Set a custom access token'

@@ -16,6 +16,7 @@ module Box
             headers: AUTH_HEADERS,
             success: Entities::V2::Event,
             failure: DEFAULT_ERROR_RESPONSES,
+            produces: ['application/vnd.ebicsbox-v2+json'],
             detail: <<-USAGE.strip_heredoc
               Paginated list of all events which occured on an organization. These are not account
               specific. Each event will trigger a webhook delivery as long as a webhook endpoint
@@ -44,6 +45,7 @@ module Box
             headers: AUTH_HEADERS,
             success: Entities::V2::Event,
             failure: DEFAULT_ERROR_RESPONSES,
+            produces: ['application/vnd.ebicsbox-v2+json'],
             detail: <<-USAGE.strip_heredoc
               Get details on every triggered event. In case of a webhook delivery, all attempts
               are listed. For each attempt we store data on its response and errors if any are
