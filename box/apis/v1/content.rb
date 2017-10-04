@@ -79,13 +79,20 @@ module Box
         end
 
         params do
-          requires :account, type: String, desc: "the account to use"
+          requires :account, type: String, desc: "IBAN for an existing account"
+          requires :from, type: Date, desc: "Date from which on to filter the results"
+          requires :to, type: Date, desc: "Date to which filter results"
         end
-        get ':account', requirements: { account: /[A-Z]{2}.*/ } do
-          present account, with: Entities::Account
+        get ':account/import/statements', requirements: { account: /[A-Z]{2}.*/ } do
+          stats = Jobs::FetchStatements.fetch_new_statements(account.id, params[:from], params[:to])
+          {
+            message: "Imported statements successfully",
+            fetched: stats[:total],
+            imported: stats[:imported],
+          }
         end
 
-        resource ':account' do
+        resource ':account', requirements: { account: /[A-Z]{2}.*/ } do
           params do
             requires :account, type: String, desc: "the account to use"
             requires :name, type: String, desc: "the customers name"
@@ -166,20 +173,11 @@ module Box
             end
           end
 
-          namespace :import do
-            params do
-              requires :account, type: String, desc: "IBAN for an existing account"
-              requires :from, type: Date, desc: "Date from which on to filter the results"
-              requires :to, type: Date, desc: "Date to which filter results"
-            end
-            get 'statements' do
-              stats = Jobs::FetchStatements.fetch_new_statements(account.id, params[:from], params[:to])
-              {
-                message: "Imported statements successfully",
-                fetched: stats[:total],
-                imported: stats[:imported],
-              }
-            end
+          params do
+            requires :account, type: String, desc: "the account to use"
+          end
+          get do
+            present account, with: Entities::Account
           end
         end
       end

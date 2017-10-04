@@ -26,7 +26,7 @@ module Box
         end
 
         context 'account owned by another organization' do
-          let(:account) { other_organization.add_account(iban: SecureRandom.uuid) }
+          let(:account) { other_organization.add_account(iban: 'DE51370501981929807319') }
 
           it 'returns a not found status' do
             get "#{account.iban}/transactions", { 'Authorization' => "token #{user.access_token}" }
@@ -40,7 +40,7 @@ module Box
         end
 
         context 'account is owned by user\s organization' do
-          let(:account) { organization.add_account(iban: SecureRandom.uuid) }
+          let(:account) { organization.add_account(iban: 'DE51370501981929807319') }
 
           it 'returns an empty array for new accounts' do
             get "#{account.iban}/transactions", { 'Authorization' => 'token orga-user' }
