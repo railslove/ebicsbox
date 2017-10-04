@@ -14,7 +14,8 @@ module Box
             is_array: true,
             headers: AUTH_HEADERS,
             success: Entities::V2::Transaction,
-            failure: DEFAULT_ERROR_RESPONSES
+            failure: DEFAULT_ERROR_RESPONSES,
+            produces: ['application/vnd.ebicsbox-v2+json']
 
           params do
             optional :page, type: Integer, desc: "page through the results", default: 1

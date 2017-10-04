@@ -27,7 +27,8 @@ module Box
             is_array: true,
             headers: AUTH_HEADERS,
             success: Entities::V2::Account,
-            failure: DEFAULT_ERROR_RESPONSES
+            failure: DEFAULT_ERROR_RESPONSES,
+            produces: ['application/vnd.ebicsbox-v2+json']
 
           params do
             optional :page, type: Integer, desc: "page through the results", default: 1
@@ -49,7 +50,8 @@ module Box
             headers: AUTH_HEADERS,
             success: Message,
             body_name: 'body',
-            failure: DEFAULT_ERROR_RESPONSES
+            failure: DEFAULT_ERROR_RESPONSES,
+            produces: ['application/vnd.ebicsbox-v2+json']
 
           params do
             requires :name, type: String, allow_blank: false, desc: 'Name of the account', documentation: { param_type: 'body' }
@@ -85,7 +87,8 @@ module Box
           desc "Fetch an account",
             headers: AUTH_HEADERS,
             success: Entities::V2::Account,
-            failure: DEFAULT_ERROR_RESPONSES
+            failure: DEFAULT_ERROR_RESPONSES,
+            produces: ['application/vnd.ebicsbox-v2+json']
 
           params do
             requires :iban, type: String
@@ -125,6 +128,7 @@ module Box
             success: Entities::V2::Account,
             headers: AUTH_HEADERS,
             failure: DEFAULT_ERROR_RESPONSES,
+            produces: ['application/vnd.ebicsbox-v2+json'],
             body_name: 'body'
 
           params do

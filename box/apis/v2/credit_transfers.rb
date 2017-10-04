@@ -30,7 +30,8 @@ module Box
             is_array: true,
             headers: AUTH_HEADERS,
             success: Entities::V2::CreditTransfer,
-            failure: DEFAULT_ERROR_RESPONSES
+            failure: DEFAULT_ERROR_RESPONSES,
+            produces: ['application/vnd.ebicsbox-v2+json']
 
           params do
             optional :iban, type: Array[String], desc: "IBAN of an account", coerce_with: ->(value) { value.split(',') }, documentation: { param_type: 'query' }
@@ -53,6 +54,7 @@ module Box
             success: Message,
             body_name: 'body',
             failure: DEFAULT_ERROR_RESPONSES,
+            produces: ['application/vnd.ebicsbox-v2+json'],
             detail: <<-USAGE.strip_heredoc
               Creating a credit by parameter should be the preferred way for low-volume transactions
               esp. for use cases where the PAIN XML isn't generated before.
@@ -87,7 +89,8 @@ module Box
           desc "Fetch a credit transfer",
             headers: AUTH_HEADERS,
             success: Entities::V2::CreditTransfer,
-            failure: DEFAULT_ERROR_RESPONSES
+            failure: DEFAULT_ERROR_RESPONSES,
+            produces: ['application/vnd.ebicsbox-v2+json']
           params do
             requires :id, type: String
           end
