@@ -196,12 +196,12 @@ module Box
 
         it 'fails on invalid IBAN' do
           post "/credit_transfers", valid_attributes.merge(iban: 'MYTESTIBAN'), VALID_HEADERS
-          expect_json message: "Failed to initiate credit transfer.", errors: { base: "Iban is invalid" }
+          expect_json message: "Failed to initiate credit transfer.", errors: { base: "Iban MYTESTIBAN is invalid" }
         end
 
         it 'fails on invalid BIC' do
           post "/credit_transfers", valid_attributes.merge(bic: 'MYTESTBIC'), VALID_HEADERS
-          expect_json message: "Failed to initiate credit transfer.", errors: { base: "Bic is invalid" }
+          expect_json message: "Failed to initiate credit transfer.", errors: { base: "Bic MYTESTBIC is invalid" }
         end
       end
 
