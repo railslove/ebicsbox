@@ -19,7 +19,7 @@ Sequel.migration do
       String :config
       String :descriptor, :text=>true
     end
-    
+
     create_table(:bank_statements) do
       primary_key :id
       Integer :account_id
@@ -32,7 +32,7 @@ Sequel.migration do
       String :content, :text=>true
       Integer :year
     end
-    
+
     create_table(:events) do
       primary_key :id
       Integer :account_id
@@ -44,7 +44,7 @@ Sequel.migration do
       String :webhook_status, :default=>"pending", :text=>true
       Integer :webhook_retries, :default=>0
     end
-    
+
     create_table(:imports) do
       primary_key :id
       Date :date
@@ -52,20 +52,14 @@ Sequel.migration do
       Integer :transactions_count
       Integer :account_id
     end
-    
+
     create_table(:organizations) do
       primary_key :id
       String :name, :text=>true
       DateTime :created_at, :default=>DateTime.parse("2017-09-21T14:53:09.628190000+0000")
       String :webhook_token, :text=>true, :null=>false
     end
-    
-    create_table(:schema_migrations) do
-      String :filename, :text=>true, :null=>false
-      
-      primary_key [:filename]
-    end
-    
+
     create_table(:statements, :ignore_index_errors=>true) do
       primary_key :id
       String :sha, :text=>true
@@ -92,10 +86,10 @@ Sequel.migration do
       Integer :transaction_id
       Integer :bank_statement_id
       String :public_id
-      
+
       index [:sha], :name=>:statements_sha_key, :unique=>true
     end
-    
+
     create_table(:subscribers) do
       primary_key :id
       Integer :account_id
@@ -108,7 +102,7 @@ Sequel.migration do
       String :ini_letter, :text=>true
       DateTime :submitted_at
     end
-    
+
     create_table(:transactions, :ignore_index_errors=>true) do
       primary_key :id
       String :eref, :text=>true
@@ -124,10 +118,10 @@ Sequel.migration do
       DateTime :created_at
       String :public_id, :null=>false
       String :history
-      
+
       index [:eref], :name=>:transactions_eref_key, :unique=>true
     end
-    
+
     create_table(:users) do
       primary_key :id
       Integer :organization_id
@@ -137,7 +131,7 @@ Sequel.migration do
       TrueClass :admin, :default=>false
       String :email, :text=>true
     end
-    
+
     create_table(:webhook_deliveries) do
       primary_key :id
       Integer :event_id
