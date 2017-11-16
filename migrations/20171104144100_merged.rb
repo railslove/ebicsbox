@@ -59,7 +59,7 @@ Sequel.migration do
     create_table(:organizations) do
       primary_key :id
       String :name, :text=>true
-      DateTime :created_at, :default=>DateTime.parse("2017-09-21T14:53:09.628190000+0000")
+      DateTime :created_at, :default=>Sequel.function(:now)
       String :webhook_token, :text=>true, :null=>false
     end
 
@@ -100,7 +100,7 @@ Sequel.migration do
       String :remote_user_id, :text=>true
       String :encryption_keys, :text=>true
       String :signature_class, :size=>1
-      DateTime :created_at, :default=>DateTime.parse("2017-09-21T14:53:09.628190000+0000")
+      DateTime :created_at, :default=>Sequel.function(:now)
       DateTime :activated_at
       String :ini_letter, :text=>true
       DateTime :submitted_at
@@ -130,7 +130,7 @@ Sequel.migration do
       Integer :organization_id
       String :name, :text=>true
       String :access_token, :text=>true
-      DateTime :created_at, :default=>DateTime.parse("2017-09-21T14:53:09.628190000+0000")
+      DateTime :created_at, :default=>Sequel.function(:now)
       TrueClass :admin, :default=>false
       String :email, :text=>true
     end
