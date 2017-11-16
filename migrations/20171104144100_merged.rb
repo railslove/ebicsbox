@@ -1,7 +1,8 @@
 Sequel.migration do
-  run 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'
-  DB.extension :pg_json
   change do
+    run 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'
+    DB.extension :pg_json
+
     create_table(:accounts) do
       primary_key :id
       String :iban, :text=>true
