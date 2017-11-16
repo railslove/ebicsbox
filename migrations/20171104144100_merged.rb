@@ -1,4 +1,6 @@
 Sequel.migration do
+  run 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'
+  DB.extension :pg_json
   change do
     create_table(:accounts) do
       primary_key :id
@@ -16,7 +18,7 @@ Sequel.migration do
       Integer :balance_in_cents
       Date :balance_date
       String :statements_format, :default=>"mt940", :text=>true
-      String :config
+      String :config, type: :json, default: Sequel.pg_json({})
       String :descriptor, :text=>true
     end
 
@@ -37,9 +39,9 @@ Sequel.migration do
       primary_key :id
       Integer :account_id
       String :type, :text=>true
-      String :public_id
-      String :payload
-      DateTime :triggered_at, :default=>DateTime.parse("2017-09-21T14:53:09.562580000+0000")
+      String :public_id, :type=>:uuid, :default=>Sequel.function(:uuid_generate_v4)
+      String :payload, :type=>:json, :default=>Sequel.pg_json({})
+      DateTime :triggered_at, :default=>Sequel.function(:now)
       String :signature, :text=>true
       String :webhook_status, :default=>"pending", :text=>true
       Integer :webhook_retries, :default=>0
@@ -116,8 +118,8 @@ Sequel.migration do
       Integer :amount
       Integer :user_id
       DateTime :created_at
-      String :public_id, :null=>false, :default=>Sequel.function(:uuid_generate_v4)
-      String :history
+      String :public_id, :type=>:uuid, :null=>false, :default=>Sequel.function(:uuid_generate_v4)
+      String :history, :type=>:json, :default=> Sequel.pg_json([])
 
       index [:eref], :name=>:transactions_eref_key, :unique=>true
     end
@@ -137,7 +139,7 @@ Sequel.migration do
       Integer :event_id
       DateTime :delivered_at
       String :response_body, :text=>true
-      String :reponse_headers
+      String :reponse_headers, type: :json, default: Sequel.pg_json({})
       Integer :response_status
       Integer :response_time
     end
