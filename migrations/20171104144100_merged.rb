@@ -116,7 +116,7 @@ Sequel.migration do
       Integer :amount
       Integer :user_id
       DateTime :created_at
-      String :public_id, :null=>false
+      String :public_id, :null=>false, default=>Sequel.function(:uuid_generate_v4)
       String :history
 
       index [:eref], :name=>:transactions_eref_key, :unique=>true
