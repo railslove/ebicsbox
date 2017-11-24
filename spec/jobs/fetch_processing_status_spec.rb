@@ -21,22 +21,15 @@ module Box
         ACCOUNT_ID = 1
 
         def do_action(order_id = '0001')
-          described_class.update_transaction(ACCOUNT_ID, { action: 'test', reason_code: 'none', ids: { 'OrderID' => order_id }})
+          described_class.update_transaction(ACCOUNT_ID, { action: 'file_upload', reason_code: 'none', ids: { 'OrderID' => order_id }})
         end
 
         context 'transaction with order exists' do
-          let!(:transaction) { Transaction.create(account_id: ACCOUNT_ID, ebics_order_id: '0001', status: 'new') }
+          let!(:old_transaction) { Transaction.create(account_id: ACCOUNT_ID, ebics_order_id: '0001', status: 'created', type: 'debit') }
+          let!(:new_transaction) { Transaction.create(account_id: ACCOUNT_ID, ebics_order_id: '0001', status: 'created', type: 'debit') }
 
-          it 'updates the transaction status' do
-            expect_any_instance_of(Transaction).to receive(:update_status).with('test', reason: 'none')
-            do_action
-          end
-
-          context 'transaction status changed' do
-            it 'updates the transaction status' do
-              expect_any_instance_of(Transaction).to receive(:update_status).and_return('changed')
-              do_action
-            end
+          it 'updates the last transaction with that order_id' do
+            expect { do_action }.to change { new_transaction.reload.status }.to('file_upload')
           end
         end
 

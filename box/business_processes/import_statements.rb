@@ -26,7 +26,7 @@ module Box
         end
 
         stats = { total: bank_transactions.count, imported: statements.select(&:present?).count }
-        Box.logger.debug { "[BusinessProcesses::ImportStatements] Imported statements from bank statement. total=#{stats[:total]} imported=#{stats[:imported]}" }
+        Box.logger.info { "[BusinessProcesses::ImportStatements] Imported statements from bank statement. total=#{stats[:total]} imported=#{stats[:imported]}" }
         stats
       end
 
