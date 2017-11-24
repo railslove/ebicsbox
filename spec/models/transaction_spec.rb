@@ -1,3 +1,5 @@
+require "epics"
+
 module Box
   module Models
     RSpec.describe Transaction do
@@ -82,7 +84,7 @@ module Box
         let(:account) { Account.create }
         let(:user) { User.create }
         let!(:subscriber) { user.add_subscriber(account: account) }
-        subject(:transaction) { account.add_transaction(user: user, order_type: 'test', payload: 'my-pain') }
+        subject(:transaction) { account.add_transaction(user: user, order_type: 'test', payload: 'my-pain', type: 'debit') }
 
         before do
           allow_any_instance_of(Subscriber).to receive(:client).and_return(client)
@@ -115,6 +117,22 @@ module Box
         it 'executes the correct ebics call' do
           transaction.execute!
           expect(client).to have_received(:public_send).with('test', anything)
+        end
+
+        describe 'ebics call fails' do
+          before do
+            allow(client).to receive(:public_send).and_raise(Epics::Error::TechnicalError.new('061099'))
+          end
+
+          it 'updates the status' do
+            expect{ transaction.execute! }.to change(transaction, :status).to('failed')
+          end
+
+          it 'updates the history' do
+            expect{ transaction.execute! }.to change { transaction.history.to_a }.to(
+              [hash_including(reason: '061099/EBICS_INTERNAL_ERROR - Internal EBICS error')]
+            )
+          end
         end
       end
 

@@ -77,6 +77,7 @@ module Box
         when new_status == "credit_received" && type == "debit" then "funds_credited"
         when new_status == "debit_received" && type == "credit" then "funds_debited"
         when new_status == "debit_received" && type == "debit" then "funds_charged_back"
+        when new_status == "failed" then "failed"
         else status
       end
     end
@@ -85,6 +86,9 @@ module Box
       return if ebics_transaction_id.present?
       transaction_id, order_id = account.client_for(user.id).public_send(order_type, payload)
       update(ebics_order_id: order_id, ebics_transaction_id: transaction_id)
+    rescue Epics::Error => e
+      Box.logger.warn { "Could not execute payload for transaction. id=#{id} message=#{e.message}" }
+      update_status('failed', reason: "#{e.code}/#{e.message}")
     end
 
     def parsed_payload
