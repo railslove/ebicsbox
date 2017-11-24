@@ -18,7 +18,7 @@ module Box
 
       def self.update_transaction(account_id, info)
         order_id = info[:ids]["OrderID"]
-        if trx = Transaction.first(ebics_order_id: info[:ids]["OrderID"], account_id: account_id)
+        if trx = Transaction.last(ebics_order_id: info[:ids]["OrderID"], account_id: account_id)
           trx.update_status(info[:action], reason: info[:reason_code])
 
           log(:info, "Transaction status change.", {
