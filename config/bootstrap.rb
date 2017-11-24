@@ -15,7 +15,9 @@ module Box
   end
 
   def self.logger
-    @logger ||= Logger.new(STDOUT)
+    @logger ||= Logger.new(STDOUT).tap do |logger|
+      logger.level = ENV['DEBUG'] ? Logger::DEBUG : Logger::INFO
+    end
   end
 
   def self.logger=(logger)
