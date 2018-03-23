@@ -42,6 +42,10 @@ module Box
         ::File.open( ::File.expand_path("~/hac_empty.xml"))
       end
 
+      def HTD
+        ::File.open( ::File.expand_path("~/htd.xml"))
+      end
+
       def CD1(pain)
         ["TRX#{SecureRandom.hex(6)}", "N#{SecureRandom.hex(6)}"]
       end
@@ -78,6 +82,10 @@ module Box
         })
 
         Event.statement_created(statement)
+        ["TRX#{SecureRandom.hex(6)}", "N#{SecureRandom.hex(6)}"]
+      end
+
+      def AZV(dtazv)
         ["TRX#{SecureRandom.hex(6)}", "N#{SecureRandom.hex(6)}"]
       end
     end

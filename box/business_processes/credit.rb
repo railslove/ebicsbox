@@ -29,7 +29,9 @@ module Box
           user_id: user.id,
           payload: Base64.strict_encode64(sct.to_xml),
           eref: params[:eref],
-          amount: params[:amount]
+          currency: 'EUR',
+          amount: params[:amount],
+          metadata: params.slice(:name, :iban, :bic, :execution_date, :reference)
         )
       else
         fail(Box::BusinessProcessFailure.new(sct.errors))
@@ -51,9 +53,7 @@ module Box
       # Set urgent flag or fall back to SEPA
       params[:service_level] = params[:urgent] ? 'URGP' : 'SEPA'
 
-      # Execute v1 method
       create!(account, params, user)
     end
-
   end
 end

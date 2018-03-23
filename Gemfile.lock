@@ -5,6 +5,13 @@ GIT
     camt_parser (1.0.2)
       nokogiri
 
+GIT
+  remote: https://github.com/salesking/king_dtaus.git
+  revision: 84a72f2f0476b6fae5253aa7a139cfc639eace08
+  specs:
+    king_dtaus (2.0.4)
+      i18n
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -192,6 +199,7 @@ DEPENDENCIES
   grape-swagger
   grape-swagger-entity
   jwt
+  king_dtaus!
   nokogiri
   pg
   pry
@@ -205,4 +213,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-   1.15.4
+   1.16.1

@@ -6,7 +6,6 @@ require_relative '../../validations/unique_transaction_eref'
 require_relative '../../validations/length'
 require_relative '../../errors/business_process_failure'
 
-
 module Box
   module Apis
     module V2
@@ -44,7 +43,6 @@ module Box
             present query.paginate(declared(params)).all, with: Entities::V2::CreditTransfer
           end
 
-
           ###
           ### POST /credit_transfers
           ###
@@ -66,21 +64,38 @@ module Box
           params do
             requires :account, type: String, desc: "the account to use", documentation: { param_type: 'body' }
             requires :name, type: String, desc: "the customers name"
-            optional :bic , type: String, desc: "the customers bic", allow_blank: false
-            requires :iban, type: String, desc: "the customers iban"
+
+            optional :currency, type: String, desc: "currency of the transfer", length: 3, regexp: /[A-Z]{3}/, default: 'EUR'
+            requires :iban, type: String, desc: "the customers acconut"
+
+            given currency: ->(val) { val != 'EUR' } do
+              optional :fee_handling, type: Symbol, values: %i[split sender receiver], default: :split
+              requires :bic,          type: String, desc: "the customers bic", allow_blank: false
+              requires :country_code, type: String, desc: "the customers country", allow_blank: false
+            end
+
+            given currency: ->(val) { val == 'EUR' } do
+              optional :urgent, type: Boolean, desc: "requested execution date", default: false
+            end
+
+            requires :end_to_end_reference, type: String, desc: "unique end to end reference", unique_transaction_eref: true, length_transaction_eref: true
+
             requires :amount_in_cents, type: Integer, desc: "amount to credit (charged in cents)", values: 1..1200000000
-            requires :end_to_end_reference, type: String, desc: "unique end to end reference", unique_transaction_eref: true
             optional :reference, type: String, length: 140, desc: "description of the transaction (max. 140 char)"
             optional :execution_date, type: Date, desc: "requested execution date", default: -> { Date.today }
-            optional :urgent, type: Boolean, desc: "requested execution date", default: false
           end
 
           post do
             account = current_organization.find_account!(params[:account])
-            Credit.v2_create!(current_user, account, declared(params))
+
+            if params[:currency] == "EUR"
+              Credit.v2_create!(current_user, account, declared(params))
+            else
+              ForeignCredit.v2_create!(current_user, account, declared(params))
+            end
+
             { message: 'Credit transfer has been initiated successfully!' }
           end
-
 
           ###
           ### GET /credit_transfers/:id

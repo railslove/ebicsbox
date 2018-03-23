@@ -106,6 +106,25 @@ module Box
       values.slice(:name, :bic, :iban)
     end
 
+    def bank_account_number
+      @bank_account_number ||= (bank_account_metadata; @bank_account_number)
+    end
+
+    def bank_number
+      @bank_number ||= (bank_account_metadata; @bank_number)
+    end
+
+    def bank_country_code
+      iban[0...2]
+    end
+
+    def bank_account_metadata
+      Nokogiri::XML(transport_client.HTD).tap do |htd|
+        @bank_account_number ||= htd.at_xpath("//xmlns:AccountNumber[@international='false']", xmlns: "urn:org:ebics:H004").text
+        @bank_number         ||= htd.at_xpath("//xmlns:BankCode[@international='false']", xmlns: "urn:org:ebics:H004").text
+      end
+    end
+
     def last_imported_at
       DB[:imports].where(account_id: id).order(:date).last.try(:[], :date)
     end

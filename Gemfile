@@ -13,6 +13,7 @@ gem 'grape-swagger-entity'
 gem 'faraday'
 gem 'nokogiri'
 gem 'sepa_king'
+gem 'king_dtaus', git: 'https://github.com/salesking/king_dtaus.git'
 gem 'sequel'
 gem 'puma'
 gem 'jwt'
@@ -27,7 +28,6 @@ else
   gem 'byebug'
   gem 'epics', '~> 1.5.0'
 end
-
 
 group :development, :test do
   gem 'database_cleaner'
