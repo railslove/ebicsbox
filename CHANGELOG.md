@@ -1,8 +1,12 @@
 # Changelog
 
+## 0.8
+
+* [BUGFIX] dropped setup migrations restored
+
 ## 0.7.2.2
 
-* Fix webhook signature mechanism 
+* Fix webhook signature mechanism
 
 ## 0.7.2.1
 
