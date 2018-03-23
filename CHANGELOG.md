@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9
+
+* [BUGFIX] fixes setup issue
+
 ## 0.8
 
 * [BUGFIX] dropped setup migrations restored
