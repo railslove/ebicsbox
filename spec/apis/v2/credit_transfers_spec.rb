@@ -234,8 +234,8 @@ module Box
           end
 
           it 'fails on too long end_to_end_reference' do
-            post "/credit_transfers", valid_attributes.merge(currency: 'CHF', end_to_end_reference: 'E'*13), VALID_HEADERS
-            expect_json 'errors.end_to_end_reference', ["must be at the most 12 characters long"]
+            post "/credit_transfers", valid_attributes.merge(currency: 'CHF', end_to_end_reference: 'E'*28), VALID_HEADERS
+            expect_json 'errors.end_to_end_reference', ["must be at the most 27 characters long"]
           end
         end
       end
@@ -279,6 +279,10 @@ module Box
         end
 
         context 'foreign currency' do
+          before do
+            allow_any_instance_of(Epics::Client).to receive(:HTD).and_return(File.read('spec/fixtures/htd.xml'))
+          end
+
           it 'returns a 201' do
             post "/credit_transfers", valid_attributes_foreign, VALID_HEADERS
             expect_status 201

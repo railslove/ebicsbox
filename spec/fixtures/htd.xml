@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<HTDResponseOrderData xmlns="urn:org:ebics:H004" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:org:ebics:H004 ebics_orders_H004.xsd">
+  <PartnerInfo>
+    <AddressInfo>
+      <Name>Railslove GmbH</Name>
+      <Street>Sechzigstr.</Street>
+      <PostCode>50733</PostCode>
+      <City>Köln</City>
+    </AddressInfo>
+    <BankInfo>
+      <HostID>EBICSSPK</HostID>
+    </BankInfo>
+    <AccountInfo ID="accid000000001" Currency="EUR" Description="Railslove GmbH">
+      <AccountNumber international="false">2624334974</AccountNumber>
+      <AccountNumber international="true">DE45100110012624334974</AccountNumber>
+      <BankCode international="false">10011001</BankCode>
+      <BankCode international="true">NTSBDEB1XXX</BankCode>
+      <AccountHolder>Railslove GmbH</AccountHolder>
+    </AccountInfo>
+    <OrderInfo>
+      <OrderType>C52</OrderType>
+      <TransferType>Download</TransferType>
+      <OrderFormat>CAMT052</OrderFormat>
+      <Description>Abholen Vormerkposten</Description>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>C53</OrderType>
+      <TransferType>Download</TransferType>
+      <OrderFormat>CAMT053</OrderFormat>
+      <Description>Abholen Kontoauszuege</Description>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>HAA</OrderType>
+      <TransferType>Download</TransferType>
+      <OrderFormat>MISC</OrderFormat>
+      <Description>Abrufbare Auftragsarten abholen</Description>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>HAC</OrderType>
+      <TransferType>Download</TransferType>
+      <OrderFormat>HAC</OrderFormat>
+      <Description>Kundenprotokoll (XML-Format) abholen</Description>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>HKD</OrderType>
+      <TransferType>Download</TransferType>
+      <OrderFormat>MISC</OrderFormat>
+      <Description>Kunden- und Teilnehmerdaten abholen</Description>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>HPB</OrderType>
+      <TransferType>Download</TransferType>
+      <OrderFormat>MISC</OrderFormat>
+      <Description>Public Keys der Bank abholen</Description>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>HPD</OrderType>
+      <TransferType>Download</TransferType>
+      <OrderFormat>MISC</OrderFormat>
+      <Description>Bankparameter abholen</Description>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>HTD</OrderType>
+      <TransferType>Download</TransferType>
+      <OrderFormat>MISC</OrderFormat>
+      <Description>Kunden- und Teilnehmerdaten abholen</Description>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>HVD</OrderType>
+      <TransferType>Download</TransferType>
+      <OrderFormat>MISC</OrderFormat>
+      <Description>VEU-Status abrufen</Description>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>HVT</OrderType>
+      <TransferType>Download</TransferType>
+      <OrderFormat>MISC</OrderFormat>
+      <Description>VEU-Transaktionsdetails abrufen</Description>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>HVU</OrderType>
+      <TransferType>Download</TransferType>
+      <OrderFormat>MISC</OrderFormat>
+      <Description>VEU-Uebersicht abholen</Description>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>HVZ</OrderType>
+      <TransferType>Download</TransferType>
+      <OrderFormat>MISC</OrderFormat>
+      <Description>VEU-Uebersicht mit Zusatzinformationen</Description>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>PTK</OrderType>
+      <TransferType>Download</TransferType>
+      <OrderFormat>PTK</OrderFormat>
+      <Description>Protokolldatei abholen</Description>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>STA</OrderType>
+      <TransferType>Download</TransferType>
+      <OrderFormat>MT940</OrderFormat>
+      <Description>Swift-Tagesauszuege abholen</Description>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>AZV</OrderType>
+      <TransferType>Upload</TransferType>
+      <OrderFormat>DTAZVJS</OrderFormat>
+      <Description>AZV im Diskettenformat senden</Description>
+      <NumSigRequired>1</NumSigRequired>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>CCT</OrderType>
+      <TransferType>Upload</TransferType>
+      <OrderFormat>PN1GOCS</OrderFormat>
+      <Description>Einreichen von Ueberweisungen</Description>
+      <NumSigRequired>1</NumSigRequired>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>CCU</OrderType>
+      <TransferType>Upload</TransferType>
+      <OrderFormat>P1URGCS</OrderFormat>
+      <Description>Einreichen von Eilueberweisungen</Description>
+      <NumSigRequired>1</NumSigRequired>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>CD1</OrderType>
+      <TransferType>Upload</TransferType>
+      <OrderFormat>P8COR1</OrderFormat>
+      <Description>Einreichen von Lastschriften D-1-Option</Description>
+      <NumSigRequired>1</NumSigRequired>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>CDD</OrderType>
+      <TransferType>Upload</TransferType>
+      <OrderFormat>PN8GOCS</OrderFormat>
+      <Description>Einreichen von Lastschriften</Description>
+      <NumSigRequired>1</NumSigRequired>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>HCA</OrderType>
+      <TransferType>Upload</TransferType>
+      <OrderFormat>MISC</OrderFormat>
+      <Description>Teilnehmerschluessel EBICS aendern</Description>
+      <NumSigRequired>0</NumSigRequired>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>HCS</OrderType>
+      <TransferType>Upload</TransferType>
+      <OrderFormat>MISC</OrderFormat>
+      <Description>Teilnehmerschluessel EU und EBICS aendern</Description>
+      <NumSigRequired>0</NumSigRequired>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>HIA</OrderType>
+      <TransferType>Upload</TransferType>
+      <OrderFormat>MISC</OrderFormat>
+      <Description>Teilnehmerschluessel EBICS uebermitteln</Description>
+      <NumSigRequired>0</NumSigRequired>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>HVE</OrderType>
+      <TransferType>Upload</TransferType>
+      <OrderFormat>MISC</OrderFormat>
+      <Description>VEU-Unterschrift hinzufuegen</Description>
+      <NumSigRequired>0</NumSigRequired>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>HVS</OrderType>
+      <TransferType>Upload</TransferType>
+      <OrderFormat>MISC</OrderFormat>
+      <Description>VEU-Storno</Description>
+      <NumSigRequired>0</NumSigRequired>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>INI</OrderType>
+      <TransferType>Upload</TransferType>
+      <OrderFormat>MISC</OrderFormat>
+      <Description>Passwort-Initialisierung</Description>
+      <NumSigRequired>0</NumSigRequired>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>PUB</OrderType>
+      <TransferType>Upload</TransferType>
+      <OrderFormat>MISC</OrderFormat>
+      <Description>Public-Key senden</Description>
+      <NumSigRequired>0</NumSigRequired>
+    </OrderInfo>
+    <OrderInfo>
+      <OrderType>SPR</OrderType>
+      <TransferType>Upload</TransferType>
+      <OrderFormat>MISC</OrderFormat>
+      <Description>Sperrung der Zugangsberechtigung</Description>
+      <NumSigRequired>0</NumSigRequired>
+    </OrderInfo>
+  </PartnerInfo>
+  <UserInfo>
+    <UserID Status="1">12353901</UserID>
+    <Name>Michael Bumann</Name>
+    <Permission>
+      <OrderTypes>C52 C53 HAA HAC HKD HPB HPD HTD HVD HVT HVU HVZ PTK STA</OrderTypes>
+    </Permission>
+    <Permission>
+      <OrderTypes/>
+      <AccountID>accid000000001</AccountID>
+    </Permission>
+    <Permission AuthorisationLevel="E">
+      <OrderTypes>AZV CCT CCU CD1 CDD</OrderTypes>
+    </Permission>
+    <Permission AuthorisationLevel="T">
+      <OrderTypes>HCA HCS HIA HVE HVS INI PUB SPR</OrderTypes>
+    </Permission>
+  </UserInfo>
+</HTDResponseOrderData>
