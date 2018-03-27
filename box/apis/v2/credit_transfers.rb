@@ -66,7 +66,7 @@ module Box
             requires :name, type: String, desc: "the customers name"
 
             optional :currency, type: String, desc: "currency of the transfer", length: 3, regexp: /[A-Z]{3}/, default: 'EUR'
-            requires :iban, type: String, desc: "the customers acconut"
+            requires :iban, type: String, desc: "the customers account"
 
             given currency: ->(val) { val != 'EUR' } do
               optional :fee_handling, type: Symbol, values: %i[split sender receiver], default: :split
