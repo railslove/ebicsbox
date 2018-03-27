@@ -29,7 +29,6 @@ GEM
       thread_safe (~> 0.3, >= 0.3.1)
     beaneater (1.0.0)
     builder (3.2.3)
-    byebug (9.1.0)
     clockwork (2.0.2)
       activesupport
       tzinfo
@@ -176,7 +175,6 @@ DEPENDENCIES
   activesupport
   airborne
   beaneater (~> 1.0.0)
-  byebug
   camt_parser!
   clockwork
   cmxl
@@ -205,4 +203,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-   1.15.4
+   1.16.0
