@@ -1,6 +1,0 @@
-#!/bin/bash
-echo "Removing obsolete documentation files"
-rm doc/swagger/swagger.json
-rm -R doc/swagger/paths
-RUBYOPT="-W0" bundle exec rake swagger:grape:generate_doc[Epics::Box::Server]
-RUBYOPT="-W0" bundle exec rake swagger:compile_doc
