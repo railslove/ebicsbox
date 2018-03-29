@@ -32,7 +32,7 @@ GEM
     clockwork (2.0.2)
       activesupport
       tzinfo
-    cmxl (0.2.0)
+    cmxl (0.2.2)
       rchardet19
     coderay (1.1.2)
     coercible (1.0.0)
@@ -59,6 +59,7 @@ GEM
       i18n (~> 0.5)
     faraday (0.13.1)
       multipart-post (>= 1.2, < 3)
+    ffi (1.9.18)
     ffi (1.9.18-java)
     foreman (0.84.0)
       thor (~> 0.19.1)
