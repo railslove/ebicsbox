@@ -32,7 +32,7 @@ GEM
     clockwork (2.0.2)
       activesupport
       tzinfo
-    cmxl (0.2.2)
+    cmxl (1.0.0)
       rchardet19
     coderay (1.1.2)
     coercible (1.0.0)
