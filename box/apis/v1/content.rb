@@ -10,6 +10,7 @@ require_relative '../../helpers/pagination'
 
 # Business processes
 require_relative '../../business_processes/credit'
+require_relative '../../business_processes/foreign_credit'
 require_relative '../../business_processes/direct_debit'
 require_relative '../../jobs/fetch_statements'
 
