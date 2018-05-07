@@ -46,9 +46,13 @@ module Box
       end
 
       def self.link_statement_to_transaction(account, statement)
-        if transaction = account.transactions_dataset.where(eref: statement.eref).first
-          transaction.add_statement(statement)
+        # find transactions via EREF
+        transaction   = account.transactions_dataset.where(eref: statement.eref).first
+        # fallback to finding via statement information
+        transaction ||= account.transactions_dataset.exclude(currency: 'EUR', status: ['credit_received', 'debit_received']).where{ created_at > 14.days.ago}.detect{|t| statement.information =~ /#{t.eref}/i }
 
+        if transaction
+          transaction.add_statement(statement)
           if statement.credit?
             transaction.update_status("credit_received")
           elsif statement.debit?

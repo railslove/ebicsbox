@@ -15,4 +15,19 @@ module Box
       eref_unused or fail(Grape::Exceptions::Validation, params: [@scope.full_name(:end_to_end_reference)], message: "must be unique")
     end
   end
+
+  class LengthTransactionEref < Grape::Validations::Base
+
+    def length(currency)
+      Hash.new(27).update(
+        'EUR' => 64
+      )[currency]
+    end
+
+    def validate(request)
+      return if request.params[:end_to_end_reference].to_s.size <= length(request.params[:currency])
+
+      fail(Grape::Exceptions::Validation, params: [@scope.full_name(:end_to_end_reference)], message: "must be at the most #{length(request.params[:currency])} characters long")
+    end
+  end
 end

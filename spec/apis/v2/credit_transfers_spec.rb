@@ -153,6 +153,14 @@ module Box
         }
       end
 
+      let(:valid_attributes_foreign) do
+        valid_attributes.merge(
+          currency: 'CHF',
+          country_code: 'CH',
+          end_to_end_reference: 'TEST'
+        )
+      end
+
       context "when no valid access token is provided" do
         it 'returns a 401' do
           post '/credit_transfers', {}, INVALID_TOKEN_HEADER
@@ -203,6 +211,33 @@ module Box
           post "/credit_transfers", valid_attributes.merge(bic: 'MYTESTBIC'), VALID_HEADERS
           expect_json message: "Failed to initiate credit transfer.", errors: { base: "Bic MYTESTBIC is invalid" }
         end
+
+        it 'fails on too long end_to_end_reference' do
+          post "/credit_transfers", valid_attributes.merge(end_to_end_reference: 'E'*65), VALID_HEADERS
+          expect_json 'errors.end_to_end_reference', ["must be at the most 64 characters long"]
+        end
+
+        context 'foreign currency' do
+          it 'fails on missing country_code' do
+            post "/credit_transfers", valid_attributes.merge(currency: 'CHF'), VALID_HEADERS
+            expect_json 'errors.country_code', ["is missing", "is empty"]
+          end
+
+          it 'fails on missing bic' do
+            post "/credit_transfers", valid_attributes.merge(currency: 'CHF', bic: nil), VALID_HEADERS
+            expect_json 'errors.bic', ["is empty"]
+          end
+
+          it 'fails on invalid currency' do
+            post "/credit_transfers", valid_attributes.merge(currency: 'CHF123'), VALID_HEADERS
+            expect_json 'errors.currency', ["must be at the most 3 characters long"]
+          end
+
+          it 'fails on too long end_to_end_reference' do
+            post "/credit_transfers", valid_attributes.merge(currency: 'CHF', end_to_end_reference: 'E'*28), VALID_HEADERS
+            expect_json 'errors.end_to_end_reference', ["must be at the most 27 characters long"]
+          end
+        end
       end
 
       context 'valid data' do
@@ -243,6 +278,17 @@ module Box
           expect_status 201
         end
 
+        context 'foreign currency' do
+          before do
+            allow_any_instance_of(Epics::Client).to receive(:HTD).and_return(File.read('spec/fixtures/htd.xml'))
+          end
+
+          it 'returns a 201' do
+            post "/credit_transfers", valid_attributes_foreign, VALID_HEADERS
+            expect_status 201
+          end
+        end
+
         context "when sandbox server mode" do
           before { allow(Box.configuration).to receive(:sandbox?).and_return(true) }
 
@@ -250,7 +296,6 @@ module Box
         end
       end
     end
-
 
     ###
     ### GET /accounts

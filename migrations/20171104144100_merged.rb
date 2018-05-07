@@ -21,7 +21,7 @@ Sequel.migration do
       String :statements_format, :default=>"mt940", :text=>true
       String :config, type: :json, default: Sequel.pg_json({})
       String :descriptor, :text=>true
-    end
+    end unless tables.include?(:accounts)
 
     create_table(:bank_statements) do
       primary_key :id
@@ -34,7 +34,7 @@ Sequel.migration do
       Date :fetched_on
       String :content, :text=>true
       Integer :year
-    end
+    end unless tables.include?(:bank_statements)
 
     create_table(:events) do
       primary_key :id
@@ -46,7 +46,7 @@ Sequel.migration do
       String :signature, :text=>true
       String :webhook_status, :default=>"pending", :text=>true
       Integer :webhook_retries, :default=>0
-    end
+    end unless tables.include?(:events)
 
     create_table(:imports) do
       primary_key :id
@@ -54,14 +54,14 @@ Sequel.migration do
       Integer :duration
       Integer :transactions_count
       Integer :account_id
-    end
+    end unless tables.include?(:imports)
 
     create_table(:organizations) do
       primary_key :id
       String :name, :text=>true
       DateTime :created_at, :default=>Sequel.function(:now)
       String :webhook_token, :text=>true, :null=>false
-    end
+    end unless tables.include?(:organizations)
 
     create_table(:statements, :ignore_index_errors=>true) do
       primary_key :id
@@ -91,7 +91,7 @@ Sequel.migration do
       String :public_id
 
       index [:sha], :name=>:statements_sha_key, :unique=>true
-    end
+    end unless tables.include?(:statements)
 
     create_table(:subscribers) do
       primary_key :id
@@ -104,7 +104,7 @@ Sequel.migration do
       DateTime :activated_at
       String :ini_letter, :text=>true
       DateTime :submitted_at
-    end
+    end unless tables.include?(:subscribers)
 
     create_table(:transactions, :ignore_index_errors=>true) do
       primary_key :id
@@ -123,7 +123,7 @@ Sequel.migration do
       String :history, :type=>:json, :default=> Sequel.pg_json([])
 
       index [:eref], :name=>:transactions_eref_key, :unique=>true
-    end
+    end unless tables.include?(:transactions)
 
     create_table(:users) do
       primary_key :id
@@ -133,7 +133,7 @@ Sequel.migration do
       DateTime :created_at, :default=>Sequel.function(:now)
       TrueClass :admin, :default=>false
       String :email, :text=>true
-    end
+    end unless tables.include?(:users)
 
     create_table(:webhook_deliveries) do
       primary_key :id
@@ -143,6 +143,6 @@ Sequel.migration do
       String :reponse_headers, type: :json, default: Sequel.pg_json({})
       Integer :response_status
       Integer :response_time
-    end
+    end unless tables.include?(:webhook_deliveries)
   end
 end

@@ -7,6 +7,10 @@ require_relative '../models/transaction'
 module Box
   module Jobs
     class Credit
+      INSTRUMENT_MAPPING = Hash.new('AZV').update({
+        "EUR" => :CCT,
+      })
+
       def self.process!(message)
         transaction = Transaction.create(
           account_id: message[:account_id],
@@ -15,8 +19,10 @@ module Box
           type: "credit",
           payload: Base64.strict_decode64(message[:payload]),
           eref: message[:eref],
+          currency: message[:currency],
           status: "created",
-          order_type: :CCT
+          order_type: INSTRUMENT_MAPPING[message[:currency]],
+          metadata: message[:metadata]
         )
 
         transaction.execute!
