@@ -17,6 +17,7 @@ module Box
 
     dataset_module do
       where(:credit_transfers, type: 'credit')
+      where(:direct_debits, type: 'debit')
 
       def by_organization(organization)
         left_join(:accounts, id: :account_id)
