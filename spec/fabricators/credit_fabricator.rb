@@ -1,6 +1,6 @@
 require_relative '../../box/models/transaction'
 
-def generat_credit_payload
+def generate_credit_payload
   %{
     <?xml version="1.0" encoding="UTF-8"?>
     <Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.003.03" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:iso:std:iso:20022:tech:xsd:pain.001.003.03 pain.001.003.03.xsd">
@@ -74,7 +74,7 @@ end
 Fabricator(:credit, from: 'Box::Transaction') do
   eref { Fabricate.sequence(:credit) { |i| "credit-#{i}" } }
   type 'credit'
-  payload { generat_credit_payload }
+  payload { generate_credit_payload }
   ebics_transaction_id 'B00U'
   status { %w[created file_upload funds_debited].sample }
   account_id 1

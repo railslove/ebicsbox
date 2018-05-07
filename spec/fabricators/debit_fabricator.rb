@@ -1,6 +1,6 @@
 require_relative '../../box/models/transaction'
 
-def generate_debit_fabricator
+def generate_debit_payload
   %{
     <?xml version="1.0" encoding="UTF-8"?>
     <Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.008.003.02" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:iso:std:iso:20022:tech:xsd:pain.008.003.02 pain.008.003.02.xsd">
@@ -104,7 +104,7 @@ end
 Fabricator(:debit, from: 'Box::Transaction') do
   eref { Fabricate.sequence(:debit) { |i| "debit-#{i}" } }
   type 'debit'
-  payload { generate_debit_fabricator }
+  payload { generate_debit_payload }
   ebics_transaction_id 'B00U'
   status { %w[created file_upload funds_debited].sample }
   account_id 1

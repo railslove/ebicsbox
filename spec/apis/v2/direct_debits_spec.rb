@@ -5,7 +5,7 @@ module Box
     include_context 'valid user'
     include_context 'with account'
 
-    TRANSFER_SPEC = {
+    DIRECT_DEBIT_TRANSFER_SPEC = {
       id: :string,
       account: :string,
       name: :string,
@@ -19,7 +19,7 @@ module Box
       _links: :object,
     }
 
-    VALID_HEADERS = {
+    VALID_DEBIT_HEADERS = {
       'Accept' => 'application/vnd.ebicsbox-v2+json',
       'Authorization' => 'Bearer test-token'
     }
@@ -43,12 +43,12 @@ module Box
 
       context "when no debits are available" do
         it 'returns a 200' do
-          get '/direct_debits', VALID_HEADERS
+          get '/direct_debits', VALID_DEBIT_HEADERS
           expect_status 200
         end
 
         it 'returns an empty array' do
-          get '/direct_debits', VALID_HEADERS
+          get '/direct_debits', VALID_DEBIT_HEADERS
           expect_json []
         end
       end
@@ -58,19 +58,19 @@ module Box
 
         it 'does not show debits from other organizations' do
           other_debit = Fabricate(:debit, account_id: account.id.succ)
-          get '/direct_debits', VALID_HEADERS
+          get '/direct_debits', VALID_DEBIT_HEADERS
           expect(json_body).to_not include(other_debit.eref)
         end
 
         it 'returns includes the existing direct debit' do
-          get '/direct_debits', VALID_HEADERS
+          get '/direct_debits', VALID_DEBIT_HEADERS
           expect_json_sizes 1
         end
 
         describe "object format" do
           it 'exposes properly formatted data' do
-            get '/direct_debits', VALID_HEADERS
-            expect_json_types '0', TRANSFER_SPEC
+            get '/direct_debits', VALID_DEBIT_HEADERS
+            expect_json_types '0', DIRECT_DEBIT_TRANSFER_SPEC
           end
         end
 
@@ -79,19 +79,19 @@ module Box
           let!(:other_debit) { Fabricate(:debit, account_id: second_account.id, eref: 'other-debit') }
 
           it 'only returns transactions belonging to matching account' do
-            get "/direct_debits?iban=#{second_account.iban}", VALID_HEADERS
+            get "/direct_debits?iban=#{second_account.iban}", VALID_DEBIT_HEADERS
             expect_json_sizes 1
             expect_json '0', end_to_end_reference: 'other-debit'
           end
 
           it 'does not return transactions not belonging to matching account' do
-            get "/direct_debits?iban=#{account.iban}", VALID_HEADERS
+            get "/direct_debits?iban=#{account.iban}", VALID_DEBIT_HEADERS
             expect_json_sizes 1
             expect_json '0', end_to_end_reference: 'my-debit'
           end
 
           it 'allows to specify multiple accounts' do
-            get "/direct_debits?iban=#{account.iban},#{second_account.iban}", VALID_HEADERS
+            get "/direct_debits?iban=#{account.iban},#{second_account.iban}", VALID_DEBIT_HEADERS
             expect_json_sizes 2
           end
         end
@@ -103,31 +103,31 @@ module Box
           let!(:debit_new) { Fabricate(:debit, eref: 'debit-new', account_id: account.id) }
 
           it 'returns multiple items by default' do
-            get "/direct_debits", VALID_HEADERS
+            get "/direct_debits", VALID_DEBIT_HEADERS
             expect_json_sizes 2
           end
 
           it 'orders by name' do
-            get "/direct_debits", VALID_HEADERS
+            get "/direct_debits", VALID_DEBIT_HEADERS
             expect_json '0', end_to_end_reference: 'debit-new'
             expect_json '1', end_to_end_reference: 'debit-old'
           end
 
           it 'allows to specify items per page' do
-            get "/direct_debits?per_page=1", VALID_HEADERS
+            get "/direct_debits?per_page=1", VALID_DEBIT_HEADERS
             expect_json_sizes 1
           end
 
           it 'allows to specify the page' do
-            get "/direct_debits?page=1&per_page=1", VALID_HEADERS
+            get "/direct_debits?page=1&per_page=1", VALID_DEBIT_HEADERS
             expect_json '0', end_to_end_reference: 'debit-new'
 
-            get "/direct_debits?page=2&per_page=1", VALID_HEADERS
+            get "/direct_debits?page=2&per_page=1", VALID_DEBIT_HEADERS
             expect_json '0', end_to_end_reference: 'debit-old'
           end
 
           it 'sets pagination headers' do
-            get "/direct_debits?per_page=1", VALID_HEADERS
+            get "/direct_debits?per_page=1", VALID_DEBIT_HEADERS
             expect(headers['Link']).to include("rel='next'")
           end
         end
@@ -163,12 +163,12 @@ module Box
 
       context 'invalid data' do
         it 'returns a 401' do
-          post "/direct_debits", {}, VALID_HEADERS
+          post "/direct_debits", {}, VALID_DEBIT_HEADERS
           expect_status 400
         end
 
         it 'specifies invalid fields' do
-          post "/direct_debits", {}, VALID_HEADERS
+          post "/direct_debits", {}, VALID_DEBIT_HEADERS
           expect_json_types errors: {
             account: :array_of_strings,
             name: :array_of_strings,
@@ -182,67 +182,67 @@ module Box
         end
 
         it 'provides a proper error message' do
-          post "/direct_debits", {}, VALID_HEADERS
+          post "/direct_debits", {}, VALID_DEBIT_HEADERS
           expect_json message: "Validation of your request's payload failed!"
         end
 
         it 'does not allow two debits with the same end_to_end_reference for one account' do
           debit = Fabricate(:debit, account_id: account.id, eref: 'my-debit-eref')
-          post "/direct_debits", { account: account.iban, end_to_end_reference: 'my-debit-eref' }, VALID_HEADERS
+          post "/direct_debits", { account: account.iban, end_to_end_reference: 'my-debit-eref' }, VALID_DEBIT_HEADERS
           expect_json 'errors.end_to_end_reference', ["must be unique"]
         end
 
         it 'allows a max length of 140 characters for reference' do
-          post "/direct_debits", { reference: 'a' * 141 }, VALID_HEADERS
+          post "/direct_debits", { reference: 'a' * 141 }, VALID_DEBIT_HEADERS
           expect_json 'errors.reference', ["must be at the most 140 characters long"]
         end
 
         it 'fails on invalid IBAN' do
-          post "/direct_debits", valid_attributes.merge(iban: 'MYTESTIBAN'), VALID_HEADERS
+          post "/direct_debits", valid_attributes.merge(iban: 'MYTESTIBAN'), VALID_DEBIT_HEADERS
           expect_json message: "Failed to initiate direct debit.", errors: { base: "Iban MYTESTIBAN is invalid" }
         end
 
         it 'fails on invalid BIC' do
-          post "/direct_debits", valid_attributes.merge(bic: 'MYTESTBIC'), VALID_HEADERS
+          post "/direct_debits", valid_attributes.merge(bic: 'MYTESTBIC'), VALID_DEBIT_HEADERS
           expect_json message: "Failed to initiate direct debit.", errors: { base: "Bic MYTESTBIC is invalid" }
         end
       end
 
       context 'valid data' do
         it 'returns a 201' do
-          post "/direct_debits", valid_attributes, VALID_HEADERS
+          post "/direct_debits", valid_attributes, VALID_DEBIT_HEADERS
           expect_status 201
         end
 
         it 'returns a proper message' do
-          post "/direct_debits", valid_attributes, VALID_HEADERS
+          post "/direct_debits", valid_attributes, VALID_DEBIT_HEADERS
           expect_json 'message', 'Direct debit has been initiated successfully!'
         end
 
         it 'triggers a debit transfer' do
           expect(DirectDebit).to receive(:create!)
-          post "/direct_debits", valid_attributes, VALID_HEADERS
+          post "/direct_debits", valid_attributes, VALID_DEBIT_HEADERS
         end
 
         it 'triggers a debit transfer without bic' do
           expect(DirectDebit).to receive(:create!)
-          post "/direct_debits", valid_attributes.reject{ |k,_| k == :bic }, VALID_HEADERS
+          post "/direct_debits", valid_attributes.reject{ |k,_| k == :bic }, VALID_DEBIT_HEADERS
         end
 
         it 'transactions without bic should be valid' do
           expect(Queue).to receive(:execute_debit)
-          post "/direct_debits", valid_attributes.reject{ |k,_| k == :bic }, VALID_HEADERS
+          post "/direct_debits", valid_attributes.reject{ |k,_| k == :bic }, VALID_DEBIT_HEADERS
         end
 
         it 'transforms parameters so they are understood by debit business process' do
           expect(DirectDebit).to receive(:create!).with(account, anything, user)
-          post "/direct_debits", valid_attributes, VALID_HEADERS
+          post "/direct_debits", valid_attributes, VALID_DEBIT_HEADERS
         end
 
         it 'allows same end_to_end_reference for two different accounts' do
           other_account = Fabricate(:account, organization_id: account.organization_id, iban: 'DE41405327214540168131')
           debit = Fabricate(:debit, account_id: other_account.id, eref: 'my-debit-eref')
-          post "/direct_debits", valid_attributes.merge(end_to_end_reference: 'my-debit-eref'), VALID_HEADERS
+          post "/direct_debits", valid_attributes.merge(end_to_end_reference: 'my-debit-eref'), VALID_DEBIT_HEADERS
           expect_status 201
         end
 
@@ -270,14 +270,14 @@ module Box
       context "when direct debit does not exist" do
         context "when invalid uuid" do
           it 'returns a 404' do
-            get "/direct_debits/UNKNOWN_ID", VALID_HEADERS
+            get "/direct_debits/UNKNOWN_ID", VALID_DEBIT_HEADERS
             expect_status 404
           end
         end
 
         context "when uuid does not exist" do
           it 'returns a 404' do
-            get "/direct_debits/d23d5d52-28fc-4352-a094-b69818a3fdf1", VALID_HEADERS
+            get "/direct_debits/d23d5d52-28fc-4352-a094-b69818a3fdf1", VALID_DEBIT_HEADERS
             expect_status 404
           end
         end
@@ -288,13 +288,13 @@ module Box
 
         it 'returns a 200' do
           id = debit.public_id
-          get "/direct_debits/#{id}", VALID_HEADERS
+          get "/direct_debits/#{id}", VALID_DEBIT_HEADERS
           expect_status 200
         end
 
         it 'exposes properly formatted data' do
-          get "/direct_debits/#{debit.public_id}", VALID_HEADERS
-          expect_json_types TRANSFER_SPEC
+          get "/direct_debits/#{debit.public_id}", VALID_DEBIT_HEADERS
+          expect_json_types DIRECT_DEBIT_TRANSFER_SPEC
         end
       end
 
