@@ -108,6 +108,9 @@ module Box
             failure: DEFAULT_ERROR_RESPONSES,
             produces: ['text/html']
 
+          params do
+            requires :iban, type: String
+          end
           get ':iban/ini_letter' do
             account = Box::Account.by_organization(current_organization).first!(iban: params[:iban])
             subscriber = account.subscriber_for(current_user.id)
