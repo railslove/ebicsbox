@@ -81,7 +81,7 @@ module Box
             requires :mandate_id, type: String, desc: "ID of the SEPA mandate (max. 35 char)"
             requires :mandate_signature_date, type: Integer, desc: "when the mandate was signed by the customer"
             optional :reference, type: String, length: 140, desc: "description of the transaction (max. 140 char)"
-            optional :instrument, type: String, desc: "", values: %w[CORE COR1 B2B], default: "COR1"
+            optional :instrument, type: String, desc: "", values: %w[CORE], default: "CORE"
             optional :sequence_type, type: String, desc: "", values: ["FRST", "RCUR", "OOFF", "FNAL"], default: "FRST"
             optional :instruction, type: String, desc: "instruction identification, will not be submitted to the debtor"
             optional :execution_date, type: Date, desc: "requested execution date", default: -> { 2.days.from_now }
