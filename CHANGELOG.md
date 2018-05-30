@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.1
+
+* [BUGFIX] migrations not passing
+* [OTHERS] updates dependencies because of vulnerabilities
+* [OTHERS] replaces byebug with pry
+
 ## 0.9
 
 * [BUGFIX] fixes setup issue
