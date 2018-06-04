@@ -1,18 +1,17 @@
 require 'grape'
 
-require_relative './api_endpoint'
+require_relative '../api_endpoint'
 
 # Validations
-require_relative '../../validations/unique_account'
-require_relative '../../validations/active_account'
-require_relative '../../validations/unique_subscriber'
+require_relative '../../../validations/unique_account'
+require_relative '../../../validations/active_account'
+require_relative '../../../validations/unique_subscriber'
 
 # Helpers
-require_relative '../../helpers/default'
+require_relative '../../../helpers/default'
 
 # Entities
-require_relative '../../entities/management_account'
-require_relative '../../entities/user'
+require_relative '../../../entities/management_account'
 
 module Box
   module Apis
@@ -41,7 +40,7 @@ module Box
               tags: ['account management'],
               is_array: true,
               headers: AUTH_HEADERS,
-              success: Entities::V2::Account,
+              success: Entities::ManagementAccount,
               failure: DEFAULT_ERROR_RESPONSES,
               produces: ['application/vnd.ebicsbox-v2+json']
 
@@ -56,7 +55,7 @@ module Box
             desc 'Retrieve a single account by its IBAN',
               tags: ['account management'],
               headers: AUTH_HEADERS,
-              success: Entities::V2::Account,
+              success: Entities::ManagementAccount,
               failure: DEFAULT_ERROR_RESPONSES,
               produces: ['application/vnd.ebicsbox-v2+json']
             params do
@@ -79,7 +78,7 @@ module Box
               tags: ['account management'],
               body_name: 'body',
               headers: AUTH_HEADERS,
-              success: Entities::V2::Account,
+              success: Entities::ManagementAccount,
               failure: DEFAULT_ERROR_RESPONSES,
               produces: ['application/vnd.ebicsbox-v2+json']
 
@@ -155,105 +154,6 @@ module Box
                 end
               rescue Sequel::NoMatchingRow
                 error!({ message: 'Your organization does not have an account with given IBAN!' }, 400)
-              end
-            end
-          end
-
-          resource 'accounts/:iban/subscribers' do
-            desc 'Fetch an account\'s INI letter',
-              tags: ['subscriber management']
-
-            get ':id/ini_letter' do
-              subscriber = Subscriber.join(:accounts, id: :account_id).where(organization_id: current_organization.id, iban: params[:iban]).first!(Sequel.qualify(:subscribers, :id) => params[:id])
-              if subscriber.ini_letter.nil?
-                error!({ message: 'Subscriber setup not yet initiated!' }, 412)
-              else
-                content_type 'text/html'
-                subscriber.ini_letter
-              end
-            end
-
-            desc 'Retrieve a list of all subscribers for given account',
-              tags: ['subscriber management'],
-              headers: AUTH_HEADERS,
-              success: Entities::Subscriber,
-              failure: DEFAULT_ERROR_RESPONSES,
-              produces: ['application/vnd.ebicsbox-v2+json']
-            get do
-              account = current_organization.accounts_dataset.first!(iban: params[:iban])
-              present account.subscribers, with: Entities::Subscriber
-            end
-
-            desc 'Add a subscriber to given account',
-              tags: ['subscriber management'],
-              body_name: 'body',
-              headers: AUTH_HEADERS,
-              success: Entities::Subscriber,
-              failure: DEFAULT_ERROR_RESPONSES,
-              produces: ['application/vnd.ebicsbox-v2+json']
-            params do
-              requires :user_id, type: Integer, desc: "Internal user identifier to associate the subscriber with", documentation: { param_type: 'body' }
-              requires :ebics_user, type: String, unique_subscriber: true, desc: "EBICS user to represent"
-            end
-            post do
-              account = current_organization.accounts_dataset.first!(iban: params[:iban])
-              declared_params = declared(params)
-              ebics_user = declared_params.delete(:ebics_user)
-              subscriber = account.add_subscriber(declared_params.merge(remote_user_id: ebics_user))
-              if subscriber
-                if subscriber.setup!
-                  present subscriber, with: Entities::Subscriber
-                else
-                  subscriber.destroy
-                  error!({ message: 'Failed to setup subscriber. Make sure your data is valid and retry!' }, 412)
-                end
-              else
-                error!({ message: 'Failed to create subscriber' }, 400)
-              end
-            end
-          end
-
-          resource :users do
-            desc 'Retrieve a list of all users',
-              tags: ['user management'],
-              is_array: true,
-              headers: AUTH_HEADERS,
-              success: Entities::User,
-              failure: DEFAULT_ERROR_RESPONSES,
-              produces: ['application/vnd.ebicsbox-v2+json']
-            get do
-              users = current_organization.users_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
-              present users, with: Entities::User
-            end
-
-            desc 'Retrieve a single user by its identifier',
-              tags: ['user management'],
-              headers: AUTH_HEADERS,
-              success: Entities::User,
-              failure: DEFAULT_ERROR_RESPONSES,
-              produces: ['application/vnd.ebicsbox-v2+json']
-            get ':id' do
-              user = current_organization.users_dataset.first!({ id: params[:id] })
-              present user, with: Entities::User, type: 'full'
-            end
-
-            desc 'Create a new user instance',
-              tags: ['user management'],
-              body_name: 'body',
-              headers: AUTH_HEADERS,
-              success: Entities::User,
-              failure: DEFAULT_ERROR_RESPONSES,
-              produces: ['application/vnd.ebicsbox-v2+json']
-            params do
-              requires :name, type: String, desc: "The user's display name", documentation: { param_type: 'body' }
-              optional :token, type: String, desc: 'Set a custom access token'
-            end
-            post do
-              token = params[:token] || SecureRandom.hex
-              if user = current_organization.add_user(name: params[:name], access_token: token)
-                present user, with: Entities::User, include_token: true
-              else
-                error!({ message: 'Failed to create user' }, 400)
               end
             end
           end
