@@ -23,17 +23,6 @@ module Box
       status: :string,
       subscriber: :string,
     }
-
-    VALID_HEADERS = {
-      'Accept' => 'application/vnd.ebicsbox-v2+json',
-      'Authorization' => 'Bearer test-token'
-    }
-
-    INVALID_TOKEN_HEADER = {
-      'Accept' => 'application/vnd.ebicsbox-v2+json',
-      'Authorization' => 'Bearer invalid-token'
-    }
-
     ###
     ### GET /accounts
     ###
@@ -41,19 +30,19 @@ module Box
     describe 'GET: /accounts' do
       context "when no valid access token is provided" do
         it 'returns a 401' do
-          get '/accounts', INVALID_TOKEN_HEADER
+          get '/accounts', TestHelpers::INVALID_TOKEN_HEADER
           expect_status 401
         end
       end
 
       context "when no accounts are available" do
         it 'returns a 200' do
-          get '/accounts', VALID_HEADERS
+          get '/accounts', TestHelpers::VALID_HEADERS
           expect_status 200
         end
 
         it 'returns an empty array' do
-          get '/accounts', VALID_HEADERS
+          get '/accounts', TestHelpers::VALID_HEADERS
           expect_json []
         end
       end
@@ -62,13 +51,13 @@ module Box
         let!(:account) { Fabricate(:activated_account, organization_id: organization.id) }
 
         it 'returns includes the existing account' do
-          get '/accounts', VALID_HEADERS
+          get '/accounts', TestHelpers::VALID_HEADERS
           expect_json_sizes 1
         end
 
         describe "object format" do
           it 'exposes properly formatted data' do
-            get '/accounts', VALID_HEADERS
+            get '/accounts', TestHelpers::VALID_HEADERS
             expect_json_types '0', ACCOUNT_SPEC
           end
         end
@@ -80,18 +69,18 @@ module Box
           let!(:activated_account) { Fabricate(:activated_account, name: 'activated', organization_id: organization.id) }
 
           it 'returns all accounts by default' do
-            get "/accounts", VALID_HEADERS
+            get "/accounts", TestHelpers::VALID_HEADERS
             expect_json_sizes 2
           end
 
           it 'returns only activated accounts when requested' do
-            get "/accounts?status=activated", VALID_HEADERS
+            get "/accounts?status=activated", TestHelpers::VALID_HEADERS
             expect_json_sizes 1
             expect_json '0', name: 'activated'
           end
 
           it 'returns only not_activated accounts when requested' do
-            get "/accounts?status=not_activated", VALID_HEADERS
+            get "/accounts?status=not_activated", TestHelpers::VALID_HEADERS
             expect_json_sizes 1
             expect_json '0', name: 'not-activated'
           end
@@ -104,31 +93,31 @@ module Box
           let!(:account2) { Fabricate(:account, name: "a account", organization_id: organization.id) }
 
           it 'returns multiple items by default' do
-            get "/accounts", VALID_HEADERS
+            get "/accounts", TestHelpers::VALID_HEADERS
             expect_json_sizes 2
           end
 
           it 'orders by name' do
-            get "/accounts", VALID_HEADERS
+            get "/accounts", TestHelpers::VALID_HEADERS
             expect_json '0', name: 'a account'
             expect_json '1', name: 'z account'
           end
 
           it 'allows to specify items per page' do
-            get "/accounts?per_page=1", VALID_HEADERS
+            get "/accounts?per_page=1", TestHelpers::VALID_HEADERS
             expect_json_sizes 1
           end
 
           it 'allows to specify the page' do
-            get "/accounts?page=1&per_page=1", VALID_HEADERS
+            get "/accounts?page=1&per_page=1", TestHelpers::VALID_HEADERS
             expect_json '0', name: 'a account'
 
-            get "/accounts?page=2&per_page=1", VALID_HEADERS
+            get "/accounts?page=2&per_page=1", TestHelpers::VALID_HEADERS
             expect_json '0', name: 'z account'
           end
 
           it 'sets pagination headers' do
-            get "/accounts?per_page=1", VALID_HEADERS
+            get "/accounts?per_page=1", TestHelpers::VALID_HEADERS
             expect(headers['Link']).to include("rel='next'")
           end
         end
@@ -142,19 +131,19 @@ module Box
     describe 'POST: /accounts' do
       context "when no valid access token is provided" do
         it 'returns a 401' do
-          post "/accounts", {}, INVALID_TOKEN_HEADER
+          post "/accounts", {}, TestHelpers::INVALID_TOKEN_HEADER
           expect_status 401
         end
       end
 
       context 'invalid data' do
         it 'returns a 401' do
-          post "/accounts", {}, VALID_HEADERS
+          post "/accounts", {}, TestHelpers::VALID_HEADERS
           expect_status 400
         end
 
         it 'specifies invalid fields' do
-          post "/accounts", {}, VALID_HEADERS
+          post "/accounts", {}, TestHelpers::VALID_HEADERS
           expect_json_types errors: {
             name: :array_of_strings,
             iban: :array_of_strings,
@@ -167,21 +156,21 @@ module Box
         end
 
         it 'provides a proper error message' do
-          post "/accounts", {}, VALID_HEADERS
+          post "/accounts", {}, TestHelpers::VALID_HEADERS
           expect_json message: "Validation of your request's payload failed!"
         end
 
         it 'does not allow two accounts with the same IBAN' do
           account = Fabricate(:account, organization_id: organization.id)
           payload = Fabricate.attributes_for(:account)
-          post "/accounts", payload.merge(subscriber: "SOMEUSER", iban: account.iban), VALID_HEADERS
+          post "/accounts", payload.merge(subscriber: "SOMEUSER", iban: account.iban), TestHelpers::VALID_HEADERS
           expect_json 'errors.iban', ["must be unique"]
         end
 
         it 'handles bank related errors when setting up an account' do
           allow_any_instance_of(Subscriber).to receive(:setup!).and_return(false)
           payload = Fabricate.attributes_for(:account)
-          post "/accounts", payload.merge(subscriber: "SOMEUSER"), VALID_HEADERS
+          post "/accounts", payload.merge(subscriber: "SOMEUSER"), TestHelpers::VALID_HEADERS
           expect_json 'message', 'Failed to setup subscriber with your bank. Make sure your data is valid and retry!'
         end
       end
@@ -191,7 +180,7 @@ module Box
 
         def do_request
           payload = Fabricate.attributes_for(:account)
-          post "/accounts", payload.merge(subscriber: "SOMEUSER"), VALID_HEADERS
+          post "/accounts", payload.merge(subscriber: "SOMEUSER"), TestHelpers::VALID_HEADERS
         end
 
         it 'returns a 201' do
@@ -225,7 +214,7 @@ module Box
           other_organization = Fabricate(:organization)
           account = Fabricate(:account, organization_id: other_organization.id)
           payload = Fabricate.attributes_for(:account)
-          post "/accounts", payload.merge(subscriber: "SOMEUSER", iban: account.iban), VALID_HEADERS
+          post "/accounts", payload.merge(subscriber: "SOMEUSER", iban: account.iban), TestHelpers::VALID_HEADERS
           expect_status 201
         end
 
@@ -268,26 +257,26 @@ module Box
 
       context "when no valid access token is provided" do
         it 'returns a 401' do
-          get "/accounts/#{account.iban}", INVALID_TOKEN_HEADER
+          get "/accounts/#{account.iban}", TestHelpers::INVALID_TOKEN_HEADER
           expect_status 401
         end
       end
 
       context "when account does not exist" do
         it 'returns a 404' do
-          get "/accounts/UNKNOWN_IBAN", VALID_HEADERS
+          get "/accounts/UNKNOWN_IBAN", TestHelpers::VALID_HEADERS
           expect_status 404
         end
       end
 
       context "when account does exist" do
         it 'returns a 200' do
-          get "/accounts/#{account.iban}", VALID_HEADERS
+          get "/accounts/#{account.iban}", TestHelpers::VALID_HEADERS
           expect_status 200
         end
 
         it 'exposes properly formatted data' do
-          get "/accounts/#{account.iban}", VALID_HEADERS
+          get "/accounts/#{account.iban}", TestHelpers::VALID_HEADERS
           expect_json_types ACCOUNT_SPEC
         end
       end
@@ -303,14 +292,14 @@ module Box
 
       context "when no valid access token is provided" do
         it 'returns a 401' do
-          get "/accounts/#{account.iban}/ini_letter", INVALID_TOKEN_HEADER
+          get "/accounts/#{account.iban}/ini_letter", TestHelpers::INVALID_TOKEN_HEADER
           expect_status 401
         end
       end
 
       context "when account does not exist" do
         it 'returns a 404' do
-          get "/accounts/UNKNOWN_IBAN/ini_letter", VALID_HEADERS
+          get "/accounts/UNKNOWN_IBAN/ini_letter", TestHelpers::VALID_HEADERS
           expect_status 404
         end
       end
@@ -319,12 +308,12 @@ module Box
         before { account.subscribers.first.update(activated_at: nil, user_id: user.id) }
 
         it 'fails with an error status' do
-          get "/accounts/#{account.iban}/ini_letter", VALID_HEADERS
+          get "/accounts/#{account.iban}/ini_letter", TestHelpers::VALID_HEADERS
           expect_status 412
         end
 
         it 'fails with a meaningful error message' do
-          get "/accounts/#{account.iban}/ini_letter", VALID_HEADERS
+          get "/accounts/#{account.iban}/ini_letter", TestHelpers::VALID_HEADERS
           expect_json 'message', 'Subscriber setup not yet initiated'
         end
       end
@@ -333,17 +322,17 @@ module Box
         before { account.subscribers.first.update(ini_letter: "INI LETTER", user_id: user.id) }
 
         it 'returns a success code' do
-          get "/accounts/#{account.iban}/ini_letter", VALID_HEADERS
+          get "/accounts/#{account.iban}/ini_letter", TestHelpers::VALID_HEADERS
           expect_status 200
         end
 
         it 'returns data as html content' do
-          get "/accounts/#{account.iban}/ini_letter", VALID_HEADERS
+          get "/accounts/#{account.iban}/ini_letter", TestHelpers::VALID_HEADERS
           expect(response.headers["Content-Type"]).to eq('text/html')
         end
 
         it 'returns the ini letter' do
-          get "/accounts/#{account.iban}/ini_letter", VALID_HEADERS
+          get "/accounts/#{account.iban}/ini_letter", TestHelpers::VALID_HEADERS
           expect(response.body).to eq("INI LETTER")
         end
       end
@@ -359,14 +348,14 @@ module Box
 
       context "when no valid access token is provided" do
         it 'returns a 401' do
-          put "/accounts/#{account.iban}", { name: 'Internal Account' }, INVALID_TOKEN_HEADER
+          put "/accounts/#{account.iban}", { name: 'Internal Account' }, TestHelpers::INVALID_TOKEN_HEADER
           expect_status 401
         end
       end
 
       context "when account does not exist" do
         it 'returns a 404' do
-          put "/accounts/UNKNOWN_IBAN", { name: 'Internal Account' }, VALID_HEADERS
+          put "/accounts/UNKNOWN_IBAN", { name: 'Internal Account' }, TestHelpers::VALID_HEADERS
           expect_status 404
         end
       end
@@ -376,7 +365,7 @@ module Box
         let!(:other_account) { other_organization.add_account(Fabricate.attributes_for(:account, iban: 'DE41405327214540168131')) }
 
         it 'returns a 404' do
-          put "/accounts/#{other_account.iban}", { name: 'Internal Account' }, VALID_HEADERS
+          put "/accounts/#{other_account.iban}", { name: 'Internal Account' }, TestHelpers::VALID_HEADERS
           expect_status 404
         end
       end
@@ -384,13 +373,13 @@ module Box
       context 'activated account' do
         it 'cannot change iban' do
           expect {
-            put "/accounts/#{account.iban}", { iban: 'new-iban' }, VALID_HEADERS
+            put "/accounts/#{account.iban}", { iban: 'new-iban' }, TestHelpers::VALID_HEADERS
           }.to_not change { account.reload.iban }
         end
 
         it 'cannot change bic' do
           expect {
-            put "/accounts/#{account.iban}", { bic: 'new-bic' }, VALID_HEADERS
+            put "/accounts/#{account.iban}", { bic: 'new-bic' }, TestHelpers::VALID_HEADERS
           }.to_not change { account.reload.bic }
         end
 
@@ -398,25 +387,25 @@ module Box
 
         it 'allows changes of internal descriptor' do
           expect {
-            put "/accounts/#{account.iban}", { descriptor: 'FooBar'}, VALID_HEADERS
+            put "/accounts/#{account.iban}", { descriptor: 'FooBar'}, TestHelpers::VALID_HEADERS
           }.to change { account.reload.descriptor }.to('FooBar')
         end
 
         it 'allows changes of name' do
           expect {
-            put "/accounts/#{account.iban}", { name: 'new-name' }, VALID_HEADERS
+            put "/accounts/#{account.iban}", { name: 'new-name' }, TestHelpers::VALID_HEADERS
           }.to change { account.reload.name }
         end
 
         it 'allows changes of callback url' do
           expect {
-            put "/accounts/#{account.iban}", { callback_url: 'new-callback-url' }, VALID_HEADERS
+            put "/accounts/#{account.iban}", { callback_url: 'new-callback-url' }, TestHelpers::VALID_HEADERS
           }.to change { account.reload.callback_url }
         end
 
         it 'allows changes of creditor identifier' do
           expect {
-            put "/accounts/#{account.iban}", { creditor_identifier: 'new-creditor-identifier' }, VALID_HEADERS
+            put "/accounts/#{account.iban}", { creditor_identifier: 'new-creditor-identifier' }, TestHelpers::VALID_HEADERS
           }.to change { account.reload.creditor_identifier }
         end
       end

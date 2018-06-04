@@ -2,22 +2,16 @@ require 'spec_helper'
 
 module Box
   RSpec.describe Apis::V2::Management do
-    include_context 'valid user'
+    include_context 'admin user'
 
-    let(:organization) { Fabricate(:organization) }
     let(:other_organization) { Fabricate(:organization) }
-    let(:user) { User.create(organization_id: organization.id, name: 'Some user', access_token: 'orga-user', admin: true) }
-
-    VALID_HEADERS = {
-      'Accept' => 'application/vnd.ebicsbox-v2+json'
-    }
 
     describe 'GET /accounts/:iban/subscribers' do
       let(:account) { Account.create(name: 'name', iban: 'iban', bic: 'bic', organization_id: organization.id) }
 
       context 'without subscribers' do
         it 'returns an empty array' do
-          get "management/accounts/#{account.iban}/subscribers", VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
+          get "management/accounts/#{account.iban}/subscribers", TestHelpers::VALID_HEADERS
           expect_json []
         end
       end
@@ -26,7 +20,7 @@ module Box
         before { account.add_subscriber(user_id: user.id, remote_user_id: 'test') }
 
         it 'returns a representation of account subscribers' do
-          get "management/accounts/#{account.iban}/subscribers", VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
+          get "management/accounts/#{account.iban}/subscribers", TestHelpers::VALID_HEADERS
           expect_json '0.ebics_user', 'test'
         end
       end
@@ -44,7 +38,7 @@ module Box
         organization_id: organization.id) }
 
       def perform_request
-        post "management/accounts/#{account.iban}/subscribers", data, VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
+        post "management/accounts/#{account.iban}/subscribers", data, TestHelpers::VALID_HEADERS
       end
 
       context 'missing attributes' do
@@ -126,7 +120,7 @@ module Box
       let(:account) { Account.create(name: 'name', iban: 'iban', organization_id: organization.id) }
 
       def perform_request
-        get "management/accounts/#{account.iban}/subscribers/#{subscriber.id}/ini_letter", VALID_HEADERS.merge('Authorization' => "Bearer #{user.access_token}")
+        get "management/accounts/#{account.iban}/subscribers/#{subscriber.id}/ini_letter", TestHelpers::VALID_HEADERS
       end
 
       context 'setup has not been performed' do
