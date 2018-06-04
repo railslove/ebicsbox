@@ -64,7 +64,9 @@ module Box
 
         it 'returns includes the existing direct debit' do
           get '/direct_debits', VALID_DEBIT_HEADERS
-          expect_json_sizes 1
+          expect(json_body.first[:end_to_end_reference]).to eql(debit.eref)
+          expect(json_body.first[:iban]).to eql('AL90208110080000001039531801')
+          expect(json_body.first[:account]).to eql(account.iban)
         end
 
         describe "object format" do
@@ -79,15 +81,15 @@ module Box
           let!(:other_debit) { Fabricate(:debit, account_id: second_account.id, eref: 'other-debit') }
 
           it 'only returns transactions belonging to matching account' do
-            get "/direct_debits?iban=#{second_account.iban}", VALID_DEBIT_HEADERS
+            get "/direct_debits?iban=#{account.iban}", VALID_DEBIT_HEADERS
             expect_json_sizes 1
-            expect_json '0', end_to_end_reference: 'other-debit'
+            expect_json '0', end_to_end_reference: debit.eref
           end
 
           it 'does not return transactions not belonging to matching account' do
-            get "/direct_debits?iban=#{account.iban}", VALID_DEBIT_HEADERS
+            get "/direct_debits?iban=#{second_account.iban}", VALID_DEBIT_HEADERS
             expect_json_sizes 1
-            expect_json '0', end_to_end_reference: 'my-debit'
+            expect_json '0', end_to_end_reference: other_debit.eref
           end
 
           it 'allows to specify multiple accounts' do
@@ -244,12 +246,6 @@ module Box
           debit = Fabricate(:debit, account_id: other_account.id, eref: 'my-debit-eref')
           post "/direct_debits", valid_attributes.merge(end_to_end_reference: 'my-debit-eref'), VALID_DEBIT_HEADERS
           expect_status 201
-        end
-
-        context "when sandbox server mode" do
-          before { allow(Box.configuration).to receive(:sandbox?).and_return(true) }
-
-          it 'executes order immediately'
         end
       end
     end

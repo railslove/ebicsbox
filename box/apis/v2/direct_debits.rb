@@ -74,12 +74,12 @@ module Box
           params do
             requires :account, type: String, desc: "the account to use", documentation: { param_type: 'body' }
             requires :name, type: String, desc: "the customers name"
-            optional :bic, type: String, desc: "the customers bic", allow_blank: false
             requires :iban, type: String, desc: "the customers iban"
-            requires :amount_in_cents, type: Integer, desc: "amount to credit (charged in cents)", values: 1..1200000000
+            requires :amount_in_cents, type: Integer, desc: "amount to debit (in cents)", values: 1..1200000000
             requires :end_to_end_reference, type: String, desc: "unique end to end reference", unique_transaction_eref: true
             requires :mandate_id, type: String, desc: "ID of the SEPA mandate (max. 35 char)"
             requires :mandate_signature_date, type: Integer, desc: "when the mandate was signed by the customer"
+            optional :bic, type: String, desc: "the customers bic"
             optional :reference, type: String, length: 140, desc: "description of the transaction (max. 140 char)"
             optional :instrument, type: String, desc: "", values: %w[CORE], default: "CORE"
             optional :sequence_type, type: String, desc: "", values: ["FRST", "RCUR", "OOFF", "FNAL"], default: "FRST"
@@ -98,7 +98,7 @@ module Box
           ### GET /direct_debits/:id
           ###
 
-          desc "Fetch a credit transfer",
+          desc "Fetch a direct debit",
             headers: AUTH_HEADERS,
             success: Entities::V2::DirectDebit,
             failure: DEFAULT_ERROR_RESPONSES,
@@ -107,7 +107,7 @@ module Box
             requires :id, type: String
           end
           get ":id" do
-            if params[:id].to_s.match(/([a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}?)/i)
+            if Box::Transaction::ID_REGEX.match(params[:id].to_s)
               direct_debit = Box::Transaction.by_organization(current_organization).direct_debits.first!(public_id: params[:id])
               present direct_debit, with: Entities::V2::DirectDebit
             else
