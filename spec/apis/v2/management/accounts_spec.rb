@@ -50,7 +50,7 @@ module Box
       context 'no account with given IBAN exist' do
         it 'returns an error' do
           get "management/accounts/NOTEXISTING", TestHelpers::VALID_HEADERS
-          expect_status 400
+          expect_status 404
         end
 
         it 'returns a proper error message' do
@@ -62,7 +62,7 @@ module Box
       context 'account with given IBAN belongs to another organization' do
         it 'denies updates to inaccesible accounts' do
           get "management/accounts/#{other_account.iban}", TestHelpers::VALID_HEADERS
-          expect_status 400
+          expect_status 404
         end
 
         it 'returns a proper error message' do
@@ -79,7 +79,7 @@ module Box
       context 'no account with given IBAN exist' do
         it 'returns an error' do
           put "management/accounts/NOTEXISTING", {}, TestHelpers::VALID_HEADERS
-          expect_status 400
+          expect_status 404
         end
 
         it 'returns a proper error message' do
@@ -91,7 +91,7 @@ module Box
       context 'account with given IBAN belongs to another organization' do
         it 'denies updates to inaccesible accounts' do
           put "management/accounts/#{other_account.iban}", {}, TestHelpers::VALID_HEADERS
-          expect_status 400
+          expect_status 404
         end
 
         it 'returns a proper error message' do

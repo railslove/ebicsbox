@@ -3,15 +3,13 @@ require 'grape'
 require_relative '../api_endpoint'
 
 # Validations
-require_relative '../../../validations/unique_account'
-require_relative '../../../validations/active_account'
 require_relative '../../../validations/unique_subscriber'
 
 # Helpers
 require_relative '../../../helpers/default'
 
 # Entities
-require_relative '../../../entities/management_account'
+require_relative '../../../entities/subscriber'
 
 module Box
   module Apis
@@ -33,9 +31,11 @@ module Box
           end
 
           resource :subscribers do
+            ###
+            ### GET /management/accounts/DExx/subscribers/1/ini_letter
+            ###
             desc 'Fetch an account\'s INI letter',
               tags: ['subscriber management']
-
             get ':id/ini_letter' do
               subscriber = Subscriber.join(:accounts, id: :account_id).where(organization_id: current_organization.id, iban: params[:iban]).first!(Sequel.qualify(:subscribers, :id) => params[:id])
               if subscriber.ini_letter.nil?
@@ -46,6 +46,9 @@ module Box
               end
             end
 
+            ###
+            ### GET /management/accounts/DExx/subscribers
+            ###
             desc 'Retrieve a list of all subscribers for given account',
               tags: ['subscriber management'],
               headers: AUTH_HEADERS,
@@ -57,6 +60,9 @@ module Box
               present account.subscribers, with: Entities::Subscriber
             end
 
+            ###
+            ### POST /management/accounts/DExx/subscribers
+            ###
             desc 'Add a subscriber to given account',
               tags: ['subscriber management'],
               body_name: 'body',

@@ -2,16 +2,10 @@ require 'grape'
 
 require_relative '../api_endpoint'
 
-# Validations
-require_relative '../../../validations/unique_account'
-require_relative '../../../validations/active_account'
-require_relative '../../../validations/unique_subscriber'
-
 # Helpers
 require_relative '../../../helpers/default'
 
 # Entities
-require_relative '../../../entities/management_account'
 require_relative '../../../entities/user'
 
 module Box
@@ -42,7 +36,7 @@ module Box
               failure: DEFAULT_ERROR_RESPONSES,
               produces: ['application/vnd.ebicsbox-v2+json']
             get do
-              users = current_organization.users_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
+              users = current_organization.users_dataset.order(:name).all
               present users, with: Entities::User
             end
 
@@ -53,8 +47,12 @@ module Box
               failure: DEFAULT_ERROR_RESPONSES,
               produces: ['application/vnd.ebicsbox-v2+json']
             get ':id' do
-              user = current_organization.users_dataset.first!({ id: params[:id] })
-              present user, with: Entities::User, type: 'full', include_token: true
+              begin
+                user = current_organization.users_dataset.first!({ id: params[:id] })
+                present user, with: Entities::User, type: 'full', include_token: true
+              rescue Sequel::NoMatchingRow
+                error!({ message: 'User not found' }, 404)
+              end
             end
 
             desc 'Create a new user instance',

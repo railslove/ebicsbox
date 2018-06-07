@@ -5,7 +5,6 @@ require_relative '../api_endpoint'
 # Validations
 require_relative '../../../validations/unique_account'
 require_relative '../../../validations/active_account'
-require_relative '../../../validations/unique_subscriber'
 
 # Helpers
 require_relative '../../../helpers/default'
@@ -67,7 +66,7 @@ module Box
                 account = current_organization.accounts_dataset.first!(iban: params[:iban])
                 present account, with: Entities::ManagementAccount, type: 'full'
               rescue Sequel::NoMatchingRow
-                error!({ message: 'Your organization does not have an account with given IBAN!' }, 400)
+                error!({ message: 'Your organization does not have an account with given IBAN!' }, 404)
               end
             end
 
@@ -103,29 +102,9 @@ module Box
               end
             end
 
-            desc 'Setup a newly created account',
-              tags: ['account management'],
-              headers: AUTH_HEADERS,
-              success: Message,
-              failure: DEFAULT_ERROR_RESPONSES,
-              produces: ['application/vnd.ebicsbox-v2+json']
-
-            params do
-              requires :iban, type: String
-            end
-            put ':iban/setup' do
-              begin
-                account = current_organization.accounts_dataset.first!(iban: params[:iban])
-                account.setup!
-              rescue Account::AlreadyActivated
-                error!({ message: "Account is already activated" }, 400)
-              rescue Account::IncompleteEbicsData
-                error!({ message: "Incomplete EBICS setup" }, 400)
-              rescue
-                error!({ message: "unknown failure" }, 400)
-              end
-            end
-
+            ###
+            ### PUT /management/accounts/DExx
+            ###
             desc 'Update an existing account',
               tags: ['account management'],
               headers: AUTH_HEADERS,
@@ -153,7 +132,7 @@ module Box
                   error!({ message: 'Failed to update account' }, 400)
                 end
               rescue Sequel::NoMatchingRow
-                error!({ message: 'Your organization does not have an account with given IBAN!' }, 400)
+                error!({ message: 'Your organization does not have an account with given IBAN!' }, 404)
               end
             end
           end
