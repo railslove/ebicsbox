@@ -178,8 +178,7 @@ module Box
               optional :token, type: String, desc: 'Set a custom access token'
             end
             post do
-              token = params[:token] || SecureRandom.hex
-              if user = current_organization.add_user(name: params[:name], access_token: token)
+              if user = current_organization.add_user(name: params[:name], access_token: params[:token])
                 {
                   message: 'User has been created successfully!',
                   user: Entities::User.represent(user, include_token: true),
