@@ -13,14 +13,6 @@ module Box
         expose :balance_in_cents
         expose :creditor_identifier
 
-        # expose(:bank) do |account|
-        #   expose :name
-        #   expose :full_name
-        #   expose :city
-        #   expose :postal_code
-        #   expose :bank_identifier
-        # end
-
         expose(:subscriber) { |account| account.subscribers.first&.remote_user_id }
         expose(:url)
         expose(:partner)

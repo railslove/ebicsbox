@@ -8,7 +8,9 @@ require_relative './direct_debits'
 require_relative './service'
 require_relative './events'
 require_relative './transactions'
-require_relative './management'
+require_relative './management/accounts'
+require_relative './management/subscribers'
+require_relative './management/users'
 
 
 module Box

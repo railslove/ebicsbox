@@ -25,7 +25,7 @@ if ENV['EBICS_CLIENT'] == 'Blebics::Client'
   gem 'blebics-wrapper', git: 'git@github.com:railslove/blebics-wrapper.git'
 else
   gem 'pg'
-  gem 'epics', '~> 1.5.0'
+  gem 'epics', '~> 1.6.0'
 end
 
 group :development, :test do

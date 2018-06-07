@@ -33,9 +33,8 @@ module Box
         post '/organizations' do
           begin
             DB.transaction do
-              user_token = (params[:user][:access_token] || SecureRandom.hex)
               organization = Organization.register(declared(params).except(:user))
-              user = organization.add_user(name: params[:user][:name], access_token: user_token, admin: true)
+              user = organization.add_user(name: params[:user][:name], access_token: params[:user][:access_token], admin: true)
               present organization, with: Entities::RegistrationOrganization
             end
           rescue => ex
