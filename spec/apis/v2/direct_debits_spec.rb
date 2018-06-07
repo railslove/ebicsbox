@@ -80,7 +80,10 @@ module Box
           let!(:second_account) { organization.add_account(name: 'Second account', iban: 'SECONDACCOUNT') }
           let!(:other_debit) { Fabricate(:debit, account_id: second_account.id, eref: 'other-debit') }
 
-          it 'only returns transactions belonging to matching account' do
+          let!(:third_account) { organization.add_account(name: 'Third account', iban: 'THIRDACCOUNT') }
+          let!(:other_debit_2) { Fabricate(:debit, account_id: third_account.id, eref: 'other-debit-2') }
+
+          it 'only returns transactions belonging to matching ibans' do
             get "/direct_debits?iban=#{account.iban}", VALID_DEBIT_HEADERS
             expect_json_sizes 1
             expect_json '0', end_to_end_reference: debit.eref
@@ -93,7 +96,7 @@ module Box
           end
 
           it 'allows to specify multiple accounts' do
-            get "/direct_debits?iban=#{account.iban},#{second_account.iban}", VALID_DEBIT_HEADERS
+            get "/direct_debits?iban[]=#{account.iban}&iban[]=#{second_account.iban}", VALID_DEBIT_HEADERS
             expect_json_sizes 2
           end
         end
@@ -228,11 +231,6 @@ module Box
 
         it 'triggers a debit transfer without bic' do
           expect(DirectDebit).to receive(:create!)
-          post "/direct_debits", valid_attributes.reject{ |k,_| k == :bic }, VALID_DEBIT_HEADERS
-        end
-
-        it 'transactions without bic should be valid' do
-          expect(Queue).to receive(:execute_debit)
           post "/direct_debits", valid_attributes.reject{ |k,_| k == :bic }, VALID_DEBIT_HEADERS
         end
 

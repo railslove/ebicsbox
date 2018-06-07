@@ -34,7 +34,7 @@ module Box
             produces: ['application/vnd.ebicsbox-v2+json']
 
           params do
-            optional :iban, type: Array[String], desc: "IBAN of an account", coerce_with: ->(value) { value.split(',') }, documentation: { param_type: 'query' }
+            optional :iban, type: Array[String], desc: "IBANs of account to filter", documentation: { param_type: 'query' }
             optional :page, type: Integer, desc: "page through the results", default: 1
             optional :per_page, type: Integer, desc: "how many results per page", values: 1..100, default: 10
           end
