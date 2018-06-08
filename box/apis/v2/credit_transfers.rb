@@ -110,7 +110,7 @@ module Box
             requires :id, type: String
           end
           get ":id" do
-            if params[:id].to_s.match(/([a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}?)/i)
+            if Box::Transaction::ID_REGEX.match(params[:id].to_s)
               credit_transfer = Box::Transaction.by_organization(current_organization).credit_transfers.first!(public_id: params[:id])
               present credit_transfer, with: Entities::V2::CreditTransfer
             else

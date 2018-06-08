@@ -46,7 +46,7 @@ Fabricator(:account, from: 'Box::Account') do
   host "HOST_ID"
 
   # Account configuration
-  creditor_identifier 'my-creditor-identifier'
+  creditor_identifier 'DE98ZZZ09999999999'
   callback_url "https://myapp.url/webhooks"
 end
 

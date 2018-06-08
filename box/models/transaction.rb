@@ -9,6 +9,8 @@ require_relative './user'
 
 module Box
   class Transaction < Sequel::Model
+    ID_REGEX = Regexp.new('([a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}?)', Regexp::IGNORECASE)
+
     plugin :dirty
 
     many_to_one :account
@@ -17,6 +19,7 @@ module Box
 
     dataset_module do
       where(:credit_transfers, type: 'credit')
+      where(:direct_debits, type: 'debit')
 
       def by_organization(organization)
         left_join(:accounts, id: :account_id)
