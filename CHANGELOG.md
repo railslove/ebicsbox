@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.0
+
+* [FEATURE] direct debits for API v2
+* [BUGFIX] initial migration now setups initial user
+
 ## 0.9.1
 
 * [BUGFIX] migrations not passing
