@@ -35,9 +35,10 @@ module Box
               success: Entities::User,
               failure: DEFAULT_ERROR_RESPONSES,
               produces: ['application/vnd.ebicsbox-v2+json']
+
             get do
               users = current_organization.users_dataset.order(:name).all
-              present users, with: Entities::User
+              present users, with: Entities::User, type: 'full'
             end
 
             desc 'Retrieve a single user by its identifier',
@@ -46,6 +47,10 @@ module Box
               success: Entities::User,
               failure: DEFAULT_ERROR_RESPONSES,
               produces: ['application/vnd.ebicsbox-v2+json']
+
+            params do
+              requires :id, type: Integer, desc: 'ID of the user'
+            end
             get ':id' do
               begin
                 user = current_organization.users_dataset.first!({ id: params[:id] })
@@ -62,6 +67,7 @@ module Box
               success: Entities::User,
               failure: DEFAULT_ERROR_RESPONSES,
               produces: ['application/vnd.ebicsbox-v2+json']
+
             params do
               requires :name, type: String, desc: "The user's display name", documentation: { param_type: 'body' }
               optional :token, type: String, desc: 'Set a custom access token'

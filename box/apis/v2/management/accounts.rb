@@ -57,10 +57,10 @@ module Box
               success: Entities::ManagementAccount,
               failure: DEFAULT_ERROR_RESPONSES,
               produces: ['application/vnd.ebicsbox-v2+json']
+
             params do
               requires :iban, type: String
             end
-
             get ':iban' do
               begin
                 account = current_organization.accounts_dataset.first!(iban: params[:iban])

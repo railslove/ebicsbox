@@ -34,8 +34,16 @@ module Box
             ###
             ### GET /management/accounts/DExx/subscribers/1/ini_letter
             ###
-            desc 'Fetch an account\'s INI letter',
-              tags: ['subscriber management']
+            desc 'Retrieve a list of all subscribers for given account',
+              tags: ['subscriber management'],
+              headers: AUTH_HEADERS,
+              failure: DEFAULT_ERROR_RESPONSES,
+              produces: ['application/vnd.ebicsbox-v2+json']
+
+            params do
+              requires :iban, type: String, desc: 'IBAN for the account'
+              requires :id, type: Integer, desc: 'ID of the subscriber'
+            end
             get ':id/ini_letter' do
               subscriber = Subscriber.join(:accounts, id: :account_id).where(organization_id: current_organization.id, iban: params[:iban]).first!(Sequel.qualify(:subscribers, :id) => params[:id])
               if subscriber.ini_letter.nil?
@@ -55,6 +63,10 @@ module Box
               success: Entities::Subscriber,
               failure: DEFAULT_ERROR_RESPONSES,
               produces: ['application/vnd.ebicsbox-v2+json']
+
+            params do
+              requires :iban, type: String, desc: 'IBAN for the account'
+            end
             get do
               account = current_organization.accounts_dataset.first!(iban: params[:iban])
               present account.subscribers, with: Entities::Subscriber
@@ -70,7 +82,9 @@ module Box
               success: Entities::Subscriber,
               failure: DEFAULT_ERROR_RESPONSES,
               produces: ['application/vnd.ebicsbox-v2+json']
+
             params do
+              requires :iban, type: String, desc: 'IBAN for the account'
               requires :user_id, type: Integer, desc: "Internal user identifier to associate the subscriber with", documentation: { param_type: 'body' }
               requires :ebics_user, type: String, unique_subscriber: true, desc: "EBICS user to represent"
             end
