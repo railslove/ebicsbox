@@ -19,6 +19,9 @@ module Box
         content_type :html, 'text/html'
 
         namespace '/management/accounts/:iban' do
+          params do
+            requires :iban, type: String, desc: 'IBAN for the account'
+          end
           before do
             unless env['box.admin']
               error!({ message: 'Unauthorized access. Please provide a valid organization management token!' }, 401)
@@ -41,7 +44,6 @@ module Box
               produces: ['application/vnd.ebicsbox-v2+json']
 
             params do
-              requires :iban, type: String, desc: 'IBAN for the account'
               requires :id, type: Integer, desc: 'ID of the subscriber'
             end
             get ':id/ini_letter' do
@@ -65,7 +67,6 @@ module Box
               produces: ['application/vnd.ebicsbox-v2+json']
 
             params do
-              requires :iban, type: String, desc: 'IBAN for the account'
             end
             get do
               account = current_organization.accounts_dataset.first!(iban: params[:iban])
@@ -84,7 +85,6 @@ module Box
               produces: ['application/vnd.ebicsbox-v2+json']
 
             params do
-              requires :iban, type: String, desc: 'IBAN for the account'
               requires :user_id, type: Integer, desc: "Internal user identifier to associate the subscriber with", documentation: { param_type: 'body' }
               requires :ebics_user, type: String, unique_subscriber: true, desc: "EBICS user to represent"
             end
