@@ -94,7 +94,7 @@ module Box
               optional :mode, type: String, desc: 'mode'
             end
             post do
-              if account = current_organization.add_account(params)
+              if account = current_organization.add_account(declared(params))
                 Event.account_created(account)
                 present account, with: Entities::ManagementAccount
               else
@@ -120,12 +120,11 @@ module Box
               optional :host, type: String, desc: 'host'
               optional :partner, type: String, desc: 'partner'
               optional :url, type: String, desc: 'url'
-              optional :mode, type: String, desc: 'mode'
             end
             put ':iban' do
               begin
                 account = current_organization.accounts_dataset.first!(iban: params[:iban])
-                account.set(params.except('id', 'state', 'access_token', 'iban', 'bic'))
+                account.set(declared(params))
                 if !account.modified? || account.save
                   present account, with: Entities::ManagementAccount
                 else
