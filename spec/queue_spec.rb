@@ -40,7 +40,7 @@ module Box
 
       context 'delay check by default' do
         it 'schedules a new job' do
-          expect { described_class.check_subscriber_activation(1, 120) }.to change { scheduled_jobs }
+          expect { described_class.check_subscriber_activation(1, 120) }.to change { scheduled_jobs.size }
         end
 
         it 'schedules by given time' do
