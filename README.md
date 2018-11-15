@@ -10,7 +10,7 @@ It offers a HTTP interface and can be integrated with different message queueing
 ## Prerequisites
 
 * ruby (jruby / ruby 2.3.x)
-* beanstalkd
+* redis
 * postgres
 
 ## Getting started
@@ -46,8 +46,8 @@ Set the following environment variables:
 * SANDBOX
   - "enabled"
 * AUTH_SERVICE
-  - "static": 
-  - [default (oauth)]:  
+  - "static":
+  - [default (oauth)]:
 * OAUTH_SERVER
 * JWT_SECRET
 * ALLOW_REGISTRATIONS

@@ -85,7 +85,7 @@ module Box
           requires :to, type: Date, desc: "Date to which filter results"
         end
         get ':account/import/statements', requirements: { account: /[A-Z]{2}.*/ } do
-          stats = Jobs::FetchStatements.fetch_new_statements(account.id, params[:from], params[:to])
+          stats = Jobs::FetchStatements.new.call(account.id, params[:from], params[:to])
           {
             message: "Imported statements successfully",
             fetched: stats[:total],

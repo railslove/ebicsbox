@@ -1,17 +1,23 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'active_support/all'
 
 module Box
   module Jobs
     RSpec.describe FetchStatements do
-      let(:account) { Account.create(host: "HOST", iban: "iban1234567") }
+      subject(:job) { described_class.new }
+      let(:account) { Account.create(host: 'HOST', iban: 'iban1234567') }
       let!(:subscriber) { account.add_subscriber(signature_class: 'T', activated_at: 1.day.ago) }
 
-      describe '.process!' do
+      describe '#perform' do
         it 'fetches statements for every submitted account' do
-          allow(described_class).to receive(:fetch_new_statements)
-          described_class.process!(account_ids: [1, 2, 3])
-          expect(described_class).to have_received(:fetch_new_statements).with(1).with(2).with(3)
+          allow(job).to receive(:call)
+          job.perform(account_ids: [1, 2, 3])
+          expect(job).to have_received(:call)
+            .with(1, 30.days.ago.to_date, Date.today)
+            .with(2, 30.days.ago.to_date, Date.today)
+            .with(3, 30.days.ago.to_date, Date.today)
         end
       end
 
@@ -30,36 +36,36 @@ module Box
 
         it 'imports all bank statements' do
           included_bank_statements = 4
-          described_class.fetch_new_statements(account.id)
+          job.call(account.id)
           expect(BusinessProcesses::ImportBankStatement).to have_received(:from_cmxl).exactly(included_bank_statements).times
         end
 
         it 'imports all statements for all bank statements' do
           bank_statements_for_this_account = 3 # One bank statement is for another account, such as a sub-account
-          described_class.fetch_new_statements(account.id)
+          job.call(account.id)
           expect(BusinessProcesses::ImportStatements).to have_received(:from_bank_statement).exactly(bank_statements_for_this_account).times
         end
 
         context 'with timeframe' do
-          def exec_process
-            described_class.fetch_new_statements(account.id, Date.new(2015, 12, 1), Date.new(2015, 12, 31))
+          def call_job
+            job.call(account.id, Date.new(2015, 12, 1), Date.new(2015, 12, 31))
           end
 
           it 'fetches statements from remote server' do
-            exec_process
-            expect(account.transport_client).to have_received(:STA).with("2015-12-01", "2015-12-31")
+            call_job
+            expect(account.transport_client).to have_received(:STA).with('2015-12-01', '2015-12-31')
           end
 
           it 'does not alter date when last import happened' do
-            exec_process
+            call_job
             expect_any_instance_of(Account).to_not receive(:imported_at!)
-            exec_process
+            call_job
           end
         end
 
         context 'without timeframe' do
           def exec_process
-            described_class.fetch_new_statements(account.id)
+            job.call(account.id)
           end
 
           it 'fetches statements from remote server' do

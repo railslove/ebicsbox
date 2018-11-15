@@ -7,11 +7,15 @@ require_relative '../models/transaction'
 module Box
   module Jobs
     class Credit
+      include Sidekiq::Worker
+      sidekiq_options queue: 'credit'
+
       INSTRUMENT_MAPPING = Hash.new('AZV').update({
         "EUR" => :CCT,
       })
 
-      def self.process!(message)
+      def perform(message)
+        message.symbolize_keys!
         transaction = Transaction.create(
           account_id: message[:account_id],
           user_id: message[:user_id],

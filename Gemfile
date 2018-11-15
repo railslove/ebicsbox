@@ -2,7 +2,6 @@ source 'https://rubygems.org'
 
 gem 'rake'
 gem 'activesupport'
-gem 'beaneater', '~> 1.0.0'
 gem 'clockwork'
 gem 'cmxl'
 gem 'camt_parser', git: 'https://github.com/railslove/camt_parser.git'
@@ -19,6 +18,8 @@ gem 'puma'
 gem 'jwt'
 gem 'rack-cors', require: false
 
+gem 'sidekiq'
+
 if ENV['EBICS_CLIENT'] == 'Blebics::Client'
   gem 'jdbc-postgres'
   gem 'jruby-openssl', '0.8.2'
@@ -26,6 +27,10 @@ if ENV['EBICS_CLIENT'] == 'Blebics::Client'
 else
   gem 'pg'
   gem 'epics', '~> 1.6.0'
+end
+
+group :development do
+  gem 'rubocop'
 end
 
 group :development, :test do
