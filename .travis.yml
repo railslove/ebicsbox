@@ -5,6 +5,8 @@ rvm:
 cache:
 - bundler
 - apt
+services:
+- redis-server
 addons:
   postgresql: '9.6'
 env:
