@@ -1,6 +1,8 @@
-# Load environment from file
-require 'dotenv'
-Dotenv.load
+if %w[development test].include?(ENV['ENVIRONMENT'])
+  # Load environment from file
+  require 'dotenv'
+  Dotenv.load
+end
 
 # Load BL EBICS client when in BV environment
 if ENV['EBICS_CLIENT'] == 'Blebics::Client'

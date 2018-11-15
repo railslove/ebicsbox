@@ -1,6 +1,8 @@
-# Load environment variables
-require 'dotenv'
-Dotenv.load
+if %w[development test].include?(ENV['ENVIRONMENT'])
+  # Load environment from file
+  require 'dotenv'
+  Dotenv.load
+end
 
 # Load environment
 require 'bundler'
