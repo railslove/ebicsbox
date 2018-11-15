@@ -19,10 +19,6 @@ module Box
         (ENV['DATABASE_URL'] || 'postgres://localhost/ebicsbox')
     end
 
-    def beanstalkd_url
-      (ENV['BEANSTALKD_URL'] || 'localhost:11300').gsub('beanstalkd://','').gsub('/','')
-    end
-
     def hac_retrieval_interval
       120 # seconds
     end

@@ -11,15 +11,9 @@ addons:
   postgresql: '9.6'
 env:
 - TEST_DATABASE_URL="postgresql://localhost/ebicsbox_test"
-before_install:
-- wget https://github.com/kr/beanstalkd/archive/v1.10.tar.gz
-- tar xf v1.10.tar.gz
-- make -C beanstalkd-1.10/
-- mv beanstalkd-1.10/beanstalkd .
 before_script:
 - createdb ebicsbox_test
 - ENVIRONMENT=test bundle exec bin/migrate
-- "./beanstalkd &"
 script:
 - bundle exec rspec spec
 notifications:

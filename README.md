@@ -25,7 +25,7 @@ Run it:
     $ foreman start
 
 If this is too noisy, you can prefix the command with ```RUBYOPT="-W0"``` which removes warnings
-raised by jruby and beaneater about uninitialized variables.
+raised by jruby  about uninitialized variables.
 
 Furthermore, we recommend using ```JRUBY_OPTS="$JRUBY_OPTS --dev"``` which speeds up jruby quite a
 bit. Check https://github.com/jruby/jruby/wiki/Improving-startup-time for more infomation about it.
@@ -41,7 +41,6 @@ Run it:
 Set the following environment variables:
 
 * DATABASE_URL
-* BEANSTALKD_URL
 * PASSPHRASE
 * SANDBOX
   - "enabled"
