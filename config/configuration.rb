@@ -1,4 +1,5 @@
-if %w[development test].include?(ENV['ENVIRONMENT'])
+env = ENV.fetch('RACK_ENV', :development)
+if %w[development test].include?(env.to_s)
   # Load environment from file
   require 'dotenv'
   Dotenv.load
@@ -38,7 +39,7 @@ module Box
     end
 
     def test?
-      ENV['ENVIRONMENT'] == 'test'
+      ENV['RACK_ENVIRONMENT'] == 'test'
     end
 
     def sandbox?

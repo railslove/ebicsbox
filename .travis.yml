@@ -1,7 +1,7 @@
 language: ruby
 sudo: false
 rvm:
-- ruby-2.3.1
+- ruby-2.5.1
 cache:
 - bundler
 - apt
@@ -11,6 +11,7 @@ addons:
   postgresql: '9.6'
 env:
 - TEST_DATABASE_URL="postgresql://localhost/ebicsbox_test"
+- RACK_ENV=test
 before_script:
 - createdb ebicsbox_test
 - ENVIRONMENT=test bundle exec bin/migrate
