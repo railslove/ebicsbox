@@ -11,7 +11,7 @@ module Box
       include Sidekiq::Worker
       sidekiq_options queue: 'check.orders'
 
-      def peform(account_ids = [])
+      def perform(account_ids = [])
         log(:debug, 'Check orders.')
         account_ids.each do |account_id|
           log(:debug, 'Reconciling orders by HAC.', account_id: account_id)
