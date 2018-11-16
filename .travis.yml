@@ -14,7 +14,7 @@ env:
 - RACK_ENV=test
 before_script:
 - createdb ebicsbox_test
-- ENVIRONMENT=test bundle exec bin/migrate
+- bundle exec bin/migrate
 script:
 - bundle exec rspec spec
 notifications:
