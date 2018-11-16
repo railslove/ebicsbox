@@ -1,4 +1,7 @@
-if %w[development test].include?(ENV['ENVIRONMENT'])
+# frozen_string_literal: true
+
+env = ENV.fetch('RACK_ENV', :development)
+if %w[development test].include?(env.to_s)
   # Load environment from file
   require 'dotenv'
   Dotenv.load
@@ -6,7 +9,7 @@ end
 
 # Load environment
 require 'bundler'
-Bundler.setup(:default, :development)
+Bundler.setup(:default, env)
 
 # Make sure output is written immediately
 $stdout.sync = true

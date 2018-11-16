@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
-if %w[development test].include?(ENV['ENVIRONMENT'])
+env = ENV.fetch('RACK_ENV', :development)
+if %w[development test].include?(env.to_s)
   # Load environment from file
   require 'dotenv'
   Dotenv.load
@@ -8,7 +9,7 @@ end
 
 # Load environment
 require 'bundler'
-Bundler.setup(:default, :development)
+Bundler.setup(:default, env)
 
 # Start pry session
 require_relative '../config/bootstrap'
