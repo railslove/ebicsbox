@@ -31,7 +31,8 @@ module Box
     end
 
     def self.trigger_webhook(payload, options = {})
-      Jobs::Webhook.perform_async(payload, options)
+      delay = options.fetch(:delay, 0)
+      Jobs::Webhook.perform_in(delay, payload)
     end
 
     def self.execute_credit(payload)
