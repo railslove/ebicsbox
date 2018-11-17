@@ -39,21 +39,44 @@ namespace :generate do
   end
 end
 
+# namespace :db do
+#   Sequel.extension :migration
+#   DB = Sequel.connect(Box::Configuration.new.database_url)
 
-namespace :db do
-  Sequel.extension :migration
-  DB = Sequel.connect(Box::Configuration.new.database_url)
+#   desc "Perform migration up/down to VERSION"
+#   task :to, :version do |_, args|
+#     if args[:version].nil?
+#       puts 'You must specify a migration version'
+#       exit false
+#     end
 
-  desc "Perform migration up/down to VERSION"
-  task :to, :version do |_, args|
-    if args[:version].nil?
-      puts 'You must specify a migration version'
-      exit false
-    end
+#     version = args[:version].to_i
+#     raise "No VERSION was provided" if version.nil?
+#     Sequel::Migrator.run(DB, "migrations", :target => version)
+#     puts "<= sq:migrate:to version=[#{version}] executed"
+#   end
+# end
 
-    version = args[:version].to_i
-    raise "No VERSION was provided" if version.nil?
-    Sequel::Migrator.run(DB, "migrations", :target => version)
-    puts "<= sq:migrate:to version=[#{version}] executed"
+namespace :enqueue do
+  env = ENV.fetch('RACK_ENV', :development)
+  if %w[development test].include?(env.to_s)
+    # Load environment from file
+    require 'dotenv'
+    Dotenv.load
+  end
+
+  require_relative './config/bootstrap'
+  require_relative './box/queue'
+
+  desc 'enqueue account statement fething'
+  task :fetch_account_statements do
+    Box::Queue.fetch_account_statements
+  end
+
+  desc 'enqueue updating processing status'
+  task :update_processing_status do
+    # run every 5 hours only
+    return unless ((Time.now.to_i / 3600) % 5).zero?
+    Box::Queue.update_processing_status
   end
 end

@@ -72,16 +72,16 @@ module Box
         end
 
         it 'puts only the provided account id onto the job' do
-          jid = described_class.update_processing_status(1)
+          jid = described_class.update_processing_status([1])
           job = scheduled_jobs.find { |j| j.jid == jid }
-          expect(job.args).to include('account_ids' => [1])
+          expect(job.args.flatten).to match_array([1])
         end
 
         it 'puts all provided account ids onto the job' do
           jid = described_class.update_processing_status([1, 2])
           job = scheduled_jobs.find { |j| j.jid == jid }
 
-          expect(job.args).to include('account_ids' => [1, 2])
+          expect(job.args.flatten).to match([1, 2])
         end
 
         it 'puts all existing account ids onto the job if none is provided' do
@@ -91,7 +91,7 @@ module Box
           jid = described_class.update_processing_status
 
           job = scheduled_jobs.find { |j| j.jid == jid }
-          expect(job.args).to include('account_ids' => accounts.map(&:id))
+          expect(job.args.flatten).to match(accounts.map(&:id))
         end
       end
 

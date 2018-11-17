@@ -15,14 +15,13 @@ module Box
       Sidekiq::Queue.new(queue).clear
     end
 
-    def self.update_processing_status(account_ids = nil)
+    def self.update_processing_status(account_ids = nil, delay = Box.configuration.hac_retrieval_interval.seconds)
       account_ids ||= Account.all_active_ids
 
       # do not schedule job if already scheduled
       return if Sidekiq::ScheduledSet.new.any? { |j| j.item['class'] == Jobs::FetchProcessingStatus.name }
 
-      delay = Box.configuration.hac_retrieval_interval.seconds
-      Jobs::FetchProcessingStatus.perform_in(delay, account_ids: Array.wrap(account_ids))
+      Jobs::FetchProcessingStatus.perform_in(delay, Array.wrap(account_ids))
     end
 
     def self.fetch_account_statements(account_ids = nil)
@@ -32,7 +31,7 @@ module Box
 
     def self.trigger_webhook(payload, options = {})
       delay = options.fetch(:delay, 0)
-      Jobs::Webhook.perform_in(delay, payload)
+      Jobs::Webhook.perform_in(delay, payload[:event_id])
     end
 
     def self.execute_credit(payload)
