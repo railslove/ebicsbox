@@ -76,7 +76,8 @@ namespace :enqueue do
   desc 'enqueue updating processing status'
   task :update_processing_status do
     # run every 5 hours only
-    return unless ((Time.now.to_i / 3600) % 5).zero?
+    next unless ((Time.now.to_i / 3600) % 5).zero?
+
     Box::Queue.update_processing_status
   end
 end
