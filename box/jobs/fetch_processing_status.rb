@@ -23,17 +23,19 @@ module Box
 
       def update_transaction(account_id, info)
         order_id = info[:ids]['OrderID']
-        if trx = Transaction.last(ebics_order_id: info[:ids]['OrderID'], account_id: account_id)
-          trx.update_status(info[:action], reason: info[:reason_code])
+        trx = Transaction.last(ebics_order_id: info[:ids]['OrderID'], account_id: account_id)
 
-          log(:info, 'Transaction status change.',
-              account_id: account_id,
-              ebics_order_id: order_id,
-              transaction_id: trx.public_id,
-              status: info[:action])
-        else
+        unless trx
           log(:info, 'Transaction not found.', account_id: account_id, order_id: order_id, info: info)
+          return
         end
+
+        trx.update_status(info[:action], reason: info[:reason_code])
+        log(:info, 'Transaction status change.',
+            account_id: account_id,
+            ebics_order_id: order_id,
+            transaction_id: trx.public_id,
+            status: info[:action])
       end
 
       def remote_records(account_id)
