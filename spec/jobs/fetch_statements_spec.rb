@@ -10,14 +10,25 @@ module Box
       let(:account) { Account.create(host: 'HOST', iban: 'iban1234567') }
       let!(:subscriber) { account.add_subscriber(signature_class: 'T', activated_at: 1.day.ago) }
 
+      describe '.for_account' do
+        it 'fetches statement for a single account' do
+          expect_any_instance_of(described_class).to receive(:fetch_for_account).with(account.id)
+          described_class.for_account(account.id)
+        end
+      end
+
       describe '#perform' do
         it 'fetches statements for every submitted account' do
-          allow(job).to receive(:call)
+          allow(job).to receive(:fetch_for_account)
           job.perform(account_ids: [1, 2, 3])
-          expect(job).to have_received(:call)
-            .with(1, 30.days.ago.to_date, Date.today)
-            .with(2, 30.days.ago.to_date, Date.today)
-            .with(3, 30.days.ago.to_date, Date.today)
+          expect(job).to have_received(:fetch_for_account).with(1).with(2).with(3)
+        end
+
+        it 'sets default daterange if not provided' do
+          allow(job).to receive(:fetch_for_account).and_return(true)
+          job.perform(account_ids: [1, 2, 3])
+          expect(job.from).to eql(30.days.ago.to_date)
+          expect(job.to).to eql(Date.today)
         end
       end
 
@@ -36,19 +47,21 @@ module Box
 
         it 'imports all bank statements' do
           included_bank_statements = 4
-          job.call(account.id)
+          job.fetch_for_account(account.id)
           expect(BusinessProcesses::ImportBankStatement).to have_received(:from_cmxl).exactly(included_bank_statements).times
         end
 
         it 'imports all statements for all bank statements' do
           bank_statements_for_this_account = 3 # One bank statement is for another account, such as a sub-account
-          job.call(account.id)
+          job.fetch_for_account(account.id)
           expect(BusinessProcesses::ImportStatements).to have_received(:from_bank_statement).exactly(bank_statements_for_this_account).times
         end
 
         context 'with timeframe' do
+          subject(:job) { described_class.new(from: Date.new(2015, 12, 1), to: Date.new(2015, 12, 31)) }
+
           def call_job
-            job.call(account.id, Date.new(2015, 12, 1), Date.new(2015, 12, 31))
+            job.fetch_for_account(account.id)
           end
 
           it 'fetches statements from remote server' do
@@ -65,7 +78,7 @@ module Box
 
         context 'without timeframe' do
           def exec_process
-            job.call(account.id)
+            job.fetch_for_account(account.id)
           end
 
           it 'fetches statements from remote server' do

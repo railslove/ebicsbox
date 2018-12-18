@@ -16,20 +16,31 @@ module Box
       include Sidekiq::Worker
       sidekiq_options queue: 'check.statements'
 
-      def perform(args)
-        args.symbolize_keys!
-        account_ids = args[:account_ids]
-        from = args.fetch(from, 30.days.ago.to_date)
-        to = args.fetch(to, Date.today)
+      attr_accessor :from, :to
+
+      def self.for_account(account_id, options = {})
+        new(options).fetch_for_account(account_id)
+      end
+
+      def initialize(options = {})
+        self.from = options.fetch(:from, 30.days.ago.to_date)
+        self.to = options.fetch(:to, Date.today)
+      end
+
+      def perform(options)
+        options.symbolize_keys!
+        account_ids = options[:account_ids]
+        self.from = options.fetch(:from, 30.days.ago.to_date)
+        self.to = options.fetch(:to, Date.today)
 
         account_ids.each do |account_id|
-          call(account_id, from, to)
+          fetch_for_account(account_id)
         end
       end
 
       # Fetch all new statements for a single account since its last import. Each account import
       # can fail and should not affect imports for other accounts.
-      def call(account_id, from = 30.days.ago.to_date, to = Date.today)
+      def fetch_for_account(account_id)
         account = Account.first!(id: account_id)
         method = account.statements_format
 

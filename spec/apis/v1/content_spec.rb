@@ -307,9 +307,51 @@ module Box
               Timecop.freeze(now) do
                 default = now.to_i
                 expect(Box::Credit).to receive(:create!).with(anything, hash_including('requested_date' => default), anything)
-                post "#{account.iban}/credits", valid_payload, { 'Authorization' => "token #{user.access_token}" }
+                post "#{account.iban}/credits", valid_payload, 'Authorization' => "token #{user.access_token}"
               end
             end
+          end
+        end
+      end
+
+      describe 'GET /:account/import/statements' do
+        let(:account) do
+          organization.add_account(
+            iban: 'AL90208110080000001039531801',
+            name: 'Test Account',
+            creditor_identifier: 'DE98ZZZ09999999999',
+            balance_date: Date.new(2015, 1, 1),
+            balance_in_cents: 123
+          )
+        end
+        let(:from) { 30.days.ago.to_date }
+        let(:to) { Date.today }
+
+        it 'is not accessible for unknown users' do
+          get "/#{account.iban}/import/statements", 'Authorization' => nil
+          expect_status 401
+        end
+
+        context 'valid user' do
+          include_context 'valid user'
+
+          before(:each) do
+            allow(Jobs::FetchStatements).to receive(:for_account).and_return({ total: 12, imported: 3 })
+            account.add_subscriber(activated_at: 1.day.ago)
+
+            get "/#{account.iban}/import/statements?from=#{from}&to=#{to}", 'Authorization' => "token #{user.access_token}"
+          end
+
+          it 'returns a success status' do
+            expect_status 200
+          end
+
+          it 'calls statement fetching' do
+            expect(Jobs::FetchStatements).to have_received(:for_account).with(account.id, from: from, to: to)
+          end
+
+          it 'returns import stats' do
+            expect_json :fetched => 12, :imported => 3, :message => 'Imported statements successfully'
           end
         end
       end
