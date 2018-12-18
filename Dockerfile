@@ -1,4 +1,4 @@
-FROM ruby:2.3.1
+FROM ruby:2.5.1
 RUN apt-get update && apt-get install -y git supervisor build-essential zlib1g-dev libpq-dev
 
 # throw errors if Gemfile has been modified since Gemfile.lock
