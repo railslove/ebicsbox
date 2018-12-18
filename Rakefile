@@ -2,23 +2,6 @@ require 'sequel'
 # Load application
 require './config/configuration'
 
-# namespace :jruby do
-#   desc 'Build jruby classes'
-#   task 'build' do
-#     Dir["lib/**/*.rb"].each do |file|
-#       if system("jrubyc #{file}")
-
-#         puts " ---> Processing: #{file}"
-
-#         File.write(file, 'load __FILE__.sub(/\.rb$/, ".class")')
-#       else
-#         puts " ---> Failed: #{file}"
-#         exit(1)
-#       end
-#     end
-#   end
-# end
-
 namespace :generate do
   desc 'Generate a timestamped, empty Sequel migration.'
   task :migration, :name do |_, args|
@@ -38,24 +21,6 @@ namespace :generate do
     puts "Created the migration #{filename}"
   end
 end
-
-# namespace :db do
-#   Sequel.extension :migration
-#   DB = Sequel.connect(Box::Configuration.new.database_url)
-
-#   desc "Perform migration up/down to VERSION"
-#   task :to, :version do |_, args|
-#     if args[:version].nil?
-#       puts 'You must specify a migration version'
-#       exit false
-#     end
-
-#     version = args[:version].to_i
-#     raise "No VERSION was provided" if version.nil?
-#     Sequel::Migrator.run(DB, "migrations", :target => version)
-#     puts "<= sq:migrate:to version=[#{version}] executed"
-#   end
-# end
 
 namespace :enqueue do
   env = ENV.fetch('RACK_ENV', :development)
