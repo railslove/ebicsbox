@@ -1,5 +1,4 @@
 #!/bin/bash
-sleep 10
 /usr/local/bin/bundle exec bin/migrate
 
 if [ "$1" = "server" ]; then
