@@ -9,9 +9,9 @@ It offers a HTTP interface and can be integrated with different message queueing
 
 ## Prerequisites
 
-* ruby (jruby / ruby 2.3.x)
-* beanstalkd
-* postgres
+- ruby (jruby / ruby 2.3.x)
+- beanstalkd
+- postgres
 
 ## Getting started
 
@@ -24,10 +24,10 @@ Run it:
 
     $ foreman start
 
-If this is too noisy, you can prefix the command with ```RUBYOPT="-W0"``` which removes warnings
+If this is too noisy, you can prefix the command with `RUBYOPT="-W0"` which removes warnings
 raised by jruby and beaneater about uninitialized variables.
 
-Furthermore, we recommend using ```JRUBY_OPTS="$JRUBY_OPTS --dev"``` which speeds up jruby quite a
+Furthermore, we recommend using `JRUBY_OPTS="$JRUBY_OPTS --dev"` which speeds up jruby quite a
 bit. Check https://github.com/jruby/jruby/wiki/Improving-startup-time for more infomation about it.
 
 ## Installation
@@ -40,18 +40,18 @@ Run it:
 
 Set the following environment variables:
 
-* DATABASE_URL
-* BEANSTALKD_URL
-* PASSPHRASE
-* SANDBOX
-  - "enabled"
-* AUTH_SERVICE
-  - "static": 
-  - [default (oauth)]:  
-* OAUTH_SERVER
-* JWT_SECRET
-* ALLOW_REGISTRATIONS
-  - "enabled"
+- PASSPHRASE=
+- AUTH_SERVICE=
+  - "static":
+  - [default (oauth)]:
+- VIRTUAL_HOST=
+- LETSENCRYPT_HOST=
+- LETSENCRYPT_EMAIL=
+
+If you want to use a custom postgres instance provide the database connection strings:
+
+- DATABASE_URL=
+- TEST_DATABASE_URL=
 
 see config/configuration.rb
 
@@ -68,7 +68,7 @@ sign each webhook with a predefined secret. Each box should have a unique secret
 generate one, you can use the following command:
 
 ```bash
-  ruby -rsecurerandom -e 'puts SecureRandom.hex(20)'
+  ruby -rsecurerandom -e 'puts SecureRandom.hex(32)'
 ```
 
 ## Usage
@@ -77,7 +77,7 @@ see [docs.ebicsbox.apiary.io](http://docs.ebicsbox.apiary.io)
 
 ### Tests
 
-We are using RSpec to test this project. In order to execute all specs once, run ```bundle exec rspec```.
+We are using RSpec to test this project. In order to execute all specs once, run `bundle exec rspec`.
 
 To migrate your test database run the following command:
 

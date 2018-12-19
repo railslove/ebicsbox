@@ -1,0 +1,18 @@
+version: "3"
+services:
+  db:
+    image: postgres:9.6.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=mysecretpassword
+      - POSTGRES_USER=ebicsbox
+    ports:
+      - 5432:5432
+    volumes:
+      - $DATABASE_PATH:/var/lib/postgresql/data
+  webapp:
+    environment:
+      - DATABASE_URL=postgresql://db/ebicsbox?user=ebicsbox&password=mysecretpassword
+    depends_on:
+      - db
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; bin/start all'
