@@ -7,8 +7,6 @@ RUN bundle config --global frozen 1
 RUN mkdir -p /usr/ebicsbox
 WORKDIR /usr/ebicsbox
 
-RUN echo invokedynamic.all=true >> /usr/ebicsbox/.jrubyrc
-
 ADD Gemfile /usr/ebicsbox/
 ADD Gemfile.lock /usr/ebicsbox/
 RUN bundle install
