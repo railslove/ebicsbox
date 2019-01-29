@@ -1,19 +1,22 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'json'
 
 module Box
   module Jobs
     RSpec.describe FetchProcessingStatus do
-      describe '.process!' do
+      subject(:job) { described_class.new }
+      describe '#perform' do
         it 'fetches processing status for all provided accounts' do
-          expect(described_class).to receive(:remote_records).exactly(3).times.and_return([])
-          described_class.process!(account_ids: [1,2,3])
+          expect(job).to receive(:remote_records).exactly(3).times.and_return([])
+          job.perform([1, 2, 3])
         end
 
         it 'triggers transaction updates for all records from remote documents' do
-          expect(described_class).to receive(:remote_records).with(1).and_return([{ some: 'data' }])
-          expect(described_class).to receive(:update_transaction).with(1, { some: 'data' })
-          described_class.process!(account_ids: [1])
+          expect(job).to receive(:remote_records).with(1).and_return([{ some: 'data' }])
+          expect(job).to receive(:update_transaction).with(1, some: 'data')
+          job.perform([1])
         end
       end
 
@@ -21,7 +24,7 @@ module Box
         ACCOUNT_ID = 1
 
         def do_action(order_id = '0001')
-          described_class.update_transaction(ACCOUNT_ID, { action: 'file_upload', reason_code: 'none', ids: { 'OrderID' => order_id }})
+          job.update_transaction(ACCOUNT_ID, action: 'file_upload', reason_code: 'none', ids: { 'OrderID' => order_id })
         end
 
         context 'transaction with order exists' do
@@ -50,19 +53,19 @@ module Box
         end
 
         it 'fetches the HAC statement' do
-          described_class.remote_records(account.id)
+          job.remote_records(account.id)
         end
 
         it 'returns an array of actions' do
-          expect(described_class.remote_records(account.id).map { |a| a[:action] }).to eq(["file_upload", "es_verification", "order_hac_final_pos"])
+          expect(job.remote_records(account.id).map { |a| a[:action] }).to eq(%w[file_upload es_verification order_hac_final_pos])
         end
 
         it 'extracts reason codes' do
-          expect(described_class.remote_records(account.id).map { |a| a[:reason_code] }).to eq(["TS01", "DS01", ""])
+          expect(job.remote_records(account.id).map { |a| a[:reason_code] }).to eq(['TS01', 'DS01', ''])
         end
 
         it 'extracts record ids' do
-          expect(described_class.remote_records(account.id).map { |a| a[:ids] }).to eq([{"PartnerID"=>"1234560F", "OrderType"=>"CD1", "OrderID"=>"N013", "UserID"=>"12345601", "TimeStamp"=>"2015-04-14T18:12:26.570Z"}, {"PartnerID"=>"1234560F", "OrderType"=>"CD1", "OrderID"=>"N013", "UserID"=>"12345601", "TimeStamp"=>"2015-04-14T18:12:29.310Z"}, {"PartnerID"=>"1234560F", "OrderType"=>"CD1", "OrderID"=>"N013", "UserID"=>"12345601", "TimeStamp"=>"2015-04-14T18:12:29.310Z"}])
+          expect(job.remote_records(account.id).map { |a| a[:ids] }).to eq([{ 'PartnerID' => '1234560F', 'OrderType' => 'CD1', 'OrderID' => 'N013', 'UserID' => '12345601', 'TimeStamp' => '2015-04-14T18:12:26.570Z' }, { 'PartnerID' => '1234560F', 'OrderType' => 'CD1', 'OrderID' => 'N013', 'UserID' => '12345601', 'TimeStamp' => '2015-04-14T18:12:29.310Z' }, { 'PartnerID' => '1234560F', 'OrderType' => 'CD1', 'OrderID' => 'N013', 'UserID' => '12345601', 'TimeStamp' => '2015-04-14T18:12:29.310Z' }])
         end
       end
     end

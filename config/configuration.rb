@@ -1,6 +1,8 @@
-# Load environment from file
-require 'dotenv'
-Dotenv.load
+if %w[development test].include?(ENV['RACK_ENV'])
+  # Load environment from file
+  require 'dotenv'
+  Dotenv.load
+end
 
 module Box
   class Configuration
@@ -12,10 +14,6 @@ module Box
       test? ?
         (ENV['TEST_DATABASE_URL'] || 'postgres://localhost/ebicsbox_test') :
         (ENV['DATABASE_URL'] || 'postgres://localhost/ebicsbox')
-    end
-
-    def beanstalkd_url
-      (ENV['BEANSTALKD_URL'] || 'localhost:11300').gsub('beanstalkd://','').gsub('/','')
     end
 
     def hac_retrieval_interval
@@ -35,7 +33,7 @@ module Box
     end
 
     def test?
-      ENV['ENVIRONMENT'] == 'test'
+      ENV['RACK_ENV'] == 'test'
     end
 
     def sandbox?

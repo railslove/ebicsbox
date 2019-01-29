@@ -32,18 +32,18 @@ components:
     volumes:
     - host_path: /data-postgresql
       container_path: /var/lib/postgresql/data
-- name: Beanstalkd
+- name: Redis
   containers:
   - source: public
-    image_name: "yoyostile/beanstalkd"
+    image_name: redis
     version: latest
     publish_events:
-    - name: Container Beanstalkd started
+    - name: Container Redis started
       trigger: container-start
       data: ""
     ports:
-    - private_port: "11300"
-      public_port: "11300"
+    - private_port: "6379"
+      public_port: "6379"
       port_type: tcp
       interface: docker0
       when: ""
@@ -59,8 +59,6 @@ components:
       static_val: "{{repl ConfigOption \"username\" }}"
     - name: PASSWORD
       static_val: "{{repl ConfigOption \"password\" }}"
-    - name: BEANSTALKD_URL
-      static_val: "{{repl InterfaceAddress \"docker0\" }}:11300"
     - name: DATABASE_URL
       static_val: "postgresql://{{repl InterfaceAddress \"docker0\" }}/ebicsbox?user=ebicsbox&password=mysecretpassword"
     - name: EBICS_CLIENT

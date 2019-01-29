@@ -10,7 +10,7 @@ It offers a HTTP interface and can be integrated with different message queueing
 ## Prerequisites
 
 - ruby (ruby 2.5.x)
-- beanstalkd
+- redis
 - postgres
 
 ## Getting started
@@ -78,6 +78,11 @@ To migrate your test database run the following command:
 ```bash
   $ ENVIRONMENT=test bundle exec bin/migrate
 ```
+
+### Error Tracking
+
+The ebicsbox enables sentry as the error tracking software of choice. Simply define `SENTRY_DSN` via an environment
+variable to enable error tracking in production mode
 
 ### Documentation
 

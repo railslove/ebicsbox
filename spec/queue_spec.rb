@@ -1,44 +1,29 @@
+# frozen_string_literal: true
+
 module Box
   RSpec.describe Queue do
+    let(:scheduled_jobs) { Sidekiq::ScheduledSet.new }
 
-    let(:client) { described_class.client }
-
-    def clear_all_tubes
-      Queue.clear!(Queue::DEBIT_TUBE)
-      Queue.clear!(Queue::CREDIT_TUBE)
-      Queue.clear!(Queue::ORDER_TUBE)
-      Queue.clear!(Queue::STA_TUBE)
-      Queue.clear!(Queue::WEBHOOK_TUBE)
-      Queue.clear!(Queue::ACTIVATION_TUBE)
-    end
-
-    around do |example|
-      clear_all_tubes
-      example.run
-      clear_all_tubes
-    end
-
-    describe '.client' do
-      it 'returns an instance of a beanstalk client' do
-        expect(described_class.client).to be_an_instance_of(Beaneater)
-      end
+    before(:each) do
+      Sidekiq::Queue.all.each(&:clear)
+      scheduled_jobs.clear
     end
 
     describe '.fetch_account_statements' do
-      let(:tube) { client.tubes[Queue::STA_TUBE] }
+      let(:tube) { Sidekiq::Queue.new('check.statements') }
 
       it 'puts a new message onto the STA queue' do
-        expect { described_class.fetch_account_statements }.to change { tube.peek(:ready) }
+        expect { described_class.fetch_account_statements }.to change { tube.size }
       end
 
       it 'puts only the provided account id onto the job' do
         described_class.fetch_account_statements(1)
-        expect(tube.peek(:ready).body).to eq(account_ids: [1])
+        expect(tube.first.args).to include('account_ids' => [1])
       end
 
       it 'puts all provided account ids onto the job' do
         described_class.fetch_account_statements([1, 2])
-        expect(tube.peek(:ready).body).to eq(account_ids: [1, 2])
+        expect(tube.first.args).to include('account_ids' => [1, 2])
       end
 
       it 'puts all existing account ids onto the job if none is provided' do
@@ -46,96 +31,75 @@ module Box
           Account.create.tap { |account| Subscriber.create(account: account, activated_at: Time.now) }
         end
         described_class.fetch_account_statements
-        expect(tube.peek(:ready).body).to eq(account_ids: accounts.map(&:id))
+        expect(tube.first.args).to include('account_ids' => accounts.map(&:id))
       end
     end
 
     describe '.check_subscriber_activation' do
-      let(:tube) { client.tubes[Queue::ACTIVATION_TUBE] }
+      let(:tube) { Sidekiq::Queue.new('check.activations') }
 
       context 'delay check by default' do
-        it 'puts a new message onto the activation queue' do
-          expect { described_class.check_subscriber_activation(1, 120) }.to change { tube.peek(:delayed) }
+        it 'schedules a new job' do
+          expect { described_class.check_subscriber_activation(1, 120) }.to change { scheduled_jobs.size }
+        end
+
+        it 'schedules by given time' do
+          jid = described_class.check_subscriber_activation(1, 45)
+          job = scheduled_jobs.find { |j| j.jid == jid }
+          creation_time = Time.at(job.created_at)
+          execution_time = Time.at(job.score)
+
+          expect(execution_time - creation_time).to be_within(0.1).of(45)
         end
 
         it 'puts only provided account id onto job' do
-          described_class.check_subscriber_activation(1, 120)
-          expect(tube.peek(:delayed).body).to eq(subscriber_id: 1)
+          described_class.check_subscriber_activation(1, 0)
+          expect(tube.first.args).to include('subscriber_id' => 1)
         end
 
-        it 'does not put anything on immediate execution tube' do
-          expect { described_class.check_subscriber_activation(1, 120) }.to_not change { tube.peek(:ready) }
+        it 'does not queue it right away' do
+          expect { described_class.check_subscriber_activation(1, 120) }.not_to change { tube.size }
         end
       end
     end
 
     describe '.update_processing_status' do
-      let(:tube) { client.tubes[Queue::ORDER_TUBE] }
+      let(:tube) { Sidekiq::Queue.new('check.orders') }
 
       context 'no job currently queued' do
         it 'puts a new message onto the check orders queue' do
-          expect { described_class.update_processing_status }.to change { tube.peek(:delayed) }
+          expect { described_class.update_processing_status }.to change { scheduled_jobs.size }
         end
 
         it 'puts only the provided account id onto the job' do
-          described_class.update_processing_status(1)
-          expect(tube.peek(:delayed).body).to match hash_including(account_ids: [1])
+          jid = described_class.update_processing_status([1])
+          job = scheduled_jobs.find { |j| j.jid == jid }
+          expect(job.args.flatten).to match_array([1])
         end
 
         it 'puts all provided account ids onto the job' do
-          described_class.update_processing_status([1, 2])
-          expect(tube.peek(:delayed).body).to match hash_including(account_ids: [1, 2])
+          jid = described_class.update_processing_status([1, 2])
+          job = scheduled_jobs.find { |j| j.jid == jid }
+
+          expect(job.args.flatten).to match([1, 2])
         end
 
         it 'puts all existing account ids onto the job if none is provided' do
           accounts = Array.new(3).map do
             Account.create.tap { |account| Subscriber.create(account: account, activated_at: Time.now) }
           end
-          described_class.update_processing_status
-          expect(tube.peek(:delayed).body).to match hash_including(account_ids: accounts.map(&:id))
+          jid = described_class.update_processing_status
+
+          job = scheduled_jobs.find { |j| j.jid == jid }
+          expect(job.args.flatten).to match(accounts.map(&:id))
         end
       end
 
       context 'job already queued' do
+        before { described_class.update_processing_status }
         it 'does not queue another job' do
-          described_class.update_processing_status
-          expect { described_class.update_processing_status }.to_not change { tube.peek(:delayed).id }
+          expect { described_class.update_processing_status }.to_not change { scheduled_jobs.size }
         end
-      end
-    end
-
-    describe '#process!' do
-      let(:payload) { { some: 'data' } }
-
-      it 'registers debit jobs' do
-        expect(Jobs::Debit).to receive(:process!).with(payload) { raise Beaneater::AbortProcessingError }
-        described_class.execute_debit(payload)
-        subject.process!
-      end
-
-      it 'registers credit jobs' do
-        expect(Jobs::Credit).to receive(:process!).with(payload) { raise Beaneater::AbortProcessingError }
-        described_class.execute_credit(payload)
-        subject.process!
-      end
-    end
-
-    describe '#with_error_logging' do
-      let(:logger) { double('Logger', error: true) }
-      let(:exception) { StandardError.new('test') }
-
-      it 'returns the original result' do
-        expect(subject.with_error_logging("test-tube", 1) { 'ok' }).to eq('ok')
-      end
-
-      it 're-raises any exception raised in its code block' do
-        expect { subject.with_error_logging("test-tube", 1) { raise exception } }.to raise_error(exception)
-      end
-
-      it 'logs any exception messages' do
-        subject.logger = logger
-        subject.with_error_logging("test-tube", 1) { raise exception } rescue ''
-        expect(logger).to have_received(:error).with("[Queue] Failed job. tube=test-tube job='1' message='test'")
       end
     end
   end

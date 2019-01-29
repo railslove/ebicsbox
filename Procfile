@@ -1,4 +1,2 @@
 web: bundle exec rackup -p $PORT
-beanstalk: beanstalkd
-worker: bin/worker
-clock: clockwork config/scheduler.rb
+worker: bundle exec sidekiq -C ./config/sidekiq.yml -r ./config/sidekiq.rb

@@ -1,7 +1,12 @@
 require_relative './config/bootstrap'
 
-# Log all requests in apache log file format
 if ENV['RACK_ENV'] == 'production'
+  if ENV['SENTRY_DSN']
+    require 'raven'
+    use Raven::Rack
+  end
+
+  # Log all requests in apache log file format
   use Rack::CommonLogger
 end
 

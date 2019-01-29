@@ -4,7 +4,6 @@ ruby '2.5.1'
 
 gem 'rake'
 gem 'activesupport'
-gem 'beaneater', '~> 1.0.0'
 gem 'clockwork'
 gem 'cmxl'
 gem 'camt_parser', git: 'https://github.com/railslove/camt_parser.git'
@@ -22,6 +21,12 @@ gem 'jwt'
 gem 'rack-cors', require: false
 gem 'pg'
 gem 'epics', '~> 1.6.0'
+gem 'sentry-raven'
+gem 'sidekiq'
+
+group :development do
+  gem 'rubocop'
+end
 
 group :development, :test do
   gem 'database_cleaner'

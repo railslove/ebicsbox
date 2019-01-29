@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_support/all'
 require 'cmxl'
 
@@ -10,8 +12,8 @@ module Box
   module BusinessProcesses
     RSpec.describe ImportStatements do
       let(:organization) { Fabricate(:organization) }
-      let(:account) { organization.add_account(host: "HOST", iban: "iban1234567") }
-      let(:camt_account) { organization.add_account(host: "HOST", iban: "iban1234567", statements_format: 'camt53') }
+      let(:account) { organization.add_account(host: 'HOST', iban: 'iban1234567') }
+      let(:camt_account) { organization.add_account(host: 'HOST', iban: 'iban1234567', statements_format: 'camt53') }
       let(:camt_fixture) { 'camt_statement.xml' }
       let(:camt) { File.read("spec/fixtures/#{camt_fixture}") }
       let(:mt940_fixture) { 'single_valid.mt940' }
@@ -26,12 +28,7 @@ module Box
         Queue.clear!(Queue::ACTIVATION_TUBE)
       end
 
-      around do |example|
-        clear_all_tubes
-        example.run
-        clear_all_tubes
-      end
-
+      before(:each) { Sidekiq::Queue.all.each(&:clear) }
 
       it 'creates db statements for each bank statement transaction' do
         bank_statement = ImportBankStatement.from_mt940(mt940, account)
@@ -51,28 +48,27 @@ module Box
       describe '.create_statement' do
         let(:data) do
           double('MT940 Transaction',
-            information: 'test',
-            date: '2015-06-20',
-            entry_date: '2015-06-20',
-            amount_in_cents: 100_24,
-            sign: 1,
-            debit?: true,
-            swift_code: 'swift_code',
-            reference: 'reference',
-            bank_reference: 'bank_reference',
-            bic: 'bic',
-            iban: 'iban',
-            name: 'name',
-            information: 'information',
-            description: 'description',
-            sha: 'balbalblabladslflasdfk',
-            sepa: {
-              "EREF" => 'my-eref',
-              "MREF" => 'my-mref',
-              "SVWZ" => 'my-svwz',
-              "CRED" => 'my-cred',
-            }
-          )
+                 information: 'test',
+                 date: '2015-06-20',
+                 entry_date: '2015-06-20',
+                 amount_in_cents: 100_24,
+                 sign: 1,
+                 debit?: true,
+                 swift_code: 'swift_code',
+                 reference: 'reference',
+                 bank_reference: 'bank_reference',
+                 bic: 'bic',
+                 iban: 'iban',
+                 name: 'name',
+                 information: 'information',
+                 description: 'description',
+                 sha: 'balbalblabladslflasdfk',
+                 sepa: {
+                   'EREF' => 'my-eref',
+                   'MREF' => 'my-mref',
+                   'SVWZ' => 'my-svwz',
+                   'CRED' => 'my-cred'
+                 })
         end
 
         before do
@@ -88,7 +84,7 @@ module Box
           before { Statement.create(sha: 'a83041608974d854ef26f649a2a74c6af9688e327d2c4cf8fdf039f07755b521', account_id: account.id) }
 
           it 'does not create a statement' do
-            expect { exec_create_action }.to_not change{ Statement.count }
+            expect { exec_create_action }.to_not change { Statement.count }
           end
         end
 
@@ -96,11 +92,11 @@ module Box
           it 'extracts subdata from sepa subtree' do
             exec_create_action
             expect(Statement.last.values).to match(hash_including(
-              eref: 'my-eref',
-              mref: 'my-mref',
-              svwz: 'my-svwz',
-              creditor_identifier: 'my-cred',
-            ))
+                                                     eref: 'my-eref',
+                                                     mref: 'my-mref',
+                                                     svwz: 'my-svwz',
+                                                     creditor_identifier: 'my-cred'
+                                                   ))
           end
 
           it 'creates an event' do
@@ -111,8 +107,8 @@ module Box
       end
 
       describe 'duplicated bank statement number' do
-        let!(:cmxl_2016) { File.read("spec/fixtures/duplicated_sequence_number_2016.mt940") }
-        let!(:cmxl_2017) { File.read("spec/fixtures/duplicated_sequence_number_2017.mt940") }
+        let!(:cmxl_2016) { File.read('spec/fixtures/duplicated_sequence_number_2016.mt940') }
+        let!(:cmxl_2017) { File.read('spec/fixtures/duplicated_sequence_number_2017.mt940') }
 
         it 'imports even if statement number is duplicated' do
           bank_statement = ImportBankStatement.from_mt940(cmxl_2016, account)
