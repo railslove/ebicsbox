@@ -4,11 +4,6 @@ if %w[development test].include?(ENV['RACK_ENV'])
   Dotenv.load
 end
 
-# Load BL EBICS client when in BV environment
-if ENV['EBICS_CLIENT'] == 'Blebics::Client'
-  require 'blebics'
-end
-
 module Box
   class Configuration
     def app_url

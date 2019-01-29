@@ -19,17 +19,8 @@ gem 'sequel'
 gem 'puma'
 gem 'jwt'
 gem 'rack-cors', require: false
-
-gem 'sidekiq'
-
-if ENV['EBICS_CLIENT'] == 'Blebics::Client'
-  gem 'jdbc-postgres'
-  gem 'jruby-openssl', '0.8.2'
-  gem 'blebics-wrapper', git: 'git@github.com:railslove/blebics-wrapper.git'
-else
-  gem 'pg'
-  gem 'epics', '~> 1.6.0'
-end
+gem 'pg'
+gem 'epics', '~> 1.6.0'
 
 group :development do
   gem 'rubocop'

@@ -9,7 +9,7 @@ It offers a HTTP interface and can be integrated with different message queueing
 
 ## Prerequisites
 
-- ruby (jruby / ruby 2.5.x)
+- ruby (ruby 2.5.x)
 - redis
 - postgres
 
@@ -23,12 +23,6 @@ It offers a HTTP interface and can be integrated with different message queueing
 Run it:
 
     $ foreman start
-
-If this is too noisy, you can prefix the command with `RUBYOPT="-W0"` which removes warnings
-raised by jruby about uninitialized variables.
-
-Furthermore, we recommend using `JRUBY_OPTS="$JRUBY_OPTS --dev"` which speeds up jruby quite a
-bit. Check https://github.com/jruby/jruby/wiki/Improving-startup-time for more infomation about it.
 
 ## Installation
 
