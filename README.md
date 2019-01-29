@@ -79,6 +79,11 @@ To migrate your test database run the following command:
   $ ENVIRONMENT=test bundle exec bin/migrate
 ```
 
+### Error Tracking
+
+The ebicsbox enables sentry as the error tracking software of choice. Simply define `SENTRY_DNS` via an environment
+variable to enable error tracking in production mode
+
 ### Documentation
 
 Our goal is to provide an always up-to-date documentation from within the app.
