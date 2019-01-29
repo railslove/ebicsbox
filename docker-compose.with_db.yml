@@ -3,16 +3,29 @@ services:
   db:
     image: postgres:9.6.1-alpine
     restart: always
+    env_file: .env
     environment:
-      - POSTGRES_PASSWORD=mysecretpassword
-      - POSTGRES_USER=ebicsbox
+      - POSTGRES_DB=ebicsbox
     ports:
       - 5432:5432
     volumes:
       - $DATABASE_PATH:/var/lib/postgresql/data
-  webapp:
+  web:
     environment:
-      - DATABASE_URL=postgresql://db/ebicsbox?user=ebicsbox&password=mysecretpassword
+      - DATABASE_URL=postgresql://db/ebicsbox?user=${POSTGRES_USER}&password=${POSTGRES_PASSWORD}
+      - PORT=5000
     depends_on:
       - db
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; bin/start all'
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; bundle exec rackup -p $${PORT}'
+  worker:
+    environment:
+      - DATABASE_URL=postgresql://db/ebicsbox?user=${POSTGRES_USER}&password=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; bundle exec sidekiq -C ./config/sidekiq.yml -r ./config/sidekiq.rb'
+  scheduler:
+    environment:
+      - DATABASE_URL=postgresql://db/ebicsbox?user=${POSTGRES_USER}&password=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; bundle exec clockwork config/scheduler.rb'

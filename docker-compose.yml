@@ -1,23 +1,49 @@
 version: "3"
 services:
-  queue:
-    image: redis
+  redis:
+    image: redis:latest
     restart: always
-    expose:
-      - 11300
-  webapp:
-    # build: .
+  web:
     image: ebicsbox:latest
     restart: always
+    env_file:
+      - .env
+      - .web.env
     environment:
       - PORT=5000
       - RACK_ENV=production
-    env_file: .env
+      - REDIS_URL=redis://redis:6379
     expose:
       - 5000
-    command: bin/start all
+    command: bundle exec rackup -p $${PORT}
     depends_on:
-      - queue
+      - redis
+  worker:
+    image: ebicsbox:latest
+    restart: always
+    env_file: .env
+    environment:
+      - RACK_ENV=production
+      - REDIS_URL=redis://redis:6379
+      - VIRTUAL_HOST
+      - LETSENCRYPT_HOST
+      - LETSENCRYPT_EMAIL
+    command: bundle exec sidekiq -C ./config/sidekiq.yml -r ./config/sidekiq.rb
+    depends_on:
+      - redis
+  scheduler:
+    image: ebicsbox:latest
+    restart: always
+    env_file: .env
+    environment:
+      - RACK_ENV=production
+      - REDIS_URL=redis://redis:6379
+      - VIRTUAL_HOST
+      - LETSENCRYPT_HOST
+      - LETSENCRYPT_EMAIL
+    command: bundle exec clockwork config/scheduler.rb
+    depends_on:
+      - redis
   proxy:
     image: jwilder/nginx-proxy:latest
     restart: always
