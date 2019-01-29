@@ -22,6 +22,7 @@ gem 'rack-cors', require: false
 gem 'pg'
 gem 'epics', '~> 1.6.0'
 gem 'sentry-raven'
+gem 'sidekiq'
 
 group :development do
   gem 'rubocop'
