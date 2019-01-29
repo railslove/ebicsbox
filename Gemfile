@@ -21,6 +21,7 @@ gem 'jwt'
 gem 'rack-cors', require: false
 gem 'pg'
 gem 'epics', '~> 1.6.0'
+gem 'sentry-raven'
 
 group :development do
   gem 'rubocop'
