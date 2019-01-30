@@ -87,7 +87,7 @@ or add the heroku plugin, which will create a Sentry account for you automatical
 # Created sentry-animate-94502 as SENTRY_DSN
 ```
 
-Then add the git handle and push the first
+Then add the git handle and push the first iteration.
 
 ```bash
 > heroku git:remote -r heroku -a DESIRED_APP_NAME
@@ -164,3 +164,10 @@ heroku container:release web worker --app DESIRED_APP_NAME
 ```
 
 Voilà, that should do the trick. Go and try reloading the page.
+
+Also, make sure you have at least one worker dyno startet as it seems that this is not the case by default. To do so run:
+
+```bash
+> heroku ps:scale web=1 worker=1 --app DESIRED_APP_NAME
+# Scaling dynos... done, now running worker at 1:Hobby, web at 1:Hobby
+```
