@@ -1,11 +1,11 @@
 # What's heroku?
 
-[heroku](http://heroku.com) is a Platform as a Service Provider. Instead of hosting the ebicsbox on your own infrastructure it's possible to host the ebicsbox on heroku and benefit from the ease of deployment and the flexibility of scaling as needed.
+[heroku](https://heroku.com) is a Platform as a Service Provider. Instead of hosting the ebicsbox on your own infrastructure it's possible to host the ebicsbox on heroku and benefit from the ease of deployment and the flexibility of scaling as needed.
 
 ## Requirements
 
-- Heroku Account
-- Heroku CLI
+- [Heroku](https://heroku.com) Account
+- [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
 
 ## Initial setup
 
@@ -24,7 +24,7 @@ Prepare your heroku cli by updating to beta and activating the manifest plugin:
 # Installing plugin heroku-open-dashboard... installed v1.0.6
 ```
 
-After doing so, setup the new app using the manifest option.
+After doing so, setup the new app **from within the folder with the `heroku.yml`** using the manifest option
 
 ```bash
 > heroku create DESIRED_APP_NAME --manifest --team=TEAM --region=eu
@@ -90,7 +90,7 @@ or add the heroku plugin, which will create a Sentry account for you automatical
 Then add the git handle and push the first iteration.
 
 ```bash
-> heroku git:remote -r heroku -a DESIRED_APP_NAME
+> heroku git:remote --remote heroku --app DESIRED_APP_NAME
 # set git remote heroku to https://git.heroku.com/ebicsbox.git
 
 > git push heroku master
@@ -159,8 +159,8 @@ This builds and pushes the required container to heroku.
 Last but not least, release the container
 
 ```bash
-heroku container:release web worker --app DESIRED_APP_NAME
-# Releasing images web,worker to ebicsbox-setup-test... done
+> heroku container:release web worker --app DESIRED_APP_NAME
+# Releasing images web,worker to ebicsbox... done
 ```
 
 Voilà, that should do the trick. Go and try reloading the page.
