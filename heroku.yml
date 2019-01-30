@@ -13,8 +13,6 @@ build:
   docker:
     web: dockerfiles/Dockerfile.web
     worker: dockerfiles/Dockerfile.worker
-  languages:
-    - ruby
   config:
     RACK_ENV: production
     AUTH_SERVICE: static
