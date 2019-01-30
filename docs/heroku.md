@@ -9,7 +9,9 @@
 
 ## Initial setup
 
-Prepare your heroku cli by updating to beta and activating the manifest plugin:
+#### Prepare your CLI
+
+Prepare your heroku CLI by updating to beta and activating the manifest plugin:
 
 ```bash
 > heroku update beta
@@ -24,6 +26,8 @@ Prepare your heroku cli by updating to beta and activating the manifest plugin:
 # Installing plugin heroku-open-dashboard... installed v1.0.6
 ```
 
+#### Create the app
+
 After doing so, setup the new app **from within the folder with the `heroku.yml`** using the manifest option
 
 ```bash
@@ -34,6 +38,8 @@ After doing so, setup the new app **from within the folder with the `heroku.yml`
 # Adding heroku-redis... done
 # Adding scheduler... done
 ```
+
+#### Set ENV
 
 Afterward, make sure to set the required environment variables
 
@@ -46,6 +52,8 @@ Afterward, make sure to set the required environment variables
 # Setting APP_URL and restarting ⬢ ebicsbox... done, v8
 # APP_URL: https://ebicsbox.herokuapp.com/
 ```
+
+#### Manage Resources
 
 Then open the apps overview
 
@@ -66,7 +74,16 @@ Also, adjust the scheduler settings to run these every hour:
 
 ![](./scheduler.png)
 
+#### Sentry
+
 If you'd like you could setup sentry as follows to keep track of errors and mishaps.
+
+In any case you need to enable meta-info for your dynos:
+
+```bash
+> heroku labs:enable runtime-dyno-metadata --app DESIRED_APP_NAME
+# Enabling runtime-dyno-metadata for ebicsbox... done
+```
 
 For self-hosted sentry-instances, set the required environment variable
 
@@ -86,6 +103,8 @@ or add the heroku plugin, which will create a Sentry account for you automatical
 # Please visit https://docs.sentry.io/ for further instructions
 # Created sentry-animate-94502 as SENTRY_DSN
 ```
+
+#### Deploy to heroku
 
 Then add the git handle and push the first iteration.
 
