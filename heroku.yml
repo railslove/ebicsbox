@@ -3,10 +3,16 @@ setup:
     - plan: heroku-postgresql
       as: DATABASE
     - plan: heroku-redis
-      as: QUEUE
-    - plan: heroku-scheduler
+      as: REDIS
+    - plan: scheduler
       as: SCHEDULER
+  config:
+    RACK_ENV: production
+    AUTH_SERVICE: static
 build:
+  docker:
+    web: dockerfiles/Dockerfile.web
+    worker: dockerfiles/Dockerfile.worker
   languages:
     - ruby
   config:
@@ -14,8 +20,9 @@ build:
     AUTH_SERVICE: static
     PORT: 5000
 release:
+  image: web
   command:
     - bin/migrate
 run:
   web: bundle exec rackup -p $PORT
-  workers: bundle exec sidekiq -C ./config/sidekiq.yml -r ./config/sidekiq.rb
+  worker: bundle exec sidekiq -C ./config/sidekiq.yml -r ./config/sidekiq.rb

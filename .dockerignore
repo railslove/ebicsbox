@@ -1,3 +1,5 @@
+dockerfiles
+docs
 node_modules
 .env
 .env.example
