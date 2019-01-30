@@ -1,2 +1,2 @@
-FROM railslove/ebicsbox:latest
+FROM railslove/ebicsbox
 CMD bundle exec clockwork config/scheduler.rb
