@@ -76,7 +76,7 @@ For self-hosted sentry-instances, set the required environment variable
 # SENTRY_DSN: https://example.org/sentry/1337
 ```
 
-or add the heroku plugin
+or add the heroku plugin, which will create a Sentry account for you automatically set `SENTRY_DSN`
 
 ```bash
 > heroku addons:add --app DESIRED_APP_NAME sentry
