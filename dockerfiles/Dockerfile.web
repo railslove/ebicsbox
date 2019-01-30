@@ -1,2 +1,2 @@
-FROM ebicsbox:latest
+FROM railslove/ebicsbox:latest
 CMD bundle exec rackup -p $PORT
