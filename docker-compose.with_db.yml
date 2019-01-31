@@ -9,7 +9,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - $DATABASE_PATH:/var/lib/postgresql/data
+      - $POSTGRES_DATA_FOLDER_PATH:/var/lib/postgresql/data
   web:
     environment:
       - DATABASE_URL=postgresql://db/ebicsbox?user=${POSTGRES_USER}&password=${POSTGRES_PASSWORD}
