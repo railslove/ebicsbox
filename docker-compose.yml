@@ -1,25 +1,48 @@
 version: "3"
 services:
-  queue:
+  redis:
     image: redis
     restart: always
-    expose:
-      - 11300
-  webapp:
-    # build: .
-    image: ebicsbox:latest
+  web:
+    image: railslove/ebicsbox
     restart: always
+    env_file:
+      - .env
+      - .web.env
     environment:
       - PORT=5000
-      - RACK_ENV=production
-    env_file: .env
+      - REDIS_URL=redis://redis:6379
     expose:
       - 5000
-    command: bin/start all
+    command: bundle exec rackup -p $${PORT}
     depends_on:
-      - queue
+      - redis
+  worker:
+    image: railslove/ebicsbox
+    restart: always
+    env_file: .env
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - VIRTUAL_HOST
+      - LETSENCRYPT_HOST
+      - LETSENCRYPT_EMAIL
+    command: bundle exec sidekiq -C ./config/sidekiq.yml -r ./config/sidekiq.rb
+    depends_on:
+      - redis
+  scheduler:
+    image: railslove/ebicsbox
+    restart: always
+    env_file: .env
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - VIRTUAL_HOST
+      - LETSENCRYPT_HOST
+      - LETSENCRYPT_EMAIL
+    command: bundle exec clockwork config/scheduler.rb
+    depends_on:
+      - redis
   proxy:
-    image: jwilder/nginx-proxy:latest
+    image: jwilder/nginx-proxy
     restart: always
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
