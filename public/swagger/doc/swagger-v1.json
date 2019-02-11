@@ -56,7 +56,7 @@
           {
             "name": "include",
             "in": "query",
-            "description": "Additional data to include. Can be one of: subscriber",
+            "description": "Additional data to include. Can be one of: ebics_user",
             "type": "object"
           }
         ],
@@ -313,14 +313,14 @@
         }
       }
     },
-    "/management/accounts/{account_id}/subscribers": {
+    "/management/accounts/{account_id}/ebics_users": {
       "get": {
         "tags": [
           "Management"
         ],
-        "summary": "Retrieve a list of all subscribers for given account",
-        "description": "Retrieve a list of all subscribers for given account",
-        "operationId": "management_account_subscribers",
+        "summary": "Retrieve a list of all ebics_users for given account",
+        "description": "Retrieve a list of all ebics_users for given account",
+        "operationId": "management_account_ebics_users",
         "parameters": [
           {
             "name": "Authorization",
@@ -355,7 +355,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "$ref": "#/definitions/Epics::Box::Entities::Subscriber"
+                "$ref": "#/definitions/Epics::Box::Entities::EbicsUser"
               }
             }
           },
@@ -368,9 +368,9 @@
         "tags": [
           "Management"
         ],
-        "summary": "Add a subscriber to given account",
-        "description": "Add a subscriber to given account",
-        "operationId": "management_account_subscriber_create",
+        "summary": "Add a ebics_user to given account",
+        "description": "Add a ebics_user to given account",
+        "operationId": "management_account_ebics_user_create",
         "parameters": [
           {
             "name": "Authorization",
@@ -397,7 +397,7 @@
               "type": "object",
               "properties": {
                 "user_id": {
-                  "description": "Internal user identifier to associate the subscriber with",
+                  "description": "Internal user identifier to associate the ebics_user with",
                   "type": "integer"
                 },
                 "ebics_user": {
@@ -427,7 +427,7 @@
         }
       }
     },
-    "/management/accounts/{account_id}/subscribers/{id}/ini_letter": {
+    "/management/accounts/{account_id}/ebics_users/{id}/ini_letter": {
       "get": {
         "tags": [
           "Management"
@@ -1298,7 +1298,7 @@
           "type": "boolean",
           "description": "Whether this is a test account"
         },
-        "subscriber": {
+        "ebics_user": {
           "type": "string"
         },
         "_links": {
@@ -1398,9 +1398,9 @@
           "type": "boolean",
           "description": "Whether this is a test account"
         },
-        "subscribers": {
+        "ebics_users": {
           "type": "object",
-          "$ref": "#/definitions/Epics::Box::Entities::Subscriber"
+          "$ref": "#/definitions/Epics::Box::Entities::EbicsUser"
         },
         "_links": {
           "type": "object",
@@ -1411,7 +1411,7 @@
         }
       }
     },
-    "Epics::Box::Entities::Subscriber": {
+    "Epics::Box::Entities::EbicsUser": {
       "type": "object",
       "properties": {
         "account": {
@@ -1436,7 +1436,7 @@
         },
         "state": {
           "type": "string",
-          "description": "Current subscriber state"
+          "description": "Current ebics_user state"
         },
         "submitted_at": {
           "type": "string",
@@ -1476,9 +1476,9 @@
           "format": "date-time",
           "description": "Date and time when user was created"
         },
-        "subscribers": {
+        "ebics_users": {
           "type": "object",
-          "$ref": "#/definitions/Epics::Box::Entities::Subscriber"
+          "$ref": "#/definitions/Epics::Box::Entities::EbicsUser"
         },
         "_links": {
           "type": "object",
