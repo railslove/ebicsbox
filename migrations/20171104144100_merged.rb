@@ -93,7 +93,7 @@ Sequel.migration do
       index [:sha], :name=>:statements_sha_key, :unique=>true
     end unless tables.include?(:statements)
 
-    create_table(:ebics_users) do
+    create_table(:subscribers) do
       primary_key :id
       Integer :account_id
       Integer :user_id
@@ -104,7 +104,7 @@ Sequel.migration do
       DateTime :activated_at
       String :ini_letter, :text=>true
       DateTime :submitted_at
-    end unless tables.include?(:ebics_users)
+    end unless tables.include?(:subscribers)
 
     create_table(:transactions, :ignore_index_errors=>true) do
       primary_key :id
