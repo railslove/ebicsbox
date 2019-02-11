@@ -1,6 +1,6 @@
 require 'grape-entity'
 
-require_relative './subscriber'
+require_relative './ebics_user'
 
 module Box
   module Entities

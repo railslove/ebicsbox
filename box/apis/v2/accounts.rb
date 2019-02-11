@@ -60,7 +60,7 @@ module Box
             requires :host, type: String, desc: 'EBICS HOSTID as provided by financial institution'
             requires :partner, type: String, desc: 'EBICS PARTNERID as provided by financial institution'
             requires :url, type: String, desc: 'EBICS server url'
-            requires :subscriber, type: String, desc: 'EBICS subscriber as provided by financial institution'
+            requires :ebics_user, type: String, desc: 'EBICS ebics_user as provided by financial institution'
             optional :descriptor, type: String, allow_blank: false, desc: 'Internal descriptor of account'
             optional :creditor_identifier, type: String, desc: 'Creditor identifier required for direct debits'
             optional :callback_url, type: String, desc: 'URL to which webhooks are delivered'
@@ -73,7 +73,7 @@ module Box
                 account: Entities::V2::Account.represent(account),
               }
             rescue BusinessProcesses::NewAccount::EbicsError => ex
-              error!({ message: 'Failed to setup subscriber with your bank. Make sure your data is valid and retry!' }, 412)
+              error!({ message: 'Failed to setup ebics_user with your bank. Make sure your data is valid and retry!' }, 412)
             rescue => ex
               error!({ message: 'Failed to create account' }, 400)
             end
@@ -113,12 +113,12 @@ module Box
           end
           get ':iban/ini_letter' do
             account = Box::Account.by_organization(current_organization).first!(iban: params[:iban])
-            subscriber = account.subscriber_for(current_user.id)
-            if subscriber.ini_letter.nil?
-              error!({ message: 'Subscriber setup not yet initiated!' }, 412)
+            ebics_user = account.ebics_user_for(current_user.id)
+            if ebics_user.ini_letter.nil?
+              error!({ message: 'EbicsUser setup not yet initiated!' }, 412)
             else
               content_type 'text/html'
-              subscriber.ini_letter
+              ebics_user.ini_letter
             end
           end
 

@@ -108,7 +108,7 @@ module Box
         end
 
         context 'activated account' do
-          before { account.add_subscriber(activated_at: 1.hour.ago) }
+          before { account.add_ebics_user(activated_at: 1.hour.ago) }
 
           it 'cannot change iban' do
             expect { put "management/accounts/#{account.iban}", { iban: 'new-iban' }, { 'Authorization' => "Bearer #{user.access_token}" } }.to_not change { account.reload.iban }
@@ -129,7 +129,7 @@ module Box
         end
 
         context 'inactive account' do
-          before { account.subscribers_dataset.update(activated_at: nil) }
+          before { account.ebics_users_dataset.update(activated_at: nil) }
 
           it 'can change iban' do
             expect { put "management/accounts/#{account.iban}", { iban: 'new-iban' }, { 'Authorization' => "Bearer #{user.access_token}" } }.to change { account.reload.iban }
@@ -141,27 +141,27 @@ module Box
         end
       end
 
-      describe 'GET /accounts/:iban/subscribers' do
+      describe 'GET /accounts/:iban/ebics_users' do
         let(:account) { Account.create(name: 'name', iban: 'iban', bic: 'bic', organization_id: organization.id) }
 
-        context 'without subscribers' do
+        context 'without ebics_users' do
           it 'returns an empty array' do
-            get "management/accounts/#{account.iban}/subscribers", { 'Authorization' => "Bearer #{user.access_token}" }
+            get "management/accounts/#{account.iban}/ebics_users", { 'Authorization' => "Bearer #{user.access_token}" }
             expect_json []
           end
         end
 
-        context 'with subscribers' do
-          before { account.add_subscriber(user_id: user.id, remote_user_id: 'test') }
+        context 'with ebics_users' do
+          before { account.add_ebics_user(user_id: user.id, remote_user_id: 'test') }
 
-          it 'returns a representation of account subscribers' do
-            get "management/accounts/#{account.iban}/subscribers", { 'Authorization' => "Bearer #{user.access_token}" }
+          it 'returns a representation of account ebics_users' do
+            get "management/accounts/#{account.iban}/ebics_users", { 'Authorization' => "Bearer #{user.access_token}" }
             expect_json '0.ebics_user', 'test'
           end
         end
       end
 
-      describe 'POST /accounts/:iban/subscribers' do
+      describe 'POST /accounts/:iban/ebics_users' do
         let(:account) { Account.create(
           name: 'name',
           iban: 'iban',
@@ -173,7 +173,7 @@ module Box
           organization_id: organization.id) }
 
         def perform_request
-          post "management/accounts/#{account.iban}/subscribers", data, { 'Authorization' => "Bearer #{user.access_token}" }
+          post "management/accounts/#{account.iban}/ebics_users", data, { 'Authorization' => "Bearer #{user.access_token}" }
         end
 
         context 'missing attributes' do
@@ -198,7 +198,7 @@ module Box
         context 'user with same used id' do
           let(:data) { { ebics_user: "test", user_id: user.id } }
 
-          before { account.add_subscriber(remote_user_id: 'test', user_id: user.id) }
+          before { account.add_ebics_user(remote_user_id: 'test', user_id: user.id) }
 
           it 'returns an error code' do
             perform_request
@@ -219,7 +219,7 @@ module Box
         context 'remote ebics server throws an error' do
           let(:data) { { ebics_user: "test", user_id: user.id } }
 
-          before { allow_any_instance_of(Subscriber).to receive(:setup!).and_return(false) }
+          before { allow_any_instance_of(EbicsUser).to receive(:setup!).and_return(false) }
 
           it 'returns an error status' do
             perform_request
@@ -228,11 +228,11 @@ module Box
 
           it 'returns a meaningful error message' do
             perform_request
-            expect_json 'message', 'Failed to setup subscriber. Make sure your data is valid and retry!'
+            expect_json 'message', 'Failed to setup ebics_user. Make sure your data is valid and retry!'
           end
 
-          it 'removes created subscriber' do
-            expect { perform_request }.to_not change { Subscriber.count }
+          it 'removes created ebics_user' do
+            expect { perform_request }.to_not change { EbicsUser.count }
           end
         end
 
@@ -248,25 +248,25 @@ module Box
 
           it 'returns a meaningful message' do
             perform_request
-            expect_json 'message', 'Subscriber has been created and setup successfully! Please fetch INI letter, sign it, and submit it to your bank.'
+            expect_json 'message', 'EbicsUser has been created and setup successfully! Please fetch INI letter, sign it, and submit it to your bank.'
           end
 
-          it 'returns a representation of the subscriber' do
+          it 'returns a representation of the ebics_user' do
             perform_request
-            expect_json 'subscriber.ebics_user', 'test'
+            expect_json 'ebics_user.ebics_user', 'test'
           end
         end
       end
 
-      describe 'GET /accounts/:iban/subscribers/ini_letter' do
+      describe 'GET /accounts/:iban/ebics_users/ini_letter' do
         let(:account) { Account.create(name: 'name', iban: 'iban', organization_id: organization.id) }
 
         def perform_request
-          get "management/accounts/#{account.iban}/subscribers/#{subscriber.id}/ini_letter", { 'Authorization' => "Bearer #{user.access_token}" }
+          get "management/accounts/#{account.iban}/ebics_users/#{ebics_user.id}/ini_letter", { 'Authorization' => "Bearer #{user.access_token}" }
         end
 
         context 'setup has not been performed' do
-          let(:subscriber) { account.add_subscriber(remote_user_id: 'test1') }
+          let(:ebics_user) { account.add_ebics_user(remote_user_id: 'test1') }
 
           it 'fails with an error status' do
             perform_request
@@ -275,12 +275,12 @@ module Box
 
           it 'fails with a meaningful error message' do
             perform_request
-            expect_json 'message', 'Subscriber setup not yet initiated'
+            expect_json 'message', 'EbicsUser setup not yet initiated'
           end
         end
 
         context 'setup has been initiated before' do
-          let(:subscriber) { account.add_subscriber(remote_user_id: "test1", ini_letter: "INI LETTER") }
+          let(:ebics_user) { account.add_ebics_user(remote_user_id: "test1", ini_letter: "INI LETTER") }
 
           it 'returns a success code' do
             perform_request

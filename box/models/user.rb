@@ -6,7 +6,7 @@ module Box
     self.unrestrict_primary_key
 
     many_to_one :organization
-    one_to_many :subscribers
+    one_to_many :ebics_users
 
     def before_create
       super

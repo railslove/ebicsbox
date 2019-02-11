@@ -3,12 +3,12 @@ require_relative '../models/event'
 module Box
   module BusinessProcesses
     class NewAccount
-      # Raised when something goes wrong when setting up remote subscriber
+      # Raised when something goes wrong when setting up remote ebics_user
       EbicsError = Class.new(StandardError)
 
       def self.create!(organization, user, params)
         # Remove it, so we can safely pass params to account create method
-        subscriber = params.delete(:subscriber)
+        ebics_user = params.delete(:ebics_user)
 
         # Always create fake accounts in sandbox mode
         if Box.configuration.sandbox?
@@ -18,9 +18,9 @@ module Box
 
         DB.transaction do
           account = organization.add_account(params)
-          subscriber = account.add_subscriber(user_id: user.id, remote_user_id: subscriber)
+          ebics_user = account.add_ebics_user(user_id: user.id, remote_user_id: ebics_user)
 
-          if subscriber.setup!
+          if ebics_user.setup!
             Event.account_created(account)
             account
           else

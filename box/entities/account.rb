@@ -1,6 +1,6 @@
 require 'grape-entity'
 
-require_relative './subscriber'
+require_relative './ebics_user'
 
 module Box
   module Entities
@@ -17,9 +17,9 @@ module Box
         account.mode == 'File' || account.mode == 'Fake'
       end
 
-      expose(:subscriber, if: -> (account, options) { options[:include].try(:include?, 'subscriber') }) do |account|
-        if subscriber = account.subscriber_for(options[:env]['box.user'].id)
-          Entities::Subscriber.represent(subscriber, only: [:ebics_user, :signature_class, :state, :submitted_at, :activated_at])
+      expose(:ebics_user, if: -> (account, options) { options[:include].try(:include?, 'ebics_user') }) do |account|
+        if ebics_user = account.ebics_user_for(options[:env]['box.user'].id)
+          Entities::EbicsUser.represent(ebics_user, only: [:ebics_user, :signature_class, :state, :submitted_at, :activated_at])
         end
       end
 

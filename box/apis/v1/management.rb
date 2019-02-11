@@ -4,7 +4,7 @@ require 'sequel'
 # Validations
 require_relative '../../validations/unique_account'
 require_relative '../../validations/active_account'
-require_relative '../../validations/unique_subscriber'
+require_relative '../../validations/unique_ebics_user'
 
 # Helpers
 require_relative '../../helpers/default'
@@ -121,43 +121,43 @@ module Box
             end
           end
 
-          resource 'accounts/:account_id/subscribers' do
+          resource 'accounts/:account_id/ebics_users' do
             get ':id/ini_letter' do
-              subscriber = Subscriber.join(:accounts, id: :account_id).where(organization_id: current_organization.id, iban: params[:account_id]).first!(Sequel.qualify(:subscribers, :id) => params[:id])
-              if subscriber.ini_letter.nil?
-                error!({ message: 'Subscriber setup not yet initiated!' }, 412)
+              ebics_user = EbicsUser.join(:accounts, id: :account_id).where(organization_id: current_organization.id, iban: params[:account_id]).first!(Sequel.qualify(:ebics_users, :id) => params[:id])
+              if ebics_user.ini_letter.nil?
+                error!({ message: 'EbicsUser setup not yet initiated!' }, 412)
               else
                 content_type 'text/html'
-                subscriber.ini_letter
+                ebics_user.ini_letter
               end
             end
 
             get do
               account = current_organization.accounts_dataset.first!(iban: params[:account_id])
-              present account.subscribers, with: Entities::Subscriber
+              present account.ebics_users, with: Entities::EbicsUser
             end
 
             params do
-              requires :user_id, type: Integer, desc: "Internal user identifier to associate the subscriber with"
-              requires :ebics_user, type: String, unique_subscriber: true, desc: "EBICS user to represent"
+              requires :user_id, type: Integer, desc: "Internal user identifier to associate the ebics_user with"
+              requires :ebics_user, type: String, unique_ebics_user: true, desc: "EBICS user to represent"
             end
             post do
               account = current_organization.accounts_dataset.first!(iban: params[:account_id])
               declared_params = declared(params)
               ebics_user = declared_params.delete(:ebics_user)
-              subscriber = account.add_subscriber(declared_params.merge(remote_user_id: ebics_user))
-              if subscriber
-                if subscriber.setup!
+              ebics_user = account.add_ebics_user(declared_params.merge(remote_user_id: ebics_user))
+              if ebics_user
+                if ebics_user.setup!
                   {
-                    message: 'Subscriber has been created and setup successfully! Please fetch INI letter, sign it, and submit it to your bank.',
-                    subscriber: Entities::Subscriber.represent(subscriber),
+                    message: 'EbicsUser has been created and setup successfully! Please fetch INI letter, sign it, and submit it to your bank.',
+                    ebics_user: Entities::EbicsUser.represent(ebics_user),
                   }
                 else
-                  subscriber.destroy
-                  error!({ message: 'Failed to setup subscriber. Make sure your data is valid and retry!' }, 412)
+                  ebics_user.destroy
+                  error!({ message: 'Failed to setup ebics_user. Make sure your data is valid and retry!' }, 412)
                 end
               else
-                error!({ message: 'Failed to create subscriber' }, 400)
+                error!({ message: 'Failed to create ebics_user' }, 400)
               end
             end
           end
