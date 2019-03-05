@@ -20,7 +20,7 @@ gem 'puma'
 gem 'jwt'
 gem 'rack-cors', require: false
 gem 'pg'
-gem 'epics', '~> 1.6.0'
+gem 'epics'
 gem 'sentry-raven'
 gem 'sidekiq'
 
