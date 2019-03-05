@@ -47,7 +47,7 @@ jobs:
       cache: false
       install: skip
       before_script:
-        - docker login -u "$REGISTRY_USER" -p "$REGISTRY_PASS"
+        - docker login -u "$DOCKER_USER" -p "$DOCKER_PASS"
       script:
         - docker build -t ebicsbox:$TRAVIS_TAG .
         - docker tag ebicsbox:$TRAVIS_TAG railslove/ebicsbox:$TRAVIS_TAG
