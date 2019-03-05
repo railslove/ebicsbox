@@ -27,7 +27,6 @@ jobs:
         - bundle exec bin/migrate
       script:
         - bundle exec rspec spec
-
     - stage: build
       language: minimal
       cache: false
@@ -39,7 +38,6 @@ jobs:
         - docker tag ebicsbox:latest railslove/ebicsbox:latest
         - docker push railslove/ebicsbox:latest
       if: branch = master
-
     - stage: build
       language: minimal
       cache: false
@@ -51,9 +49,8 @@ jobs:
         - docker tag ebicsbox:${TRAVIS_TAG} railslove/ebicsbox:${TRAVIS_TAG}
         - docker push railslove/ebicsbox:${TRAVIS_TAG}
       if: tag IS present
-
 notifications:
   slack:
-    on_success: change
+    on_success: always
     on_failure: always
-    secure: hQ448PKksVM8tscDzphg/QZvpRrnowFNJq/zNMqZg1GtYJ+Rxpf0hEYg3COx628xzCclEre90+QX7VnZbyL+rrtaYTV8r05/tQ344kDfRKUZlNTPrnCasm0mpmTuT1b8hbSzOH2JkUqgKpm76Kl3CVm6RLVH/E2NEBhj4pC2eS8=
+    secure: T+A+w3m8OffyVJuCrzpYMkbRA5GEwP33XeyhLXmRwsFsyRV9yftuugH7zKfY095GffP0h2lyHzAsGbUIYwWQNfHbo8WoHWwll23isEvnunrEQvSPyXvdLNnYuKBlPQLviBhsFyAt67Etr9Blh0E4AjURxiMHIXWgJep2tgoo6bM=
