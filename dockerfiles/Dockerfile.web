@@ -1,2 +1,0 @@
-FROM railslove/ebicsbox
-CMD bundle exec rackup -p $PORT

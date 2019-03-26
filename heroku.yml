@@ -11,8 +11,8 @@ setup:
     AUTH_SERVICE: static
 build:
   docker:
-    web: dockerfiles/Dockerfile.web
-    worker: dockerfiles/Dockerfile.worker
+    web: Dockerfile
+    worker: Dockerfile
   config:
     RACK_ENV: production
     AUTH_SERVICE: static
