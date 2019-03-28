@@ -139,49 +139,6 @@ Then add the git handle and push the first iteration.
 # To https://git.heroku.com/ebicsbox.git
 ```
 
-## Follow-up Deployment
-
-The initial setup takes care of the first deployment. Each recurring deployment to update the box afterwards follows another procedure.
-
-```bash
-> heroku container:push web worker --recursive --app DESIRED_APP_NAME
-
-# === Building web (/Users/stevenuniverse/ebicsbox/dockerfiles/Dockerfile.web)
-# Sending build context to Docker daemon  4.096kB
-# Step 1/2 : FROM ebicsbox:latest
-# ---> 418b1c33dda1
-# Step 2/2 : CMD bundle exec rackup -p $PORT
-# ---> Using cache
-# ---> e19e8510f380
-# Successfully built e19e8510f380
-# Successfully tagged registry.heroku.com/ebicsbox/web:latest
-# === Building worker (/Users/stevenuniverse/ebicsbox/dockerfiles/Dockerfile.worker)
-# Sending build context to Docker daemon  4.096kB
-# Step 1/2 : FROM ebicsbox:latest
-# ---> 418b1c33dda1
-# Step 2/2 : CMD bundle exec sidekiq -C ./config/sidekiq.yml -r ./config/sidekiq.rb
-# ---> Using cache
-# ---> e8f94077181c
-# Successfully built e8f94077181c
-# Successfully tagged registry.heroku.com/ebicsbox/worker:latest
-# === Pushing web (/Users/stevenuniverse/ebicsbox/dockerfiles/Dockerfile.web)
-# ...
-# ...
-# this takes a while
-# ...
-# ...
-# Your images have been successfully pushed. You can now release them with the 'container:release' command.
-```
-
-This builds and pushes the required container to heroku.
-
-Last but not least, release the container
-
-```bash
-> heroku container:release web worker --app DESIRED_APP_NAME
-# Releasing images web,worker to ebicsbox... done
-```
-
 Voilà, that should do the trick. Go and try reloading the page.
 
 Also, make sure you have at least one worker dyno startet as it seems that this is not the case by default. To do so run:
