@@ -24,5 +24,6 @@ RUN rm Procfile*
 RUN rm README*
 RUN rm docker-compose.yml
 RUN rm replicated-compose.yml
+RUN rm -rf docs
 
 CMD ["bin/start", "all"]
