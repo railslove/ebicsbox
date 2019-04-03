@@ -41,6 +41,12 @@ After doing so, setup the new app **from within the folder with the `heroku.yml`
 
 #### Set ENV
 
+If you have not created the app via manifest, make sure to the set the stack to container by running
+
+```bash
+heroku stack:set container -a DESIRED_APP_NAME
+```
+
 Afterward, make sure to set the required environment variables
 
 ```bash
@@ -68,8 +74,8 @@ and you should see something like this, where you can adjust your databse and re
 Also, adjust the scheduler settings to run these every hour:
 
 ```bash
-> rake enqueue:update_processing_status
-> rake enqueue:fetch_account_statements
+> bundle exec rake enqueue:update_processing_status
+> bundle exec rake enqueue:fetch_account_statements
 ```
 
 ![](./scheduler.png)
