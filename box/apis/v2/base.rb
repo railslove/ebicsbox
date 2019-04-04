@@ -64,9 +64,14 @@ module Box
           ### Webhooks
           The account callback url can be defined either through the account
           management UI or directly through the api. When the callback URL is
-          that, webhook delivery is enabled. Following are all supported
-          callbacks with parameters. In paranethesis is a short explanation for
-          the non obvious parameters, fixed values are written "as strings"
+          set, webhook delivery is enabled.
+
+          If the deliver of a webhooks fails for any reason, it will be
+          attempted again up to 20 times, exponentially delaying the execution.
+
+          Following are all supported callbacks with parameters. In
+          paranethesis is a short explanation for the non obvious parameters,
+          fixed values are written "as strings".
 
           Account Created:
           ```
