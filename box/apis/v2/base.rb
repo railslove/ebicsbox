@@ -7,6 +7,7 @@ require_relative './credit_transfers'
 require_relative './direct_debits'
 require_relative './service'
 require_relative './events'
+require_relative './webhooks'
 require_relative './transactions'
 require_relative './management/accounts'
 require_relative './management/subscribers'
@@ -26,6 +27,7 @@ module Box
         mount Transactions
         mount Events
         mount Management
+        mount Webhooks
 
         add_swagger_documentation \
           doc_version: 'v2',
