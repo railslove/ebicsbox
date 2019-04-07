@@ -1,6 +1,7 @@
 require 'grape'
 
 require_relative './api_endpoint'
+require_relative '../../models/event'
 require_relative '../../entities/v2/event'
 
 module Box
@@ -23,7 +24,7 @@ module Box
               an outage
             USAGE
           post 'reset' do
-            events = BOX::Event.where(Sequel.~(webhook_status: 'success'))
+            events = Box::Event.where(Sequel.~(webhook_status: 'success')).all
 
             events.each do |event|
               event
@@ -33,7 +34,7 @@ module Box
               Queue.trigger_webhook(event_id: event.id)
             end
 
-            present events, with: Entities::V2::EVENT
+            present [], with: Entities::V2::Event
           end
         end
       end
