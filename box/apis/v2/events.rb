@@ -49,7 +49,7 @@ module Box
             detail: <<-USAGE.strip_heredoc
               Get details on every triggered event. In case of a webhook delivery, all attempts
               are listed. For each attempt we store data on its response and errors if any are
-              encountered. After 10 attempts, the system will stop to any retries.
+              encountered. After 20 attempts, the system will stop to any retries.
             USAGE
 
           params do

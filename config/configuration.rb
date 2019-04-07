@@ -1,4 +1,4 @@
-if %w[development test].include?(ENV['RACK_ENV'])
+unless ENV['RACK_ENV'] == 'production'
   # Load environment from file
   require 'dotenv'
   Dotenv.load
