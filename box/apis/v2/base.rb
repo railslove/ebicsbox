@@ -71,6 +71,9 @@ module Box
           If the deliver of a webhooks fails for any reason, it will be
           attempted again up to 20 times, exponentially delaying the execution.
 
+          After that, to reset the retry count, `POST: /webhooks/reset` can be
+          used. See below.
+
           Following are all supported callbacks with parameters. In
           paranethesis is a short explanation for the non obvious parameters,
           fixed values are written "as strings".
