@@ -29,6 +29,8 @@ module Box
               event
                 .set(webhook_status: 'pending', webhook_retries: 0)
                 .save
+
+              Queue.trigger_webhook(event_id: event.id)
             end
 
             present events, with: Entities::V2::EVENT
