@@ -42,7 +42,7 @@ module Box
           post "webhooks/reset", {}, TestHelpers::VALID_HEADERS
 
           expect_json '*.type', 'test'
-          expect_json_sizes '*', 2
+          expect_json_sizes '', 2
         end
 
         it 'changes the status to pending and retries to 0' do

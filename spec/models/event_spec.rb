@@ -88,5 +88,23 @@ module Box
         end
       end
     end
+
+    describe 'reset_webhook_delivery' do
+      before { subject.set(webhook_status: 'failed', webhook_retries: 20).save }
+
+      it 'sets the status to "pending"' do
+        expect { subject.reset_webhook_delivery }.to change { subject.webhook_status }.to('pending')
+      end
+
+      it 'sets the retry count to 0' do
+        expect { subject.reset_webhook_delivery }.to change { subject.webhook_retries }.to(0)
+      end
+
+      it 'adds the webhook to the event queue' do
+        expect(Queue).to receive(:trigger_webhook).with({ event_id: subject.id })
+
+        subject.reset_webhook_delivery
+      end
+    end
   end
 end

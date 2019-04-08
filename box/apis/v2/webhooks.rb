@@ -24,17 +24,11 @@ module Box
               an outage
             USAGE
           post 'reset' do
-            events = Box::Event.where(Sequel.~(webhook_status: 'success')).all
+            events = Box::Event.exclude(webhook_status: 'success').all
 
-            events.each do |event|
-              event
-                .set(webhook_status: 'pending', webhook_retries: 0)
-                .save
+            events.each(&:reset_webhook_delivery)
 
-              Queue.trigger_webhook(event_id: event.id)
-            end
-
-            present [], with: Entities::V2::Event
+            present events, with: Entities::V2::Event
           end
         end
       end
