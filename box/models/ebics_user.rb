@@ -7,7 +7,7 @@ require_relative '../models/event'
 require_relative '../queue'
 
 module Box
-  class Subscriber < Sequel::Model
+  class EbicsUser < Sequel::Model
     self.raise_on_save_failure = true
 
     AlreadyActivated = Class.new(StandardError)
@@ -20,8 +20,8 @@ module Box
       {
         account_id: account.id,
         user_id: user.id,
-        subscriber: remote_user_id,
-        subscriber_id: id,
+        ebics_user: remote_user_id,
+        ebics_user_id: id,
         signature_class: signature_class,
       }
     end
@@ -52,20 +52,20 @@ module Box
       fail(AlreadyActivated) if !ini_letter.nil? && !reset
       fail(IncompleteEbicsData) unless ebics_data?
       # TODO: handle exceptions
-      Box.logger.info("setting up EBICS keys for subscriber #{id}")
+      Box.logger.info("setting up EBICS keys for ebics_user #{id}")
       epics = client_adapter.setup(passphrase, account.url, account.host, remote_user_id, account.partner)
       self.encryption_keys = epics.send(:dump_keys)
       self.save
-      Box.logger.info("starting EBICS key exchange for subscriber #{id}")
+      Box.logger.info("starting EBICS key exchange for ebics_user #{id}")
       epics.INI
       epics.HIA
       self.ini_letter = epics.ini_letter(account.bankname)
-      Box.logger.info("EBICS key exchange done and ini letter generated for subscriber #{id}")
+      Box.logger.info("EBICS key exchange done and ini letter generated for ebics_user #{id}")
       self.submitted_at = DateTime.now
       self.save
-      Queue.check_subscriber_activation(id, account.config.activation_check_interval)
+      Queue.check_ebics_user_activation(id, account.config.activation_check_interval)
     rescue Epics::Error::TechnicalError, Epics::Error::BusinessError => ex
-      Box.logger.error("Failed to init subscriber #{id}. Reason='#{ex.message}'")
+      Box.logger.error("Failed to init ebics_user #{id}. Reason='#{ex.message}'")
       false
     end
 
@@ -75,7 +75,7 @@ module Box
       self.encryption_keys = self.client.send(:dump_keys)
       self.activated_at ||= Time.now
       self.save
-      Box::Event.subscriber_activated(self)
+      Box::Event.ebics_user_activated(self)
       true
     rescue => e
       # TODO: show the error to the user

@@ -12,19 +12,19 @@ module Box
       let!(:organization) { Fabricate(:organization) }
       let!(:account) { organization.add_account(iban: 'AL90208110080000001039531801', name: 'Test account', mode: 'Fake', url: 'url', host: 'host', partner: 'partner') }
       let!(:user) { organization.add_user(name: 'Test user') }
-      let!(:subscriber) { account.add_subscriber(user_id: user.id, signature_class: 'T', activated_at: 1.day.ago) }
+      let!(:ebics_user) { account.add_ebics_user(user_id: user.id, signature_class: 'T', activated_at: 1.day.ago) }
 
       before(:each) { Sidekiq::Queue.all.each(&:clear) }
 
       describe 'Account setup' do
-        let(:subscriber) { account.add_subscriber(user_id: user.id, remote_user_id: 'TEST') }
+        let(:ebics_user) { account.add_ebics_user(user_id: user.id, remote_user_id: 'TEST') }
 
-        it 'allows to setup a subscriber' do
-          expect { subscriber.setup! }.to change { subscriber.reload.submitted_at }
+        it 'allows to setup a ebics_user' do
+          expect { ebics_user.setup! }.to change { ebics_user.reload.submitted_at }
         end
 
-        it 'allows to activate a subscriber' do
-          expect { subscriber.activate! }.to change { subscriber.reload.activated_at }
+        it 'allows to activate a ebics_user' do
+          expect { ebics_user.activate! }.to change { ebics_user.reload.activated_at }
         end
       end
 

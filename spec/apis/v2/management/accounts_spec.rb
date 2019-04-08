@@ -101,7 +101,7 @@ module Box
       end
 
       context 'activated account' do
-        before { account.add_subscriber(activated_at: 1.hour.ago) }
+        before { account.add_ebics_user(activated_at: 1.hour.ago) }
 
         it 'cannot change iban' do
           expect { put "management/accounts/#{account.iban}", { iban: 'new-iban' }, TestHelpers::VALID_HEADERS }.to_not change { account.reload.iban }

@@ -33,7 +33,7 @@ module Box
     one_to_many :bank_statements
     one_to_many :events
     one_to_many :statements
-    one_to_many :subscribers
+    one_to_many :ebics_users
     one_to_many :transactions
     many_to_one :organization
 
@@ -46,8 +46,8 @@ module Box
         query = self
         # Filter by status
         query = case params[:status]
-          when 'activated' then query.left_join(:subscribers, account_id: :id).exclude(subscribers__activated_at: nil)
-          when 'not_activated' then query.left_join(:subscribers, account_id: :id).where(subscribers__activated_at: nil)
+          when 'activated' then query.left_join(:ebics_users, account_id: :id).exclude(ebics_users__activated_at: nil)
+          when 'not_activated' then query.left_join(:ebics_users, account_id: :id).where(ebics_users__activated_at: nil)
           else query
         end
         query
@@ -66,30 +66,30 @@ module Box
 
     def transport_client
       @transport_client ||= begin
-        base_scope = subscribers_dataset.exclude(subscribers__activated_at: nil)
-        subscriber = base_scope.where(subscribers__signature_class: 'T').first || base_scope.first
-        if subscriber.nil?
-          fail NoTransportClient, 'Please setup and activate at least one subscriber with a transport signature'
+        base_scope = ebics_users_dataset.exclude(ebics_users__activated_at: nil)
+        ebics_user = base_scope.where(ebics_users__signature_class: 'T').first || base_scope.first
+        if ebics_user.nil?
+          fail NoTransportClient, 'Please setup and activate at least one ebics_user with a transport signature'
         else
-          subscriber.client
+          ebics_user.client
         end
       end
     end
 
     def client_for(user_id)
-      subscriber_for(user_id).client
+      ebics_user_for(user_id).client
     end
 
-    def subscriber_for(user_id)
-      subscribers_dataset.first(user_id: user_id)
+    def ebics_user_for(user_id)
+      ebics_users_dataset.first(user_id: user_id)
     end
 
     def self.all_active_ids
-      join(:subscribers, :account_id => :id).select(:accounts__id).exclude(subscribers__activated_at: nil).map(&:id)
+      join(:ebics_users, :account_id => :id).select(:accounts__id).exclude(ebics_users__activated_at: nil).map(&:id)
     end
 
     def active?
-      subscribers.any?(&:active?)
+      ebics_users.any?(&:active?)
     end
 
     def status
@@ -139,18 +139,18 @@ module Box
       save
     end
 
-    def add_unique_subscriber(user_id, ebics_user)
+    def add_unique_ebics_user(user_id, ebics_user)
       DB.transaction do
-        if !!subscriber_for(user_id)
-          fail('This user already has a subscriber for this account.')
+        if !!ebics_user_for(user_id)
+          fail('This user already has a ebics_user for this account.')
         end
 
-        if subscribers_dataset.where(remote_user_id: ebics_user).any?
+        if ebics_users_dataset.where(remote_user_id: ebics_user).any?
           fail('Another user is using the same EBICS user id.')
         end
 
-        if !(subscriber = add_subscriber(user_id: user_id, remote_user_id: ebics_user)) || !subscriber.setup!
-          fail('Failed to create subscriber.')
+        if !(ebics_user = add_ebics_user(user_id: user_id, remote_user_id: ebics_user)) || !ebics_user.setup!
+          fail('Failed to create ebics_user.')
         end
       end
     end

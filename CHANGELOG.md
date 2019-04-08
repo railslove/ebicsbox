@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0
+
+- [ENHANCEMENT] renames subscribers to ebics user to lessen complexity
+
 ## 1.0.1
 
 - [DEPS] updates epics to work with sparkasse again

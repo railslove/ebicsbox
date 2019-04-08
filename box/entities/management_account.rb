@@ -1,6 +1,6 @@
 require 'grape-entity'
 
-require_relative './subscriber'
+require_relative './ebics_user'
 
 module Box
   module Entities
@@ -21,12 +21,12 @@ module Box
         account.mode == 'File' || account.mode == 'Fake'
       end
 
-      expose :subscribers, using: Entities::Subscriber, if: { type: "full" }
+      expose :ebics_users, using: Entities::EbicsUser, if: { type: "full" }
 
       expose(:_links, documentation: { type: "Hash", desc: "Links to resources" }) do |account, options|
         {
           self: Box.configuration.app_url + "/management/accounts/#{account.iban}",
-          subscribers: Box.configuration.app_url + "/management/accounts/#{account.iban}/subscribers",
+          ebics_users: Box.configuration.app_url + "/management/accounts/#{account.iban}/ebics_users",
         }
       end
     end

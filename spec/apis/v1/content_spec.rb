@@ -148,7 +148,7 @@ module Box
         context 'account is activated and accessible' do
           let(:account) { organization.add_account(iban: 'AL90208110080000001039531801', name: 'Test Account', creditor_identifier: 'DE98ZZZ09999999999') }
 
-          before { account.add_subscriber(activated_at: 1.day.ago) }
+          before { account.add_ebics_user(activated_at: 1.day.ago) }
 
           context 'invalid data' do
             it 'includes a proper error message' do
@@ -260,7 +260,7 @@ module Box
         context 'account is activated and accessible' do
           let(:account) { organization.add_account(iban: 'AL90208110080000001039531801', name: 'Test Account', creditor_identifier: 'DE98ZZZ09999999999') }
 
-          before { account.add_subscriber(activated_at: 1.day.ago) }
+          before { account.add_ebics_user(activated_at: 1.day.ago) }
 
           context 'invalid data' do
             it 'includes a proper error message' do
@@ -337,7 +337,7 @@ module Box
 
           before(:each) do
             allow(Jobs::FetchStatements).to receive(:for_account).and_return({ total: 12, imported: 3 })
-            account.add_subscriber(activated_at: 1.day.ago)
+            account.add_ebics_user(activated_at: 1.day.ago)
 
             get "/#{account.iban}/import/statements?from=#{from}&to=#{to}", 'Authorization' => "token #{user.access_token}"
           end

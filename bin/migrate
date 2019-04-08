@@ -2,6 +2,13 @@
 require 'securerandom'
 require 'sequel'
 
+env = ENV.fetch('RACK_ENV', :development)
+if %w[development test].include?(env.to_s)
+  # Load environment from file
+  require 'dotenv'
+  Dotenv.load
+end
+
 # Load app configuration
 require_relative '../config/bootstrap'
 Sequel.extension :migration, :core_extensions

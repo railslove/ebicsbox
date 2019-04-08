@@ -1,6 +1,6 @@
 require 'grape-entity'
 
-require_relative './subscriber'
+require_relative './ebics_user'
 
 module Box
   module Entities
@@ -9,7 +9,7 @@ module Box
       expose :name, documentation: { type: "String", desc: "Display name for given bank account" }
       expose :access_token, documentation: { type: "String", desc: "The user's access token" }, if: :include_token
       expose :created_at, documentation: { type: "DateTime", desc: "Date and time when user was created" }
-      expose :subscribers, using: Entities::Subscriber, if: { type: "full" }
+      expose :ebics_users, using: Entities::EbicsUser, if: { type: "full" }
 
       expose(:_links, documentation: { type: "Hash", desc: "Links to resources" }) do |user, options|
         {

@@ -7,7 +7,7 @@ module Box
     module V2
       MAPPED_TYPES = {
         'statement_created' => 'transaction_created',
-        'subscriber_activated' => 'account_activated',
+        'ebics_user_activated' => 'account_activated',
       }
       class Event < Grape::Entity
         expose :public_id, as: 'id'

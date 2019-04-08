@@ -7,8 +7,8 @@ module Box
     module V2
       RSpec.describe Event do
         describe "type mapping" do
-          it "transforms subscriber to account activation" do
-            event = Box::Event.new(type: "subscriber_activated")
+          it "transforms ebics_user to account activation" do
+            event = Box::Event.new(type: "ebics_user_activated")
             expect(described_class.represent(event).as_json).to match(hash_including(type: "account_activated"))
           end
 

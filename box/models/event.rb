@@ -13,7 +13,7 @@ module Box
       :debit_created,
       :credit_created,
       :statement_created,
-      :subscriber_activated,
+      :ebics_user_activated,
       :credit_status_changed,
       :debit_status_changed
     ]

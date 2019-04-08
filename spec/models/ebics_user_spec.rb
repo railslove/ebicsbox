@@ -1,5 +1,5 @@
 module Box
-  RSpec.describe Subscriber do
+  RSpec.describe EbicsUser do
     describe 'acticated?' do
       specify do
         expect(described_class.new(activated_at: Time.now)).to be_active
@@ -15,7 +15,7 @@ module Box
         before { subject.update(remote_user_id: nil) }
 
         it 'fails to submit' do
-          expect { subject.setup! }.to raise_error(Subscriber::IncompleteEbicsData)
+          expect { subject.setup! }.to raise_error(EbicsUser::IncompleteEbicsData)
         end
       end
 
@@ -23,7 +23,7 @@ module Box
         before { subject.update(ini_letter: 'some data') }
 
         it 'fails if reset flag is not set' do
-          expect { subject.setup! }.to raise_error(Subscriber::AlreadyActivated)
+          expect { subject.setup! }.to raise_error(EbicsUser::AlreadyActivated)
         end
       end
 
@@ -46,7 +46,7 @@ module Box
       end
 
       it 'queues an account activation job' do
-        expect(Box::Queue).to receive(:check_subscriber_activation).with(subject.id, anything)
+        expect(Box::Queue).to receive(:check_ebics_user_activation).with(subject.id, anything)
         subject.setup!
       end
     end
