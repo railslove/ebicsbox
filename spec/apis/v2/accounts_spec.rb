@@ -13,7 +13,7 @@ module Box
       creditor_identifier: :string,
       callback_url: :string,
       status: :string,
-      subscriber: :string,
+      ebics_user: :string,
     }
 
     NEW_ACCOUNT_SPEC = {
@@ -21,7 +21,7 @@ module Box
       iban: :string,
       bic: :string,
       status: :string,
-      subscriber: :string,
+      ebics_user: :string,
     }
     ###
     ### GET /accounts
@@ -151,7 +151,7 @@ module Box
             host: :array_of_strings,
             partner: :array_of_strings,
             url: :array_of_strings,
-            subscriber: :array_of_strings,
+            ebics_user: :array_of_strings,
           }
         end
 
@@ -163,24 +163,24 @@ module Box
         it 'does not allow two accounts with the same IBAN' do
           account = Fabricate(:account, organization_id: organization.id)
           payload = Fabricate.attributes_for(:account)
-          post "/accounts", payload.merge(subscriber: "SOMEUSER", iban: account.iban), TestHelpers::VALID_HEADERS
+          post "/accounts", payload.merge(ebics_user: "SOMEUSER", iban: account.iban), TestHelpers::VALID_HEADERS
           expect_json 'errors.iban', ["must be unique"]
         end
 
         it 'handles bank related errors when setting up an account' do
-          allow_any_instance_of(Subscriber).to receive(:setup!).and_return(false)
+          allow_any_instance_of(EbicsUser).to receive(:setup!).and_return(false)
           payload = Fabricate.attributes_for(:account)
-          post "/accounts", payload.merge(subscriber: "SOMEUSER"), TestHelpers::VALID_HEADERS
-          expect_json 'message', 'Failed to setup subscriber with your bank. Make sure your data is valid and retry!'
+          post "/accounts", payload.merge(ebics_user: "SOMEUSER"), TestHelpers::VALID_HEADERS
+          expect_json 'message', 'Failed to setup ebics_user with your bank. Make sure your data is valid and retry!'
         end
       end
 
       context 'valid data' do
-        before { allow_any_instance_of(Subscriber).to receive(:setup!).and_return(true) }
+        before { allow_any_instance_of(EbicsUser).to receive(:setup!).and_return(true) }
 
         def do_request
           payload = Fabricate.attributes_for(:account)
-          post "/accounts", payload.merge(subscriber: "SOMEUSER"), TestHelpers::VALID_HEADERS
+          post "/accounts", payload.merge(ebics_user: "SOMEUSER"), TestHelpers::VALID_HEADERS
         end
 
         it 'returns a 201' do
@@ -202,8 +202,8 @@ module Box
           expect { do_request }.to change { Account.count }.by(1)
         end
 
-        it 'creates a new subscriber' do
-          expect { do_request }.to change { Subscriber.count }.by(1)
+        it 'creates a new ebics_user' do
+          expect { do_request }.to change { EbicsUser.count }.by(1)
         end
 
         it 'triggers an event' do
@@ -214,7 +214,7 @@ module Box
           other_organization = Fabricate(:organization)
           account = Fabricate(:account, organization_id: other_organization.id)
           payload = Fabricate.attributes_for(:account)
-          post "/accounts", payload.merge(subscriber: "SOMEUSER", iban: account.iban), TestHelpers::VALID_HEADERS
+          post "/accounts", payload.merge(ebics_user: "SOMEUSER", iban: account.iban), TestHelpers::VALID_HEADERS
           expect_status 201
         end
 
@@ -305,7 +305,7 @@ module Box
       end
 
       context 'setup has not been performed' do
-        before { account.subscribers.first.update(activated_at: nil, user_id: user.id) }
+        before { account.ebics_users.first.update(activated_at: nil, user_id: user.id) }
 
         it 'fails with an error status' do
           get "/accounts/#{account.iban}/ini_letter", TestHelpers::VALID_HEADERS
@@ -314,12 +314,12 @@ module Box
 
         it 'fails with a meaningful error message' do
           get "/accounts/#{account.iban}/ini_letter", TestHelpers::VALID_HEADERS
-          expect_json 'message', 'Subscriber setup not yet initiated'
+          expect_json 'message', 'EbicsUser setup not yet initiated'
         end
       end
 
       context 'setup has been initiated before' do
-        before { account.subscribers.first.update(ini_letter: "INI LETTER", user_id: user.id) }
+        before { account.ebics_users.first.update(ini_letter: "INI LETTER", user_id: user.id) }
 
         it 'returns a success code' do
           get "/accounts/#{account.iban}/ini_letter", TestHelpers::VALID_HEADERS
@@ -383,7 +383,7 @@ module Box
           }.to_not change { account.reload.bic }
         end
 
-        it 'cannot change subscriber'
+        it 'cannot change ebics_user'
 
         it 'allows changes of internal descriptor' do
           expect {

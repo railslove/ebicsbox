@@ -28,23 +28,23 @@ module Box
 
       it 'puts all existing account ids onto the job if none is provided' do
         accounts = Array.new(3).map do
-          Account.create.tap { |account| Subscriber.create(account: account, activated_at: Time.now) }
+          Account.create.tap { |account| EbicsUser.create(account: account, activated_at: Time.now) }
         end
         described_class.fetch_account_statements
         expect(tube.first.args).to include('account_ids' => accounts.map(&:id))
       end
     end
 
-    describe '.check_subscriber_activation' do
+    describe '.check_ebics_user_activation' do
       let(:tube) { Sidekiq::Queue.new('check.activations') }
 
       context 'delay check by default' do
         it 'schedules a new job' do
-          expect { described_class.check_subscriber_activation(1, 120) }.to change { scheduled_jobs.size }
+          expect { described_class.check_ebics_user_activation(1, 120) }.to change { scheduled_jobs.size }
         end
 
         it 'schedules by given time' do
-          jid = described_class.check_subscriber_activation(1, 45)
+          jid = described_class.check_ebics_user_activation(1, 45)
           job = scheduled_jobs.find { |j| j.jid == jid }
           creation_time = Time.at(job.created_at)
           execution_time = Time.at(job.score)
@@ -53,12 +53,12 @@ module Box
         end
 
         it 'puts only provided account id onto job' do
-          described_class.check_subscriber_activation(1, 0)
-          expect(tube.first.args).to include('subscriber_id' => 1)
+          described_class.check_ebics_user_activation(1, 0)
+          expect(tube.first.args).to include('ebics_user_id' => 1)
         end
 
         it 'does not queue it right away' do
-          expect { described_class.check_subscriber_activation(1, 120) }.not_to change { tube.size }
+          expect { described_class.check_ebics_user_activation(1, 120) }.not_to change { tube.size }
         end
       end
     end
@@ -86,7 +86,7 @@ module Box
 
         it 'puts all existing account ids onto the job if none is provided' do
           accounts = Array.new(3).map do
-            Account.create.tap { |account| Subscriber.create(account: account, activated_at: Time.now) }
+            Account.create.tap { |account| EbicsUser.create(account: account, activated_at: Time.now) }
           end
           jid = described_class.update_processing_status
 

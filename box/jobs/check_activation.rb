@@ -1,5 +1,5 @@
 require_relative '../queue'
-require_relative '../models/subscriber'
+require_relative '../models/ebics_user'
 
 module Box
   module Jobs
@@ -7,13 +7,13 @@ module Box
       include Sidekiq::Worker
       sidekiq_options queue: 'check.activations'
 
-      def perform(subscriber_id)
-        subscriber = Subscriber.find(id: subscriber_id)
-        if subscriber.activate!
-          Box.logger.info("[Jobs::CheckActivation] Activated subscriber! subscriber_id=#{subscriber_id}")
+      def perform(ebics_user_id)
+        ebics_user = EbicsUser.find(id: ebics_user_id)
+        if ebics_user.activate!
+          Box.logger.info("[Jobs::CheckActivation] Activated ebics_user! ebics_user_id=#{ebics_user_id}")
         else
-          Queue.check_subscriber_activation(subscriber_id, subscriber.account.config.activation_check_interval)
-          Box.logger.info("[Jobs::CheckActivation] Failed to activate subscriber! subscriber_id=#{subscriber_id}")
+          Queue.check_ebics_user_activation(ebics_user_id, ebics_user.account.config.activation_check_interval)
+          Box.logger.info("[Jobs::CheckActivation] Failed to activate ebics_user! ebics_user_id=#{ebics_user_id}")
         end
       end
     end

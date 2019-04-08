@@ -8,7 +8,7 @@ module Box
     RSpec.describe FetchStatements do
       subject(:job) { described_class.new }
       let(:account) { Account.create(host: 'HOST', iban: 'iban1234567') }
-      let!(:subscriber) { account.add_subscriber(signature_class: 'T', activated_at: 1.day.ago) }
+      let!(:ebics_user) { account.add_ebics_user(signature_class: 'T', activated_at: 1.day.ago) }
 
       describe '.for_account' do
         it 'fetches statement for a single account' do
@@ -37,7 +37,7 @@ module Box
 
         before do
           account.imported_at!(1.day.ago)
-          allow_any_instance_of(Subscriber).to receive(:client) { client }
+          allow_any_instance_of(EbicsUser).to receive(:client) { client }
           allow(client).to receive(:STA).and_return(File.read('spec/fixtures/mt940.txt'))
           allow(Account).to receive(:[]).and_return(double('account', organization: double('orga', webhook_token: 'token')))
 

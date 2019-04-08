@@ -72,7 +72,7 @@ module Box
         include Apis::V1::Events
 
         params do
-          optional :include, type: Array[String], desc: 'Additional data to include. Can be one of: subscriber'
+          optional :include, type: Array[String], desc: 'Additional data to include. Can be one of: ebics_user'
         end
         get 'accounts' do
           accounts = current_organization.accounts_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
@@ -164,11 +164,11 @@ module Box
           params do
             requires :ebics_user, type: String, desc: 'IBAN for an existing account'
           end
-          post 'subscribers' do
-            account.add_unique_subscriber(current_user.id, params[:ebics_user])
-            { message: 'Subscriber has been created and setup successfully! INI letter has been sent via eMail.' }
+          post 'ebics_users' do
+            account.add_unique_ebics_user(current_user.id, params[:ebics_user])
+            { message: 'EbicsUser has been created and setup successfully! INI letter has been sent via eMail.' }
           rescue StandardError => ex
-            Box.logger.info { "[Content::AddSubscriber] #{ex.message}" }
+            Box.logger.info { "[Content::AddEbicsUser] #{ex.message}" }
             error!({ message: ex.message }, 400)
           end
 

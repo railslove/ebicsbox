@@ -9,7 +9,7 @@ require_relative './service'
 require_relative './events'
 require_relative './transactions'
 require_relative './management/accounts'
-require_relative './management/subscribers'
+require_relative './management/ebics_users'
 require_relative './management/users'
 
 

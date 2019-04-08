@@ -83,11 +83,11 @@ module Box
         let(:client) { double('Client') }
         let(:account) { Account.create }
         let(:user) { User.create }
-        let!(:subscriber) { user.add_subscriber(account: account) }
+        let!(:ebics_user) { user.add_ebics_user(account: account) }
         subject(:transaction) { account.add_transaction(user: user, order_type: 'test', payload: 'my-pain', type: 'debit') }
 
         before do
-          allow_any_instance_of(Subscriber).to receive(:client).and_return(client)
+          allow_any_instance_of(EbicsUser).to receive(:client).and_return(client)
           allow(client).to receive(:public_send) do |type, pain|
             ["transaction-#{type}", "order-#{type}"]
           end

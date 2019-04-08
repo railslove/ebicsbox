@@ -42,8 +42,8 @@ module Box
       Jobs::Debit.perform_async(payload)
     end
 
-    def self.check_subscriber_activation(subscriber_id, delay)
-      Jobs::CheckActivation.perform_in(delay, subscriber_id: subscriber_id)
+    def self.check_ebics_user_activation(ebics_user_id, delay)
+      Jobs::CheckActivation.perform_in(delay, ebics_user_id: ebics_user_id)
     end
   end
 end

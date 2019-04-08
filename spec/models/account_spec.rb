@@ -6,24 +6,24 @@ module Box
     describe '#transport_client' do
       subject(:account) { described_class.create(mode: "Fake") }
 
-      context 'no subscriber added' do
+      context 'no ebics_user added' do
         it 'fails with an no transport client exceptiopn' do
           expect { account.transport_client }.to raise_error(Account::NoTransportClient)
         end
       end
 
-      context 'no activated subscriber available' do
-        before { account.add_subscriber(activated_at: nil) }
+      context 'no activated ebics_user available' do
+        before { account.add_ebics_user(activated_at: nil) }
 
         it 'fails with an no transport client exceptiopn' do
           expect { account.transport_client }.to raise_error(Account::NoTransportClient)
         end
       end
 
-      context 'activated T and another subscriber available' do
+      context 'activated T and another ebics_user available' do
         before do
-          account.add_subscriber(remote_user_id: 'E-USER', signature_class: 'E', activated_at: Date.new(2015, 1, 1))
-          account.add_subscriber(remote_user_id: 'T-USER', signature_class: 'T', activated_at: Date.new(2015, 1, 1))
+          account.add_ebics_user(remote_user_id: 'E-USER', signature_class: 'E', activated_at: Date.new(2015, 1, 1))
+          account.add_ebics_user(remote_user_id: 'T-USER', signature_class: 'T', activated_at: Date.new(2015, 1, 1))
         end
 
         it 'returns a client instance' do
@@ -35,12 +35,12 @@ module Box
         end
       end
 
-      context 'no activated T subscriber' do
+      context 'no activated T ebics_user' do
         before do
-          account.add_subscriber(signature_class: 'E', activated_at: Date.new(2015, 1, 1))
+          account.add_ebics_user(signature_class: 'E', activated_at: Date.new(2015, 1, 1))
         end
 
-        it 'falls back to non-T subscriber' do
+        it 'falls back to non-T ebics_user' do
           expect(account.transport_client).to respond_to(:STA)
         end
       end
@@ -55,8 +55,8 @@ module Box
         activated_account = described_class.create
         inactive_account = described_class.create
 
-        Subscriber.create(account: activated_account, activated_at: Time.now)
-        Subscriber.create(account: inactive_account, activated_at: nil)
+        EbicsUser.create(account: activated_account, activated_at: Time.now)
+        EbicsUser.create(account: inactive_account, activated_at: nil)
 
         expect(described_class.all_active_ids).to eq([activated_account.id])
       end
@@ -66,7 +66,7 @@ module Box
       subject { Account.create(name: 'name', bic: 'bic', iban: 'iban', creditor_identifier: 'ci') }
 
       context 'activated account' do
-        before { subject.add_subscriber(activated_at: 1.day.ago) }
+        before { subject.add_ebics_user(activated_at: 1.day.ago) }
 
         it 'returns only relevant pain attributes' do
           expect(subject.pain_attributes_hash.keys).to eq([:name, :bic, :iban, :creditor_identifier])
@@ -84,7 +84,7 @@ module Box
       subject { Account.create(name: 'name', bic: 'bic', iban: 'iban', creditor_identifier: 'ci') }
 
       context 'activated account' do
-        before { subject.add_subscriber(activated_at: 1.day.ago) }
+        before { subject.add_ebics_user(activated_at: 1.day.ago) }
 
         it 'returns only relevant pain attributes' do
           expect(subject.credit_pain_attributes_hash.keys).to eq([:name, :bic, :iban])
