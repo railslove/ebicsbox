@@ -4,6 +4,11 @@
 
 - [ENHANCEMENT] renames subscribers to ebics user to lessen complexity
 
+## 1.0.1
+
+- [DEPS] updates epics to work with sparkasse again
+- [HOUSEKEEPING] makes travis build docker files on success
+
 ## 1.0.0
 
 - [FEATURE] direct debits for API v2

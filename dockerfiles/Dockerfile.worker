@@ -1,2 +1,0 @@
-FROM railslove/ebicsbox
-CMD bundle exec sidekiq -C ./config/sidekiq.yml -r ./config/sidekiq.rb

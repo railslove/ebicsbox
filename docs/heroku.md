@@ -41,6 +41,12 @@ After doing so, setup the new app **from within the folder with the `heroku.yml`
 
 #### Set ENV
 
+If you have not created the app via manifest, make sure to the set the stack to container by running
+
+```bash
+heroku stack:set container -a DESIRED_APP_NAME
+```
+
 Afterward, make sure to set the required environment variables
 
 ```bash
@@ -68,8 +74,8 @@ and you should see something like this, where you can adjust your databse and re
 Also, adjust the scheduler settings to run these every hour:
 
 ```bash
-> rake enqueue:update_processing_status
-> rake enqueue:fetch_account_statements
+> bundle exec rake enqueue:update_processing_status
+> bundle exec rake enqueue:fetch_account_statements
 ```
 
 ![](./scheduler.png)
@@ -137,49 +143,6 @@ Then add the git handle and push the first iteration.
 # remote: migrated to:
 # remote: Waiting for release.... done.
 # To https://git.heroku.com/ebicsbox.git
-```
-
-## Follow-up Deployment
-
-The initial setup takes care of the first deployment. Each recurring deployment to update the box afterwards follows another procedure.
-
-```bash
-> heroku container:push web worker --recursive --app DESIRED_APP_NAME
-
-# === Building web (/Users/stevenuniverse/ebicsbox/dockerfiles/Dockerfile.web)
-# Sending build context to Docker daemon  4.096kB
-# Step 1/2 : FROM ebicsbox:latest
-# ---> 418b1c33dda1
-# Step 2/2 : CMD bundle exec rackup -p $PORT
-# ---> Using cache
-# ---> e19e8510f380
-# Successfully built e19e8510f380
-# Successfully tagged registry.heroku.com/ebicsbox/web:latest
-# === Building worker (/Users/stevenuniverse/ebicsbox/dockerfiles/Dockerfile.worker)
-# Sending build context to Docker daemon  4.096kB
-# Step 1/2 : FROM ebicsbox:latest
-# ---> 418b1c33dda1
-# Step 2/2 : CMD bundle exec sidekiq -C ./config/sidekiq.yml -r ./config/sidekiq.rb
-# ---> Using cache
-# ---> e8f94077181c
-# Successfully built e8f94077181c
-# Successfully tagged registry.heroku.com/ebicsbox/worker:latest
-# === Pushing web (/Users/stevenuniverse/ebicsbox/dockerfiles/Dockerfile.web)
-# ...
-# ...
-# this takes a while
-# ...
-# ...
-# Your images have been successfully pushed. You can now release them with the 'container:release' command.
-```
-
-This builds and pushes the required container to heroku.
-
-Last but not least, release the container
-
-```bash
-> heroku container:release web worker --app DESIRED_APP_NAME
-# Releasing images web,worker to ebicsbox... done
 ```
 
 Voilà, that should do the trick. Go and try reloading the page.
