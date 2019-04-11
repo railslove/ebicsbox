@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.1
+
+- [BUGFIX] fixes docker-compose file running incorrect server command
+- [ENHANCEMENT] makes docker services run migration before startup
+- [HOUSEKEEPING] updates heroku doku
+
 ## 1.1.0
 
 - [ENHANCEMENT] renames subscribers to ebics user to lessen complexity
