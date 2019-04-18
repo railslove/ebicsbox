@@ -54,7 +54,7 @@ module Box
 
         it 'puts only provided account id onto job' do
           described_class.check_ebics_user_activation(1, 0)
-          expect(tube.first.args).to include('ebics_user_id' => 1)
+          expect(tube.first.args).to include(1)
         end
 
         it 'does not queue it right away' do
