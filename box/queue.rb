@@ -43,7 +43,7 @@ module Box
     end
 
     def self.check_ebics_user_activation(ebics_user_id, delay)
-      Jobs::CheckActivation.perform_in(delay, ebics_user_id: ebics_user_id)
+      Jobs::CheckActivation.perform_in(delay, ebics_user_id)
     end
   end
 end

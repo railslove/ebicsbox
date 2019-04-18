@@ -1,9 +1,9 @@
 ---
 concurrency: 3
 queues:
-  - 'debit'
-  - 'credit'
-  - 'webhooks'
-  - 'check.statements'
-  - 'check.orders'
-  - 'check.activation'
+  - "debit"
+  - "credit"
+  - "webhooks"
+  - "check.statements"
+  - "check.orders"
+  - "check.activations"
