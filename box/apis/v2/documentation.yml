@@ -87,15 +87,15 @@ Statement Created:
 }
 ```
 
-Subscriber Activated:
+Ebics User Activated:
 ```
 {
-  action: "subscriber_activated",
+  action: "ebics_user_activated",
   triggered_at (time of event),
-  subscriber_id,
+  ebics_user_id,
   account_id,
   user_id,
-  subscriber (remote user id),
+  ebics_user (remote user id),
   signature_class
 }
 ```
