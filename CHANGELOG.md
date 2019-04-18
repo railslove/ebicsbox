@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2
+
+- [BUGFIX] account activation was not triggered due to incorrect sidekiq config
+
 ## 1.1.1
 
 - [BUGFIX] fixes docker-compose file running incorrect server command
