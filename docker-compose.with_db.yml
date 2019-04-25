@@ -1,5 +1,8 @@
 version: "3"
 services:
+  redis:
+    image: redis
+    restart: always
   db:
     image: postgres:9.6.1-alpine
     restart: always
@@ -12,20 +15,26 @@ services:
       - $POSTGRES_DATA_FOLDER_PATH:/var/lib/postgresql/data
   web:
     environment:
+      - REDIS_URL=redis://redis:6379
       - DATABASE_URL=postgresql://db/ebicsbox?user=${POSTGRES_USER}&password=${POSTGRES_PASSWORD}
       - PORT=5000
     depends_on:
+      - redis
       - db
     command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; bundle exec rackup -p $${PORT}'
   worker:
     environment:
+      - REDIS_URL=redis://redis:6379
       - DATABASE_URL=postgresql://db/ebicsbox?user=${POSTGRES_USER}&password=${POSTGRES_PASSWORD}
     depends_on:
+      - redis
       - db
     command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; bundle exec sidekiq -C ./config/sidekiq.yml -r ./config/sidekiq.rb'
   scheduler:
     environment:
+      - REDIS_URL=redis://redis:6379
       - DATABASE_URL=postgresql://db/ebicsbox?user=${POSTGRES_USER}&password=${POSTGRES_PASSWORD}
     depends_on:
+      - redis
       - db
     command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; bundle exec clockwork config/scheduler.rb'

@@ -1,40 +1,26 @@
 version: "3"
 services:
-  redis:
-    image: redis
-    restart: always
   web:
     image: railslove/ebicsbox
     restart: always
     env_file:
       - .env
       - .web.env
-    environment:
-      - REDIS_URL=redis://redis:6379
     ports:
       - 5000:5000
     command: bundle exec puma ./config.ru -p 5000
     depends_on:
-      - redis
       - proxy
   worker:
     image: railslove/ebicsbox
     restart: always
     env_file: .env
-    environment:
-      - REDIS_URL=redis://redis:6379
     command: bundle exec sidekiq -C ./config/sidekiq.yml -r ./config/sidekiq.rb
-    depends_on:
-      - redis
   scheduler:
     image: railslove/ebicsbox
     restart: always
     env_file: .env
-    environment:
-      - REDIS_URL=redis://redis:6379
     command: bundle exec clockwork config/scheduler.rb
-    depends_on:
-      - redis
   proxy:
     image: jwilder/nginx-proxy
     restart: always
