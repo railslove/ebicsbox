@@ -10,11 +10,6 @@ if ENV['RACK_ENV'] == 'production'
   use Rack::CommonLogger
 end
 
-# Validate current license
-if ENV['REPLICATED_INTEGRATIONAPI']
-  require_relative './box/middleware/license_validator'
-  use Box::Middleware::LicenseValidator
-end
 
 # Load database connection validator middleware
 require_relative './box/middleware/connection_validator'

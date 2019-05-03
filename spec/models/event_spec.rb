@@ -31,8 +31,6 @@ module Box
         described_class.publish('some_event', some: 'payload')
         expect(Queue).to have_received(:trigger_webhook).with(event_id: anything)
       end
-
-      it 'logs it to replicated audit log'
     end
 
     describe "default values" do
