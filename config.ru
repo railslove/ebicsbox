@@ -10,6 +10,8 @@ if ENV['RACK_ENV'] == 'production'
   use Rack::CommonLogger
 end
 
+# check env vars
+Box.configuration.valid?
 
 # Load database connection validator middleware
 require_relative './box/middleware/connection_validator'
