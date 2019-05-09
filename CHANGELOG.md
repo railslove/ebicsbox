@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.3
+
+- [ENHANCEMENT] fake adapter now adds reference to info field for statements
+
 ## 1.1.2
 
 - [BUGFIX] account activation was not triggered due to incorrect sidekiq config
