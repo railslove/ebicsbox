@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 env = ENV.fetch('RACK_ENV', :development)
-if %w[development test].include?(env.to_s)
+if env.to_s != 'production'
   # Load environment from file
   require 'dotenv'
   Dotenv.load
