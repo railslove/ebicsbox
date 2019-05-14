@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0
+
+- [HOUSEKEEPING] removes clockwork in favor of sidekiq-scheduler
+- [FEATURE] added env-variable (ACTIVATE_EBICS_USER_INTERVAL) to defined interval of activation jobs (default: 60 minutes)
+- [ENHANCEMENT] account activation is now a recurring job to prevent missing activation due to queue failure
+- [ENHANCEMENT] forces SSL unless DISABLE_SSL_FORCE is set (to true obviously :])
+
 ## 1.1.3
 
 - [ENHANCEMENT] fake adapter now adds reference to info field for statements
