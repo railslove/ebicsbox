@@ -6,6 +6,11 @@ if ENV['RACK_ENV'] == 'production'
     use Raven::Rack
   end
 
+  unless ENV['DISABLE_SSL_FORCE']
+    require 'rack/ssl-enforcer'
+    use Rack::SslEnforcer
+  end
+
   # Log all requests in apache log file format
   use Rack::CommonLogger
 end

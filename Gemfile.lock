@@ -120,6 +120,7 @@ GEM
     rack-cors (1.0.2)
     rack-protection (2.0.5)
       rack
+    rack-ssl-enforcer (0.2.9)
     rack-test (0.8.3)
       rack (>= 1.0, < 3)
     rainbow (3.0.0)
@@ -212,6 +213,7 @@ DEPENDENCIES
   pry
   puma
   rack-cors
+  rack-ssl-enforcer
   rake
   rspec
   rubocop

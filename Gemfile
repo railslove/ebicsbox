@@ -27,6 +27,8 @@ gem 'sepa_king'
 gem 'sequel'
 gem 'sidekiq'
 
+gem 'rack-ssl-enforcer'
+
 group :development do
   gem 'rubocop'
 end
