@@ -7,16 +7,12 @@ module Box
   module Jobs
     RSpec.describe FetchProcessingStatus do
       subject(:job) { described_class.new }
-      describe '#perform' do
-        it 'fetches processing status for all provided accounts' do
-          expect(job).to receive(:remote_records).exactly(3).times.and_return([])
-          job.perform([1, 2, 3])
-        end
 
+      describe '#perform' do
         it 'triggers transaction updates for all records from remote documents' do
           expect(job).to receive(:remote_records).with(1).and_return([{ some: 'data' }])
           expect(job).to receive(:update_transaction).with(1, some: 'data')
-          job.perform([1])
+          job.perform(1)
         end
       end
 

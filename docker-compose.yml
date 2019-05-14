@@ -16,11 +16,6 @@ services:
     restart: always
     env_file: .env
     command: bundle exec sidekiq -C ./config/sidekiq.yml -r ./config/sidekiq.rb
-  scheduler:
-    image: railslove/ebicsbox
-    restart: always
-    env_file: .env
-    command: bundle exec clockwork config/scheduler.rb
   proxy:
     image: jwilder/nginx-proxy
     restart: always

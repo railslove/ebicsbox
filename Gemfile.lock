@@ -36,8 +36,6 @@ GEM
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
     builder (3.2.3)
-    clockwork (2.0.3)
-      tzinfo
     cmxl (1.2.0)
       rchardet19
     coderay (1.1.2)
@@ -59,6 +57,8 @@ GEM
       nokogiri (>= 1.8.5)
       rubyzip (>= 1.2.1)
     equalizer (0.0.11)
+    et-orbi (1.2.1)
+      tzinfo
     fabrication (2.20.1)
     faker (1.9.1)
       i18n (>= 0.7)
@@ -66,6 +66,9 @@ GEM
       multipart-post (>= 1.2, < 3)
     foreman (0.85.0)
       thor (~> 0.19.1)
+    fugit (1.2.1)
+      et-orbi (~> 1.1, >= 1.1.8)
+      raabro (~> 1.1)
     grape (1.1.0)
       activesupport
       builder
@@ -114,6 +117,7 @@ GEM
       method_source (~> 0.9.0)
     public_suffix (3.0.3)
     puma (3.12.0)
+    raabro (1.1.6)
     rack (2.0.6)
     rack-accept (0.4.5)
       rack (>= 0.4)
@@ -154,6 +158,8 @@ GEM
       unicode-display_width (~> 1.4.0)
     ruby-progressbar (1.10.0)
     rubyzip (1.2.2)
+    rufus-scheduler (3.6.0)
+      fugit (~> 1.1, >= 1.1.6)
     safe_yaml (1.0.4)
     sentry-raven (2.9.0)
       faraday (>= 0.7.6, < 1.0)
@@ -167,8 +173,14 @@ GEM
       rack (>= 1.5.0)
       rack-protection (>= 1.5.0)
       redis (>= 3.3.5, < 5)
+    sidekiq-scheduler (3.0.0)
+      redis (>= 3, < 5)
+      rufus-scheduler (~> 3.2)
+      sidekiq (>= 3)
+      tilt (>= 1.4.0)
     thor (0.19.4)
     thread_safe (0.3.6)
+    tilt (2.0.9)
     timecop (0.9.1)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
@@ -193,7 +205,6 @@ DEPENDENCIES
   activesupport
   airborne
   camt_parser!
-  clockwork
   cmxl
   database_cleaner
   dotenv
@@ -221,6 +232,7 @@ DEPENDENCIES
   sepa_king
   sequel
   sidekiq
+  sidekiq-scheduler
   timecop
   webmock
 

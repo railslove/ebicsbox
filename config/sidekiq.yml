@@ -7,3 +7,13 @@ queues:
   - "check.statements"
   - "check.orders"
   - "check.activations"
+schedule:
+  update_processing_status:
+    every: "6h"
+    class: Box::Jobs::QueueProcessingStatus
+    queue: "check.orders"
+  fetch_account_statements:
+    every: "60m"
+    class: Box::Jobs::FetchStatements
+    queue: "check.statements"
+dynamic: true

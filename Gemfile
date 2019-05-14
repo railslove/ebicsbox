@@ -6,7 +6,6 @@ ruby '2.5.1'
 
 gem 'activesupport'
 gem 'camt_parser', git: 'https://github.com/railslove/camt_parser.git'
-gem 'clockwork'
 gem 'cmxl'
 gem 'epics'
 gem 'faraday'
@@ -26,6 +25,7 @@ gem 'sentry-raven'
 gem 'sepa_king'
 gem 'sequel'
 gem 'sidekiq'
+gem 'sidekiq-scheduler'
 
 gem 'rack-ssl-enforcer'
 

@@ -1,9 +1,12 @@
+# frozen_string_literal: true
+
 require 'sidekiq'
 require 'sidekiq/api'
 require 'active_support/core_ext/array'
 
 require_relative './jobs/credit'
 require_relative './jobs/debit'
+require_relative './jobs/queue_processing_status'
 require_relative './jobs/fetch_processing_status'
 require_relative './jobs/fetch_statements'
 require_relative './jobs/webhook'
@@ -19,13 +22,12 @@ module Box
       account_ids ||= Account.all_active_ids
 
       # do not schedule job if already scheduled
-      return if Sidekiq::ScheduledSet.new.any? { |j| j.item['class'] == Jobs::FetchProcessingStatus.name }
+      return if Sidekiq::ScheduledSet.new.any? { |j| j.item['class'] == Jobs::QueueProcessingStatus.name }
 
-      Jobs::FetchProcessingStatus.perform_in(delay, Array.wrap(account_ids))
+      Jobs::QueueProcessingStatus.perform_in(delay, Array.wrap(account_ids))
     end
 
     def self.fetch_account_statements(account_ids = nil)
-      account_ids ||= Account.all_active_ids
       Jobs::FetchStatements.perform_async(account_ids: Array.wrap(account_ids))
     end
 

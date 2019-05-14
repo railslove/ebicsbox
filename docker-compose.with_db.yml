@@ -30,11 +30,3 @@ services:
       - redis
       - db
     command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; bundle exec sidekiq -C ./config/sidekiq.yml -r ./config/sidekiq.rb'
-  scheduler:
-    environment:
-      - REDIS_URL=redis://redis:6379
-      - DATABASE_URL=postgresql://db/ebicsbox?user=${POSTGRES_USER}&password=${POSTGRES_PASSWORD}
-    depends_on:
-      - redis
-      - db
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; bundle exec clockwork config/scheduler.rb'

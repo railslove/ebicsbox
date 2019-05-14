@@ -23,3 +23,30 @@ require_relative '../box/jobs/fetch_processing_status'
 require_relative '../box/jobs/fetch_statements'
 require_relative '../box/jobs/webhook'
 require_relative '../box/jobs/check_activation'
+
+require 'sidekiq'
+require 'sidekiq-scheduler'
+
+Sidekiq.configure_server do |config|
+  config.on(:startup) do
+    fetch_bank_statements_interval = ENV['UPDATE_BANK_STATEMENTS_INTERVAL'].to_i
+    unless fetch_bank_statements_interval.zero?
+      Sidekiq.set_schedule(
+        'fetch_account_statements',
+        every: "#{fetch_bank_statements_interval}m",
+        class: 'Box::Jobs::FetchStatements',
+        queue: 'check.statements'
+      )
+    end
+
+    update_processing_status_interval = ENV['UPDATE_PROCESSING_STATUS_INTERVAL'].to_i
+    unless update_processing_status_interval.zero?
+      Sidekiq.set_schedule(
+        'update_processing_status',
+        every: "#{update_processing_status_interval}m",
+        class: 'Box::Jobs::QueueProcessingStatus',
+        queue: 'check.orders'
+      )
+    end
+  end
+end
