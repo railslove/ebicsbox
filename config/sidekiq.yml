@@ -16,4 +16,8 @@ schedule:
     every: "60m"
     class: Box::Jobs::FetchStatements
     queue: "check.statements"
+  activate_ebics_user:
+    every: "60m"
+    class: Box::Jobs::CheckActivation
+    queue: "check.activations"
 dynamic: true

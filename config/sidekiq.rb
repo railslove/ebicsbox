@@ -48,5 +48,15 @@ Sidekiq.configure_server do |config|
         queue: 'check.orders'
       )
     end
+
+    activate_ebics_user_interval = ENV['ACTIVATE_EBICS_USER_INTERVAL'].to_i
+    unless activate_ebics_user_interval.zero?
+      Sidekiq.set_schedule(
+        'activate_ebics_user',
+        every: "#{activate_ebics_user_interval}m",
+        class: 'Box::Jobs::CheckActivation',
+        queue: 'check.activations'
+      )
+    end
   end
 end

@@ -22,31 +22,6 @@ module Box
       end
     end
 
-    describe '.check_ebics_user_activation' do
-      let(:jobs) { Jobs::CheckActivation.jobs }
-
-      context 'delay check by default' do
-        it 'schedules a new job' do
-          expect { described_class.check_ebics_user_activation(1, 120) }.to(change { jobs.count })
-        end
-
-        it 'schedules by given time' do
-          jid = described_class.check_ebics_user_activation(1, 45)
-          job = jobs.find { |j| j['jid'] == jid }
-          creation_time = Time.at(job['created_at'])
-          execution_time = Time.at(job['at'])
-
-          expect(execution_time - creation_time).to be_within(0.1).of(45)
-        end
-
-        it 'puts only provided account id onto job' do
-          jid = described_class.check_ebics_user_activation(1, 0)
-          job = jobs.find { |j| j['jid'] == jid }
-          expect(job['args']).to include(1)
-        end
-      end
-    end
-
     describe '.update_processing_status' do
       let(:jobs) { Jobs::QueueProcessingStatus.jobs }
       let(:tube) { Sidekiq::Queue.new('check.orders') }
