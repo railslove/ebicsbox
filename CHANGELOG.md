@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1
+
+- [BUGFIX] fixes migrations missing statements public-id default value
+
 ## 1.2.0
 
 - [HOUSEKEEPING] removes clockwork in favor of sidekiq-scheduler
