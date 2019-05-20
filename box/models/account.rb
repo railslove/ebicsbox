@@ -33,7 +33,7 @@ module Box
     one_to_many :bank_statements
     one_to_many :events
     one_to_many :statements
-    one_to_many :ebics_users
+    many_to_many :ebics_users
     one_to_many :transactions
     many_to_one :organization
 
@@ -62,6 +62,12 @@ module Box
 
     def config
       Config.new(super)
+    end
+
+    def client_adapter
+      Box::Adapters.const_get(mode)
+    rescue => e
+      Box.configuration.ebics_client
     end
 
     def transport_client

@@ -9,7 +9,7 @@ module Box
     describe '#setup!' do
       let(:account) { Account.create(mode: 'File', url: 'url', host: 'host', partner: 'partner') }
       let(:user) { User.create(name: 'John Doe') }
-      subject { described_class.create(account: account, user: user, remote_user_id: 'user') }
+      subject { described_class.create(accounts: [account], user: user, remote_user_id: 'user') }
 
       context 'incomplete ebics data' do
         before { subject.update(remote_user_id: nil) }
@@ -49,7 +49,7 @@ module Box
     describe '#activate!' do
       let(:account) { Account.create(mode: 'File', url: 'url', host: 'host', partner: 'partner') }
       let(:user) { User.create(name: 'John Doe') }
-      subject { described_class.create(account: account, user: user) }
+      subject { described_class.create(accounts: [account], user: user) }
 
       before do
         allow(Account).to receive(:[]).and_return(double('account', organization: double('orga', webhook_token: 'token')))
