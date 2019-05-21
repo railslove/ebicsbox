@@ -47,7 +47,8 @@ module Box
 
       context 'user does not yet have a ebics_user for given account' do
         it 'return success' do
-          allow_any_instance_of(Account).to receive(:add_unique_ebics_user).and_return(true)
+
+          allow_any_instance_of(Account).to receive(:setup_ebics_user!).and_return(true)
           post "/#{account.iban}/ebics_users", { ebics_user: 'someuser' }, { 'Authorization' => "token #{user.access_token}" }
           expect(response.status).to eq(201)
         end

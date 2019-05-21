@@ -23,7 +23,7 @@ module Box
         let(:ebics_user) { account.add_ebics_user(user_id: user.id, remote_user_id: 'TEST') }
 
         it 'allows to setup a ebics_user' do
-          expect { ebics_user.setup! }.to(change { ebics_user.reload.submitted_at })
+          expect { ebics_user.setup!(account) }.to(change { ebics_user.reload.submitted_at })
         end
 
         it 'allows to activate a ebics_user' do

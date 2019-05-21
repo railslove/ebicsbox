@@ -13,7 +13,7 @@ module Box
       creditor_identifier: :string,
       callback_url: :string,
       status: :string,
-      ebics_user: :string,
+      ebics_users: :array
     }
 
     NEW_ACCOUNT_SPEC = {
@@ -21,7 +21,7 @@ module Box
       iban: :string,
       bic: :string,
       status: :string,
-      ebics_user: :string,
+      ebics_users: :array
     }
     ###
     ### GET /accounts

@@ -83,7 +83,7 @@ module Box
         let(:client) { double('Client') }
         let(:account) { Account.create }
         let(:user) { User.create }
-        let!(:ebics_user) { user.add_ebics_user(account: account) }
+        let!(:ebics_user) { account.add_ebics_user(user: user) }
         subject(:transaction) { account.add_transaction(user: user, order_type: 'test', payload: 'my-pain', type: 'debit') }
 
         before do
