@@ -10,7 +10,6 @@ module Box
   class EbicsUser < Sequel::Model
     self.raise_on_save_failure = true
 
-    AlreadyActivated = Class.new(StandardError)
     IncompleteEbicsData = Class.new(StandardError)
 
     many_to_many :accounts
@@ -18,7 +17,7 @@ module Box
 
     def as_event_payload
       {
-        account_id: primary_account.id,
+        account_id: first_account.id,
         user_id: user.id,
         ebics_user: remote_user_id,
         ebics_user_id: id,
@@ -31,7 +30,7 @@ module Box
     end
 
     def ebics_data?
-      [remote_user_id, primary_account.url, primary_account.partner, primary_account.host].all?(&:present?)
+      [remote_user_id, first_account.url, first_account.partner, first_account.host].all?(&:present?)
     end
 
     def passphrase
@@ -39,12 +38,13 @@ module Box
     end
 
     def client
-      account = primary_account
-      @client ||= client_adapter.new(encryption_keys, passphrase, account.url, account.host, remote_user_id, account.partner)
+      account = first_account
+      @client ||= account.client_adapter.new(encryption_keys, passphrase, account.url, account.host, remote_user_id, account.partner)
     end
 
     def setup!(account, reset = false)
-      fail(AlreadyActivated) if !ini_letter.nil? && !reset
+      return true if !ini_letter.nil? && !reset
+
       fail(IncompleteEbicsData) unless ebics_data?
 
       # TODO: handle exceptions
@@ -93,9 +93,7 @@ module Box
       end
     end
 
-    private
-
-    def primary_account
+    def first_account
       accounts.first
     end
   end

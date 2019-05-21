@@ -46,8 +46,8 @@ module Box
         query = self
         # Filter by status
         query = case params[:status]
-          when 'activated' then query.left_join(:ebics_users, account_id: :id).exclude(ebics_users__activated_at: nil)
-          when 'not_activated' then query.left_join(:ebics_users, account_id: :id).where(ebics_users__activated_at: nil)
+          when 'activated' then query.eager_graph(:ebics_users).exclude(ebics_users__activated_at: nil)
+          when 'not_activated' then query.eager_graph(:ebics_users).where(ebics_users__activated_at: nil)
           else query
         end
         query
@@ -91,7 +91,7 @@ module Box
     end
 
     def self.all_active_ids
-      join(:ebics_users, :account_id => :id).select(:accounts__id).exclude(ebics_users__activated_at: nil).map(&:id)
+      association_join(:ebics_users).select(:accounts__id).exclude(ebics_users__activated_at: nil).map(&:id)
     end
 
     def active?
@@ -145,19 +145,20 @@ module Box
       save
     end
 
-    def add_unique_ebics_user(user_id, ebics_user)
+    def setup_ebics_user!(user_id, ebics_user)
       DB.transaction do
-        if !!ebics_user_for(user_id)
-          fail('This user already has a ebics_user for this account.')
-        end
+        raise 'This user already has a ebics_user for this account.' if ebics_user_for(user_id)
 
         if ebics_users_dataset.where(remote_user_id: ebics_user).any?
-          fail('Another user is using the same EBICS user id.')
+          raise 'Another user is using the same EBICS user id.'
         end
 
-        if !(ebics_user = add_ebics_user(user_id: user_id, remote_user_id: ebics_user)) || !ebics_user.setup!
-          fail('Failed to create ebics_user.')
-        end
+        ebics_user = EbicsUser.find_or_create(user_id: user_id, remote_user_id: ebics_user)
+        raise 'Failed to create ebics_user.' unless ebics_user
+
+        add_ebics_user(ebics_user)
+        ebics_user.setup!(account)
+        ebics_user
       end
     end
 

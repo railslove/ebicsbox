@@ -165,7 +165,7 @@ module Box
             requires :ebics_user, type: String, desc: 'IBAN for an existing account'
           end
           post 'ebics_users' do
-            account.add_unique_ebics_user(current_user.id, params[:ebics_user])
+            account.setup_ebics_user!(current_user.id, params[:ebics_user])
             { message: 'EbicsUser has been created and setup successfully! INI letter has been sent via eMail.' }
           rescue StandardError => ex
             Box.logger.info { "[Content::AddEbicsUser] #{ex.message}" }

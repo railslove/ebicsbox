@@ -13,7 +13,7 @@ module Box
         expose :balance_in_cents
         expose :creditor_identifier
 
-        expose(:ebics_user) { |account| account.ebics_users.first&.remote_user_id }
+        expose :ebics_users, using: Entities::EbicsUser
         expose(:url)
         expose(:partner)
         expose(:host)
