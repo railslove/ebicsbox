@@ -19,6 +19,8 @@ blocks:
   - name: Tests ✅
     task:
       env_vars:
+        - name: TEST_DATABASE_URL
+          value: postgres://postgres@localhost/ebicsbox_test
         - name: RACK_ENV
           value: test
       prologue:
