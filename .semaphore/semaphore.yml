@@ -18,7 +18,7 @@ blocks:
 
   - name: Tests ✅
     task:
-    env_vars:
+      env_vars:
         - name: RACK_ENV
           value: test
       prologue:
