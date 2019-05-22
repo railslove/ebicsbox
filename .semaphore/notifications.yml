@@ -1,0 +1,41 @@
+apiVersion: v1alpha
+kind: Notification
+metadata:
+  name: notify-ebicbox
+spec:
+  rules:
+    - name: "Run Pipeline"
+      filter:
+        projects:
+          - ebicsbox
+      notify:
+        slack:
+          endpoint: https://hooks.slack.com/services/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
+          channels:
+            - "#ebicsbox"
+    - name: "build docker:latest 🐳📦✨"
+      filter:
+        projects:
+          - ebicsbox
+        branches:
+          - master
+        results:
+          - passed
+      notify:
+        slack:
+          endpoint: https://hooks.slack.com/services/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
+          channels:
+            - "#ebicsbox"
+    - name: "build docker:tag 🐳📦🔐"
+      filter:
+        projects:
+          - ebicsbox
+        branches:
+          - ^refs/tags/v.*$
+        results:
+          - passed
+      notify:
+        slack:
+          endpoint: https://hooks.slack.com/services/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
+          channels:
+            - "#ebicsbox"
