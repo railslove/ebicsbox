@@ -44,8 +44,9 @@ promotions:
     pipeline_file: docker-latest.yml
     auto_promote_on:
       - result: passed
-        branch:
-          - master
+        # TODO: readd when docker integration works
+        # branch:
+        #   - master
   - name: build ebicsbox:tag 🐳📦🔐
     pipeline_file: docker-tagged.yml
     auto_promote_on:
