@@ -1,0 +1,18 @@
+version: v1.0
+name: build ebicsbox:latest 🐳📦✨
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: docker image
+    task:
+      secrets:
+        - name: ebicsbox-secrets
+      jobs:
+        - name: build latest
+          commands:
+            - docker login -u "$DOCKER_USER" -p "$DOCKER_PASS"
+            - docker build -t ebicsbox:latest .
+            - docker tag ebicsbox:latest railslove/ebicsbox:latest
+            - docker push railslove/ebicsbox:latest
