@@ -4,10 +4,12 @@ metadata:
   name: notify-ebicsbox
 spec:
   rules:
-    - name: "Run Pipeline"
+    - name: "Pipeline failed 🔥"
       filter:
         projects:
           - ebicsbox
+        results:
+          - failed
       notify:
         slack:
           endpoint: https://hooks.slack.com/services/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
@@ -17,8 +19,8 @@ spec:
       filter:
         projects:
           - ebicsbox
-        branches:
-          - master
+        pipelines:
+          - docker-latest.yml
         results:
           - passed
       notify:
@@ -30,8 +32,8 @@ spec:
       filter:
         projects:
           - ebicsbox
-        branches:
-          - ^refs/tags/v.*$
+        pipelines:
+          - docker-tag.yml
         results:
           - passed
       notify:
