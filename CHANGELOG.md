@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.2.1
+
+- [BUGFIX] fixes migrations missing statements public-id default value
+
+## 1.2.0
+
+- [HOUSEKEEPING] removes clockwork in favor of sidekiq-scheduler
+- [FEATURE] added env-variable (ACTIVATE_EBICS_USER_INTERVAL) to defined interval of activation jobs (default: 60 minutes)
+- [ENHANCEMENT] account activation is now a recurring job to prevent missing activation due to queue failure
+- [ENHANCEMENT] forces SSL unless DISABLE_SSL_FORCE is set (to true obviously :])
+
+## 1.1.3
+
+- [ENHANCEMENT] fake adapter now adds reference to info field for statements
+
+## 1.1.2
+
+- [BUGFIX] account activation was not triggered due to incorrect sidekiq config
+
+## 1.1.1
+
+- [BUGFIX] fixes docker-compose file running incorrect server command
+- [ENHANCEMENT] makes docker services run migration before startup
+- [HOUSEKEEPING] updates heroku doku
+
 ## 1.1.0
 
 - [ENHANCEMENT] renames subscribers to ebics user to lessen complexity

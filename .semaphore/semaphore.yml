@@ -1,0 +1,54 @@
+version: v1.0
+name: ebicsbox
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: Setup 🛠
+    task:
+      jobs:
+        - name: bundle
+          commands:
+            - checkout
+            - cache restore gems-$SEMAPHORE_GIT_BRANCH-$(checksum Gemfile.lock),gems-$SEMAPHORE_GIT_BRANCH-,gems-master-
+            - sem-version ruby 2.5.1
+            - bundle install --deployment -j 4 --path vendor/bundle
+            - cache store gems-$SEMAPHORE_GIT_BRANCH-$(checksum Gemfile.lock) vendor/bundle
+
+  - name: Tests ✅
+    task:
+      env_vars:
+        - name: TEST_DATABASE_URL
+          value: postgres://postgres@localhost/ebicsbox_test
+        - name: RACK_ENV
+          value: test
+      prologue:
+        commands:
+          - checkout
+          - cache restore gems-$SEMAPHORE_GIT_BRANCH-$(checksum Gemfile.lock),gems-$SEMAPHORE_GIT_BRANCH-,gems-master-
+          - sem-service start postgres
+          - sem-service start redis
+          - sem-version ruby 2.5.1
+          - bundle install --deployment --path vendor/bundle
+          - createdb -U postgres -h 0.0.0.0 ebicsbox_test
+          - bundle exec bin/migrate
+
+      jobs:
+        - name: RSpec
+          commands:
+            - bundle exec rspec
+
+promotions:
+  - name: build ebicsbox:latest 🐳📦✨
+    pipeline_file: docker-latest.yml
+    auto_promote_on:
+      - result: passed
+        branch:
+          - master
+  - name: build ebicsbox:tag 🐳📦🔐
+    pipeline_file: docker-tagged.yml
+    auto_promote_on:
+      - result: passed
+        branch:
+          - ^refs/tags/v.*$

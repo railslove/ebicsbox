@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'sidekiq-scheduler'
 require 'active_support/all'
 require 'camt_parser'
 require 'cmxl'
@@ -27,9 +28,11 @@ module Box
         self.to = options.fetch(:to, Date.today)
       end
 
-      def perform(options)
+      def perform(options = {})
         options.symbolize_keys!
-        account_ids = options[:account_ids]
+        account_ids = options.fetch(:account_ids, [])
+        account_ids = Account.all_active_ids if account_ids.empty?
+
         self.from = options.fetch(:from, 30.days.ago.to_date)
         self.to = options.fetch(:to, Date.today)
 

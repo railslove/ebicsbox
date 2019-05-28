@@ -7,13 +7,20 @@ module Box
       include Sidekiq::Worker
       sidekiq_options queue: 'check.activations'
 
-      def perform(ebics_user_id)
-        ebics_user = EbicsUser.find(id: ebics_user_id)
+      def perform
+        ebics_users = EbicsUser.where(activated_at: nil).exclude(ini_letter: nil)
+        ebics_users.each do |user|
+          activate_ebics_user(user)
+        end
+      end
+
+      private
+
+      def activate_ebics_user(ebics_user)
         if ebics_user.activate!
-          Box.logger.info("[Jobs::CheckActivation] Activated ebics_user! ebics_user_id=#{ebics_user_id}")
+          Box.logger.info("[Jobs::CheckActivation] Activated ebics_user! ebics_user_id=#{ebics_user.id}")
         else
-          Queue.check_ebics_user_activation(ebics_user_id, ebics_user.account.config.activation_check_interval)
-          Box.logger.info("[Jobs::CheckActivation] Failed to activate ebics_user! ebics_user_id=#{ebics_user_id}")
+          Box.logger.info("[Jobs::CheckActivation] Failed to activate ebics_user! ebics_user_id=#{ebics_user.id}")
         end
       end
     end

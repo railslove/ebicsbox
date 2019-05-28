@@ -1,0 +1,18 @@
+version: v1.0
+name: build ebicsbox:tag 🐳📦🔐
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: docker image
+    task:
+      secrets:
+        - name: ebicsbox-secrets
+      jobs:
+        - name: build tagged
+          commands:
+            - docker login -u "$DOCKER_USER" -p "$DOCKER_PASS"
+            - docker build -t ebicsbox:${SEMAPHORE_GIT_BRANCH} .
+            - docker tag ebicsbox:${SEMAPHORE_GIT_BRANCH} railslove/ebicsbox:${SEMAPHORE_GIT_BRANCH}
+            - docker push railslove/ebicsbox:${SEMAPHORE_GIT_BRANCH}

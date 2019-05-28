@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'clockwork'
 
 require_relative '../../box/adapters/fake'
 require_relative '../../box/models/account'
@@ -14,17 +13,21 @@ module Box
       let!(:user) { organization.add_user(name: 'Test user') }
       let!(:ebics_user) { account.add_ebics_user(user_id: user.id, signature_class: 'T', activated_at: 1.day.ago) }
 
-      before(:each) { Sidekiq::Queue.all.each(&:clear) }
+      around do |example|
+        Sidekiq::Testing.inline! do
+          example.run
+        end
+      end
 
       describe 'Account setup' do
         let(:ebics_user) { account.add_ebics_user(user_id: user.id, remote_user_id: 'TEST') }
 
         it 'allows to setup a ebics_user' do
-          expect { ebics_user.setup! }.to change { ebics_user.reload.submitted_at }
+          expect { ebics_user.setup! }.to(change { ebics_user.reload.submitted_at })
         end
 
         it 'allows to activate a ebics_user' do
-          expect { ebics_user.activate! }.to change { ebics_user.reload.activated_at }
+          expect { ebics_user.activate! }.to(change { ebics_user.reload.activated_at })
         end
       end
 
@@ -41,34 +44,35 @@ module Box
           }
         end
 
+        before do
+          expect(Queue).to receive(:update_processing_status).and_return(true) # we don't want to run this job
+        end
+
         context 'auto accept any credits and create statements' do
+          let(:run_job) { Credit.create!(account, valid_payload.merge(amount: 100_00), user) }
           before do
-            jid = Credit.create!(account, valid_payload.merge(amount: 100_00), user)
-            @job = Sidekiq::Queue.new('credit').find { |j| j.jid == jid }
+            Sidekiq::Testing.inline!
           end
 
           it 'creates a statement entry' do
-            expect { Jobs::Credit.new.perform(@job.args.first) }.to change { Statement.count }
+            expect { run_job }.to(change(Statement, :count))
           end
 
           it 'marks the transaction as being processed successfully' do
-            Jobs::Credit.new.perform(@job.args.first)
+            run_job
             expect(Transaction.last.status).to eq('funds_debited')
           end
 
           it 'creates associated events' do
-            expect { Jobs::Credit.new.perform(@job.args.first) }.to change { Event.all.map(&:type).sort }.to(%w[credit_created credit_status_changed statement_created])
+            expect { run_job }.to(change { Event.all.map(&:type).sort }.to(%w[credit_created credit_status_changed statement_created]))
           end
         end
 
         context 'amounts' do
-          before do
-            jid = Credit.create!(account, valid_payload.merge(amount: 251_995), user)
-            @job = Sidekiq::Queue.new('credit').find { |j| j.jid == jid }
-          end
+          let(:run_job) { Credit.create!(account, valid_payload.merge(amount: 251_995), user) }
 
           it 'sets correct statement account' do
-            Jobs::Credit.new.perform(@job.args.first)
+            run_job
             expect(Statement.last.amount).to eq(251_995)
           end
         end

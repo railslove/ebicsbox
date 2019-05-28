@@ -23,7 +23,11 @@ RUN rm -rf log
 RUN rm Procfile*
 RUN rm README*
 RUN rm docker-compose.yml
-RUN rm replicated-compose.yml
 RUN rm -rf docs
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod 755 /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["bin/start", "all"]

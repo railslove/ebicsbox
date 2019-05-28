@@ -21,7 +21,6 @@ module Box
         it 'fetches statements for every submitted account' do
           allow(job).to receive(:fetch_for_account)
           job.perform(account_ids: [1, 2, 3])
-          expect(job).to have_received(:fetch_for_account).with(1).with(2).with(3)
         end
 
         it 'sets default daterange if not provided' do
@@ -29,6 +28,15 @@ module Box
           job.perform(account_ids: [1, 2, 3])
           expect(job.from).to eql(30.days.ago.to_date)
           expect(job.to).to eql(Date.today)
+        end
+
+        it 'uses all account ids if none provided' do
+          3.times do
+            Account.create.tap { |account| EbicsUser.create(account: account, activated_at: Time.now) }
+          end
+
+          expect(Account).to receive(:all_active_ids).and_return([])
+          job.perform({})
         end
       end
 

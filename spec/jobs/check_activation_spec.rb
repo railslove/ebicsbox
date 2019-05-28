@@ -6,10 +6,10 @@ module Box
     RSpec.describe CheckActivation do
       subject(:job) { described_class.new }
       let(:account) { Account.create }
-      let(:ebics_user) { account.add_ebics_user({}) }
+      let!(:ebics_user) { account.add_ebics_user(ini_letter: 'foobar') }
 
       def execute
-        job.perform(ebics_user.id)
+        job.perform
       end
 
       it 'tries to activate the account' do

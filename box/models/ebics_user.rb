@@ -63,7 +63,6 @@ module Box
       Box.logger.info("EBICS key exchange done and ini letter generated for ebics_user #{id}")
       self.submitted_at = DateTime.now
       self.save
-      Queue.check_ebics_user_activation(id, account.config.activation_check_interval)
     rescue Epics::Error::TechnicalError, Epics::Error::BusinessError => ex
       Box.logger.error("Failed to init ebics_user #{id}. Reason='#{ex.message}'")
       false

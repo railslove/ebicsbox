@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 module Box
   def self.version
-    '1.0.1'
+    '1.2.1'
   end
 end

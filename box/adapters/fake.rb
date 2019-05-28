@@ -76,7 +76,7 @@ module Box
           bic: trx.css("CdtrAgt FinInstnId BIC").text,
           iban: trx.css("CdtrAcct Id IBAN").text,
           name: trx.css("Cdtr Nm").text,
-          information: "",
+          information: desc,
           description: desc,
           eref: eref,
         })

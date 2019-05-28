@@ -11,13 +11,10 @@ module Box
       include Sidekiq::Worker
       sidekiq_options queue: 'check.orders'
 
-      def perform(account_ids = [])
-        log(:debug, 'Check orders.')
-        account_ids.each do |account_id|
-          log(:debug, 'Reconciling orders by HAC.', account_id: account_id)
-          remote_records(account_id).each do |data|
-            update_transaction(account_id, data)
-          end
+      def perform(account_id)
+        log(:debug, 'Reconciling orders by HAC.', account_id: account_id)
+        remote_records(account_id).each do |data|
+          update_transaction(account_id, data)
         end
       end
 

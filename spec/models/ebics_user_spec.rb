@@ -44,11 +44,6 @@ module Box
         expect_any_instance_of(Adapters::File).to receive(:HIA)
         subject.setup!
       end
-
-      it 'queues an account activation job' do
-        expect(Box::Queue).to receive(:check_ebics_user_activation).with(subject.id, anything)
-        subject.setup!
-      end
     end
 
     describe '#activate!' do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative './config/bootstrap'
 
 if ENV['RACK_ENV'] == 'production'
@@ -6,15 +8,17 @@ if ENV['RACK_ENV'] == 'production'
     use Raven::Rack
   end
 
+  unless ENV['DISABLE_SSL_FORCE']
+    require 'rack/ssl-enforcer'
+    use Rack::SslEnforcer
+  end
+
   # Log all requests in apache log file format
   use Rack::CommonLogger
 end
 
-# Validate current license
-if ENV['REPLICATED_INTEGRATIONAPI']
-  require_relative './box/middleware/license_validator'
-  use Box::Middleware::LicenseValidator
-end
+# check env vars
+Box.configuration.valid?
 
 # Load database connection validator middleware
 require_relative './box/middleware/connection_validator'

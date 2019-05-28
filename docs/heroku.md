@@ -36,7 +36,6 @@ After doing so, setup the new app **from within the folder with the `heroku.yml`
 # Creating ⬢ ebicsbox... done, region is eu, stack is container
 # Adding heroku-postgresql... done
 # Adding heroku-redis... done
-# Adding scheduler... done
 ```
 
 #### Set ENV
@@ -70,15 +69,6 @@ Then open the apps overview
 and you should see something like this, where you can adjust your databse and redis plan to your desire.
 
 ![](./resources.png)
-
-Also, adjust the scheduler settings to run these every hour:
-
-```bash
-> bundle exec rake enqueue:update_processing_status
-> bundle exec rake enqueue:fetch_account_statements
-```
-
-![](./scheduler.png)
 
 #### Sentry
 

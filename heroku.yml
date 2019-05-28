@@ -4,8 +4,6 @@ setup:
       as: DATABASE
     - plan: heroku-redis
       as: REDIS
-    - plan: scheduler
-      as: SCHEDULER
   config:
     RACK_ENV: production
     AUTH_SERVICE: static

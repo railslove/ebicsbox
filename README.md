@@ -49,6 +49,10 @@ If you want to use a custom postgres instance provide the database connection st
 
 see config/configuration.rb
 
+SSL forcing can be disabled by setting
+
+- DISABLE_SSL_FORCE
+
 you can store these in a local .env file for development.
 
 Is done via environment variables. You can utilize a `.env` file while
