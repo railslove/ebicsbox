@@ -1,7 +1,7 @@
 apiVersion: v1alpha
 kind: Notification
 metadata:
-  name: notify-ebicbox
+  name: notify-ebicsbox
 spec:
   rules:
     - name: "Run Pipeline"
