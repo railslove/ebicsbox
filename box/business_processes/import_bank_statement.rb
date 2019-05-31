@@ -32,7 +32,7 @@ module Box
         verify_arguments(raw_bank_statement, account)
         bank_statement = find_or_create_bank_statement(raw_bank_statement, account)
         update_meta_data(raw_bank_statement, account)
-        return bank_statement
+        bank_statement
       end
 
       def self.verify_arguments(raw_bank_statement, account)
@@ -43,14 +43,14 @@ module Box
       # This is required as Deutsche Bank has a very weird MT940 file format
       def self.valid_account?(raw_bank_statement, account)
         account_number = raw_bank_statement.account_identification.account_number
-        !(!(account.iban.end_with?(account_number) || (account.iban + "00").end_with?(account_number)))
+        !(!(account.iban.end_with?(account_number) || (account.iban + '00').end_with?(account_number)))
       end
 
       def self.find_or_create_bank_statement(raw_bank_statement, account)
-        BankStatement.find_or_create(
-            account_id: account.id,
-            sequence: (raw_bank_statement.try(:electronic_sequence_number) || raw_bank_statement.legal_sequence_number),
-            year: self.extract_year_from_bank_statement(raw_bank_statement)) do |bs|
+        BankStatement.find_or_create(sha: checksum(raw_bank_statement, account)) do |bs|
+          bs.account_id = account.id
+          bs.sequence = raw_bank_statement.try(:electronic_sequence_number) || raw_bank_statement.legal_sequence_number
+          bs.year = extract_year_from_bank_statement(raw_bank_statement)
           bs.remote_account = raw_bank_statement.account_identification.source
           bs.opening_balance = as_big_decimal(raw_bank_statement.opening_or_intermediary_balance) # this will be final or intermediate
           bs.closing_balance = as_big_decimal(raw_bank_statement.closing_or_intermediary_balance) # this will be final or intermediate
@@ -62,6 +62,8 @@ module Box
 
       def self.update_meta_data(raw_bank_statement, account)
         balance = raw_bank_statement.closing_or_intermediary_balance # We have to handle both final and intermediary balances
+        return unless balance # vmk do not have a closing balance and thus cannot update it
+
         if account.balance_date.blank? || account.balance_date <= balance.date
           account.set_balance(balance.date, balance.amount_in_cents)
         end
@@ -69,12 +71,23 @@ module Box
 
       def self.as_big_decimal(input)
         return if input.nil?
+
         (input.amount * input.sign).to_d
       end
 
       def self.extract_year_from_bank_statement(raw_bank_statement)
         first_transaction = raw_bank_statement.transactions.first
         first_transaction&.date&.year
+      end
+
+      def self.checksum(raw_bank_statement, account)
+        payload = [
+          account.id,
+          extract_year_from_bank_statement(raw_bank_statement),
+          raw_bank_statement.source
+        ]
+
+        Digest::SHA2.hexdigest(payload.flatten.join).to_s
       end
     end
   end
