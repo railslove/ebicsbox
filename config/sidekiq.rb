@@ -21,6 +21,7 @@ require_relative '../box/jobs/credit'
 require_relative '../box/jobs/debit'
 require_relative '../box/jobs/fetch_processing_status'
 require_relative '../box/jobs/fetch_statements'
+require_relative '../box/jobs/fetch_upcoming_statements'
 require_relative '../box/jobs/webhook'
 require_relative '../box/jobs/check_activation'
 

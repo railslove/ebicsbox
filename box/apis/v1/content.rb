@@ -15,6 +15,7 @@ require_relative '../../business_processes/credit'
 require_relative '../../business_processes/foreign_credit'
 require_relative '../../business_processes/direct_debit'
 require_relative '../../jobs/fetch_statements'
+require_relative '../../jobs/fetch_upcoming_statements'
 
 # Errors
 require_relative '../../errors/business_process_failure'

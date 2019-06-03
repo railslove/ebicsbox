@@ -17,24 +17,21 @@ module Box
       include Sidekiq::Worker
       sidekiq_options queue: 'check.statements'
 
-      attr_accessor :from, :to
+      attr_accessor :options
 
       def self.for_account(account_id, options = {})
         new(options).fetch_for_account(account_id)
       end
 
       def initialize(options = {})
-        self.from = options.fetch(:from, Date.today)
-        self.to = options.fetch(:to, 30.days.from_now.to_date)
+        self.options = options
       end
 
       def perform(options = {})
-        options.symbolize_keys!
+        self.options = options.symbolize_keys!
+
         account_ids = options.fetch(:account_ids, [])
         account_ids = Account.all_active_ids if account_ids.empty?
-
-        self.from = options.fetch(:from, Date.today)
-        self.to = options.fetch(:to, 180.days.from_now.to_date)
 
         account_ids.each do |account_id|
           fetch_for_account(account_id)
@@ -49,7 +46,7 @@ module Box
           return
         end
 
-        vmk_data = account.transport_client.VMK(from.to_s(:db), to.to_s(:db))
+        vmk_data = account.transport_client.VMK(safe_from.to_s(:db), safe_to.to_s(:db))
         chunks = Cmxl.parse(vmk_data)
         import_stats = import_to_database(chunks, account)
 
@@ -73,6 +70,16 @@ module Box
           Box.logger.error("[Jobs::FetchUpcomingStatements] #{e} account_id=#{account.id}")
           memo
         end
+      end
+
+      private
+
+      def safe_from
+        options.fetch(:from, Date.today)
+      end
+
+      def safe_to
+        options.fetch(:to, 180.days.from_now.to_date)
       end
     end
   end
