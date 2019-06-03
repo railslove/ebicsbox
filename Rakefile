@@ -27,7 +27,6 @@ end
 namespace :after_migration do
   desc 'calculate SHAs of bank_statements'
   task :calculate_bank_statements_sha do
-
     env = ENV.fetch('RACK_ENV', :development)
     if env.to_s != 'production'
       # Load environment from file
@@ -41,7 +40,10 @@ namespace :after_migration do
     i = 0
     statements = Box::BankStatement.where(sha: nil)
 
-    p "Found #{statements.count} without a SHA, recalculating"
+    p "Found #{statements.count} Bank Statements without a SHA."
+    next if statements.count.zero?
+
+    p 'Recalculating Bank Statement SHAs.'
 
     statements.each do |bs|
       payload = [
@@ -55,6 +57,6 @@ namespace :after_migration do
       i += 1
     end
 
-    p "Updated #{i} bank statements"
+    p "Updated #{i} Bank Statement SHAs."
   end
 end
