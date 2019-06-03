@@ -23,6 +23,8 @@ namespace :generate do
 end
 
 namespace :after_migration do
+  require_relative './box/models/bank_statement'
+
   env = ENV.fetch('RACK_ENV', :development)
   if %w[development test].include?(env.to_s)
     # Load environment from file
