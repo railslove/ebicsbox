@@ -59,5 +59,15 @@ Sidekiq.configure_server do |config|
         queue: 'check.activations'
       )
     end
+
+    upcoming_statements_intveral = ENV['UPCOMING_STATEMENTS_INTVERAL'].to_i
+    unless upcoming_statements_intveral.zero?
+      Sidekiq.set_schedule(
+        'fetch_upcoming_account_statements',
+        every: "#{upcoming_statements_intveral}m",
+        class: 'Box::Jobs::FetchUpcomingStatements',
+        queue: 'check.statements'
+      )
+    end
   end
 end

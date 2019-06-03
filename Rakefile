@@ -22,7 +22,7 @@ namespace :generate do
   end
 end
 
-namespace :enqueue do
+namespace :after_migration do
   env = ENV.fetch('RACK_ENV', :development)
   if %w[development test].include?(env.to_s)
     # Load environment from file
@@ -30,19 +30,25 @@ namespace :enqueue do
     Dotenv.load
   end
 
-  require_relative './config/bootstrap'
-  require_relative './box/queue'
+  desc 'calculate SHAs of bank_statements'
+  task :calculate_bank_statements_sha do
+    i = 0
+    statements = Box::BankStatement.where(sha: nil)
 
-  desc 'enqueue account statement fething'
-  task :fetch_account_statements do
-    Box::Queue.fetch_account_statements
-  end
+    p "Found #{statements.count} without a SHA, recalculating"
 
-  desc 'enqueue updating processing status'
-  task :update_processing_status do
-    # run every 5 hours only
-    next unless ((Time.now.to_i / 3600) % 5).zero?
+    statements.each do |bs|
+      payload = [
+        bs.account_id,
+        bs.year,
+        bs.source
+      ]
 
-    Box::Queue.update_processing_status
+      bs.update(sha: Digest::SHA2.hexdigest(payload.flatten.join).to_s)
+
+      i += i
+    end
+
+    p "Updated #{i} bank statements"
   end
 end
