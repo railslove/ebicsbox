@@ -52,7 +52,7 @@ namespace :after_migration do
 
       bs.update(sha: Digest::SHA2.hexdigest(payload.flatten.join).to_s)
 
-      i += i
+      i += 1
     end
 
     p "Updated #{i} bank statements"
