@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sequel'
 # Load application
 require './config/configuration'
@@ -23,20 +25,19 @@ namespace :generate do
 end
 
 namespace :after_migration do
-  require 'sequel'
-  # Load application
-  require './config/configuration'
-  require './box/models/bank_statement'
-
-  env = ENV.fetch('RACK_ENV', :development)
-  if %w[development test].include?(env.to_s)
-    # Load environment from file
-    require 'dotenv'
-    Dotenv.load
-  end
-
   desc 'calculate SHAs of bank_statements'
   task :calculate_bank_statements_sha do
+
+    env = ENV.fetch('RACK_ENV', :development)
+    if env.to_s != 'production'
+      # Load environment from file
+      require 'dotenv'
+      Dotenv.load
+    end
+
+    require './config/bootstrap'
+    require './box/models/bank_statement'
+
     i = 0
     statements = Box::BankStatement.where(sha: nil)
 
