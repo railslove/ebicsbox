@@ -47,7 +47,7 @@ namespace :after_migration do
       payload = [
         bs.account_id,
         bs.year,
-        bs.source
+        bs.content
       ]
 
       bs.update(sha: Digest::SHA2.hexdigest(payload.flatten.join).to_s)
