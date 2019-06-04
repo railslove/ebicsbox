@@ -1,9 +1,10 @@
-require 'spec_helper'
+rjequire 'spec_helper'
 
 module Box
   RSpec.describe Apis::V2::Webhooks do
     include_context 'valid user'
     include_context 'with account'
+    include_context 'with other account'
 
     let!(:successful_event) do
       account.add_event(type: 'control', webhook_status: 'success',
@@ -16,6 +17,10 @@ module Box
     let!(:failed_event) do
       account.add_event(type: 'test', webhook_status: 'failed',
                         webhook_retries: 20)
+    end
+    let!(:unrelated_event) do
+      other_account.add_event(type: 'control', webhook_status: 'failed',
+                              webhook_retries: 20)
     end
 
     describe 'POST /webhooks/reset' do
@@ -38,11 +43,25 @@ module Box
           expect_json_types :array
         end
 
-        it 'does not return successful events' do
+        it 'does not return or change other account\'s events' do
           post "webhooks/reset", {}, TestHelpers::VALID_HEADERS
 
           expect_json '*.type', 'test'
           expect_json_sizes '', 2
+        end
+
+        it 'does not return successful or other account\'s events' do
+          post "webhooks/reset", {}, TestHelpers::VALID_HEADERS
+
+          expect_json '*.type', 'test'
+          expect_json_sizes '', 2
+        end
+
+        it 'does not change events from other accounts' do
+          post "webhooks/reset", {}, TestHelpers::VALID_HEADERS
+
+          expect(other_event.refresh.webhook_status).to eq('failed')
+          expect(other_event.refresh.webhook_retries).to eq(20)
         end
 
         it 'changes the status to pending and retries to 0' do
