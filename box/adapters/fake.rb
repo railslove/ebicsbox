@@ -38,6 +38,11 @@ module Box
         ::File.read( ::File.expand_path("~/sta.mt940"))
       end
 
+      def VMK(from = nil, to = nil)
+        # Create a random number of statements every day
+        ::File.read( ::File.expand_path("~/vmk.mt942"))
+      end
+
       def HAC(from = nil, to = nil)
         ::File.open( ::File.expand_path("~/hac_empty.xml"))
       end
