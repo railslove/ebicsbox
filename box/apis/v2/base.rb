@@ -13,7 +13,6 @@ require_relative './management/accounts'
 require_relative './management/ebics_users'
 require_relative './management/users'
 
-
 module Box
   module Apis
     module V2

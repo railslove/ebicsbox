@@ -1,4 +1,4 @@
-rjequire 'spec_helper'
+require 'spec_helper'
 
 module Box
   RSpec.describe Apis::V2::Webhooks do
