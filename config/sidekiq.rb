@@ -60,11 +60,11 @@ Sidekiq.configure_server do |config|
       )
     end
 
-    upcoming_statements_intveral = ENV['UPCOMING_STATEMENTS_INTVERAL'].to_i
-    unless upcoming_statements_intveral.zero?
+    upcoming_statements_interval = ENV['UPCOMING_STATEMENTS_INTERVAL'].to_i
+    unless upcoming_statements_interval.zero?
       Sidekiq.set_schedule(
         'fetch_upcoming_account_statements',
-        every: "#{upcoming_statements_intveral}m",
+        every: "#{upcoming_statements_interval}m",
         class: 'Box::Jobs::FetchUpcomingStatements',
         queue: 'check.statements'
       )

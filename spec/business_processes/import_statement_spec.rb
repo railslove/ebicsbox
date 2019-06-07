@@ -178,21 +178,33 @@ module Box
       describe 'importing VMK' do
         let(:mt942) { File.read('spec/fixtures/single_valid.mt942') }
         let(:bank_statement) { ImportBankStatement.from_mt940(mt942, account) }
+        let(:statement) { Box::Statement.first(sha: '9a1beafab0e404500673f5a0924169217324fea533444433f04523cbdf4728e3') }
 
         it 'imports each statement' do
           expect(described_class).to receive(:create_statement).once
-          described_class.from_bank_statement(bank_statement)
+          described_class.from_bank_statement(bank_statement, upcoming: true)
+        end
+
+        it 'markes statements as unsettled' do
+          described_class.from_bank_statement(bank_statement, upcoming: true)
+          expect(statement.settled).to be_falsey
         end
 
         context 'importing mt940 statement that was previously imported via vmk' do
           let(:mt940_bank_statement) { ImportBankStatement.from_mt940(mt940, account) }
           let(:mt940_bank_transactions) { described_class.parse_bank_statement(mt940_bank_statement) }
 
-          before { described_class.from_bank_statement(bank_statement) }
+          before { described_class.from_bank_statement(bank_statement, upcoming: true) }
 
           it 'does not create a new statement' do
             transaction = mt940_bank_transactions.first
             expect(described_class.create_statement(mt940_bank_statement, transaction)).to be_falsey
+          end
+
+          it 'does update statement from VMK to be settled' do
+            transaction = mt940_bank_transactions.first
+            described_class.create_statement(mt940_bank_statement, transaction)
+            expect(statement.settled).to be_truthy
           end
 
           it 'still imports remaining statements' do

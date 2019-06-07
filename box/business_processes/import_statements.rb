@@ -16,12 +16,11 @@ module Box
         result.kind_of?(Array) ? result.first.transactions : result.transactions
       end
 
-      def self.from_bank_statement(bank_statement)
+      def self.from_bank_statement(bank_statement, upcoming = false)
         bank_transactions = self.parse_bank_statement(bank_statement)
 
-        # We need to pass down index and bank statement sequence to create better checksums
         statements = bank_transactions.map do |bank_transaction|
-          create_statement(bank_statement, bank_transaction)
+          create_statement(bank_statement, bank_transaction, upcoming)
         end
 
         stats = { total: bank_transactions.count, imported: statements.select(&:present?).count }
@@ -30,15 +29,16 @@ module Box
       end
 
 
-      def self.create_statement(bank_statement, bank_transaction)
+      def self.create_statement(bank_statement, bank_transaction, upcoming = false)
         account = bank_statement.account
         trx = statement_attributes_from_bank_transaction(bank_transaction, bank_statement)
 
-        if (statement = account.statements_dataset.where(sha: trx[:sha]).first)
+        if (statement = account.statements_dataset.first(sha: trx[:sha]))
           Box.logger.info("[BusinessProcesses::ImportStatements] Already imported. sha='#{statement.sha}'")
+          statement.update(settled: true) unless upcoming
           false
         else
-          statement = account.add_statement(trx.merge(bank_statement_id: bank_statement.id))
+          statement = account.add_statement(trx.merge(bank_statement_id: bank_statement.id, settled: !upcoming))
           Event.statement_created(statement)
           link_statement_to_transaction(account, statement)
           true
@@ -51,13 +51,14 @@ module Box
         # fallback to finding via statement information
         transaction ||= account.transactions_dataset.exclude(currency: 'EUR', status: ['credit_received', 'debit_received']).where{ created_at > 14.days.ago}.detect{|t| statement.information =~ /#{t.eref}/i }
 
-        if transaction
-          transaction.add_statement(statement)
-          if statement.credit?
-            transaction.update_status("credit_received")
-          elsif statement.debit?
-            transaction.update_status("debit_received")
-          end
+        return unless transaction
+
+        transaction.add_statement(statement)
+
+        if statement.credit?
+          transaction.update_status('credit_received')
+        elsif statement.debit?
+          transaction.update_status('debit_received')
         end
       end
 
