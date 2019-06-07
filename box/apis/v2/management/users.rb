@@ -29,12 +29,12 @@ module Box
 
           resource :users do
             desc 'Retrieve a list of all users',
-              tags: ['user management'],
-              is_array: true,
-              headers: AUTH_HEADERS,
-              success: Entities::User,
-              failure: DEFAULT_ERROR_RESPONSES,
-              produces: ['application/vnd.ebicsbox-v2+json']
+                 tags: ['user management'],
+                 is_array: true,
+                 headers: AUTH_HEADERS,
+                 success: Entities::User,
+                 failure: DEFAULT_ERROR_RESPONSES,
+                 produces: ['application/vnd.ebicsbox-v2+json']
 
             get do
               users = current_organization.users_dataset.order(:name).all
@@ -42,31 +42,29 @@ module Box
             end
 
             desc 'Retrieve a single user by its identifier',
-              tags: ['user management'],
-              headers: AUTH_HEADERS,
-              success: Entities::User,
-              failure: DEFAULT_ERROR_RESPONSES,
-              produces: ['application/vnd.ebicsbox-v2+json']
+                 tags: ['user management'],
+                 headers: AUTH_HEADERS,
+                 success: Entities::User,
+                 failure: DEFAULT_ERROR_RESPONSES,
+                 produces: ['application/vnd.ebicsbox-v2+json']
 
             params do
               requires :id, type: Integer, desc: 'ID of the user'
             end
             get ':id' do
-              begin
-                user = current_organization.users_dataset.first!({ id: params[:id] })
-                present user, with: Entities::User, type: 'full', include_token: true
-              rescue Sequel::NoMatchingRow
-                error!({ message: 'User not found' }, 404)
-              end
+              user = current_organization.users_dataset.first!(id: params[:id])
+              present user, with: Entities::User, type: 'full', include_token: true
+            rescue Sequel::NoMatchingRow
+              error!({ message: 'User not found' }, 404)
             end
 
             desc 'Create a new user instance',
-              tags: ['user management'],
-              body_name: 'body',
-              headers: AUTH_HEADERS,
-              success: Entities::User,
-              failure: DEFAULT_ERROR_RESPONSES,
-              produces: ['application/vnd.ebicsbox-v2+json']
+                 tags: ['user management'],
+                 body_name: 'body',
+                 headers: AUTH_HEADERS,
+                 success: Entities::User,
+                 failure: DEFAULT_ERROR_RESPONSES,
+                 produces: ['application/vnd.ebicsbox-v2+json']
 
             params do
               requires :name, type: String, desc: "The user's display name", documentation: { param_type: 'body' }
