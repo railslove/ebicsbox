@@ -46,9 +46,8 @@ module Box
         end
 
         it 'puts all existing account ids onto the job if none is provided' do
-          3.times do
-            Fabricate(:activated_account)
-          end
+          Fabricate.times(3, :activated_account)
+
           account_ids = Account.all_active_ids
 
           jid = described_class.update_processing_status

@@ -31,10 +31,6 @@ module Box
         end
 
         it 'uses all account ids if none provided' do
-          3.times do
-            Account.create.tap { |account| EbicsUser.create(account: account, activated_at: Time.now) }
-          end
-
           expect(Account).to receive(:all_active_ids).and_return([])
           job.perform({})
         end
