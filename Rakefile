@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sequel'
 # Load application
 require './config/configuration'
@@ -22,27 +24,39 @@ namespace :generate do
   end
 end
 
-namespace :enqueue do
-  env = ENV.fetch('RACK_ENV', :development)
-  if %w[development test].include?(env.to_s)
-    # Load environment from file
-    require 'dotenv'
-    Dotenv.load
-  end
+namespace :after_migration do
+  desc 'calculate SHAs of bank_statements'
+  task :calculate_bank_statements_sha do
+    env = ENV.fetch('RACK_ENV', :development)
+    if env.to_s != 'production'
+      # Load environment from file
+      require 'dotenv'
+      Dotenv.load
+    end
 
-  require_relative './config/bootstrap'
-  require_relative './box/queue'
+    require './config/bootstrap'
+    require './box/models/bank_statement'
 
-  desc 'enqueue account statement fething'
-  task :fetch_account_statements do
-    Box::Queue.fetch_account_statements
-  end
+    i = 0
+    statements = Box::BankStatement.where(sha: nil)
 
-  desc 'enqueue updating processing status'
-  task :update_processing_status do
-    # run every 5 hours only
-    next unless ((Time.now.to_i / 3600) % 5).zero?
+    p "Found #{statements.count} Bank Statements without a SHA."
+    next if statements.count.zero?
 
-    Box::Queue.update_processing_status
+    p 'Recalculating Bank Statement SHAs.'
+
+    statements.each do |bs|
+      payload = [
+        bs.account_id,
+        bs.year,
+        bs.content
+      ]
+
+      bs.update(sha: Digest::SHA2.hexdigest(payload.flatten.join).to_s)
+
+      i += 1
+    end
+
+    p "Updated #{i} Bank Statement SHAs."
   end
 end

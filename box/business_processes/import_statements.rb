@@ -16,13 +16,11 @@ module Box
         result.kind_of?(Array) ? result.first.transactions : result.transactions
       end
 
-      def self.from_bank_statement(bank_statement)
+      def self.from_bank_statement(bank_statement, upcoming = false)
         bank_transactions = self.parse_bank_statement(bank_statement)
 
-        # We need to pass down index and bank statement sequence to create better checksums
-        statements = bank_transactions.each.with_index.map do |bank_transaction, i|
-          unique_identifier = [bank_statement.remote_account, bank_statement.sequence, i]
-          create_statement(bank_statement.account, bank_transaction, bank_statement.id, unique_identifier)
+        statements = bank_transactions.map do |bank_transaction|
+          create_statement(bank_statement, bank_transaction, upcoming)
         end
 
         stats = { total: bank_transactions.count, imported: statements.select(&:present?).count }
@@ -31,14 +29,16 @@ module Box
       end
 
 
-      def self.create_statement(account, bank_transaction, bank_statement_id, unique_identifier)
-        trx = statement_attributes_from_bank_transaction(bank_transaction, unique_identifier)
+      def self.create_statement(bank_statement, bank_transaction, upcoming = false)
+        account = bank_statement.account
+        trx = statement_attributes_from_bank_transaction(bank_transaction, bank_statement)
 
-        if statement = account.statements_dataset.where(sha: trx[:sha]).first
-          Box.logger.debug("[BusinessProcesses::ImportStatements] Already imported. sha='#{statement.sha}'")
+        if (statement = account.statements_dataset.first(sha: trx[:sha]))
+          Box.logger.info("[BusinessProcesses::ImportStatements] Already imported. sha='#{statement.sha}'")
+          statement.update(settled: true) unless upcoming
           false
         else
-          statement = account.add_statement(trx.merge(bank_statement_id: bank_statement_id))
+          statement = account.add_statement(trx.merge(bank_statement_id: bank_statement.id, settled: !upcoming))
           Event.statement_created(statement)
           link_statement_to_transaction(account, statement)
           true
@@ -51,28 +51,37 @@ module Box
         # fallback to finding via statement information
         transaction ||= account.transactions_dataset.exclude(currency: 'EUR', status: ['credit_received', 'debit_received']).where{ created_at > 14.days.ago}.detect{|t| statement.information =~ /#{t.eref}/i }
 
-        if transaction
-          transaction.add_statement(statement)
-          if statement.credit?
-            transaction.update_status("credit_received")
-          elsif statement.debit?
-            transaction.update_status("debit_received")
-          end
+        return unless transaction
+
+        transaction.add_statement(statement)
+
+        if statement.credit?
+          transaction.update_status('credit_received')
+        elsif statement.debit?
+          transaction.update_status('debit_received')
         end
       end
 
-      def self.checksum(transaction, unique_identifier)
+      def self.checksum(transaction, bank_statement)
+        eref = transaction.respond_to?(:eref) ? transaction.eref : transaction.sepa['EREF']
+        mref = transaction.respond_to?(:mref) ? transaction.mref : transaction.sepa['MREF']
+
         payload = [
-          unique_identifier, # composed of bank statement sequence and position on statement, account
+          bank_statement.remote_account,
           transaction.date,
           transaction.amount_in_cents,
+          transaction.iban,
+          transaction.name,
+          transaction.sign,
+          eref,
+          mref
         ]
-        Digest::SHA2.hexdigest(payload.flatten.join).to_s
+        Digest::SHA2.hexdigest(payload.flatten.compact.join).to_s
       end
 
-      def self.statement_attributes_from_bank_transaction(transaction, unique_statement_id)
+      def self.statement_attributes_from_bank_transaction(transaction, bank_statement)
         {
-          sha: checksum(transaction, unique_statement_id),
+          sha: checksum(transaction, bank_statement),
           date: transaction.date,
           entry_date: transaction.entry_date,
           amount: transaction.amount_in_cents,
@@ -86,13 +95,12 @@ module Box
           name: transaction.name,
           information: transaction.information,
           description: transaction.description,
-          eref: transaction.respond_to?(:eref) ? transaction.eref : transaction.sepa["EREF"],
-          mref: transaction.respond_to?(:mref) ? transaction.mref : transaction.sepa["MREF"],
-          svwz: transaction.respond_to?(:svwz) ? transaction.svwz : transaction.sepa["SVWZ"],
-          creditor_identifier: transaction.respond_to?(:creditor_identifier) ? transaction.creditor_identifier : transaction.sepa["CRED"],
+          eref: transaction.respond_to?(:eref) ? transaction.eref : transaction.sepa['EREF'],
+          mref: transaction.respond_to?(:mref) ? transaction.mref : transaction.sepa['MREF'],
+          svwz: transaction.respond_to?(:svwz) ? transaction.svwz : transaction.sepa['SVWZ'],
+          creditor_identifier: transaction.respond_to?(:creditor_identifier) ? transaction.creditor_identifier : transaction.sepa['CRED'],
         }
       end
-
     end
   end
 end

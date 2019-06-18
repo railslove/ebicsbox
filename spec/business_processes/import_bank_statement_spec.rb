@@ -46,10 +46,10 @@ module Box
 
         describe 'database record creation' do
           describe 'bank statement already exists' do
-            let!(:bank_statement) { BankStatement.create(account_id: account.id, sequence: '5/1', year: 2002) }
+            let!(:bank_statement) { BankStatement.create(sha: described_class.checksum(cmxl, account)) }
 
             it 'does not create a new bank statement' do
-              expect { import(cmxl, account) }.to_not change { BankStatement.count }
+              expect { import(cmxl, account) }.to_not change(BankStatement, :count)
             end
 
             it 'returns the existing bank statement' do
