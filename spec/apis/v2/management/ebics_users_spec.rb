@@ -61,9 +61,8 @@ module Box
       end
 
       context 'user with same used id' do
-        let(:data) { { ebics_user: "test", user_id: user.id } }
-
-        before { account.add_ebics_user(remote_user_id: 'test', user_id: user.id) }
+        let!(:existing_account) { Fabricate(:ebics_user, accounts: [account], remote_user_id: 'test', user_id: user.id) }
+        let(:data) { { ebics_user: existing_account.remote_user_id, user_id: user.id } }
 
         it 'returns an error code' do
           perform_request
@@ -124,7 +123,7 @@ module Box
       end
 
       context 'setup has not been performed' do
-        let(:ebics_user) { account.add_ebics_user(remote_user_id: 'test1') }
+        let(:ebics_user) { Fabricate(:ebics_user, accounts: [account], remote_user_id: 'test1') }
 
         it 'fails with an error status' do
           perform_request
@@ -138,7 +137,7 @@ module Box
       end
 
       context 'setup has been initiated before' do
-        let(:ebics_user) { account.add_ebics_user(remote_user_id: "test1", ini_letter: "INI LETTER") }
+        let(:ebics_user) { Fabricate(:ebics_user, accounts: [account], remote_user_id: 'test1', ini_letter: 'INI LETTER') }
 
         it 'returns a success code' do
           perform_request

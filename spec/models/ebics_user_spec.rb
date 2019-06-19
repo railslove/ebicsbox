@@ -9,47 +9,59 @@ module Box
     describe '#setup!' do
       let(:account) { Account.create(mode: 'File', url: 'url', host: 'host', partner: 'partner') }
       let(:user) { User.create(name: 'John Doe') }
-      subject { described_class.create(account: account, user: user, remote_user_id: 'user') }
+      subject do
+        described_class.create(user: user, remote_user_id: 'user').tap do |ebics_user|
+          ebics_user.add_account(account)
+        end
+      end
 
       context 'incomplete ebics data' do
         before { subject.update(remote_user_id: nil) }
 
         it 'fails to submit' do
-          expect { subject.setup! }.to raise_error(EbicsUser::IncompleteEbicsData)
+          expect { subject.setup!(account) }.to raise_error(EbicsUser::IncompleteEbicsData)
         end
       end
 
       context 'ini already sent' do
-        before { subject.update(ini_letter: 'some data') }
+        before do
+          subject.update(ini_letter: 'some data')
+          allow(account).to receive(:client_adapter)
+        end
 
-        it 'fails if reset flag is not set' do
-          expect { subject.setup! }.to raise_error(EbicsUser::AlreadyActivated)
+        it 'does not send them again if reset-flag not set' do
+          subject.setup!(account)
+          expect(account).not_to have_received(:client_adapter)
         end
       end
 
       it 'saves the keys' do
         subject.update(encryption_keys: nil)
-        subject.setup!
+        subject.setup!(account)
         expect(subject.reload.encryption_keys).to eql(Adapters::File.new.dump_keys)
       end
 
       it 'saves the ini letter' do
         subject.update(ini_letter: nil)
-        subject.setup!
+        subject.setup!(account)
         expect(subject.reload.ini_letter).to eql(Adapters::File.new.ini_letter(account.bankname))
       end
 
       it 'calls INI and HIA' do
         expect_any_instance_of(Adapters::File).to receive(:INI)
         expect_any_instance_of(Adapters::File).to receive(:HIA)
-        subject.setup!
+        subject.setup!(account)
       end
     end
 
     describe '#activate!' do
       let(:account) { Account.create(mode: 'File', url: 'url', host: 'host', partner: 'partner') }
       let(:user) { User.create(name: 'John Doe') }
-      subject { described_class.create(account: account, user: user) }
+      subject do
+        described_class.create(user: user).tap do |ebics_user|
+          ebics_user.add_account(account)
+        end
+      end
 
       before do
         allow(Account).to receive(:[]).and_return(double('account', organization: double('orga', webhook_token: 'token')))

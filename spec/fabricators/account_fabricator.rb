@@ -51,7 +51,5 @@ Fabricator(:account, from: 'Box::Account') do
 end
 
 Fabricator(:activated_account, from: :account) do
-  after_create do |account|
-    Fabricate(:activated_ebics_user, account_id: account.id)
-  end
+  ebics_users { [Fabricate(:activated_ebics_user)] }
 end

@@ -123,7 +123,10 @@ module Box
 
           resource 'accounts/:account_id/ebics_users' do
             get ':id/ini_letter' do
-              ebics_user = EbicsUser.join(:accounts, id: :account_id).where(organization_id: current_organization.id, iban: params[:account_id]).first!(Sequel.qualify(:ebics_users, :id) => params[:id])
+              ebics_user = EbicsUser.association_join(:accounts)
+                                    .where(accounts__organization_id: current_organization.id, accounts__iban: params[:account_id])
+                                    .first!(Sequel.qualify(:ebics_users, :id) => params[:id])
+
               if ebics_user.ini_letter.nil?
                 error!({ message: 'EbicsUser setup not yet initiated!' }, 412)
               else
@@ -144,10 +147,12 @@ module Box
             post do
               account = current_organization.accounts_dataset.first!(iban: params[:account_id])
               declared_params = declared(params)
+
               ebics_user = declared_params.delete(:ebics_user)
               ebics_user = account.add_ebics_user(declared_params.merge(remote_user_id: ebics_user))
+
               if ebics_user
-                if ebics_user.setup!
+                if ebics_user.setup!(account)
                   {
                     message: 'EbicsUser has been created and setup successfully! Please fetch INI letter, sign it, and submit it to your bank.',
                     ebics_user: Entities::EbicsUser.represent(ebics_user),

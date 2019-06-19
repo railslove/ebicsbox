@@ -129,13 +129,11 @@ module Box
         end
 
         context 'inactive account' do
-          before { account.ebics_users_dataset.update(activated_at: nil) }
-
           it 'can change iban' do
             expect { put "management/accounts/#{account.iban}", { iban: 'new-iban' }, { 'Authorization' => "Bearer #{user.access_token}" } }.to change { account.reload.iban }
           end
 
-          it 'can change iban' do
+          it 'can change bic' do
             expect { put "management/accounts/#{account.iban}", { bic: 'new-bic' }, { 'Authorization' => "Bearer #{user.access_token}" } }.to change { account.reload.bic }
           end
         end

@@ -46,13 +46,14 @@ module Box
         end
 
         it 'puts all existing account ids onto the job if none is provided' do
-          accounts = Array.new(3).map do
-            Account.create.tap { |account| EbicsUser.create(account: account, activated_at: Time.now) }
-          end
+          Fabricate.times(3, :activated_account)
+
+          account_ids = Account.all_active_ids
+
           jid = described_class.update_processing_status
           job = jobs.find { |j| j['jid'] == jid }
 
-          expect(job['args'].flatten).to match(accounts.map(&:id))
+          expect(job['args'].flatten).to match(account_ids)
         end
       end
 

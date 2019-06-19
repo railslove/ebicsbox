@@ -53,10 +53,10 @@ module Box
 
       it 'returns all account ids' do
         activated_account = described_class.create
-        inactive_account = described_class.create
+        activated_account.add_ebics_user(activated_at: Time.now)
 
-        EbicsUser.create(account: activated_account, activated_at: Time.now)
-        EbicsUser.create(account: inactive_account, activated_at: nil)
+        inactive_account = described_class.create
+        inactive_account.add_ebics_user(activated_at: nil)
 
         expect(described_class.all_active_ids).to eq([activated_account.id])
       end
