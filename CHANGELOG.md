@@ -1,57 +1,65 @@
 # Changelog
 
+## 1.3.0
+
+- `[FEATURE]` supports MT942 / VMK<br>
+  set `UPCOMING_STATEMENTS_INTERVAL` to define fetching interval (minutes,_default: 60_)<br>
+  upcoming transactions will appear as statements in the `/statements` endpoint
+- `[FEATURE]` retry failed webhooks (see API-Docs at `/docs` for more details)
+- `[ENHANCEMENT]` multiple accounts per ebics_user
+
 ## 1.2.1
 
-- [BUGFIX] fixes migrations missing statements public-id default value
+- `[BUGFIX]` fixes migrations missing statements public-id default value
 
 ## 1.2.0
 
-- [HOUSEKEEPING] removes clockwork in favor of sidekiq-scheduler
-- [FEATURE] added env-variable (ACTIVATE_EBICS_USER_INTERVAL) to defined interval of activation jobs (default: 60 minutes)
-- [ENHANCEMENT] account activation is now a recurring job to prevent missing activation due to queue failure
-- [ENHANCEMENT] forces SSL unless DISABLE_SSL_FORCE is set (to true obviously :])
+- `[HOUSEKEEPING]` removes clockwork in favor of sidekiq-scheduler
+- `[FEATURE]` added env-variable (`ACTIVATE_EBICS_USER_INTERVAL`) to defined interval (minutes) of activation jobs (_default: 60_)
+- `[ENHANCEMENT]` account activation is now a recurring job to prevent missing activation due to queue failure
+- `[ENHANCEMENT]` forces SSL unless DISABLE_SSL_FORCE is set (to true obviously :])
 
 ## 1.1.3
 
-- [ENHANCEMENT] fake adapter now adds reference to info field for statements
+- `[ENHANCEMENT]` fake adapter now adds reference to info field for statements
 
 ## 1.1.2
 
-- [BUGFIX] account activation was not triggered due to incorrect sidekiq config
+- `[BUGFIX]` account activation was not triggered due to incorrect sidekiq config
 
 ## 1.1.1
 
-- [BUGFIX] fixes docker-compose file running incorrect server command
-- [ENHANCEMENT] makes docker services run migration before startup
-- [HOUSEKEEPING] updates heroku doku
+- `[BUGFIX]` fixes docker-compose file running incorrect server command
+- `[ENHANCEMENT]` makes docker services run migration before startup
+- `[HOUSEKEEPING]` updates heroku doku
 
 ## 1.1.0
 
-- [ENHANCEMENT] renames subscribers to ebics user to lessen complexity
+- `[ENHANCEMENT]` renames subscribers to ebics user to lessen complexity
 
 ## 1.0.1
 
-- [DEPS] updates epics to work with sparkasse again
-- [HOUSEKEEPING] makes travis build docker files on success
+- `[DEPS]` updates epics to work with sparkasse again
+- `[HOUSEKEEPING]` makes travis build docker files on success
 
 ## 1.0.0
 
-- [FEATURE] direct debits for API v2
-- [BUGFIX] initial migration now setups initial user
+- `[FEATURE]` direct debits for API v2
+- `[BUGFIX]` initial migration now setups initial user
 
 ## 0.9.1
 
-- [BUGFIX] migrations not passing
-- [OTHERS] updates dependencies because of vulnerabilities
-- [OTHERS] replaces byebug with pry
+- `[BUGFIX]` migrations not passing
+- `[OTHERS]` updates dependencies because of vulnerabilities
+- `[OTHERS]` replaces byebug with pry
 
 ## 0.9
 
-- [BUGFIX] fixes setup issue
+- `[BUGFIX]` fixes setup issue
 
 ## 0.8
 
-- [BUGFIX] dropped setup migrations restored
+- `[BUGFIX]` dropped setup migrations restored
 
 ## 0.7.2.2
 
