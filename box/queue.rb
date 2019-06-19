@@ -9,6 +9,7 @@ require_relative './jobs/debit'
 require_relative './jobs/queue_processing_status'
 require_relative './jobs/fetch_processing_status'
 require_relative './jobs/fetch_statements'
+require_relative './jobs/fetch_upcoming_statements'
 require_relative './jobs/webhook'
 require_relative './jobs/check_activation'
 

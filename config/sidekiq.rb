@@ -21,6 +21,7 @@ require_relative '../box/jobs/credit'
 require_relative '../box/jobs/debit'
 require_relative '../box/jobs/fetch_processing_status'
 require_relative '../box/jobs/fetch_statements'
+require_relative '../box/jobs/fetch_upcoming_statements'
 require_relative '../box/jobs/webhook'
 require_relative '../box/jobs/check_activation'
 
@@ -56,6 +57,16 @@ Sidekiq.configure_server do |config|
         every: "#{activate_ebics_user_interval}m",
         class: 'Box::Jobs::CheckActivation',
         queue: 'check.activations'
+      )
+    end
+
+    upcoming_statements_interval = ENV['UPCOMING_STATEMENTS_INTERVAL'].to_i
+    unless upcoming_statements_interval.zero?
+      Sidekiq.set_schedule(
+        'fetch_upcoming_account_statements',
+        every: "#{upcoming_statements_interval}m",
+        class: 'Box::Jobs::FetchUpcomingStatements',
+        queue: 'check.statements'
       )
     end
   end

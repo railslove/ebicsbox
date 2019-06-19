@@ -15,6 +15,7 @@ module Box
       type: :string,
       reference: :string,
       end_to_end_reference: :string,
+      settled_at: :string
     }
 
     describe 'GET: /transactions' do
