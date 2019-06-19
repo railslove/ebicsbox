@@ -41,6 +41,12 @@ module Box
       SUPPORTED_TYPES.include?(method_name) || super
     end
 
+    def reset_webhook_delivery
+      set(webhook_status: 'pending', webhook_retries: 0).save
+
+      Queue.trigger_webhook(event_id: id)
+    end
+
     def self.method_missing(method_name, *args, &block)
       if SUPPORTED_TYPES.include?(method_name)
         data = args.shift
