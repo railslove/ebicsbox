@@ -9,13 +9,12 @@ blocks:
     task:
       secrets:
         - name: ebicsbox-secrets
-      prologue:
-        commands:
-          - echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
       jobs:
         - name: build tag
           commands:
             - checkout
-            - docker build -t ebicsbox:${SEMAPHORE_GIT_BRANCH} .
-            - docker tag ebicsbox:${SEMAPHORE_GIT_BRANCH} railslove/ebicsbox:${SEMAPHORE_GIT_BRANCH}
-            - docker push railslove/ebicsbox:${SEMAPHORE_GIT_BRANCH}
+            - export GIT_TAG=`echo "$SEMAPHORE_GIT_BRANCH" | cut -d/ -f3`
+            - echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+            - docker build -t ebicsbox:"$GIT_TAG" .
+            - docker tag ebicsbox:"$GIT_TAG" "$DOCKER_USER"/ebicsbox:"$GIT_TAG"
+            - docker push "$DOCKER_USER"/ebicsbox:"$GIT_TAG"
