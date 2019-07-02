@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.1
+
+- `[FEATURE]` Fake-Mode now generated proper direct debit statements
+
 ## 1.3.0
 
 - `[FEATURE]` supports MT942 / VMK<br>
