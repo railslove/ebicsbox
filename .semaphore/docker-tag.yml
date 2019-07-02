@@ -13,7 +13,7 @@ blocks:
         commands:
           - echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
       jobs:
-        - name: build tagged
+        - name: build tag
           commands:
             - checkout
             - docker build -t ebicsbox:${SEMAPHORE_GIT_BRANCH} .

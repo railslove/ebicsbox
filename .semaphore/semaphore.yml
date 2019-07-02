@@ -47,8 +47,8 @@ promotions:
         branch:
           - master
   - name: build ebicsbox:tag 🐳📦🔐
-    pipeline_file: docker-tagged.yml
+    pipeline_file: docker-tag.yml
     auto_promote_on:
       - result: passed
         branch:
-          - ^refs/tags/v.*$
+          - ^refs/tags/*$
