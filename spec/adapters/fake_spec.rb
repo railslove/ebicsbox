@@ -9,7 +9,7 @@ module Box
   module Adapters
     RSpec.describe Fake do
       let!(:organization) { Fabricate(:organization) }
-      let!(:account) { organization.add_account(iban: 'AL90208110080000001039531801', name: 'Test account', mode: 'Fake', url: 'url', host: 'host', partner: 'partner') }
+      let!(:account) { organization.add_account(iban: 'AL90208110080000001039531801', name: 'Test account', mode: 'Fake', url: 'url', host: 'host', partner: 'partner', creditor_identifier: 'DE98ZZZ09999999999') }
       let!(:user) { organization.add_user(name: 'Test user') }
       let!(:ebics_user) { account.add_ebics_user(user_id: user.id, signature_class: 'T', activated_at: 1.day.ago) }
 
@@ -70,6 +70,55 @@ module Box
 
         context 'amounts' do
           let(:run_job) { Credit.create!(account, valid_payload.merge(amount: 251_995), user) }
+
+          it 'sets correct statement account' do
+            run_job
+            expect(Statement.last.amount).to eq(251_995)
+          end
+        end
+      end
+
+      describe 'Debit an account' do
+        let(:valid_payload) do
+          {
+            name: 'Some person',
+            bic: 'DABAIE2D',
+            iban: 'AL90208110080000001039531801',
+            amount: 123,
+            eref: SecureRandom.hex,
+            mandate_id: SecureRandom.hex,
+            mandate_signature_date: Time.now.to_i,
+            requested_date: 2.days.from_now,
+            instrument: 'CORE'
+          }
+        end
+
+        before do
+          expect(Queue).to receive(:update_processing_status).and_return(true) # we don't want to run this job
+        end
+
+        context 'auto accept any direct debits and create statements' do
+          let(:run_job) { DirectDebit.create!(account, valid_payload.merge(amount: 100_00), user) }
+          before do
+            Sidekiq::Testing.inline!
+          end
+
+          it 'creates a statement entry' do
+            expect { run_job }.to(change(Statement, :count))
+          end
+
+          it 'marks the transaction as being processed successfully' do
+            run_job
+            expect(Transaction.last.status).to eq('funds_credited')
+          end
+
+          it 'creates associated events' do
+            expect { run_job }.to(change { Event.all.map(&:type).sort }.to(%w[debit_created debit_status_changed statement_created]))
+          end
+        end
+
+        context 'amounts' do
+          let(:run_job) { DirectDebit.create!(account, valid_payload.merge(amount: 251_995), user) }
 
           it 'sets correct statement account' do
             run_job
