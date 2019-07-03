@@ -39,7 +39,7 @@ module Box
             bic: 'DABAIE2D',
             iban: 'AL90208110080000001039531801',
             eref: SecureRandom.hex,
-            remittance_information: 'Just s abasic test credit',
+            remittance_information: 'Just a basic test credit',
             requested_date: Time.now.to_i
           }
         end
@@ -89,6 +89,7 @@ module Box
             mandate_id: SecureRandom.hex,
             mandate_signature_date: Time.now.to_i,
             requested_date: 2.days.from_now,
+            remittance_information: 'Just a basic test direct debit',
             instrument: 'CORE'
           }
         end
@@ -110,6 +111,11 @@ module Box
           it 'marks the transaction as being processed successfully' do
             run_job
             expect(Transaction.last.status).to eq('funds_credited')
+          end
+
+          it 'contains correct info' do
+            run_job
+            expect(Statement.last.description).to eq('Just a basic test direct debit')
           end
 
           it 'creates associated events' do

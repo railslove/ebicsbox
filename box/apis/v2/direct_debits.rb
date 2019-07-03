@@ -72,7 +72,7 @@ module Box
             USAGE
 
           params do
-            requires :account, type: String, desc: "the account to use", documentation: { param_type: 'body' }
+            requires :account, type: String, desc: "the iban of the account to use", documentation: { param_type: 'body' }
             requires :name, type: String, desc: "the customers name"
             requires :iban, type: String, desc: "the customers iban"
             requires :amount_in_cents, type: Integer, desc: "amount to debit (in cents)", values: 1..1200000000

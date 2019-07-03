@@ -57,6 +57,7 @@ module Box
         doc = Nokogiri::XML(pain)
         trx = doc.css('Document CstmrDrctDbtInitn PmtInf DrctDbtTxInf')
         eref = trx.css('PmtId EndToEndId').text
+        information = trx.css('RmtInf Ustrd').text
         amount = trx.css('InstdAmt').text.gsub(/\./, '').to_i
         transaction = Transaction[eref: eref]
         transaction.update_status('credit_received', reason: 'Auto accept fake direct debit')
@@ -75,8 +76,8 @@ module Box
           bic: trx.css('DbtrAgt FinInstnId BIC').text,
           iban: trx.css('DbtrAcct Id IBAN').text,
           name: trx.css('Dbtr Nm').text,
-          information: 'Fake Direct Debit',
-          description: 'Fake Direct Debit',
+          information: information,
+          description: information,
           eref: eref
         )
 
