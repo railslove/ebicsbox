@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.2
+
+- `[ENHANCEMENT]` Fake-Mode now handles information for direct debits properly
+- `[HOUSEKEEPING]` Tagging dockerimages works now with semaphore
+
 ## 1.3.1
 
 - `[FEATURE]` Fake-Mode now generated proper direct debit statements
