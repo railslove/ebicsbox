@@ -16,5 +16,5 @@ blocks:
             - export GIT_TAG=`echo "$SEMAPHORE_GIT_BRANCH" | cut -d/ -f3`
             - echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
             - docker build -t ebicsbox:"$GIT_TAG" .
-            - docker tag ebicsbox:"$GIT_TAG" "$DOCKER_USER"/ebicsbox:"$GIT_TAG"
-            - docker push "$DOCKER_USER"/ebicsbox:"$GIT_TAG"
+            - docker tag ebicsbox:"$GIT_TAG" railslove/ebicsbox:"$GIT_TAG"
+            - docker push railslove/ebicsbox:"$GIT_TAG"
