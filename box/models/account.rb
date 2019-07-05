@@ -9,10 +9,6 @@ module Box
       def initialize(config_hash)
         self.config = OpenStruct.new(config_hash)
       end
-
-      def activation_check_interval
-        config.activation_check_interval || Box.configuration.activation_check_interval
-      end
     end
 
     self.raise_on_save_failure = true

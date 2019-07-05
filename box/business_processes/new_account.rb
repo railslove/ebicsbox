@@ -10,12 +10,8 @@ module Box
         # Remove it, so we can safely pass params to account create method
         ebics_user = params.delete(:ebics_user)
 
-        # Always create fake accounts in sandbox mode and set activation_check_interval
-        # to let the transaction finish
-        if Box.configuration.sandbox?
-          params[:mode] = 'Fake'
-          params[:config] = { activation_check_interval: 3 }
-        end
+        # Always create fake accounts in sandbox mode
+        params[:mode] = 'Fake' if Box.configuration.sandbox?
 
         DB.transaction do
           account = organization.add_account(params)

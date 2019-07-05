@@ -25,10 +25,6 @@ module Box
       120 # seconds
     end
 
-    def activation_check_interval
-      60 * 60 # seconds
-    end
-
     def ebics_client
       (ENV['EBICS_CLIENT'] || 'Epics::Client').constantize
     end

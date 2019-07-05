@@ -225,11 +225,6 @@ module Box
             do_request
             expect(Account.last.mode).to be_nil
           end
-
-          it 'does not set a custom activation interval' do
-            do_request
-            expect(Account.last.config.activation_check_interval).to eq(Box.configuration.activation_check_interval)
-          end
         end
 
         context "when sandbox server mode" do
@@ -238,11 +233,6 @@ module Box
           it 'sets fake mode' do
             do_request
             expect(Account.last.mode).to eq('Fake')
-          end
-
-          it 'sets custom activation interval to 3 seconds' do
-            do_request
-            expect(Account.last.config.activation_check_interval).to eq(3)
           end
         end
       end
