@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.4
+
+- `[ENHANCEMENT]` EbicsUser users partner to determine all accounts belong to the same bank
+
 ## 1.3.3
 
 - `[BUGFIX]` Fake-Mode now creates direct debits as debits
