@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.3
+
+- `[BUGFIX]` Fake-Mode now creates direct debits as debits
+
 ## 1.3.2
 
 - `[ENHANCEMENT]` Fake-Mode now handles information for direct debits properly
