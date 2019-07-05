@@ -63,6 +63,11 @@ module Box
             expect(Transaction.last.status).to eq('funds_debited')
           end
 
+          it 'creates a credit statement' do
+            run_job
+            expect(Statement.last.debit).to be_falsey
+          end
+
           it 'creates associated events' do
             expect { run_job }.to(change { Event.all.map(&:type).sort }.to(%w[credit_created credit_status_changed statement_created]))
           end
@@ -111,6 +116,11 @@ module Box
           it 'marks the transaction as being processed successfully' do
             run_job
             expect(Transaction.last.status).to eq('funds_credited')
+          end
+
+          it 'creates a debit statement' do
+            run_job
+            expect(Statement.last.debit).to be_truthy
           end
 
           it 'contains correct info' do
