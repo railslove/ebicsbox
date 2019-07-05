@@ -20,6 +20,7 @@ release:
   command:
     - bin/migrate
     - bundle exec rake after_migration:calculate_bank_statements_sha
+    - bundle exec rake after_migration:copy_partners
 run:
   web: bundle exec rackup -p $PORT
   worker: bundle exec sidekiq -C ./config/sidekiq.yml -r ./config/sidekiq.rb

@@ -6,7 +6,7 @@ module Box
   module Entities
     class EbicsUser < Grape::Entity
       expose(:accounts, documentation: { type: 'Array', desc: 'Associated IBANs' }) do |ebics_user|
-        Box::Account.where(ebics_users: ebics_user).get([:iban])
+        ebics_user.accounts.map(&:iban)
       end
       expose :id, documentation: { type: 'Integer', desc: 'Internal id' }
       expose :user_id, documentation: { type: 'String', desc: 'Associated user id' }

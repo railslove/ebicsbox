@@ -15,7 +15,7 @@ module Box
 
         DB.transaction do
           account = organization.add_account(params)
-          ebics_user = EbicsUser.find_or_create(remote_user_id: ebics_user, user_id: user.id)
+          ebics_user = EbicsUser.find_or_create(remote_user_id: ebics_user, user_id: user.id, partner: account.partner)
           account.add_ebics_user(ebics_user) unless ebics_user.in?(account.ebics_users)
 
           raise EbicsError unless ebics_user.setup!(account)

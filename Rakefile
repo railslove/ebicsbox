@@ -59,4 +59,21 @@ namespace :after_migration do
 
     p "Updated #{i} Bank Statement SHAs."
   end
+
+  desc 'copies partner value to ebics_users'
+  task :copy_partners do
+    env = ENV.fetch('RACK_ENV', :development)
+    if env.to_s != 'production'
+      # Load environment from file
+      require 'dotenv'
+      Dotenv.load
+    end
+
+    require './config/bootstrap'
+    require './box/models/ebics_user'
+
+    Box::EbicsUser.where(partner: nil).each do |ebics_user|
+      ebics_user.update(partner: ebics_user.accounts.first&.partner)
+    end
+  end
 end

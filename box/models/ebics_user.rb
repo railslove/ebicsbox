@@ -39,7 +39,7 @@ module Box
 
     def client
       account = first_account
-      @client ||= account.client_adapter.new(encryption_keys, passphrase, account.url, account.host, remote_user_id, account.partner)
+      @client ||= account.client_adapter.new(encryption_keys, passphrase, account.url, account.host, remote_user_id, partner)
     end
 
     def setup!(account, reset = false)

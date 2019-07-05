@@ -94,7 +94,7 @@ module Box
               account = current_organization.accounts_dataset.first!(iban: params[:iban])
               declared_params = declared(params)
               ebics_user = declared_params.delete(:ebics_user)
-              ebics_user = account.add_ebics_user(declared_params.merge(remote_user_id: ebics_user))
+              ebics_user = account.add_ebics_user(declared_params.merge(remote_user_id: ebics_user, partner: account.partner))
               if ebics_user
                 if ebics_user.setup!(account)
                   present ebics_user, with: Entities::EbicsUser

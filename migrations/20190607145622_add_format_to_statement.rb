@@ -4,6 +4,6 @@ Sequel.migration do
   end
 
   down do
-    remove_column :statements, :settled
+    drop_column :statements, :settled
   end
 end
