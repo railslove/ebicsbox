@@ -16,7 +16,6 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Clean up
 RUN rm Dockerfile*
-RUN rm Rakefile
 RUN rm -rf .git
 RUN rm -rf pkg
 RUN rm -rf log
