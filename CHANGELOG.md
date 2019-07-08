@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.5
+
+- `[BUGFIX]` Don't remove Rakefile from Dockerfile so rake tasks can be executed correctly
+
 ## 1.3.4
 
 - `[ENHANCEMENT]` EbicsUser users partner to determine all accounts belong to the same bank
