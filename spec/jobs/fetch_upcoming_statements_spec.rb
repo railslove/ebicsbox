@@ -27,7 +27,7 @@ module Box
           allow(job).to receive(:fetch_for_account).and_return(true)
           job.perform(account_ids: [1, 2, 3])
           expect(job.send(:safe_from)).to eql(Date.today)
-          expect(job.send(:safe_to)).to eql(180.days.from_now.to_date)
+          expect(job.send(:safe_to)).to eql(30.days.from_now.to_date)
         end
 
         it 'uses all account ids if none provided' do
@@ -94,7 +94,7 @@ module Box
           it 'fetches statements from remote server' do
             call_job
             expect(account.transport_client).to(
-              have_received(:VMK).with(Date.today.to_s, 180.days.from_now.to_date.to_s)
+              have_received(:VMK).with(Date.today.to_s, 30.days.from_now.to_date.to_s)
             )
           end
         end

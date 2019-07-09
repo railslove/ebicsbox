@@ -26,7 +26,7 @@ module Box
         it 'sets default daterange if not provided' do
           allow(job).to receive(:fetch_for_account).and_return(true)
           job.perform(account_ids: [1, 2, 3])
-          expect(job.from).to eql(30.days.ago.to_date)
+          expect(job.from).to eql(7.days.ago.to_date)
           expect(job.to).to eql(Date.today)
         end
 
@@ -87,7 +87,7 @@ module Box
 
           it 'fetches statements from remote server' do
             exec_process
-            expect(account.transport_client).to have_received(:STA).with(30.days.ago.to_date.to_s, Date.today.to_s)
+            expect(account.transport_client).to have_received(:STA).with(7.days.ago.to_date.to_s, Date.today.to_s)
           end
 
           it 'adds info that a new import happened' do

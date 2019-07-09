@@ -79,7 +79,7 @@ module Box
       end
 
       def safe_to
-        options.fetch(:to, 180.days.from_now.to_date)
+        options.fetch(:to, 30.days.from_now.to_date)
       end
     end
   end

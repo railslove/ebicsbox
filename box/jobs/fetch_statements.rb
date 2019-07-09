@@ -24,7 +24,7 @@ module Box
       end
 
       def initialize(options = {})
-        self.from = options.fetch(:from, 30.days.ago.to_date)
+        self.from = options.fetch(:from, 7.days.ago.to_date)
         self.to = options.fetch(:to, Date.today)
       end
 
@@ -33,7 +33,7 @@ module Box
         account_ids = options.fetch(:account_ids, [])
         account_ids = Account.all_active_ids if account_ids.empty?
 
-        self.from = options.fetch(:from, 30.days.ago.to_date)
+        self.from = options.fetch(:from, 7.days.ago.to_date)
         self.to = options.fetch(:to, Date.today)
 
         account_ids.each do |account_id|
