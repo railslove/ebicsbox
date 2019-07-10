@@ -35,6 +35,9 @@ GEM
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
+    barnes (0.0.7)
+      multi_json (~> 1)
+      statsd-ruby (~> 1.1)
     builder (3.2.3)
     cmxl (1.4.0)
       rchardet19
@@ -178,6 +181,7 @@ GEM
       rufus-scheduler (~> 3.2)
       sidekiq (>= 3)
       tilt (>= 1.4.0)
+    statsd-ruby (1.4.0)
     thor (0.19.4)
     thread_safe (0.3.6)
     tilt (2.0.9)
@@ -204,6 +208,7 @@ PLATFORMS
 DEPENDENCIES
   activesupport
   airborne
+  barnes
   camt_parser!
   cmxl
   database_cleaner

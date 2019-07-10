@@ -28,6 +28,7 @@ gem 'sidekiq'
 gem 'sidekiq-scheduler'
 
 gem 'rack-ssl-enforcer'
+gem 'barnes'
 
 group :development do
   gem 'rubocop'
