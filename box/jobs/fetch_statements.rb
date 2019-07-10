@@ -19,26 +19,15 @@ module Box
 
       attr_accessor :from, :to
 
-      def self.for_account(account_id, options = {})
-        new(options).fetch_for_account(account_id)
-      end
+      def perform(account_id, options = {})
+        return unless account_id
 
-      def initialize(options = {})
-        self.from = options.fetch(:from, 7.days.ago.to_date)
-        self.to = options.fetch(:to, Date.today)
-      end
-
-      def perform(options = {})
         options.symbolize_keys!
-        account_ids = options.fetch(:account_ids, [])
-        account_ids = Account.all_active_ids if account_ids.empty?
 
         self.from = options.fetch(:from, 7.days.ago.to_date)
         self.to = options.fetch(:to, Date.today)
 
-        account_ids.each do |account_id|
-          fetch_for_account(account_id)
-        end
+        fetch_for_account(account_id)
       end
 
       # Fetch all new statements for a single account since its last import. Each account import
@@ -69,7 +58,7 @@ module Box
         chunks.map do |chunk|
           begin
             bank_statement = BusinessProcesses::ImportBankStatement.from_cmxl(chunk, account)
-            res = BusinessProcesses::ImportStatements.from_bank_statement(bank_statement)
+            BusinessProcesses::ImportStatements.from_bank_statement(bank_statement)
           rescue BusinessProcesses::ImportBankStatement::InvalidInput => ex
             Box.logger.error { "[Jobs::FetchStatements] #{ex} account_id=#{account.id}" }
             { total: 0, imported: 0 }

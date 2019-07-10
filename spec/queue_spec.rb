@@ -3,7 +3,7 @@
 module Box
   RSpec.describe Queue do
     describe '.fetch_account_statements' do
-      let(:jobs) { Jobs::FetchStatements.jobs }
+      let(:jobs) { Jobs::QueueFetchStatements.jobs }
 
       it 'puts a new message onto the STA queue' do
         expect { described_class.fetch_account_statements }.to(change { jobs.count })
@@ -12,13 +12,13 @@ module Box
       it 'puts only the provided account id onto the job' do
         jid = described_class.fetch_account_statements(1)
         job = jobs.find { |j| j['jid'] == jid }
-        expect(job['args']).to include('account_ids' => [1])
+        expect(job['args'].flatten).to match_array([1])
       end
 
       it 'puts all provided account ids onto the job' do
         jid = described_class.fetch_account_statements([1, 2])
         job = jobs.find { |j| j['jid'] == jid }
-        expect(job['args']).to include('account_ids' => [1, 2])
+        expect(job['args'].flatten).to match_array([1, 2])
       end
     end
 
@@ -42,7 +42,7 @@ module Box
           jid = described_class.update_processing_status([1, 2])
           job = jobs.find { |j| j['jid'] == jid }
 
-          expect(job['args'].flatten).to match([1, 2])
+          expect(job['args'].flatten).to match_array([1, 2])
         end
 
         it 'puts all existing account ids onto the job if none is provided' do
@@ -53,7 +53,7 @@ module Box
           jid = described_class.update_processing_status
           job = jobs.find { |j| j['jid'] == jid }
 
-          expect(job['args'].flatten).to match(account_ids)
+          expect(job['args'].flatten).to match_array(account_ids)
         end
       end
 

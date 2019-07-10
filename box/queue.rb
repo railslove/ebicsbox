@@ -6,6 +6,7 @@ require 'active_support/core_ext/array'
 
 require_relative './jobs/credit'
 require_relative './jobs/debit'
+require_relative './jobs/queue_fetch_statements'
 require_relative './jobs/queue_processing_status'
 require_relative './jobs/fetch_processing_status'
 require_relative './jobs/fetch_statements'
@@ -29,7 +30,7 @@ module Box
     end
 
     def self.fetch_account_statements(account_ids = nil)
-      Jobs::FetchStatements.perform_async(account_ids: Array.wrap(account_ids))
+      Jobs::QueueFetchStatements.perform_async(Array.wrap(account_ids))
     end
 
     def self.trigger_webhook(payload, options = {})
