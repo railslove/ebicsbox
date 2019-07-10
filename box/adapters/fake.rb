@@ -36,21 +36,19 @@ module Box
       end
 
       def STA(_from = nil, _to = nil)
-        # Create a random number of statements every day
-        ::File.read(::File.expand_path('~/sta.mt940'))
+        nil
       end
 
       def VMK(_from = nil, _to = nil)
-        # Create a random number of statements every day
-        ::File.read(::File.expand_path('~/vmk.mt942'))
+        nil
       end
 
       def HAC(_from = nil, _to = nil)
-        ::File.open(::File.expand_path('~/hac_empty.xml'))
+        nil
       end
 
       def HTD
-        ::File.open(::File.expand_path('~/htd.xml'))
+        nil
       end
 
       def CD1(pain)
@@ -58,7 +56,7 @@ module Box
         trx = doc.css('Document CstmrDrctDbtInitn PmtInf DrctDbtTxInf')
         eref = trx.css('PmtId EndToEndId').text
         information = trx.css('RmtInf Ustrd').text
-        amount = trx.css('InstdAmt').text.gsub(/\./, '').to_i
+        amount = trx.css('InstdAmt').text.delete('.').to_i
         transaction = Transaction[eref: eref]
         transaction.update_status('credit_received', reason: 'Auto accept fake direct debit')
 
@@ -94,7 +92,7 @@ module Box
         trx = doc.css('Document CstmrCdtTrfInitn PmtInf CdtTrfTxInf')
         eref = trx.css('PmtId EndToEndId').text
         desc = trx.css('RmtInf Ustrd').text
-        amount = trx.css('Amt InstdAmt').text.gsub(/\./, '').to_i
+        amount = trx.css('Amt InstdAmt').text.delete('.').to_i
         transaction = Transaction[eref: eref]
         transaction.update_status('debit_received', reason: 'Auto accept fake credit transfers')
 
