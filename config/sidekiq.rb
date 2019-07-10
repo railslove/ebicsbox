@@ -35,7 +35,7 @@ Sidekiq.configure_server do |config|
       Sidekiq.set_schedule(
         'fetch_account_statements',
         every: "#{fetch_bank_statements_interval}m",
-        class: 'Box::Jobs::FetchStatements',
+        class: 'Box::Jobs::QueueFetchStatements',
         queue: 'check.statements'
       )
     end

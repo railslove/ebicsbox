@@ -335,8 +335,12 @@ module Box
         context 'valid user' do
           include_context 'valid user'
 
+          let(:job_double) { double('Jobs::FetchStatements') }
+
           before(:each) do
-            allow(Jobs::FetchStatements).to receive(:for_account).and_return({ total: 12, imported: 3 })
+            allow(Jobs::FetchStatements).to receive(:new).and_return(job_double)
+            allow(job_double).to receive(:perform).and_return({ total: 12, imported: 3 })
+
             account.add_ebics_user(activated_at: 1.day.ago)
 
             get "/#{account.iban}/import/statements?from=#{from}&to=#{to}", 'Authorization' => "token #{user.access_token}"
@@ -347,7 +351,7 @@ module Box
           end
 
           it 'calls statement fetching' do
-            expect(Jobs::FetchStatements).to have_received(:for_account).with(account.id, from: from, to: to)
+            expect(job_double).to have_received(:perform).with(account.id, from: from, to: to)
           end
 
           it 'returns import stats' do

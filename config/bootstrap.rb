@@ -5,6 +5,7 @@
 
 require 'logger'
 require 'sequel'
+require 'barnes'
 
 require_relative './configuration'
 require_relative './version'
@@ -37,3 +38,5 @@ Sequel.split_symbols = true
 Sequel::Model.plugin :timestamps, update_on_create: true
 Sequel.extension :pg_json
 DB.extension :pg_json
+
+Barnes.start
