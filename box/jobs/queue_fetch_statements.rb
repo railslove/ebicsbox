@@ -15,7 +15,7 @@ module Box
   module Jobs
     class QueueFetchStatements
       include Sidekiq::Worker
-      sidekiq_options queue: 'check.statements'
+      sidekiq_options queue: 'check.statements', retry: false
 
       def perform(account_ids = [], options = {})
         log(:debug, 'Queue fetch statements')

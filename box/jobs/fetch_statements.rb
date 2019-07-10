@@ -15,7 +15,7 @@ module Box
   module Jobs
     class FetchStatements
       include Sidekiq::Worker
-      sidekiq_options queue: 'check.statements'
+      sidekiq_options queue: 'check.statements', retry: false
 
       attr_accessor :from, :to
 

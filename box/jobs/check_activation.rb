@@ -5,7 +5,7 @@ module Box
   module Jobs
     class CheckActivation
       include Sidekiq::Worker
-      sidekiq_options queue: 'check.activations'
+      sidekiq_options queue: 'check.activations', retry: false
 
       def perform
         ebics_users = EbicsUser.where(activated_at: nil).exclude(ini_letter: nil)

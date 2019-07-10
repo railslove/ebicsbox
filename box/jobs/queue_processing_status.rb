@@ -6,7 +6,7 @@ module Box
   module Jobs
     class QueueProcessingStatus
       include Sidekiq::Worker
-      sidekiq_options queue: 'check.orders'
+      sidekiq_options queue: 'check.orders', retry: false
 
       def perform(account_ids = [])
         log(:debug, 'Check orders.')
