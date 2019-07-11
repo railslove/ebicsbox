@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.3.6
+
+- `[ENHANCEMENT]` Fetch Statements Job now runs parallelized for multiple accounts
+- `[ENHANCEMENT]` Scheduled Jobs won't get retried anymore
+- `[HOUSEKEEPING]` Adds advanced metrics for Heroku
+- `[HOUSEKEEPING]` Reduces log output in INFO mode
+- `[HOUSEKEEPING]` Reduces default timerange to fetch statements for to 7 days (was 30)
+- `[HOUSEKEEPING]` Reduces default timerange to fetch upcoming statements for to 30 days (was 180)
+- `[HOUSEKEEPING]` Adds advanced metrics support for heroku
+
 ## 1.3.5
 
 - `[BUGFIX]` Don't remove Rakefile from Dockerfile so rake tasks can be executed correctly
@@ -10,7 +20,7 @@
 
 ## 1.3.3
 
-- `[BUGFIX]` Fake-Mode now creates direct debits as debits
+- `[BUGFIX]` Fake-Mode now creates direct debits qas debits
 
 ## 1.3.2
 
