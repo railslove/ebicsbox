@@ -14,7 +14,7 @@ schedule:
     queue: "check.orders"
   fetch_account_statements:
     every: "60m"
-    class: Box::Jobs::FetchStatements
+    class: Box::Jobs::QueueFetchStatements
     queue: "check.statements"
   activate_ebics_user:
     every: "60m"
