@@ -18,7 +18,7 @@ Sequel.extension :migration, :core_extensions
 # Migrate to latest version
 version = Sequel::Migrator.run(
   DB,
-  File.join( File.dirname(__FILE__),  '../migrations/'),
+  File.join( File.dirname(__FILE__), '../migrations/'),
   use_transactions: true,
   allow_missing_migration_files: true
 )
