@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.7
+
+- `[ENHANCEMENT]` Adds ability to delete users via v2 management
+- `[HOUSEKEEPING]` Improves docker setup
+- `[HOUSEKEEPING]` Adds documentation for docker setup
+
 ## 1.3.6
 
 - `[ENHANCEMENT]` Fetch Statements Job now runs parallelized for multiple accounts
