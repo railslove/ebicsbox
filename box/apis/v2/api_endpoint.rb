@@ -13,7 +13,7 @@ module Box
         DEFAULT_ERROR_RESPONSES = [
           [400, "Invalid request", Message],
           [401, "Not authorized to access this resource", Message],
-          [404, "No account with given IBAN found", Message],
+          [404, "Resource not found", Message],
           [412, "EBICS account credentials not yet activated", Message]
         ]
 
@@ -43,9 +43,7 @@ module Box
           end
 
           before do
-            if current_user.nil?
-              error!({ message: 'Unauthorized access. Please provide a valid access token!' }, 401)
-            end
+            error!({ message: 'Unauthorized access. Please provide a valid access token!' }, 401) if current_user.nil?
           end
 
           rescue_from Grape::Exceptions::ValidationErrors do |e|

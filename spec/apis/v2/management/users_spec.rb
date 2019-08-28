@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 module Box
@@ -6,11 +8,11 @@ module Box
 
     let(:other_organization) { Fabricate(:organization) }
 
-    describe 'POST /management/users' do
+    describe 'GET /management/users' do
       before { organization.add_user(name: 'Test User', access_token: 'secret') }
 
-      def perform_request(data = {})
-        get "management/users", TestHelpers::VALID_HEADERS
+      def perform_request(_data = {})
+        get 'management/users', TestHelpers::VALID_HEADERS
       end
 
       it "does not include the user's access token" do
@@ -20,10 +22,8 @@ module Box
     end
 
     describe 'POST /management/users' do
-      before { user }
-
       def perform_request(data = {})
-        post "management/users", { name: "Another Test User" }.merge(data), TestHelpers::VALID_HEADERS
+        post 'management/users', { name: 'Another Test User' }.merge(data), TestHelpers::VALID_HEADERS
       end
 
       it 'creates a new user for the organization' do
@@ -38,6 +38,31 @@ module Box
       it 'uses the provided access token' do
         perform_request(token: 'secret')
         expect_json 'access_token', 'secret'
+      end
+    end
+
+    describe 'DELETE /management/users/:id' do
+      let!(:user_to_delete) { Fabricate(:user) }
+
+      it 'deletes an existing user' do
+        expect { delete("management/users/#{user_to_delete.id}", {}, TestHelpers::VALID_HEADERS) }.to(
+          change { Box::User.count }.by(-1)
+        )
+      end
+
+      it 'deletes an existing user' do
+        delete("management/users/#{user_to_delete.id}", {}, TestHelpers::VALID_HEADERS)
+        expect(Box::User[user_to_delete.id]).to be_nil
+      end
+
+      it 'deletes an existing user' do
+        delete("management/users/#{user_to_delete.id}", {}, TestHelpers::VALID_HEADERS)
+        expect(response.status).to eql(204)
+      end
+
+      it 'raises a 404 if user not found' do
+        delete 'management/users/-1', {}, TestHelpers::VALID_HEADERS
+        expect(response.status).to eql(404)
       end
     end
   end
