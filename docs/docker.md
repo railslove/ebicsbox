@@ -14,7 +14,7 @@ To put it simple, the ebicsbox is a proxy for your bank's ebics interface to you
   If you decide to use the internal database make sure to provide the path you created in the step before.
 - Rename the `.web.env.example` to `.web.env` and update the content
 - Start the cluster with `docker-compose up` and check for errors once everything is started. <br>
-  If you decide to use the internal DBs, use `docker-compose -f docker-compose.yml -docker-compose.with_db.yml up`
+  If you decide to use the internal DBs, use `docker-compose -f docker-compose.yml -f docker-compose.with_db.yml up`
 
 _Note:_ If you start the cluster for the first time, the worker and web will give out a lot of errors while the database is being setup. This should stop
 
