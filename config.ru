@@ -3,11 +3,6 @@
 require_relative './config/bootstrap'
 
 if ENV['RACK_ENV'] == 'production'
-  if ENV['SENTRY_DSN']
-    require 'raven'
-    use Raven::Rack
-  end
-
   unless ENV['DISABLE_SSL_FORCE']
     require 'rack/ssl-enforcer'
     use Rack::SslEnforcer

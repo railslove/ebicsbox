@@ -27,6 +27,8 @@ gem 'sequel'
 gem 'sidekiq'
 gem 'sidekiq-scheduler'
 
+gem 'rollbar'
+
 gem 'rack-ssl-enforcer'
 gem 'barnes'
 

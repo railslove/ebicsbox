@@ -8,6 +8,7 @@ require 'sequel'
 require 'barnes'
 
 require_relative './configuration'
+require_relative './exception_management'
 require_relative './version'
 
 # Setup box namespace
