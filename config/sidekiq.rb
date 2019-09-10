@@ -28,6 +28,13 @@ require_relative '../box/jobs/check_activation'
 require 'sidekiq'
 require 'sidekiq-scheduler'
 
+if ENV['ROLLBAR_ACCESS_TOKEN']
+  Rollbar.configure do |config|
+    config.access_token = ENV['ROLLBAR_ACCESS_TOKEN']
+    config.use_sidekiq
+  end
+end
+
 Sidekiq.configure_server do |config|
   config.on(:startup) do
     fetch_bank_statements_interval = ENV['UPDATE_BANK_STATEMENTS_INTERVAL'].to_i
