@@ -1,4 +1,5 @@
 require 'faraday'
+require 'rack'
 require 'jwt'
 require 'uri'
 
