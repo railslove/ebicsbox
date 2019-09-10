@@ -11,6 +11,7 @@ module Box
         expose(:iban)
         expose(:bic)
         expose(:amount, as: "amount_in_cents")
+        expose(:currency)
         expose(:eref, as: 'end_to_end_reference')
         expose(:reference)
         expose(:executed_on)

@@ -12,6 +12,7 @@ module Box
       iban: :string,
       bic: :string,
       amount_in_cents: :integer,
+      currency: :string,
       end_to_end_reference: :string,
       status: :string,
       reference: :string,
