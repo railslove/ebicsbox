@@ -21,12 +21,13 @@ gem 'pry'
 gem 'puma'
 gem 'rack-cors', require: false
 gem 'rake'
-gem 'sentry-raven'
 gem 'sepa_king'
 gem 'sequel'
 gem 'sidekiq'
 gem 'sidekiq-scheduler'
 
+# exception management
+gem 'sentry-raven'
 gem 'rollbar'
 
 gem 'rack-ssl-enforcer'
