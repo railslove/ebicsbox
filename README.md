@@ -34,28 +34,31 @@ Run it:
 
 Set the following environment variables:
 
-- PASSPHRASE=
-- AUTH_SERVICE=
-  - "static":
-  - [default (oauth)]:
-- VIRTUAL_HOST=
-- LETSENCRYPT_HOST=
-- LETSENCRYPT_EMAIL=
+- `PASSPHRASE`
+- `AUTH_SERVICE`
+  - `static` - _auth via access_token_
+  - `oauth` - _oauth, also requires server and jwt details, see .env.example_
+
+If you want the box to be available via a custom (sub-)domain, also provide these
+
+- `VIRTUAL_HOST`
+- `LETSENCRYPT_HOST`
+- `LETSENCRYPT_EMAIL`
 
 If you want to use a custom postgres instance provide the database connection strings:
 
-- DATABASE_URL=
-- TEST_DATABASE_URL=
+- `DATABASE_URL`
+- `TEST_DATABASE_URL`
 
 see config/configuration.rb
 
 SSL forcing can be disabled by setting
 
-- DISABLE_SSL_FORCE
+- `DISABLE_SSL_FORCE`
 
 you can store these in a local .env file for development.
 
-Is done via environment variables. You can utilize a `.env` file while
+It's done via environment variables. You can utilize a `.env` file while
 developing locally. Please revise `.env.example` for a overview
 of needed parameters.
 
@@ -80,17 +83,17 @@ We are using RSpec to test this project. In order to execute all specs once, run
 To migrate your test database run the following command:
 
 ```bash
-  $ ENVIRONMENT=test bundle exec bin/migrate
+  $ `ENVIRONMENT`=test bundle exec bin/migrat
 ```
 
 ### Error Tracking
 
 The ebicsbox enables sentry or rollbar as the error tracking software of choice.
 
-_using sentry_
+_using sentry_ \
 Define `SENTRY_DSN` via an environment variable to enable error tracking via sentry
 
-_using rollbar_
+_using rollbar_ \
 Define `ROLLBAR_ACCESS_TOKEN` via an environment variable to enable error tracking via rollbar
 
 ### Documentation
