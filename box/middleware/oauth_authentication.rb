@@ -1,6 +1,6 @@
 require 'faraday'
-require 'jwt'
 require 'rack'
+require 'jwt'
 require 'uri'
 
 require_relative '../models/user'

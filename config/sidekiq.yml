@@ -7,6 +7,7 @@ queues:
   - "check.statements"
   - "check.orders"
   - "check.activations"
+  - "rollbar"
 schedule:
   update_processing_status:
     every: "6h"

@@ -2,12 +2,22 @@
 
 require_relative './config/bootstrap'
 
-if ENV['RACK_ENV'] == 'production'
-  if ENV['SENTRY_DSN']
-    require 'raven'
-    use Raven::Rack
+
+if ENV['SENTRY_DSN']
+  require 'raven'
+  use Raven::Rack
+end
+
+if ENV['ROLLBAR_ACCESS_TOKEN']
+  require 'rollbar/middleware/rack'
+  Rollbar.configure do |config|
+    config.access_token = ENV['ROLLBAR_ACCESS_TOKEN']
   end
 
+  use Rollbar::Middleware::Rack
+end
+
+if ENV['RACK_ENV'] == 'production'
   unless ENV['DISABLE_SSL_FORCE']
     require 'rack/ssl-enforcer'
     use Rack::SslEnforcer
