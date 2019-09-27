@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.8
+
+- `[FEATURE]` Now supports rollbar, README updated
+- `[ENHANCEMENT]` Exception Trackers now work in dev mode too
+
 ## 1.3.7
 
 - `[ENHANCEMENT]` Adds ability to delete users via v2 management

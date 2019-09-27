@@ -85,8 +85,13 @@ To migrate your test database run the following command:
 
 ### Error Tracking
 
-The ebicsbox enables sentry as the error tracking software of choice. Simply define `SENTRY_DSN` via an environment
-variable to enable error tracking in production mode
+The ebicsbox enables sentry or rollbar as the error tracking software of choice.
+
+_using sentry_
+Define `SENTRY_DSN` via an environment variable to enable error tracking via sentry
+
+_using rollbar_
+Define `ROLLBAR_ACCESS_TOKEN` via an environment variable to enable error tracking via rollbar
 
 ### Documentation
 
