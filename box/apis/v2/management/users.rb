@@ -64,7 +64,7 @@ module Box
                 error!({ message: 'User not found' }, 404)
               end
 
-              # new
+              # create
               desc 'Create a new user instance',
                    tags: ['user management'],
                    body_name: 'body',
@@ -75,7 +75,7 @@ module Box
 
               params do
                 requires :name, type: String, desc: "The user's display name", documentation: { param_type: 'body' }
-                optional :token, type: String, desc: 'Set a custom access token'
+                optional :access_token, type: String, desc: 'Set a custom access token'
               end
 
               post do

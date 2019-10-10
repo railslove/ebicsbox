@@ -31,12 +31,12 @@ module Box
       end
 
       it 'auto generates an access token if none is provided' do
-        perform_request(token: nil)
+        perform_request(access_token: nil)
         expect_json_types 'access_token', :string
       end
 
       it 'uses the provided access token' do
-        perform_request(token: 'secret')
+        perform_request(access_token: 'secret')
         expect_json 'access_token', 'secret'
       end
     end

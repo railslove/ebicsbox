@@ -112,27 +112,23 @@ module Box
           before { account.add_ebics_user(activated_at: 1.hour.ago) }
 
           it 'cannot change iban' do
-            expect do
-              put "management/accounts/#{account.iban}", { iban: 'new-iban' }, 'Authorization' => "Bearer #{user.access_token}"
-            end.to_not(change { account.reload.iban })
+            put "management/accounts/#{account.iban}", { iban: 'new-iban' }, 'Authorization' => "Bearer #{user.access_token}"
+            expect(account.reload.iban).not_to eql('new-iban')
           end
 
           it 'cannot change bic' do
-            expect do
-              put "management/accounts/#{account.iban}", { bic: 'new-bic' }, 'Authorization' => "Bearer #{user.access_token}"
-            end.to_not(change { account.reload.bic })
+            put "management/accounts/#{account.iban}", { bic: 'new-bic' }, 'Authorization' => "Bearer #{user.access_token}"
+            expect(account.reload.bic).not_to eql('new-bic')
           end
 
           it 'ignores iban if it did not change' do
-            expect do
-              put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name' }, 'Authorization' => "Bearer #{user.access_token}"
-            end.to(change { account.reload.name })
+            put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name' }, 'Authorization' => "Bearer #{user.access_token}"
+            expect(account.reload.name).to eql('new name')
           end
 
           it 'ignores the access_token attribute' do
-            expect do
-              put "management/accounts/#{account.iban}", iban: 'old-iban', name: 'new name', access_token: user.access_token
-            end.to(change { account.reload.name })
+            put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name', access_token: user.access_token }, 'Authorization' => "Bearer #{user.access_token}"
+            expect(account.reload.name).to eql('new name')
           end
         end
 

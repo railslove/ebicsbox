@@ -117,15 +117,15 @@ module Box
         end
 
         it 'ignores iban if it did not change' do
-          expect do
-            put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name' }, TestHelpers::VALID_HEADERS
-          end.to(change { account.reload.name })
+          put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name' }, TestHelpers::VALID_HEADERS
+
+          expect(account.reload.name).to eql('new name')
         end
 
         it 'ignores the access_token attribute' do
-          expect do
-            put "management/accounts/#{account.iban}", iban: 'old-iban', name: 'new name', access_token: user.access_token
-          end.to(change { account.reload.name })
+          put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name', access_token: user.access_token }, TestHelpers::VALID_HEADERS
+
+          expect(account.reload.name).to eql('new name')
         end
       end
     end
