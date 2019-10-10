@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'grape-entity'
 
 require_relative '../webhook_delivery'
@@ -7,11 +9,11 @@ module Box
     module V2
       MAPPED_TYPES = {
         'statement_created' => 'transaction_created',
-        'ebics_user_activated' => 'account_activated',
-      }
+        'ebics_user_activated' => 'account_activated'
+      }.freeze
       class Event < Grape::Entity
         expose :public_id, as: 'id'
-        expose(:account, documentation: { type: "String", desc: "Display name for given bank account" }) do |event|
+        expose(:account, documentation: { type: 'String', desc: 'Display name for given bank account' }) do |event|
           event.account.try(:iban)
         end
         expose(:type) { |event| MAPPED_TYPES[event.type] || event.type }
@@ -21,12 +23,12 @@ module Box
         expose :webhook_status
         expose :webhook_retries
 
-        expose :webhook_deliveries, using: Entities::WebhookDelivery, if: { type: "full" }
+        expose :webhook_deliveries, using: Entities::WebhookDelivery, if: { type: 'full' }
 
-        expose(:_links, documentation: { type: "Hash", desc: "Links to resources" }) do |event, options|
+        expose(:_links, documentation: { type: 'Hash', desc: 'Links to resources' }) do |event, _options|
           {
             self: Box.configuration.app_url + "/events/#{event.public_id}",
-            account: Box.configuration.app_url + "/accounts/#{event.account.try(:iban)}",
+            account: Box.configuration.app_url + "/accounts/#{event.account.try(:iban)}"
           }
         end
       end

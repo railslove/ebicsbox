@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sequel'
 require 'securerandom'
 
@@ -42,10 +44,10 @@ module Box
         query = self
         # Filter by status
         query = case params[:status]
-          when 'activated' then query.eager_graph(:ebics_users).exclude(ebics_users__activated_at: nil)
-          when 'not_activated' then query.eager_graph(:ebics_users).where(ebics_users__activated_at: nil)
-          else query
-        end
+                when 'activated' then query.eager_graph(:ebics_users).exclude(ebics_users__activated_at: nil)
+                when 'not_activated' then query.eager_graph(:ebics_users).where(ebics_users__activated_at: nil)
+                else query
+                end
         query
       end
 
@@ -62,7 +64,7 @@ module Box
 
     def client_adapter
       Box::Adapters.const_get(mode)
-    rescue => e
+    rescue StandardError => _ex
       Box.configuration.ebics_client
     end
 
@@ -71,7 +73,7 @@ module Box
         base_scope = ebics_users_dataset.exclude(ebics_users__activated_at: nil)
         ebics_user = base_scope.where(ebics_users__signature_class: 'T').first || base_scope.first
         if ebics_user.nil?
-          fail NoTransportClient, 'Please setup and activate at least one ebics_user with a transport signature'
+          raise NoTransportClient, 'Please setup and activate at least one ebics_user with a transport signature'
         else
           ebics_user.client
         end
@@ -99,12 +101,14 @@ module Box
     end
 
     def pain_attributes_hash
-      fail(NotActivated) unless active?
+      raise(NotActivated) unless active?
+
       values.slice(:name, :bic, :iban, :creditor_identifier)
     end
 
     def credit_pain_attributes_hash
-      fail(NotActivated) unless active?
+      raise(NotActivated) unless active?
+
       values.slice(:name, :bic, :iban)
     end
 
@@ -122,8 +126,8 @@ module Box
 
     def bank_account_metadata
       Nokogiri::XML(transport_client.HTD).tap do |htd|
-        @bank_account_number ||= htd.at_xpath("//xmlns:AccountNumber[@international='false']", xmlns: "urn:org:ebics:H004").text
-        @bank_number         ||= htd.at_xpath("//xmlns:BankCode[@international='false']", xmlns: "urn:org:ebics:H004").text
+        @bank_account_number ||= htd.at_xpath("//xmlns:AccountNumber[@international='false']", xmlns: 'urn:org:ebics:H004').text
+        @bank_number         ||= htd.at_xpath("//xmlns:BankCode[@international='false']", xmlns: 'urn:org:ebics:H004').text
       end
     end
 
@@ -161,7 +165,7 @@ module Box
     def as_event_payload
       {
         account_id: id,
-        account: self.to_hash,
+        account: to_hash
       }
     end
   end

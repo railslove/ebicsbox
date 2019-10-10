@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'benchmark'
 require 'json'
 require 'faraday'
@@ -24,11 +26,11 @@ module Box
         response_body: response.body,
         reponse_headers: Sequel.pg_json(response.headers.stringify_keys),
         response_status: response.status,
-        response_time: execution_time,
+        response_time: execution_time
       )
       save
       response.success? ? event.delivery_success! : event.delivery_failure!
-    rescue Event::NoCallback => ex
+    rescue Event::NoCallback => _ex
       Box.logger.warn("[WebhookDelivery] No callback url for event. event_id=#{event.id}")
     end
 
@@ -74,6 +76,7 @@ module Box
     end
 
     private
+
     def extract_auth(url)
       url.match(/:\/\/(.*):(.*)@/).try(:captures)
     end
@@ -82,7 +85,7 @@ module Box
       auth = extract_auth(callback_url)
       uri = URI(callback_url)
       Faraday.new("#{uri.scheme}://#{uri.host}") do |c|
-        c.basic_auth *auth if auth
+        c.basic_auth(*auth) if auth
         c.request :signer, secret: event.account.organization.webhook_token
         c.adapter Faraday.default_adapter
       end

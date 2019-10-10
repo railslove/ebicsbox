@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Box
   RSpec.describe Statement do
     describe '.paginated_by_account' do
@@ -48,7 +50,6 @@ module Box
       it 'returns the connected transaction' do
         expect(statement.transaction).to eq(transaction)
       end
-
     end
   end
 end

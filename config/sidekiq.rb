@@ -41,7 +41,7 @@ if ENV['SENTRY_DSN']
   require 'raven'
   Raven.configure do |config|
     # Raven reports on the following environments
-    config.environments = %w(development staging production)
+    config.environments = %w[development staging production]
   end
 end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../queue'
 require_relative '../models/ebics_user'
 

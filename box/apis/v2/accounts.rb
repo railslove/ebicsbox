@@ -1,10 +1,11 @@
+# frozen_string_literal: true
+
 require 'grape'
 
 require_relative './api_endpoint'
 require_relative '../../business_processes/new_account'
 require_relative '../../entities/v2/account'
 require_relative '../../validations/unique_account'
-
 
 module Box
   module Apis
@@ -14,26 +15,25 @@ module Box
 
         content_type :html, 'text/html'
 
-        rescue_from Sequel::NoMatchingRow do |e|
+        rescue_from Sequel::NoMatchingRow do |_e|
           error!({ message: 'Your organization does not have an account with given IBAN!' }, 404)
         end
 
         resource :accounts do
-
           ###
           ### GET /accounts
           ###
-          desc "Fetch a list of accounts",
-            is_array: true,
-            headers: AUTH_HEADERS,
-            success: Entities::V2::Account,
-            failure: DEFAULT_ERROR_RESPONSES,
-            produces: ['application/vnd.ebicsbox-v2+json']
+          desc 'Fetch a list of accounts',
+               is_array: true,
+               headers: AUTH_HEADERS,
+               success: Entities::V2::Account,
+               failure: DEFAULT_ERROR_RESPONSES,
+               produces: ['application/vnd.ebicsbox-v2+json']
 
           params do
-            optional :page, type: Integer, desc: "page through the results", default: 1
-            optional :per_page, type: Integer, desc: "how many results per page", values: 1..100, default: 10
-            optional :status, type: String, desc: "Filter accounts by their activation status", default: 'all'
+            optional :page, type: Integer, desc: 'page through the results', default: 1
+            optional :per_page, type: Integer, desc: 'how many results per page', values: 1..100, default: 10
+            optional :status, type: String, desc: 'Filter accounts by their activation status', default: 'all'
           end
 
           get do
@@ -42,16 +42,15 @@ module Box
             present query.paginate(declared(params)).all, with: Entities::V2::Account
           end
 
-
           ###
           ### POST /accounts
           ###
-          desc "Create a new account",
-            headers: AUTH_HEADERS,
-            success: Message,
-            body_name: 'body',
-            failure: DEFAULT_ERROR_RESPONSES,
-            produces: ['application/vnd.ebicsbox-v2+json']
+          desc 'Create a new account',
+               headers: AUTH_HEADERS,
+               success: Message,
+               body_name: 'body',
+               failure: DEFAULT_ERROR_RESPONSES,
+               produces: ['application/vnd.ebicsbox-v2+json']
 
           params do
             requires :name, type: String, allow_blank: false, desc: 'Name of the account', documentation: { param_type: 'body' }
@@ -66,29 +65,26 @@ module Box
             optional :callback_url, type: String, desc: 'URL to which webhooks are delivered'
           end
           post do
-            begin
-              account = BusinessProcesses::NewAccount.create!(current_organization, current_user, declared(params, include_missing: false))
-              {
-                message: "Account created successfully. Please fetch INI letter, sign it, and submit it to your bank",
-                account: Entities::V2::Account.represent(account),
-              }
-            rescue BusinessProcesses::NewAccount::EbicsError => ex
-              error!({ message: 'Failed to setup ebics_user with your bank. Make sure your data is valid and retry!' }, 412)
-            rescue => ex
-              error!({ message: 'Failed to create account' }, 400)
-            end
+            account = BusinessProcesses::NewAccount.create!(current_organization, current_user, declared(params, include_missing: false))
+            {
+              message: 'Account created successfully. Please fetch INI letter, sign it, and submit it to your bank',
+              account: Entities::V2::Account.represent(account)
+            }
+          rescue BusinessProcesses::NewAccount::EbicsError => _ex
+            error!({ message: 'Failed to setup ebics_user with your bank. Make sure your data is valid and retry!' }, 412)
+          rescue StandardError => _ex
+            error!({ message: 'Failed to create account' }, 400)
           end
-
 
           ###
           ### GET /accounts/:iban
           ###
 
-          desc "Fetch an account",
-            headers: AUTH_HEADERS,
-            success: Entities::V2::Account,
-            failure: DEFAULT_ERROR_RESPONSES,
-            produces: ['application/vnd.ebicsbox-v2+json']
+          desc 'Fetch an account',
+               headers: AUTH_HEADERS,
+               success: Entities::V2::Account,
+               failure: DEFAULT_ERROR_RESPONSES,
+               produces: ['application/vnd.ebicsbox-v2+json']
 
           params do
             requires :iban, type: String
@@ -98,15 +94,14 @@ module Box
             present account, with: Entities::V2::Account
           end
 
-
           ###
           ### GET /accounts/:iban/ini_letter
           ###
 
-          desc "Fetch the ini letter of an account",
-            headers: AUTH_HEADERS,
-            failure: DEFAULT_ERROR_RESPONSES,
-            produces: ['text/html']
+          desc 'Fetch the ini letter of an account',
+               headers: AUTH_HEADERS,
+               failure: DEFAULT_ERROR_RESPONSES,
+               produces: ['text/html']
 
           params do
             requires :iban, type: String
@@ -122,17 +117,16 @@ module Box
             end
           end
 
-
           ###
           ### PUT /accounts/:iban
           ###
 
-          desc "Update an account",
-            success: Entities::V2::Account,
-            headers: AUTH_HEADERS,
-            failure: DEFAULT_ERROR_RESPONSES,
-            produces: ['application/vnd.ebicsbox-v2+json'],
-            body_name: 'body'
+          desc 'Update an account',
+               success: Entities::V2::Account,
+               headers: AUTH_HEADERS,
+               failure: DEFAULT_ERROR_RESPONSES,
+               produces: ['application/vnd.ebicsbox-v2+json'],
+               body_name: 'body'
 
           params do
             optional :name, type: String, allow_blank: false, desc: 'Name of account', documentation: { param_type: 'body' }
@@ -145,8 +139,8 @@ module Box
             account.set(declared(params, include_missing: false))
             if !account.modified? || account.save
               {
-                message: "Account updated successfully.",
-                account: Entities::V2::Account.represent(account),
+                message: 'Account updated successfully.',
+                account: Entities::V2::Account.represent(account)
               }
             else
               error!({ message: 'Failed to update account' }, 400)

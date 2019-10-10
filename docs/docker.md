@@ -1,8 +1,8 @@
-# 💲ebicsbox 📦 on docker 🐳
+# ebicsbox 📦 on docker 🐳
 
 ## What's the ebicsbox?
 
-To put it simple, the ebicsbox is a proxy for your bank's ebics interface to your application. Since the ebics standard is complex and not well readable, the ebicsbox provides you and your application with a handful of RESTful API endpoints to talk to your bank with simple JSON requests
+To put it simple, the ebicsbox is a proxy for your bank's ebics interface to your application. Since the ebics standard is complex and not well readable, also a lot of security, handshaking and other things that are really hard, the ebicsbox provides you and your application with a handful of RESTful API endpoints to talk to your bank with simple JSON requests
 
 ## How to setup
 
@@ -16,7 +16,7 @@ To put it simple, the ebicsbox is a proxy for your bank's ebics interface to you
 - Start the cluster with `docker-compose up` and check for errors once everything is started. <br>
   If you decide to use the internal DBs, use `docker-compose -f docker-compose.yml -f docker-compose.with_db.yml up`
 
-_Note:_ If you start the cluster for the first time, the worker and web will give out a lot of errors while the database is being setup. This should stop
+_Note:_ If you start the cluster for the first time, the worker and web will give out a lot of errors while the database is being setup. This should stop once the db is up and running.
 
 ## Check if everything is running
 

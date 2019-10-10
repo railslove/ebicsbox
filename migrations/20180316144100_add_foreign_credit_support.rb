@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Sequel.migration do
   change do
     add_column :transactions, :currency, String, default: 'EUR'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Sequel.migration do
   up do
     self[:organizations].insert(name: 'Primary Organization', webhook_token: SecureRandom.hex(32)) unless self[:organizations].any?

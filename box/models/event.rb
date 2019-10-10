@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'openssl'
 require 'sequel'
 
@@ -8,15 +10,15 @@ require_relative './webhook_delivery'
 
 module Box
   class Event < Sequel::Model
-    SUPPORTED_TYPES = [
-      :account_created,
-      :debit_created,
-      :credit_created,
-      :statement_created,
-      :ebics_user_activated,
-      :credit_status_changed,
-      :debit_status_changed
-    ]
+    SUPPORTED_TYPES = %i[
+      account_created
+      debit_created
+      credit_created
+      statement_created
+      ebics_user_activated
+      credit_status_changed
+      debit_status_changed
+    ].freeze
 
     RETRY_THRESHOLD = 20
 
@@ -32,8 +34,8 @@ module Box
 
       def by_organization(organization)
         left_join(:accounts, id: :account_id)
-        .where(accounts__organization_id: organization.id)
-        .select_all(:events)
+          .where(accounts__organization_id: organization.id)
+          .select_all(:events)
       end
     end
 
@@ -50,10 +52,8 @@ module Box
     def self.method_missing(method_name, *args, &block)
       if SUPPORTED_TYPES.include?(method_name)
         data = args.shift
-        if data.respond_to?(:as_event_payload)
-          data = data.as_event_payload
-        end
-        publish(method_name, *(args.unshift(data)))
+        data = data.as_event_payload if data.respond_to?(:as_event_payload)
+        publish(method_name, *args.unshift(data))
       else
         super # ignore and pass along
       end
@@ -63,7 +63,7 @@ module Box
       event = new(
         type: event_type,
         payload: Sequel.pg_json(payload.stringify_keys),
-        account_id: payload[:account_id],
+        account_id: payload[:account_id]
       )
       event.save
       Queue.trigger_webhook(event_id: event.id)
@@ -87,13 +87,13 @@ module Box
       if webhook_retries >= RETRY_THRESHOLD
         set(webhook_status: 'failed')
       else
-        Queue.trigger_webhook({ event_id: id }, { delay: delay_for(webhook_retries) })
+        Queue.trigger_webhook({ event_id: id }, delay: delay_for(webhook_retries))
       end
       save
     end
 
     def delay_for(attempt)
-      5 * ((attempt - 1) ** 2)
+      5 * ((attempt - 1)**2)
     end
 
     def to_webhook_payload

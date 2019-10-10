@@ -1,9 +1,10 @@
-require "epics"
+# frozen_string_literal: true
+
+require 'epics'
 
 module Box
   module Models
     RSpec.describe Transaction do
-
       it 'automatically sets created_at timestamp' do
         trx = Transaction.create
         expect(trx.reload.created_at).to be_kind_of(Time)
@@ -21,7 +22,7 @@ module Box
         subject { Transaction.create(type: 'debit', status: 'created') }
 
         it 'tracks no changes in history' do
-          expect{ subject.update_status("test") }.to_not change{ subject.reload.history }
+          expect { subject.update_status('test') }.to_not(change { subject.reload.history })
         end
 
         describe 'when the status actually changes' do
@@ -33,7 +34,7 @@ module Box
           end
 
           it 'publishes an event when status changes' do
-            subject.update_status("file_upload")
+            subject.update_status('file_upload')
 
             expect(Event).to have_received(:debit_status_changed).with(subject)
           end
@@ -41,7 +42,7 @@ module Box
           it 'tracks changes in history' do
             expect(subject.history).to be_empty
 
-            subject.update_status("file_upload")
+            subject.update_status('file_upload')
 
             expect(subject.reload.history).to include(hash_including('at', 'status', 'reason'))
           end
@@ -67,15 +68,15 @@ module Box
         end
       end
 
-      describe "#get_status", verify_stubs: false do
-        it "returns previous status on unexpected change" do
+      describe '#get_status', verify_stubs: false do
+        it 'returns previous status on unexpected change' do
           subject.status = 'created'
-          expect(subject.get_status("hello")).to eq("created")
+          expect(subject.get_status('hello')).to eq('created')
         end
 
-        it "returns new status on expected change" do
+        it 'returns new status on expected change' do
           subject.status = 'created'
-          expect(subject.get_status("file_upload")).to eq("file_upload")
+          expect(subject.get_status('file_upload')).to eq('file_upload')
         end
       end
 
@@ -88,7 +89,7 @@ module Box
 
         before do
           allow_any_instance_of(EbicsUser).to receive(:client).and_return(client)
-          allow(client).to receive(:public_send) do |type, pain|
+          allow(client).to receive(:public_send) do |type, _pain|
             ["transaction-#{type}", "order-#{type}"]
           end
         end
@@ -125,11 +126,11 @@ module Box
           end
 
           it 'updates the status' do
-            expect{ transaction.execute! }.to change(transaction, :status).to('failed')
+            expect { transaction.execute! }.to change(transaction, :status).to('failed')
           end
 
           it 'updates the history' do
-            expect{ transaction.execute! }.to change { transaction.history.to_a }.to(
+            expect { transaction.execute! }.to change { transaction.history.to_a }.to(
               [hash_including(reason: '061099/EBICS_INTERNAL_ERROR - Internal EBICS error')]
             )
           end
@@ -145,7 +146,7 @@ module Box
         end
 
         it 'returns nil on invalid data' do
-          transaction.payload = ""
+          transaction.payload = ''
           expect(transaction.parsed_payload).to be_nil
         end
       end

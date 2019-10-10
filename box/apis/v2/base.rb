@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'grape'
 require 'grape-swagger'
 require 'grape-swagger/entity'
@@ -31,10 +33,10 @@ module Box
           doc_version: 'v2',
           mount_path: '/swagger_doc',
           info: {
-            title: "EBICS::Box",
-            contact_name: "Railslove GmbH",
-            contact_email: "ebics-box@railslove.com",
-            contact_url: "https://www.ebicsbox.com/",
+            title: 'EBICS::Box',
+            contact_name: 'Railslove GmbH',
+            contact_email: 'ebics-box@railslove.com',
+            contact_url: 'https://www.ebicsbox.com/',
             description: File.read('box/apis/v2/documentation.yml')
           }
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'base64'
 require 'securerandom'
 require 'sepa_king'
@@ -9,7 +11,7 @@ module Box
   class DirectDebit
     def self.create!(account, params, user)
       sdd = SEPA::DirectDebit.new(account.pain_attributes_hash).tap do |debit|
-        debit.message_identification= "EBICS-BOX/#{SecureRandom.hex(11).upcase}"
+        debit.message_identification = "EBICS-BOX/#{SecureRandom.hex(11).upcase}"
         debit.add_transaction(
           name: params[:name],
           bic: params[:bic],
@@ -37,11 +39,11 @@ module Box
           instrument: params[:instrument]
         )
       else
-        fail Box::BusinessProcessFailure.new(sdd.errors)
+        raise Box::BusinessProcessFailure, sdd.errors
       end
     rescue ArgumentError => e
       # TODO: Will be fixed upstream in the sepa_king gem by us
-      fail Box::BusinessProcessFailure.new({base: e.message}, 'Invalid data')
+      raise Box::BusinessProcessFailure.new({ base: e.message }, 'Invalid data')
     end
 
     def self.v2_create!(user, account, params)

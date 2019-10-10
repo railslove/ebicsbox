@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_support/all'
 require 'spec_helper'
 
@@ -13,12 +15,12 @@ module Box
       describe 'Access' do
         context 'Unauthorized user' do
           it 'returns a 401 unauthorized code' do
-            get "management/"
+            get 'management/'
             expect_status 401
           end
 
           it 'includes an error message' do
-            get "management/"
+            get 'management/'
             expect_json 'message', 'Unauthorized access. Please provide a valid organization management token!'
           end
         end
@@ -27,14 +29,14 @@ module Box
           before { user.update(admin: false) }
 
           it 'denies access to the app' do
-            get 'management/', { 'Authorization' => "Bearer #{user.access_token}" }
+            get 'management/', 'Authorization' => "Bearer #{user.access_token}"
             expect_status 401
           end
         end
 
         context 'admin user' do
           it 'grants access to the app' do
-            get 'management/', { 'Authorization' => "Bearer #{user.access_token}" }
+            get 'management/', 'Authorization' => "Bearer #{user.access_token}"
             expect_status 200
           end
         end
@@ -42,7 +44,7 @@ module Box
 
       describe 'POST /accounts' do
         context 'invalid body' do
-          before { post 'management/accounts', {}, { 'Authorization' => "Bearer #{user.access_token}" } }
+          before { post 'management/accounts', {}, 'Authorization' => "Bearer #{user.access_token}" }
 
           it 'rejects empty posts' do
             expect_status 400
@@ -53,21 +55,20 @@ module Box
           end
 
           it 'highlights missing fields' do
-            expect_json 'errors', {
-              name: ["is missing", "is empty"],
-              iban: ["is missing", "is empty"],
-              bic: ["is missing", "is empty"],
-            }
+            expect_json 'errors',
+                        name: ['is missing', 'is empty'],
+                        iban: ['is missing', 'is empty'],
+                        bic: ['is missing', 'is empty']
           end
         end
 
         context 'valid body' do
           def do_request
-            post 'management/accounts', { name: 'Test account', iban: 'my-iban', bic: 'my-iban' }, { 'Authorization' => "Bearer #{user.access_token}" }
+            post 'management/accounts', { name: 'Test account', iban: 'my-iban', bic: 'my-iban' }, 'Authorization' => "Bearer #{user.access_token}"
           end
 
           it 'stores new minimal accounts' do
-            expect { do_request }.to change { Account.count }
+            expect { do_request }.to(change { Account.count })
           end
 
           it 'returns a 201 status' do
@@ -85,24 +86,24 @@ module Box
 
         context 'no account with given IBAN exist' do
           it 'returns an error' do
-            put "management/accounts/NOTEXISTING", {}, { 'Authorization' => "Bearer #{user.access_token}" }
+            put 'management/accounts/NOTEXISTING', {}, 'Authorization' => "Bearer #{user.access_token}"
             expect_status 400
           end
 
           it 'returns a proper error message' do
-            put "management/accounts/NOTEXISTING", {}, { 'Authorization' => "Bearer #{user.access_token}" }
+            put 'management/accounts/NOTEXISTING', {}, 'Authorization' => "Bearer #{user.access_token}"
             expect_json 'message', 'Your organization does not have an account with given IBAN!'
           end
         end
 
         context 'account with given IBAN belongs to another organization' do
           it 'denies updates to inaccesible accounts' do
-            put "management/accounts/#{other_account.iban}", {}, { 'Authorization' => "Bearer #{user.access_token}" }
+            put "management/accounts/#{other_account.iban}", {}, 'Authorization' => "Bearer #{user.access_token}"
             expect_status 400
           end
 
           it 'returns a proper error message' do
-            put "management/accounts/#{other_account.iban}", {}, { 'Authorization' => "Bearer #{user.access_token}" }
+            put "management/accounts/#{other_account.iban}", {}, 'Authorization' => "Bearer #{user.access_token}"
             expect_json 'message', 'Your organization does not have an account with given IBAN!'
           end
         end
@@ -111,30 +112,38 @@ module Box
           before { account.add_ebics_user(activated_at: 1.hour.ago) }
 
           it 'cannot change iban' do
-            expect { put "management/accounts/#{account.iban}", { iban: 'new-iban' }, { 'Authorization' => "Bearer #{user.access_token}" } }.to_not change { account.reload.iban }
+            expect { put "management/accounts/#{account.iban}", { iban: 'new-iban' }, 'Authorization' => "Bearer #{user.access_token}"
+          }.to_not(change { account.reload.iban })
           end
 
           it 'cannot change bic' do
-            expect { put "management/accounts/#{account.iban}", { bic: 'new-bic' }, { 'Authorization' => "Bearer #{user.access_token}" } }.to_not change { account.reload.bic }
+            expect { put "management/accounts/#{account.iban}", { bic: 'new-bic' }, 'Authorization' => "Bearer #{user.access_token}"
+          }.to_not(change { account.reload.bic })
           end
 
           it 'ignores iban if it did not change' do
-            expect { put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name' }, { 'Authorization' => "Bearer #{user.access_token}" } }.to change { account.reload.name }
+            expect { put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name' }, 'Authorization' => "Bearer #{user.access_token}"
+          }.to(change { account.reload.name })
           end
 
           it 'ignores the access_token attribute' do
-            expect { put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name', access_token: user.access_token } }.to change {
-              account.reload.name }
+            expect {
+              put "management/accounts/#{account.iban}", iban: 'old-iban', name: 'new name', access_token: user.access_token
+            }.to(change { account.reload.name } )
           end
         end
 
         context 'inactive account' do
           it 'can change iban' do
-            expect { put "management/accounts/#{account.iban}", { iban: 'new-iban' }, { 'Authorization' => "Bearer #{user.access_token}" } }.to change { account.reload.iban }
+            expect {
+              put "management/accounts/#{account.iban}", { iban: 'new-iban' }, 'Authorization' => "Bearer #{user.access_token}"
+            }.to(change { account.reload.iban })
           end
 
           it 'can change bic' do
-            expect { put "management/accounts/#{account.iban}", { bic: 'new-bic' }, { 'Authorization' => "Bearer #{user.access_token}" } }.to change { account.reload.bic }
+            expect {
+              put "management/accounts/#{account.iban}", { bic: 'new-bic' }, 'Authorization' => "Bearer #{user.access_token}"
+            }.to(change { account.reload.bic })
           end
         end
       end
@@ -144,7 +153,7 @@ module Box
 
         context 'without ebics_users' do
           it 'returns an empty array' do
-            get "management/accounts/#{account.iban}/ebics_users", { 'Authorization' => "Bearer #{user.access_token}" }
+            get "management/accounts/#{account.iban}/ebics_users", 'Authorization' => "Bearer #{user.access_token}"
             expect_json []
           end
         end
@@ -153,29 +162,32 @@ module Box
           before { account.add_ebics_user(user_id: user.id, remote_user_id: 'test') }
 
           it 'returns a representation of account ebics_users' do
-            get "management/accounts/#{account.iban}/ebics_users", { 'Authorization' => "Bearer #{user.access_token}" }
+            get "management/accounts/#{account.iban}/ebics_users", 'Authorization' => "Bearer #{user.access_token}"
             expect_json '0.ebics_user', 'test'
           end
         end
       end
 
       describe 'POST /accounts/:iban/ebics_users' do
-        let(:account) { Account.create(
-          name: 'name',
-          iban: 'iban',
-          bic: 'bic',
-          url: 'url',
-          host: 'host',
-          partner: 'partner',
-          mode: 'File',
-          organization_id: organization.id) }
+        let(:account) do
+          Account.create(
+            name: 'name',
+            iban: 'iban',
+            bic: 'bic',
+            url: 'url',
+            host: 'host',
+            partner: 'partner',
+            mode: 'File',
+            organization_id: organization.id
+          )
+        end
 
         def perform_request
-          post "management/accounts/#{account.iban}/ebics_users", data, { 'Authorization' => "Bearer #{user.access_token}" }
+          post "management/accounts/#{account.iban}/ebics_users", data, 'Authorization' => "Bearer #{user.access_token}"
         end
 
         context 'missing attributes' do
-          let(:data) { { ebics_user: "test" } }
+          let(:data) { { ebics_user: 'test' } }
 
           it 'returns an error code' do
             perform_request
@@ -194,7 +206,7 @@ module Box
         end
 
         context 'user with same used id' do
-          let(:data) { { ebics_user: "test", user_id: user.id } }
+          let(:data) { { ebics_user: 'test', user_id: user.id } }
 
           before { account.add_ebics_user(remote_user_id: 'test', user_id: user.id) }
 
@@ -215,7 +227,7 @@ module Box
         end
 
         context 'remote ebics server throws an error' do
-          let(:data) { { ebics_user: "test", user_id: user.id } }
+          let(:data) { { ebics_user: 'test', user_id: user.id } }
 
           before { allow_any_instance_of(EbicsUser).to receive(:setup!).and_return(false) }
 
@@ -230,12 +242,12 @@ module Box
           end
 
           it 'removes created ebics_user' do
-            expect { perform_request }.to_not change { EbicsUser.count }
+            expect { perform_request }.to_not(change(EbicsUser, :count))
           end
         end
 
         context 'valid data' do
-          let(:data) { { ebics_user: "test", user_id: user.id } }
+          let(:data) { { ebics_user: 'test', user_id: user.id } }
 
           # before { stub_request(:post, /url/).to_return(status: 200, body: '') }
 
@@ -260,7 +272,7 @@ module Box
         let(:account) { Account.create(name: 'name', iban: 'iban', organization_id: organization.id) }
 
         def perform_request
-          get "management/accounts/#{account.iban}/ebics_users/#{ebics_user.id}/ini_letter", { 'Authorization' => "Bearer #{user.access_token}" }
+          get "management/accounts/#{account.iban}/ebics_users/#{ebics_user.id}/ini_letter", 'Authorization' => "Bearer #{user.access_token}"
         end
 
         context 'setup has not been performed' do
@@ -278,7 +290,7 @@ module Box
         end
 
         context 'setup has been initiated before' do
-          let(:ebics_user) { account.add_ebics_user(remote_user_id: "test1", ini_letter: "INI LETTER") }
+          let(:ebics_user) { account.add_ebics_user(remote_user_id: 'test1', ini_letter: 'INI LETTER') }
 
           it 'returns a success code' do
             perform_request
@@ -287,12 +299,12 @@ module Box
 
           it 'returns data as html content' do
             perform_request
-            expect(response.headers["Content-Type"]).to eq('text/html')
+            expect(response.headers['Content-Type']).to eq('text/html')
           end
 
           it 'returns the ini letter' do
             perform_request
-            expect(response.body).to eq("INI LETTER")
+            expect(response.body).to eq('INI LETTER')
           end
         end
       end
@@ -300,8 +312,8 @@ module Box
       describe 'POST /management/users' do
         before { organization.add_user(name: 'Test User', access_token: 'secret') }
 
-        def perform_request(data = {})
-          get "management/users", { 'Authorization' => "Bearer #{user.access_token}" }
+        def perform_request(_data = {})
+          get 'management/users', 'Authorization' => "Bearer #{user.access_token}"
         end
 
         it "does not include the user's access token" do
@@ -314,11 +326,11 @@ module Box
         before { user }
 
         def perform_request(data = {})
-          post "management/users", { name: "Another Test User" }.merge(data), { 'Authorization' => "Bearer #{user.access_token}" }
+          post 'management/users', { name: 'Another Test User' }.merge(data), 'Authorization' => "Bearer #{user.access_token}"
         end
 
         it 'creates a new user for the organization' do
-          expect { perform_request }.to change { User.count }.by(1)
+          expect { perform_request }.to(change { User.count }.by(1))
         end
 
         it 'auto generates an access token if none is provided' do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'grape'
 
 require_relative '../api_endpoint'
@@ -76,7 +78,8 @@ module Box
             end
 
             post do
-              if user = current_organization.add_user(name: params[:name], access_token: params[:token])
+              user = current_organization.add_user(name: params[:name], access_token: params[:token])
+              if user
                 present user, with: Entities::User, include_token: true
               else
                 error!({ message: 'Failed to create user' }, 400)

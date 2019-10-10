@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sequel'
 
 require_relative '../../lib/pain'
@@ -23,17 +25,15 @@ module Box
 
       def by_organization(organization)
         left_join(:accounts, id: :account_id)
-        .where(accounts__organization_id: organization.id)
-        .select_all(:transactions)
+          .where(accounts__organization_id: organization.id)
+          .select_all(:transactions)
       end
 
       def filtered(params)
         query = self
 
         # Filter by account id
-        if params[:iban].present?
-          query = query.where(accounts__iban: params[:iban])
-        end
+        query = query.where(accounts__iban: params[:iban]) if params[:iban].present?
 
         query
       end
@@ -43,10 +43,9 @@ module Box
           .offset((params[:page] - 1) * params[:per_page])
           .reverse_order(:id)
       end
-
     end
 
-    def self.count_by_account(account_id, options = {})
+    def self.count_by_account(account_id, _options = {})
       where(account_id: account_id).count
     end
 
@@ -64,30 +63,30 @@ module Box
 
       if column_changed?(:status)
         update(
-          history: history.dup << { at: Time.now, status: status, reason: reason}
+          history: history.dup << { at: Time.now, status: status, reason: reason }
         )
         Event.method("#{type}_status_changed").call(self)
       end
 
-      return status
+      status
     end
 
     def get_status(new_status)
-      case
-        when new_status == "file_upload" && status == "created" then "file_upload"
-        when new_status == "es_verification" && status == "file_upload" then "es_verification"
-        when new_status == "order_hac_final_pos" && status == "es_verification" then "order_hac_final_pos"
-        when new_status == "order_hac_final_neg" && status == "es_verification" then "order_hac_final_neg"
-        when new_status == "credit_received" && type == "debit" then "funds_credited"
-        when new_status == "debit_received" && type == "credit" then "funds_debited"
-        when new_status == "debit_received" && type == "debit" then "funds_charged_back"
-        when new_status == "failed" then "failed"
-        else status
+      if new_status == 'file_upload' && status == 'created' then 'file_upload'
+      elsif new_status == 'es_verification' && status == 'file_upload' then 'es_verification'
+      elsif new_status == 'order_hac_final_pos' && status == 'es_verification' then 'order_hac_final_pos'
+      elsif new_status == 'order_hac_final_neg' && status == 'es_verification' then 'order_hac_final_neg'
+      elsif new_status == 'credit_received' && type == 'debit' then 'funds_credited'
+      elsif new_status == 'debit_received' && type == 'credit' then 'funds_debited'
+      elsif new_status == 'debit_received' && type == 'debit' then 'funds_charged_back'
+      elsif new_status == 'failed' then 'failed'
+      else status
       end
     end
 
     def execute!
       return if ebics_transaction_id.present?
+
       transaction_id, order_id = account.client_for(user.id).public_send(order_type, payload)
       update(ebics_order_id: order_id, ebics_transaction_id: transaction_id)
     rescue Epics::Error => e
@@ -97,7 +96,7 @@ module Box
 
     def parsed_payload
       @parsed_payload ||= Pain.from_xml(payload).to_h
-    rescue Pain::UnknownInput => ex
+    rescue Pain::UnknownInput => _ex
       Box.logger.warn { "Could not parse payload for transaction. id=#{id}" }
       nil
     end
@@ -112,7 +111,7 @@ module Box
           type: type,
           status: status,
           ebics_order_id: ebics_order_id,
-          ebics_transaction_id: ebics_transaction_id,
+          ebics_transaction_id: ebics_transaction_id
         }
       }
     end

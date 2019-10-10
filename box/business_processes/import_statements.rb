@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'cmxl'
 require 'camt_parser'
 
@@ -8,16 +10,16 @@ require_relative '../models/event'
 module Box
   module BusinessProcesses
     class ImportStatements
-      PARSERS = { 'mt940' => Cmxl, 'camt53' => CamtParser::Format053::Statement }
+      PARSERS = { 'mt940' => Cmxl, 'camt53' => CamtParser::Format053::Statement }.freeze
 
       def self.parse_bank_statement(bank_statement)
         parser = PARSERS.fetch(bank_statement.account.statements_format, Cmxl)
         result = parser.parse(bank_statement.content)
-        result.kind_of?(Array) ? result.first.transactions : result.transactions
+        result.is_a?(Array) ? result.first.transactions : result.transactions
       end
 
       def self.from_bank_statement(bank_statement, upcoming = false)
-        bank_transactions = self.parse_bank_statement(bank_statement)
+        bank_transactions = parse_bank_statement(bank_statement)
 
         statements = bank_transactions.map do |bank_transaction|
           create_statement(bank_statement, bank_transaction, upcoming)
@@ -27,7 +29,6 @@ module Box
         Box.logger.info { "[BusinessProcesses::ImportStatements] Imported statements from bank statement. total=#{stats[:total]} imported=#{stats[:imported]}" }
         stats
       end
-
 
       def self.create_statement(bank_statement, bank_transaction, upcoming = false)
         account = bank_statement.account
@@ -49,7 +50,7 @@ module Box
         # find transactions via EREF
         transaction   = account.transactions_dataset.where(eref: statement.eref).first
         # fallback to finding via statement information
-        transaction ||= account.transactions_dataset.exclude(currency: 'EUR', status: ['credit_received', 'debit_received']).where{ created_at > 14.days.ago}.detect{|t| statement.information =~ /#{t.eref}/i }
+        transaction ||= account.transactions_dataset.exclude(currency: 'EUR', status: %w[credit_received debit_received]).where { created_at > 14.days.ago }.detect { |t| statement.information =~ /#{t.eref}/i }
 
         return unless transaction
 
@@ -98,7 +99,7 @@ module Box
           eref: transaction.respond_to?(:eref) ? transaction.eref : transaction.sepa['EREF'],
           mref: transaction.respond_to?(:mref) ? transaction.mref : transaction.sepa['MREF'],
           svwz: transaction.respond_to?(:svwz) ? transaction.svwz : transaction.sepa['SVWZ'],
-          creditor_identifier: transaction.respond_to?(:creditor_identifier) ? transaction.creditor_identifier : transaction.sepa['CRED'],
+          creditor_identifier: transaction.respond_to?(:creditor_identifier) ? transaction.creditor_identifier : transaction.sepa['CRED']
         }
       end
     end

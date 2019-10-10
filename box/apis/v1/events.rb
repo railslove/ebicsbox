@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_support/core_ext/string/strip'
 
 require_relative '../../models/event'
@@ -10,8 +12,8 @@ module Box
         def self.included(api)
           api.resource :events do
             params do
-              optional :page, type: Integer, desc: "page through the results", default: 1
-              optional :per_page, type: Integer, desc: "how many results per page", values: 1..100, default: 10
+              optional :page, type: Integer, desc: 'page through the results', default: 1
+              optional :per_page, type: Integer, desc: 'how many results per page', values: 1..100, default: 10
             end
             api.get do
               record_count = Event.by_organization(current_organization).count
