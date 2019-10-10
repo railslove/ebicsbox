@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'jwt'
 
@@ -12,7 +14,7 @@ module Box
 
       before do
         allow(Box.configuration).to receive(:jwt_secret) { 'test-secret' }
-        WebMock.stub_request(:head, "http://localhost:3000/oauth/token/info").to_return(status: 200)
+        WebMock.stub_request(:head, 'http://localhost:3000/oauth/token/info').to_return(status: 200)
       end
 
       def generate_token(user, organization, role: '')
@@ -22,7 +24,7 @@ module Box
           name: user.name,
           organization: {
             sub: organization.id,
-            name: organization.name,
+            name: organization.name
           },
           verified: false,
           ebicsbox: { role: role }
@@ -60,7 +62,7 @@ module Box
 
         context 'existing organization and user' do
           let!(:organization) { Fabricate(:organization) }
-          let!(:user) { Box::User.create(id: 1, name: "Test User", organization: organization) }
+          let!(:user) { Box::User.create(id: 1, name: 'Test User', organization: organization) }
           let(:token_payload) { generate_token(user, organization) }
 
           describe 'authenticated user via query parameter' do
@@ -96,7 +98,7 @@ module Box
 
         context 'existing organization but user is new' do
           let!(:organization) { Fabricate(:organization) }
-          let!(:user) { double(id: 2, name: "New user") }
+          let!(:user) { double(id: 2, name: 'New user') }
           let(:token_payload) { generate_token(user, organization) }
 
           it 'returns the existing organization' do
@@ -119,13 +121,13 @@ module Box
           it 'sets correct properties on user' do
             env = Rack::MockRequest.env_for("/?access_token=#{token}")
             middleware.call(env)
-            expect(User.last).to have_attributes(id: 2, name: "New user", organization_id: organization.id)
+            expect(User.last).to have_attributes(id: 2, name: 'New user', organization_id: organization.id)
           end
         end
 
         context 'neither organization nor user exist' do
-          let!(:organization) { double(id: 2, name: "New orga") }
-          let!(:user) { double(id: 2, name: "New user") }
+          let!(:organization) { double(id: 2, name: 'New orga') }
+          let!(:user) { double(id: 2, name: 'New user') }
           let(:token_payload) { generate_token(user, organization) }
 
           it 'returns an organization' do
@@ -142,7 +144,7 @@ module Box
           it 'sets correct properties on organization' do
             env = Rack::MockRequest.env_for("/?access_token=#{token}")
             middleware.call(env)
-            expect(Organization.last).to have_attributes(id: 2, name: "New orga")
+            expect(Organization.last).to have_attributes(id: 2, name: 'New orga')
           end
 
           it 'returns a user' do
@@ -159,14 +161,14 @@ module Box
           it 'sets correct properties on user' do
             env = Rack::MockRequest.env_for("/?access_token=#{token}")
             middleware.call(env)
-            expect(User.last).to have_attributes(id: 2, name: "New user", organization_id: organization.id)
+            expect(User.last).to have_attributes(id: 2, name: 'New user', organization_id: organization.id)
           end
         end
       end
 
       describe 'admin permissions' do
-        let!(:organization) { double(id: 3, name: "New orga") }
-        let!(:user) { double(id: 3, name: "New user") }
+        let!(:organization) { double(id: 3, name: 'New orga') }
+        let!(:user) { double(id: 3, name: 'New user') }
 
         context 'user does not have any role' do
           let(:token_payload) { generate_token(user, organization, role: '') }
@@ -190,14 +192,14 @@ module Box
       end
 
       describe 'token validation' do
-        let!(:organization) { double(id: 3, name: "New orga") }
-        let!(:user) { double(id: 3, name: "New user") }
+        let!(:organization) { double(id: 3, name: 'New orga') }
+        let!(:user) { double(id: 3, name: 'New user') }
 
         context 'revoked token' do
           let(:token_payload) { generate_token(user, organization) }
 
           before do
-            WebMock.stub_request(:head, "http://localhost:3000/oauth/token/info").to_return(status: 401)
+            WebMock.stub_request(:head, 'http://localhost:3000/oauth/token/info').to_return(status: 401)
           end
 
           it 'sets no user' do
@@ -211,7 +213,7 @@ module Box
           let(:token_payload) { generate_token(user, organization) }
 
           before do
-            WebMock.stub_request(:head, "http://localhost:3000/oauth/token/info").to_return(status: 200)
+            WebMock.stub_request(:head, 'http://localhost:3000/oauth/token/info').to_return(status: 200)
           end
 
           it 'sets a user' do

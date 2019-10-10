@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 module Box
@@ -9,12 +11,12 @@ module Box
     describe 'Access' do
       context 'Unauthorized user' do
         it 'returns a 401 unauthorized code' do
-          get "management/"
+          get 'management/'
           expect_status 401
         end
 
         it 'includes an error message' do
-          get "management/"
+          get 'management/'
           expect_json 'message', 'Unauthorized access. Please provide a valid organization management token!'
         end
       end

@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require_relative '../../box/models/transaction'
 
 def generate_debit_payload
-  %{
+  %(
     <?xml version="1.0" encoding="UTF-8"?>
     <Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.008.003.02" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:iso:std:iso:20022:tech:xsd:pain.008.003.02 pain.008.003.02.xsd">
       <CstmrDrctDbtInitn>
@@ -97,9 +99,8 @@ def generate_debit_payload
       </CstmrDrctDbtInitn>
     </Document>
 
-  }
+  )
 end
-
 
 Fabricator(:debit, from: 'Box::Transaction') do
   eref { Fabricate.sequence(:debit) { |i| "debit-#{i}" } }

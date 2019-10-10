@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 module Box
@@ -17,7 +19,7 @@ module Box
         end
 
         it 'logs an info message with response code' do
-          expect { job.perform(event.id) }.to have_logged_message("Attempt to deliver a webhook")
+          expect { job.perform(event.id) }.to have_logged_message('Attempt to deliver a webhook')
         end
       end
     end

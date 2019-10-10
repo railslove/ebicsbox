@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 module Box
@@ -8,14 +10,14 @@ module Box
 
         context 'requiring version 1 explicitly' do
           it 'returns currently used version' do
-            get '/', { 'Accept' => 'application/vnd.ebicsbox-v1+json', 'Authorization' => 'Bearer test-token' }
+            get '/', 'Accept' => 'application/vnd.ebicsbox-v1+json', 'Authorization' => 'Bearer test-token'
             expect_json 'version', 'v1'
           end
         end
 
         context 'default version' do
           it 'returns currently used version' do
-            get '/', { 'Authorization' => 'Bearer test-token' }
+            get '/', 'Authorization' => 'Bearer test-token'
             expect_json 'version', 'v1'
           end
         end

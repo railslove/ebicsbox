@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'faraday'
 
 module Box
   module Middleware
     class Signer < Faraday::Middleware
-      SIGNATURE_HEADER = 'X-Signature'.freeze
+      SIGNATURE_HEADER = 'X-Signature'
 
       def initialize(app, opts = {})
         super(app)

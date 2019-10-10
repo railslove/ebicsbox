@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'faraday'
 require 'rack'
 require 'jwt'
@@ -23,7 +25,7 @@ module Box
 
       def load_user_auth_data(request)
         access_token = request.params['access_token'] || request.env['HTTP_AUTHORIZATION'].to_s[/\A(?:token|Bearer) (.+)\z/, 1]
-        data = JWT.decode(access_token, Box.configuration.jwt_secret, true, { algorithm: 'HS512', verify_jti: -> _ { validate_token(access_token) } }).first
+        data = JWT.decode(access_token, Box.configuration.jwt_secret, true, algorithm: 'HS512', verify_jti: ->(_) { validate_token(access_token) }).first
         orga_data = data['organization']
 
         organization = Organization.find_or_create(id: orga_data['sub'], name: orga_data['name']) do |orga|
@@ -34,21 +36,21 @@ module Box
         {
           'box.user' => user,
           'box.organization' => organization,
-          'box.admin' => data['ebicsbox']['role'].include?('admin'),
+          'box.admin' => data['ebicsbox']['role'].include?('admin')
         }
       rescue JWT::DecodeError => ex
         Box.logger.info { "[OauthAuthentication] #{ex.message}" }
         {
           'box.user' => nil,
           'box.organization' => nil,
-          'box.admin' => false,
+          'box.admin' => false
         }
       end
 
       def validate_token(access_token)
         conn = Faraday.new URI(Box.configuration.oauth_server)
         conn.authorization :Bearer, access_token
-        conn.head("oauth/token/info").success?
+        conn.head('oauth/token/info').success?
       end
     end
   end

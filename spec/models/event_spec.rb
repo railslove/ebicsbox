@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Box
   RSpec.describe Event do
     before do
@@ -15,8 +17,8 @@ module Box
           expect(described_class).to respond_to(event)
         end
 
-        it "redirects the call to a publish call" do
-          described_class.public_send(event, { some: 'payload' })
+        it 'redirects the call to a publish call' do
+          described_class.public_send(event, some: 'payload')
           expect(described_class).to have_received(:publish).with(event, some: 'payload')
         end
       end
@@ -33,22 +35,22 @@ module Box
       end
     end
 
-    describe "default values" do
+    describe 'default values' do
       subject { described_class.create }
 
-      it "generates a public id" do
+      it 'generates a public id' do
         expect(subject.public_id).to match(/\A[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}\z/i)
       end
 
-      it "sets the time when the event was triggered" do
+      it 'sets the time when the event was triggered' do
         expect(subject.triggered_at).to be_kind_of(Time)
       end
 
-      it "sets webhook status to pending" do
+      it 'sets webhook status to pending' do
         expect(subject.webhook_status).to eq('pending')
       end
 
-      it "sets webhook retry count to 0" do
+      it 'sets webhook retry count to 0' do
         expect(subject.webhook_retries).to eq(0)
       end
     end
@@ -73,7 +75,7 @@ module Box
         end
 
         it 'schedules a delayed retry' do
-          expect(Queue).to receive(:trigger_webhook).with({ event_id: subject.id }, { delay: subject.delay_for(4) })
+          expect(Queue).to receive(:trigger_webhook).with({ event_id: subject.id }, delay: subject.delay_for(4))
           subject.delivery_failure!
         end
       end
@@ -99,7 +101,7 @@ module Box
       end
 
       it 'adds the webhook to the event queue' do
-        expect(Queue).to receive(:trigger_webhook).with({ event_id: subject.id })
+        expect(Queue).to receive(:trigger_webhook).with(event_id: subject.id)
 
         subject.reset_webhook_delivery
       end

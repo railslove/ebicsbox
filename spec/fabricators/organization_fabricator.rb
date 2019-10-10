@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'faker'
 
 require_relative '../../box/models/organization'

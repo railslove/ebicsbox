@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 module Box
@@ -17,22 +19,22 @@ module Box
       status: :string,
       reference: :string,
       executed_on: :date,
-      _links: :object,
-    }
+      _links: :object
+    }.freeze
 
     ###
     ### GET /accounts
     ###
 
     describe 'GET: /credit_transfers' do
-      context "when no valid access token is provided" do
+      context 'when no valid access token is provided' do
         it 'returns a 401' do
           get '/credit_transfers', TestHelpers::INVALID_TOKEN_HEADER
           expect_status 401
         end
       end
 
-      context "when no credits are available" do
+      context 'when no credits are available' do
         it 'returns a 200' do
           get '/credit_transfers', TestHelpers::VALID_HEADERS
           expect_status 200
@@ -59,14 +61,14 @@ module Box
           expect_json_sizes 1
         end
 
-        describe "object format" do
+        describe 'object format' do
           it 'exposes properly formatted data' do
             get '/credit_transfers', TestHelpers::VALID_HEADERS
             expect_json_types '0', TRANSFER_SPEC
           end
         end
 
-        context "when account filter is active" do
+        context 'when account filter is active' do
           let!(:second_account) { organization.add_account(name: 'Second account', iban: 'SECONDACCOUNT') }
           let!(:other_credit) { Fabricate(:credit, account_id: second_account.id, eref: 'other-credit') }
 
@@ -95,37 +97,36 @@ module Box
           let!(:credit_new) { Fabricate(:credit, eref: 'credit-new', account_id: account.id) }
 
           it 'returns multiple items by default' do
-            get "/credit_transfers", TestHelpers::VALID_HEADERS
+            get '/credit_transfers', TestHelpers::VALID_HEADERS
             expect_json_sizes 2
           end
 
           it 'orders by name' do
-            get "/credit_transfers", TestHelpers::VALID_HEADERS
+            get '/credit_transfers', TestHelpers::VALID_HEADERS
             expect_json '0', end_to_end_reference: 'credit-new'
             expect_json '1', end_to_end_reference: 'credit-old'
           end
 
           it 'allows to specify items per page' do
-            get "/credit_transfers?per_page=1", TestHelpers::VALID_HEADERS
+            get '/credit_transfers?per_page=1', TestHelpers::VALID_HEADERS
             expect_json_sizes 1
           end
 
           it 'allows to specify the page' do
-            get "/credit_transfers?page=1&per_page=1", TestHelpers::VALID_HEADERS
+            get '/credit_transfers?page=1&per_page=1', TestHelpers::VALID_HEADERS
             expect_json '0', end_to_end_reference: 'credit-new'
 
-            get "/credit_transfers?page=2&per_page=1", TestHelpers::VALID_HEADERS
+            get '/credit_transfers?page=2&per_page=1', TestHelpers::VALID_HEADERS
             expect_json '0', end_to_end_reference: 'credit-old'
           end
 
           it 'sets pagination headers' do
-            get "/credit_transfers?per_page=1", TestHelpers::VALID_HEADERS
+            get '/credit_transfers?per_page=1', TestHelpers::VALID_HEADERS
             expect(headers['Link']).to include("rel='next'")
           end
         end
       end
     end
-
 
     ###
     ### POST /accounts
@@ -136,11 +137,11 @@ module Box
       let(:valid_attributes) do
         {
           account: account.iban,
-          name: "Max Mustermann",
-          iban: "DE75374497411708271691",
-          bic: "GENODEF1NDH",
+          name: 'Max Mustermann',
+          iban: 'DE75374497411708271691',
+          bic: 'GENODEF1NDH',
           amount_in_cents: 123_45,
-          end_to_end_reference: "valid-credit-ref",
+          end_to_end_reference: 'valid-credit-ref'
         }
       end
 
@@ -152,7 +153,7 @@ module Box
         )
       end
 
-      context "when no valid access token is provided" do
+      context 'when no valid access token is provided' do
         it 'returns a 401' do
           post '/credit_transfers', {}, TestHelpers::INVALID_TOKEN_HEADER
           expect_status 401
@@ -161,111 +162,111 @@ module Box
 
       context 'invalid data' do
         it 'returns a 401' do
-          post "/credit_transfers", {}, TestHelpers::VALID_HEADERS
+          post '/credit_transfers', {}, TestHelpers::VALID_HEADERS
           expect_status 400
         end
 
         it 'specifies invalid fields' do
-          post "/credit_transfers", {}, TestHelpers::VALID_HEADERS
+          post '/credit_transfers', {}, TestHelpers::VALID_HEADERS
           expect_json_types errors: {
             account: :array_of_strings,
             name: :array_of_strings,
             iban: :array_of_strings,
             bic: :array_or_null,
             amount_in_cents: :array_of_strings,
-            end_to_end_reference: :array_of_strings,
+            end_to_end_reference: :array_of_strings
           }
         end
 
         it 'provides a proper error message' do
-          post "/credit_transfers", {}, TestHelpers::VALID_HEADERS
+          post '/credit_transfers', {}, TestHelpers::VALID_HEADERS
           expect_json message: "Validation of your request's payload failed!"
         end
 
         it 'does not allow two credits with the same end_to_end_reference for one account' do
           credit = Fabricate(:credit, account_id: account.id, eref: 'my-credit-eref')
-          post "/credit_transfers", { account: account.iban, end_to_end_reference: 'my-credit-eref' }, TestHelpers::VALID_HEADERS
-          expect_json 'errors.end_to_end_reference', ["must be unique"]
+          post '/credit_transfers', { account: account.iban, end_to_end_reference: 'my-credit-eref' }, TestHelpers::VALID_HEADERS
+          expect_json 'errors.end_to_end_reference', ['must be unique']
         end
 
         it 'allows a max length of 140 characters for reference' do
-          post "/credit_transfers", { reference: 'a' * 141 }, TestHelpers::VALID_HEADERS
-          expect_json 'errors.reference', ["must be at the most 140 characters long"]
+          post '/credit_transfers', { reference: 'a' * 141 }, TestHelpers::VALID_HEADERS
+          expect_json 'errors.reference', ['must be at the most 140 characters long']
         end
 
         it 'fails on invalid IBAN' do
-          post "/credit_transfers", valid_attributes.merge(iban: 'MYTESTIBAN'), TestHelpers::VALID_HEADERS
-          expect_json message: "Failed to initiate credit transfer.", errors: { base: "Iban MYTESTIBAN is invalid" }
+          post '/credit_transfers', valid_attributes.merge(iban: 'MYTESTIBAN'), TestHelpers::VALID_HEADERS
+          expect_json message: 'Failed to initiate credit transfer.', errors: { base: 'Iban MYTESTIBAN is invalid' }
         end
 
         it 'fails on invalid BIC' do
-          post "/credit_transfers", valid_attributes.merge(bic: 'MYTESTBIC'), TestHelpers::VALID_HEADERS
-          expect_json message: "Failed to initiate credit transfer.", errors: { base: "Bic MYTESTBIC is invalid" }
+          post '/credit_transfers', valid_attributes.merge(bic: 'MYTESTBIC'), TestHelpers::VALID_HEADERS
+          expect_json message: 'Failed to initiate credit transfer.', errors: { base: 'Bic MYTESTBIC is invalid' }
         end
 
         it 'fails on too long end_to_end_reference' do
-          post "/credit_transfers", valid_attributes.merge(end_to_end_reference: 'E'*65), TestHelpers::VALID_HEADERS
-          expect_json 'errors.end_to_end_reference', ["must be at the most 64 characters long"]
+          post '/credit_transfers', valid_attributes.merge(end_to_end_reference: 'E' * 65), TestHelpers::VALID_HEADERS
+          expect_json 'errors.end_to_end_reference', ['must be at the most 64 characters long']
         end
 
         context 'foreign currency' do
           it 'fails on missing country_code' do
-            post "/credit_transfers", valid_attributes.merge(currency: 'CHF'), TestHelpers::VALID_HEADERS
-            expect_json 'errors.country_code', ["is missing", "is empty"]
+            post '/credit_transfers', valid_attributes.merge(currency: 'CHF'), TestHelpers::VALID_HEADERS
+            expect_json 'errors.country_code', ['is missing', 'is empty']
           end
 
           it 'fails on missing bic' do
-            post "/credit_transfers", valid_attributes.merge(currency: 'CHF', bic: nil), TestHelpers::VALID_HEADERS
-            expect_json 'errors.bic', ["is empty"]
+            post '/credit_transfers', valid_attributes.merge(currency: 'CHF', bic: nil), TestHelpers::VALID_HEADERS
+            expect_json 'errors.bic', ['is empty']
           end
 
           it 'fails on invalid currency' do
-            post "/credit_transfers", valid_attributes.merge(currency: 'CHF123'), TestHelpers::VALID_HEADERS
-            expect_json 'errors.currency', ["must be at the most 3 characters long"]
+            post '/credit_transfers', valid_attributes.merge(currency: 'CHF123'), TestHelpers::VALID_HEADERS
+            expect_json 'errors.currency', ['must be at the most 3 characters long']
           end
 
           it 'fails on too long end_to_end_reference' do
-            post "/credit_transfers", valid_attributes.merge(currency: 'CHF', end_to_end_reference: 'E'*28), TestHelpers::VALID_HEADERS
-            expect_json 'errors.end_to_end_reference', ["must be at the most 27 characters long"]
+            post '/credit_transfers', valid_attributes.merge(currency: 'CHF', end_to_end_reference: 'E' * 28), TestHelpers::VALID_HEADERS
+            expect_json 'errors.end_to_end_reference', ['must be at the most 27 characters long']
           end
         end
       end
 
       context 'valid data' do
         it 'returns a 201' do
-          post "/credit_transfers", valid_attributes, TestHelpers::VALID_HEADERS
+          post '/credit_transfers', valid_attributes, TestHelpers::VALID_HEADERS
           expect_status 201
         end
 
         it 'returns a proper message' do
-          post "/credit_transfers", valid_attributes, TestHelpers::VALID_HEADERS
+          post '/credit_transfers', valid_attributes, TestHelpers::VALID_HEADERS
           expect_json 'message', 'Credit transfer has been initiated successfully!'
         end
 
         it 'triggers a credit transfer' do
           expect(Credit).to receive(:create!)
-          post "/credit_transfers", valid_attributes, TestHelpers::VALID_HEADERS
+          post '/credit_transfers', valid_attributes, TestHelpers::VALID_HEADERS
         end
 
         it 'triggers a credit transfer without bic' do
           expect(Credit).to receive(:create!)
-          post "/credit_transfers", valid_attributes.reject{ |k,_| k == :bic }, TestHelpers::VALID_HEADERS
+          post '/credit_transfers', valid_attributes.reject { |k, _| k == :bic }, TestHelpers::VALID_HEADERS
         end
 
         it 'transactions without bic should be valid' do
           expect(Queue).to receive(:execute_credit)
-          post "/credit_transfers", valid_attributes.reject{ |k,_| k == :bic }, TestHelpers::VALID_HEADERS
+          post '/credit_transfers', valid_attributes.reject { |k, _| k == :bic }, TestHelpers::VALID_HEADERS
         end
 
         it 'transforms parameters so they are understood by credit business process' do
           expect(Credit).to receive(:create!).with(account, anything, user)
-          post "/credit_transfers", valid_attributes, TestHelpers::VALID_HEADERS
+          post '/credit_transfers', valid_attributes, TestHelpers::VALID_HEADERS
         end
 
         it 'allows same end_to_end_reference for two different accounts' do
           other_account = Fabricate(:account, organization_id: account.organization_id, iban: 'DE41405327214540168131')
           credit = Fabricate(:credit, account_id: other_account.id, eref: 'my-credit-eref')
-          post "/credit_transfers", valid_attributes.merge(end_to_end_reference: 'my-credit-eref'), TestHelpers::VALID_HEADERS
+          post '/credit_transfers', valid_attributes.merge(end_to_end_reference: 'my-credit-eref'), TestHelpers::VALID_HEADERS
           expect_status 201
         end
 
@@ -275,12 +276,12 @@ module Box
           end
 
           it 'returns a 201' do
-            post "/credit_transfers", valid_attributes_foreign, TestHelpers::VALID_HEADERS
+            post '/credit_transfers', valid_attributes_foreign, TestHelpers::VALID_HEADERS
             expect_status 201
           end
         end
 
-        context "when sandbox server mode" do
+        context 'when sandbox server mode' do
           before { allow(Box.configuration).to receive(:sandbox?).and_return(true) }
 
           it 'executes order immediately'
@@ -293,30 +294,30 @@ module Box
     ###
 
     describe 'GET: /credit_transfers/:id' do
-      context "when no valid access token is provided" do
+      context 'when no valid access token is provided' do
         it 'returns a 401' do
           get '/credit_transfers/1', TestHelpers::INVALID_TOKEN_HEADER
           expect_status 401
         end
       end
 
-      context "when credit does not exist" do
-        context "when invalid uuid" do
+      context 'when credit does not exist' do
+        context 'when invalid uuid' do
           it 'returns a 404' do
-            get "/credit_transfers/UNKNOWN_ID", TestHelpers::VALID_HEADERS
+            get '/credit_transfers/UNKNOWN_ID', TestHelpers::VALID_HEADERS
             expect_status 404
           end
         end
 
-        context "when uuid does not exist" do
+        context 'when uuid does not exist' do
           it 'returns a 404' do
-            get "/credit_transfers/d23d5d52-28fc-4352-a094-b69818a3fdf1", TestHelpers::VALID_HEADERS
+            get '/credit_transfers/d23d5d52-28fc-4352-a094-b69818a3fdf1', TestHelpers::VALID_HEADERS
             expect_status 404
           end
         end
       end
 
-      context "when credit does exist" do
+      context 'when credit does exist' do
         let!(:credit) { Fabricate(:credit, eref: 'my-credit', account_id: account.id) }
 
         it 'returns a 200' do
@@ -330,7 +331,6 @@ module Box
           expect_json_types TRANSFER_SPEC
         end
       end
-
     end
   end
 end

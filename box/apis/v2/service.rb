@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'grape'
 
 require_relative './api_endpoint'
@@ -9,7 +11,7 @@ module Box
         include ApiEndpoint
 
         desc 'Service',
-          hidden: true
+             hidden: true
 
         get do
           {

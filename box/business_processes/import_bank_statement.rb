@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'cmxl'
 
 require_relative '../models/account'
@@ -13,18 +15,16 @@ module Box
 
       def self.import_all_from_mt940(raw_mt940, account)
         Cmxl.parse(raw_mt940).map do |raw_bank_statement|
-          begin
-            from_cmxl(raw_bank_statement, account)
-          rescue InvalidInput => ex
-            nil # ignore
-          end
+          from_cmxl(raw_bank_statement, account)
+        rescue InvalidInput => ex
+          nil # ignore
         end.compact
       end
 
       # There are cases where we only have the raw mt940 file.
       def self.from_mt940(raw_mt940, account)
         mt940_chunk = Cmxl.parse(raw_mt940).first
-        self.from_cmxl(mt940_chunk, account)
+        from_cmxl(mt940_chunk, account)
       end
 
       # In case we already have a fully parsed MT940 file
@@ -36,8 +36,8 @@ module Box
       end
 
       def self.verify_arguments(raw_bank_statement, account)
-        fail(InvalidInput, 'Cannot import empty bank statement.') if raw_bank_statement.blank?
-        fail(InvalidInput, 'Cannot import bank statement for unknown sub-account.') unless valid_account?(raw_bank_statement, account)
+        raise(InvalidInput, 'Cannot import empty bank statement.') if raw_bank_statement.blank?
+        raise(InvalidInput, 'Cannot import bank statement for unknown sub-account.') unless valid_account?(raw_bank_statement, account)
       end
 
       # This is required as Deutsche Bank has a very weird MT940 file format

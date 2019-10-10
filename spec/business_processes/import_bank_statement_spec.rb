@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_support/all'
 require 'cmxl'
 
@@ -7,10 +9,10 @@ require_relative '../../box/business_processes/import_bank_statement'
 module Box
   module BusinessProcesses
     RSpec.describe ImportBankStatement do
-      let(:account) { Account.create(host: "HOST", iban: "iban1234567") }
+      let(:account) { Account.create(host: 'HOST', iban: 'iban1234567') }
       let(:mt940_fixture) { 'single_valid.mt940' }
       let(:mt940) { File.read("spec/fixtures/#{mt940_fixture}") }
-      let(:camt_account) { Account.create(host: "HOST", iban: "iban1234567", statements_format: 'camt53') }
+      let(:camt_account) { Account.create(host: 'HOST', iban: 'iban1234567', statements_format: 'camt53') }
       let(:camt_fixture) { 'camt_statement.xml' }
       let(:camt) { File.read("spec/fixtures/#{camt_fixture}") }
 
@@ -58,8 +60,8 @@ module Box
           end
 
           describe 'year over year duplicated statement numbers' do
-            let!(:cmxl_2016) { Cmxl.parse(File.read("spec/fixtures/duplicated_sequence_number_2016.mt940")).first }
-            let!(:cmxl_2017) { Cmxl.parse(File.read("spec/fixtures/duplicated_sequence_number_2017.mt940")).first }
+            let!(:cmxl_2016) { Cmxl.parse(File.read('spec/fixtures/duplicated_sequence_number_2016.mt940')).first }
+            let!(:cmxl_2017) { Cmxl.parse(File.read('spec/fixtures/duplicated_sequence_number_2017.mt940')).first }
 
             it 'does create two bank statements' do
               expect { import(cmxl_2016, account) }.to change { BankStatement.count }.to(1)
@@ -111,7 +113,7 @@ module Box
           context 'an old statement is added' do
             let(:mt940_fixture) { 'single_valid_2016-03-15.mt940' }
 
-            before { account.set_balance(Date.new(2016, 03, 20), 1_000_00) }
+            before { account.set_balance(Date.new(2016, 0o3, 20), 1_000_00) }
 
             it 'does not change closing balance date' do
               expect { import(cmxl, account) }.to_not change { account.reload.balance_date }
@@ -125,7 +127,7 @@ module Box
           context 'a new bank statement is imported' do
             let(:mt940_fixture) { 'single_valid_2016-03-15.mt940' }
 
-            before { account.set_balance(Date.new(2016, 03, 10), 1_000_00) }
+            before { account.set_balance(Date.new(2016, 0o3, 10), 1_000_00) }
 
             it 'stores new closing balance date' do
               expect { import(cmxl, account) }.to change { account.reload.balance_date }

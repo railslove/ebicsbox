@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'king_dtaus'
 require_relative '../errors/business_process_failure'
 
@@ -5,25 +7,25 @@ module Box
   class ForeignCredit
     class Payload < OpenStruct
       def sender
-        KingDta::Account.new({
-          owner_name:          account.name,
-          bank_number:         account.bank_number,
-          owner_country_code:  account.bank_country_code,
+        KingDta::Account.new(
+          owner_name: account.name,
+          bank_number: account.bank_number,
+          owner_country_code: account.bank_country_code,
           bank_account_number: account.bank_account_number
-        })
+        )
       end
 
       def receiver
-        KingDta::Account.new({
-          bank_bic:           params[:bic],
-          owner_name:         params[:name],
+        KingDta::Account.new(
+          bank_bic: params[:bic],
+          owner_name: params[:name],
           owner_country_code: params[:country_code],
           ** account_number
-        })
+        )
       end
 
       def account_number
-        if params[:iban] =~ /[A-Z]{2}/
+        if /[A-Z]{2}/.match?(params[:iban])
           { bank_iban: params[:iban] }
         else
           { bank_account_number: params[:iban] }
@@ -38,7 +40,7 @@ module Box
         {
           split: '00',
           sender: '01',
-          receiver: '02',
+          receiver: '02'
         }[params[:fee_handling]]
       end
 
@@ -79,7 +81,7 @@ module Box
       )
     rescue ArgumentError => e
       # TODO: Will be fixed upstream in the sepa_king gem by us
-      fail Box::BusinessProcessFailure.new({ base: e.message }, 'Invalid data')
+      raise Box::BusinessProcessFailure.new({ base: e.message }, 'Invalid data')
     end
   end
 end

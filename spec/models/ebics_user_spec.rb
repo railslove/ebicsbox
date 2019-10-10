@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Box
   RSpec.describe EbicsUser do
     describe 'acticated?' do

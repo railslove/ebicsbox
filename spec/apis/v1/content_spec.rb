@@ -339,7 +339,7 @@ module Box
 
           before(:each) do
             allow(Jobs::FetchStatements).to receive(:new).and_return(job_double)
-            allow(job_double).to receive(:perform).and_return({ total: 12, imported: 3 })
+            allow(job_double).to receive(:perform).and_return(total: 12, imported: 3)
 
             account.add_ebics_user(activated_at: 1.day.ago)
 
@@ -355,7 +355,7 @@ module Box
           end
 
           it 'returns import stats' do
-            expect_json :fetched => 12, :imported => 3, :message => 'Imported statements successfully'
+            expect_json fetched: 12, imported: 3, message: 'Imported statements successfully'
           end
         end
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'faraday'
 
 module Box
@@ -8,8 +10,8 @@ module Box
 
     before do
       subject.event = event
-      stub_request(:post, "https://myapp.url/webhooks")
-      @request = stub_request(:post, "http://mycallback.url/")
+      stub_request(:post, 'https://myapp.url/webhooks')
+      @request = stub_request(:post, 'http://mycallback.url/')
     end
 
     describe '.deliver' do
@@ -77,7 +79,7 @@ module Box
         end
 
         it 'logs a warning' do
-          expect { subject.deliver }.to have_logged_message("No callback url for event.")
+          expect { subject.deliver }.to have_logged_message('No callback url for event.')
         end
       end
 
@@ -100,7 +102,7 @@ module Box
 
         it 'stores response_headers' do
           subject.deliver
-          expect(subject.reponse_headers).to eq({ 'User-Agent' => 'Spec' })
+          expect(subject.reponse_headers).to eq('User-Agent' => 'Spec')
         end
 
         it 'stores response_time' do
@@ -139,7 +141,7 @@ module Box
       context 'callback url with auth specified' do
         it 'extracts authentication data' do
           url = 'http://user:pass@mycallback.url'
-          expect(subject.send(:extract_auth, url)).to eq(['user', 'pass'])
+          expect(subject.send(:extract_auth, url)).to eq(%w[user pass])
         end
       end
       context 'callback url without auth specified' do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'grape'
 
 require_relative '../../models/organization'
@@ -11,15 +13,15 @@ module Box
 
         before do
           unless Box.configuration.registrations_allowed?
-            error!({ message: "Registration is not enabled. Please contact an admin!" }, 405)
+            error!({ message: 'Registration is not enabled. Please contact an admin!' }, 405)
           end
         end
 
         rescue_from Grape::Exceptions::ValidationErrors do |e|
           error!({
-            message: 'Validation of your request\'s payload failed!',
-            errors: Hash[e.errors.map{ |k, v| [k.first, v]}]
-          }, 400)
+                   message: 'Validation of your request\'s payload failed!',
+                   errors: Hash[e.errors.map { |k, v| [k.first, v] }]
+                 }, 400)
         end
 
         params do
@@ -31,16 +33,14 @@ module Box
           optional :webhook_token, type: String, desc: "Token to sign organization's webhook payloads"
         end
         post '/organizations' do
-          begin
-            DB.transaction do
-              organization = Organization.register(declared(params).except(:user))
-              user = organization.add_user(name: params[:user][:name], access_token: params[:user][:access_token], admin: true)
-              present organization, with: Entities::RegistrationOrganization
-            end
-          rescue => ex
-            Box.logger.error("[Registration] #{ex.message}")
-            error!({ message: "Failed to create organization!" }, 400)
+          DB.transaction do
+            organization = Organization.register(declared(params).except(:user))
+            user = organization.add_user(name: params[:user][:name], access_token: params[:user][:access_token], admin: true)
+            present organization, with: Entities::RegistrationOrganization
           end
+        rescue StandardError => ex
+          Box.logger.error("[Registration] #{ex.message}")
+          error!({ message: 'Failed to create organization!' }, 400)
         end
       end
     end

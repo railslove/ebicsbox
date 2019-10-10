@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'base64'
 
 require_relative '../queue'
@@ -10,9 +12,9 @@ module Box
       include Sidekiq::Worker
       sidekiq_options queue: 'credit'
 
-      INSTRUMENT_MAPPING = Hash.new('AZV').update({
-        "EUR" => :CCT,
-      })
+      INSTRUMENT_MAPPING = Hash.new('AZV').update(
+        'EUR' => :CCT
+      )
 
       def perform(message)
         message.symbolize_keys!
@@ -20,11 +22,11 @@ module Box
           account_id: message[:account_id],
           user_id: message[:user_id],
           amount: message[:amount],
-          type: "credit",
+          type: 'credit',
           payload: Base64.strict_decode64(message[:payload]),
           eref: message[:eref],
           currency: message[:currency],
-          status: "created",
+          status: 'created',
           order_type: INSTRUMENT_MAPPING[message[:currency]],
           metadata: message[:metadata]
         )

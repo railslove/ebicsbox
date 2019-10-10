@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 module Box
@@ -16,17 +18,17 @@ module Box
       reference: :string,
       end_to_end_reference: :string,
       settled_at: :string
-    }
+    }.freeze
 
     describe 'GET: /transactions' do
-      context "when no valid access token is provided" do
+      context 'when no valid access token is provided' do
         it 'returns a 404' do
           get '/transactions', TestHelpers::INVALID_TOKEN_HEADER
           expect_status 401
         end
       end
 
-      context "when no transactions are available" do
+      context 'when no transactions are available' do
         it 'returns a 200' do
           get '/transactions', TestHelpers::VALID_HEADERS
           expect_status 200
@@ -38,7 +40,7 @@ module Box
         end
       end
 
-      context "when transactions are available" do
+      context 'when transactions are available' do
         include_context 'with account'
 
         let!(:trx1) { account.add_statement(Fabricate.attributes_for(:statement, eref: 'trx-1')) }
@@ -75,36 +77,36 @@ module Box
         let!(:trx2) { account.add_statement(eref: 'trx-2', date: '2016-01-02') }
 
         it 'returns multiple items by default' do
-          get "/transactions", TestHelpers::VALID_HEADERS
+          get '/transactions', TestHelpers::VALID_HEADERS
           expect_json_sizes 2
         end
 
         it 'orders by decending date' do
-          get "/transactions", TestHelpers::VALID_HEADERS
+          get '/transactions', TestHelpers::VALID_HEADERS
           expect_json '0', end_to_end_reference: 'trx-2'
           expect_json '1', end_to_end_reference: 'trx-1'
         end
 
         it 'allows to specify items per page' do
-          get "/transactions?per_page=1", TestHelpers::VALID_HEADERS
+          get '/transactions?per_page=1', TestHelpers::VALID_HEADERS
           expect_json_sizes 1
         end
 
         it 'allows to specify the page' do
-          get "/transactions?page=1&per_page=1", TestHelpers::VALID_HEADERS
+          get '/transactions?page=1&per_page=1', TestHelpers::VALID_HEADERS
           expect_json '*', end_to_end_reference: 'trx-2'
 
-          get "/transactions?page=2&per_page=1", TestHelpers::VALID_HEADERS
+          get '/transactions?page=2&per_page=1', TestHelpers::VALID_HEADERS
           expect_json '*', end_to_end_reference: 'trx-1'
         end
 
         it 'sets pagination headers' do
-          get "/transactions?per_page=1", TestHelpers::VALID_HEADERS
+          get '/transactions?per_page=1', TestHelpers::VALID_HEADERS
           expect(headers['Link']).to include("rel='next'")
         end
       end
 
-      context "when account filter is active" do
+      context 'when account filter is active' do
         include_context 'with account'
 
         let!(:second_account) { organization.add_account(name: 'Second account', iban: 'SECONDACCOUNT') }
@@ -129,7 +131,7 @@ module Box
         end
       end
 
-      context "when date filter is active" do
+      context 'when date filter is active' do
         include_context 'with account'
 
         let!(:old) { account.add_statement(eref: 'trx-1', date: '2016-01-01') }
@@ -151,7 +153,7 @@ module Box
         end
       end
 
-      context "when type filter is active" do
+      context 'when type filter is active' do
         include_context 'with account'
 
         let!(:debit) { account.add_statement(eref: 'trx-1', debit: true) }

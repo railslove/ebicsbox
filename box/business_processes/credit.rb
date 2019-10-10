@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'base64'
 require 'securerandom'
 require 'sepa_king'
@@ -9,7 +11,7 @@ module Box
   class Credit
     def self.create!(account, params, user)
       sct = SEPA::CreditTransfer.new(account.credit_pain_attributes_hash).tap do |credit|
-        credit.message_identification= "EBICS-BOX/#{SecureRandom.hex(11).upcase}"
+        credit.message_identification = "EBICS-BOX/#{SecureRandom.hex(11).upcase}"
         credit.add_transaction(
           name: params[:name],
           bic: params[:bic],
@@ -34,11 +36,11 @@ module Box
           metadata: params.slice(:name, :iban, :bic, :execution_date, :reference)
         )
       else
-        fail(Box::BusinessProcessFailure.new(sct.errors))
+        raise Box::BusinessProcessFailure, sct.errors
       end
     rescue ArgumentError => e
       # TODO: Will be fixed upstream in the sepa_king gem by us
-      fail Box::BusinessProcessFailure.new({ base: e.message }, 'Invalid data')
+      raise Box::BusinessProcessFailure.new({ base: e.message }, 'Invalid data')
     end
 
     def self.v2_create!(user, account, params)

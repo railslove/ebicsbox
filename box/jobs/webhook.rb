@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../models/event'
 require_relative '../models/webhook_delivery'
 

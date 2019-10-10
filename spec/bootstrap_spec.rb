@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Box do
   it 'initializes the namespace' do
     expect(Box).to be_kind_of(Module)

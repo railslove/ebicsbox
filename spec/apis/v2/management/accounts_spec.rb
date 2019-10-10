@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 module Box
@@ -19,11 +21,10 @@ module Box
         end
 
         it 'highlights missing fields' do
-          expect_json 'errors', {
-            name: ["is missing", "is empty"],
-            iban: ["is missing", "is empty"],
-            bic: ["is missing", "is empty"],
-          }
+          expect_json 'errors',
+                      name: ['is missing', 'is empty'],
+                      iban: ['is missing', 'is empty'],
+                      bic: ['is missing', 'is empty']
         end
       end
 
@@ -49,12 +50,12 @@ module Box
 
       context 'no account with given IBAN exist' do
         it 'returns an error' do
-          get "management/accounts/NOTEXISTING", TestHelpers::VALID_HEADERS
+          get 'management/accounts/NOTEXISTING', TestHelpers::VALID_HEADERS
           expect_status 404
         end
 
         it 'returns a proper error message' do
-          get "management/accounts/NOTEXISTING", TestHelpers::VALID_HEADERS
+          get 'management/accounts/NOTEXISTING', TestHelpers::VALID_HEADERS
           expect_json 'message', 'Your organization does not have an account with given IBAN!'
         end
       end
@@ -78,12 +79,12 @@ module Box
 
       context 'no account with given IBAN exist' do
         it 'returns an error' do
-          put "management/accounts/NOTEXISTING", {}, TestHelpers::VALID_HEADERS
+          put 'management/accounts/NOTEXISTING', {}, TestHelpers::VALID_HEADERS
           expect_status 404
         end
 
         it 'returns a proper error message' do
-          put "management/accounts/NOTEXISTING", {}, TestHelpers::VALID_HEADERS
+          put 'management/accounts/NOTEXISTING', {}, TestHelpers::VALID_HEADERS
           expect_json 'message', 'Your organization does not have an account with given IBAN!'
         end
       end
@@ -116,8 +117,9 @@ module Box
         end
 
         it 'ignores the access_token attribute' do
-          expect { put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name', access_token: user.access_token } }.to change {
-            account.reload.name }
+          expect { put "management/accounts/#{account.iban}", iban: 'old-iban', name: 'new name', access_token: user.access_token }.to change {
+                                                                                                                                         account.reload.name
+                                                                                                                                       }
         end
       end
     end

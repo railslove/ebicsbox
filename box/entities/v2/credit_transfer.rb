@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'grape-entity'
 require_relative './transaction'
 
@@ -5,12 +7,12 @@ module Box
   module Entities
     module V2
       class CreditTransfer < Grape::Entity
-        expose(:public_id, as: "id")
+        expose(:public_id, as: 'id')
         expose(:account) { |transaction| transaction.account.iban }
         expose(:name)
         expose(:iban)
         expose(:bic)
-        expose(:amount, as: "amount_in_cents")
+        expose(:amount, as: 'amount_in_cents')
         expose(:currency)
         expose(:eref, as: 'end_to_end_reference')
         expose(:reference)
@@ -20,7 +22,7 @@ module Box
           iban = transaction.account.iban
           {
             self: Box.configuration.app_url + "/credit_transfers/#{transaction.public_id}",
-            account: Box.configuration.app_url + "/accounts/#{iban}/",
+            account: Box.configuration.app_url + "/accounts/#{iban}/"
           }
         end
 

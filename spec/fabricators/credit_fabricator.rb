@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require_relative '../../box/models/transaction'
 
 def generate_credit_payload
-  %{
+  %(
     <?xml version="1.0" encoding="UTF-8"?>
     <Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.003.03" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:iso:std:iso:20022:tech:xsd:pain.001.003.03 pain.001.003.03.xsd">
       <CstmrCdtTrfInitn>
@@ -67,9 +69,8 @@ def generate_credit_payload
         </PmtInf>
       </CstmrCdtTrfInitn>
     </Document>
-  }
+  )
 end
-
 
 Fabricator(:credit, from: 'Box::Transaction') do
   eref { Fabricate.sequence(:credit) { |i| "credit-#{i}" } }

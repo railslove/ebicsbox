@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 module Box
@@ -27,22 +29,25 @@ module Box
     end
 
     describe 'POST /accounts/:iban/ebics_users' do
-      let(:account) { Account.create(
-        name: 'name',
-        iban: 'iban',
-        bic: 'bic',
-        url: 'url',
-        host: 'host',
-        partner: 'partner',
-        mode: 'File',
-        organization_id: organization.id) }
+      let(:account) do
+        Account.create(
+          name: 'name',
+          iban: 'iban',
+          bic: 'bic',
+          url: 'url',
+          host: 'host',
+          partner: 'partner',
+          mode: 'File',
+          organization_id: organization.id
+        )
+      end
 
       def perform_request
         post "management/accounts/#{account.iban}/ebics_users", data, TestHelpers::VALID_HEADERS
       end
 
       context 'missing attributes' do
-        let(:data) { { ebics_user: "test" } }
+        let(:data) { { ebics_user: 'test' } }
 
         it 'returns an error code' do
           perform_request
@@ -81,7 +86,7 @@ module Box
       end
 
       context 'remote ebics server throws an error' do
-        let(:data) { { ebics_user: "test", user_id: user.id } }
+        let(:data) { { ebics_user: 'test', user_id: user.id } }
 
         before { allow_any_instance_of(EbicsUser).to receive(:setup!).and_return(false) }
 
@@ -101,7 +106,7 @@ module Box
       end
 
       context 'valid data' do
-        let(:data) { { ebics_user: "test", user_id: user.id } }
+        let(:data) { { ebics_user: 'test', user_id: user.id } }
 
         it 'returns a success code' do
           perform_request
@@ -146,12 +151,12 @@ module Box
 
         it 'returns data as html content' do
           perform_request
-          expect(response.headers["Content-Type"]).to eq('text/html')
+          expect(response.headers['Content-Type']).to eq('text/html')
         end
 
         it 'returns the ini letter' do
           perform_request
-          expect(response.body).to eq("INI LETTER")
+          expect(response.body).to eq('INI LETTER')
         end
       end
     end

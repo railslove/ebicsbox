@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rack'
 require_relative '../models/user'
 require_relative '../models/organization'
@@ -24,7 +26,7 @@ module Box
         {
           'box.user' => user,
           'box.organization' => user.try(:organization),
-          'box.admin' => user.try(:admin),
+          'box.admin' => user.try(:admin)
         }
       end
     end

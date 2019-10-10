@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'benchmark'
 require 'json'
 require 'faraday'
@@ -24,7 +26,7 @@ module Box
         response_body: response.body,
         reponse_headers: Sequel.pg_json(response.headers.stringify_keys),
         response_status: response.status,
-        response_time: execution_time,
+        response_time: execution_time
       )
       save
       response.success? ? event.delivery_success! : event.delivery_failure!
@@ -74,6 +76,7 @@ module Box
     end
 
     private
+
     def extract_auth(url)
       url.match(/:\/\/(.*):(.*)@/).try(:captures)
     end

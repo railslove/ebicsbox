@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'grape'
 require 'sequel'
 
@@ -23,19 +25,19 @@ module Box
 
         AUTH_HEADERS = {
           'Authorization' => { description: 'OAuth 2 Bearer token', type: 'String' }
-        }
+        }.freeze
         DEFAULT_ERROR_RESPONSES = {
-          "400" => { description: "Invalid request" },
-          "401" => { description: "Not authorized to access this resource" },
-          "404" => { description: "No account with given IBAN found" },
-          "412" => { description: "EBICS account credentials not yet activated" },
-        }
+          '400' => { description: 'Invalid request' },
+          '401' => { description: 'Not authorized to access this resource' },
+          '404' => { description: 'No account with given IBAN found' },
+          '412' => { description: 'EBICS account credentials not yet activated' }
+        }.freeze
 
         rescue_from Grape::Exceptions::ValidationErrors do |e|
           error!({
-            message: 'Validation of your request\'s payload failed!',
-            errors: Hash[e.errors.map{ |k, v| [k.first, v]}]
-          }, 400)
+                   message: 'Validation of your request\'s payload failed!',
+                   errors: Hash[e.errors.map { |k, v| [k.first, v] }]
+                 }, 400)
         end
 
         namespace :management do
@@ -56,7 +58,7 @@ module Box
             end
 
             get ':id' do
-              account = current_organization.accounts_dataset.first!({ iban: params[:id] })
+              account = current_organization.accounts_dataset.first!(iban: params[:id])
               present account, with: Entities::ManagementAccount, type: 'full'
             end
 
@@ -82,16 +84,14 @@ module Box
             end
 
             put ':id/submit' do
-              begin
-                account = current_organization.accounts_dataset.first!({ iban: params[:id] })
-                account.setup!
-              rescue Account::AlreadyActivated => ex
-                error!({ message: "Account is already activated" }, 400)
-              rescue Account::IncompleteEbicsData => ex
-                error!({ message: "Incomplete EBICS setup" }, 400)
-              rescue => ex
-                error!({ message: "unknown failure" }, 400)
-              end
+              account = current_organization.accounts_dataset.first!(iban: params[:id])
+              account.setup!
+            rescue Account::AlreadyActivated => ex
+              error!({ message: 'Account is already activated' }, 400)
+            rescue Account::IncompleteEbicsData => ex
+              error!({ message: 'Incomplete EBICS setup' }, 400)
+            rescue StandardError => ex
+              error!({ message: 'unknown failure' }, 400)
             end
 
             params do
@@ -107,17 +107,15 @@ module Box
               optional :mode, type: String, desc: 'mode'
             end
             put ':id' do
-              begin
-                account = current_organization.accounts_dataset.first!(iban: params[:id])
-                account.set(params.except('id', 'state', 'access_token'))
-                if !account.modified? || account.save
-                  present account, with: Entities::ManagementAccount
-                else
-                  error!({ message: 'Failed to update account' }, 400)
-                end
-              rescue Sequel::NoMatchingRow => ex
-                error!({ message: 'Your organization does not have an account with given IBAN!' }, 400)
+              account = current_organization.accounts_dataset.first!(iban: params[:id])
+              account.set(params.except('id', 'state', 'access_token'))
+              if !account.modified? || account.save
+                present account, with: Entities::ManagementAccount
+              else
+                error!({ message: 'Failed to update account' }, 400)
               end
+            rescue Sequel::NoMatchingRow => ex
+              error!({ message: 'Your organization does not have an account with given IBAN!' }, 400)
             end
           end
 
@@ -141,8 +139,8 @@ module Box
             end
 
             params do
-              requires :user_id, type: Integer, desc: "Internal user identifier to associate the ebics_user with"
-              requires :ebics_user, type: String, unique_ebics_user: true, desc: "EBICS user to represent"
+              requires :user_id, type: Integer, desc: 'Internal user identifier to associate the ebics_user with'
+              requires :ebics_user, type: String, unique_ebics_user: true, desc: 'EBICS user to represent'
             end
             post do
               account = current_organization.accounts_dataset.first!(iban: params[:account_id])
@@ -155,7 +153,7 @@ module Box
                 if ebics_user.setup!(account)
                   {
                     message: 'EbicsUser has been created and setup successfully! Please fetch INI letter, sign it, and submit it to your bank.',
-                    ebics_user: Entities::EbicsUser.represent(ebics_user),
+                    ebics_user: Entities::EbicsUser.represent(ebics_user)
                   }
                 else
                   ebics_user.destroy
@@ -174,7 +172,7 @@ module Box
             end
 
             get ':id' do
-              user = current_organization.users_dataset.first!({ id: params[:id] })
+              user = current_organization.users_dataset.first!(id: params[:id])
               present user, with: Entities::User, type: 'full'
             end
 
@@ -186,7 +184,7 @@ module Box
               if user = current_organization.add_user(name: params[:name], access_token: params[:token])
                 {
                   message: 'User has been created successfully!',
-                  user: Entities::User.represent(user, include_token: true),
+                  user: Entities::User.represent(user, include_token: true)
                 }
               else
                 error!({ message: 'Failed to create user' }, 400)

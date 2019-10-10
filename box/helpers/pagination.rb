@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Box
   module Helpers
     module Pagination
@@ -14,7 +16,7 @@ module Box
           next: build_path('page' => params['page'] + 1),
           prev: build_path('page' => params['page'] - 1),
           first: build_path('page' => 1),
-          last: build_path('page' => total_pages),
+          last: build_path('page' => total_pages)
         }
 
         # Remove urls which do not make any sense to display
@@ -29,7 +31,7 @@ module Box
         end
 
         # Set pagination header
-        header "Link", urls.map { |rel, url| "<#{url}>; rel='#{rel}'" }.join(',')
+        header 'Link', urls.map { |rel, url| "<#{url}>; rel='#{rel}'" }.join(',')
       end
 
       def build_path(new_params)
