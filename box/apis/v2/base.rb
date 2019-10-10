@@ -12,6 +12,7 @@ require_relative './events'
 require_relative './transactions'
 require_relative './management/accounts'
 require_relative './management/ebics_users'
+require_relative './management/organizations'
 require_relative './management/users'
 require_relative './management/webhooks'
 
@@ -27,7 +28,11 @@ module Box
         mount Service
         mount Transactions
         mount Events
-        mount Management
+        mount Management::Accounts
+        mount Management::EbicsUsers
+        mount Management::Organizations
+        mount Management::Users
+        mount Management::Webhooks
 
         add_swagger_documentation \
           doc_version: 'v2',

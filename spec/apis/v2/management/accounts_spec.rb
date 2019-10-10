@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 module Box
-  RSpec.describe Apis::V2::Management do
+  RSpec.describe Apis::V2::Management::Accounts do
     include_context 'admin user'
 
     let(:other_organization) { Fabricate(:organization) }
