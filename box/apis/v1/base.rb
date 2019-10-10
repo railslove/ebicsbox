@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative './content'
 require_relative './management'
 require_relative './registration'

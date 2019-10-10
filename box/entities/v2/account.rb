@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'grape-entity'
 require_relative './transaction'
 
@@ -5,8 +7,8 @@ module Box
   module Entities
     module V2
       class Account < Grape::Entity
-        expose :name, documentation: { type: "String", desc: "Name appearing on customer statements" }
-        expose :descriptor, documentation: { type: "String", desc: "Internal descriptor" }
+        expose :name, documentation: { type: 'String', desc: 'Name appearing on customer statements' }
+        expose :descriptor, documentation: { type: 'String', desc: 'Internal descriptor' }
         expose :iban
         expose :bic
         expose :balance_date
@@ -21,11 +23,11 @@ module Box
 
         expose(:callback_url)
 
-        expose(:_links) do |account, options|
+        expose(:_links) do |account, _options|
           {
             self: Box.configuration.app_url + "/accounts/#{account.iban}",
             transactions: Box.configuration.app_url + "/transactions?iban=#{account.iban}",
-            ini_letter: Box.configuration.app_url + "/accounts/#{account.iban}/ini_letter",
+            ini_letter: Box.configuration.app_url + "/accounts/#{account.iban}/ini_letter"
           }
         end
       end

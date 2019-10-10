@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 require_relative '../../box/middleware/static_authentication'
@@ -39,7 +41,7 @@ module Box
 
         describe 'authenticated user via query parameter' do
           let!(:organization) { Fabricate(:organization) }
-          let!(:user) { Box::User.create(name: "Test User", access_token: 'test-token', organization: organization) }
+          let!(:user) { Box::User.create(name: 'Test User', access_token: 'test-token', organization: organization) }
 
           it 'returns a user' do
             env = Rack::MockRequest.env_for('/?access_token=test-token')
@@ -56,7 +58,7 @@ module Box
 
         describe 'authenticated user via legacy header' do
           let!(:organization) { Fabricate(:organization) }
-          let!(:user) { Box::User.create(name: "Test User", access_token: 'test-token', organization: organization) }
+          let!(:user) { Box::User.create(name: 'Test User', access_token: 'test-token', organization: organization) }
 
           it 'returns a user' do
             env = Rack::MockRequest.env_for('/')
@@ -75,7 +77,7 @@ module Box
 
         describe 'authenticated user via bearer token header' do
           let!(:organization) { Fabricate(:organization) }
-          let!(:user) { Box::User.create(name: "Test User", access_token: 'test-token', organization: organization) }
+          let!(:user) { Box::User.create(name: 'Test User', access_token: 'test-token', organization: organization) }
 
           it 'returns a user' do
             env = Rack::MockRequest.env_for('/')
@@ -96,7 +98,6 @@ module Box
       describe 'management authentication' do
         skip 'missing implementation'
       end
-
     end
   end
 end

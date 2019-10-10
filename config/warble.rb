@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Disable Rake-environment-task framework detection by uncommenting/setting to false
 # Warbler.framework_detection = false
 
@@ -11,7 +13,7 @@ Warbler::Config.new do |config|
   # config.features = %w(gemjar)
 
   # Application directories to be included in the webapp.
-  config.dirs = %w(bin config frontend lib migrations node_modules public)
+  config.dirs = %w[bin config frontend lib migrations node_modules public]
 
   # Additional files/directories to include, above those in config.dirs
   # config.includes = FileList["db"]
@@ -42,7 +44,7 @@ Warbler::Config.new do |config|
 
   # An array of Bundler groups to avoid including in the war file.
   # Defaults to ["development", "test", "assets"].
-  config.bundle_without = ["development", "test", "mri"]
+  config.bundle_without = %w[development test mri]
 
   # Other gems to be included. If you don't use Bundler or a gemspec
   # file, you need to tell Warbler which gems your application needs

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'grape'
 
 require_relative '../models/account'
@@ -7,7 +9,7 @@ module Box
     def validate(request)
       organization = request.env['box.organization']
       if request.post? && !organization.accounts_dataset.where(iban: request.params[:iban]).empty?
-        raise Grape::Exceptions::Validation, params: [:iban], message: "must be unique"
+        raise Grape::Exceptions::Validation, params: [:iban], message: 'must be unique'
       end
     end
   end

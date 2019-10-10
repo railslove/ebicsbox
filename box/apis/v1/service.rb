@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'grape'
 
 # Helpers
@@ -11,21 +13,19 @@ module Box
         helpers Helpers::Default
 
         before do
-          if current_user.nil?
-            error!({ message: 'Unauthorized access. Please provide a valid access token!' }, 401)
-          end
+          error!({ message: 'Unauthorized access. Please provide a valid access token!' }, 401) if current_user.nil?
         end
 
         get '/' do
           {
             documentation: Box.configuration.app_url + '/docs',
             management: {
-              accounts: Box.configuration.app_url + "/management/accounts",
+              accounts: Box.configuration.app_url + '/management/accounts'
             },
             resources: {
-              accounts: Box.configuration.app_url + "/accounts",
+              accounts: Box.configuration.app_url + '/accounts'
             },
-            version: 'v1',
+            version: 'v1'
           }
         end
       end

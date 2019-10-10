@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 module Box
@@ -9,45 +11,45 @@ module Box
     let!(:webhook_delivery) { event.add_webhook_delivery({}) }
 
     describe 'GET /events' do
-      context "without valid access_token" do
+      context 'without valid access_token' do
         it 'returns a 401' do
           get 'events', TestHelpers::INVALID_TOKEN_HEADER
           expect_status 401
         end
       end
 
-      context "with valid access_token" do
+      context 'with valid access_token' do
         it 'returns an OK status' do
-          get "events", TestHelpers::VALID_HEADERS
+          get 'events', TestHelpers::VALID_HEADERS
           expect_status 200
         end
 
         it 'returns a list of events' do
-          get "events", TestHelpers::VALID_HEADERS
+          get 'events', TestHelpers::VALID_HEADERS
           expect_json_types :array
         end
 
         it 'exposes each events public id' do
-          get "events", TestHelpers::VALID_HEADERS
+          get 'events', TestHelpers::VALID_HEADERS
           expect_json '0.id', event.public_id
         end
 
         it 'references the endpoint to fetch more details' do
-          get "events", TestHelpers::VALID_HEADERS
-          expect_json '0._links.self', regex(%r[http://localhost:5000/events/#{TestHelpers::UUID_REGEXP}])
+          get 'events', TestHelpers::VALID_HEADERS
+          expect_json '0._links.self', regex(%r{http://localhost:5000/events/#{TestHelpers::UUID_REGEXP}})
         end
       end
     end
 
     describe 'GET /events/:id' do
-      context "without valid access_token" do
+      context 'without valid access_token' do
         it 'returns a 401' do
           get "events/#{event.public_id}"
           expect_status 401
         end
       end
 
-      context "with valid access_token" do
+      context 'with valid access_token' do
         it 'returns an OK status' do
           get "events/#{event.public_id}", TestHelpers::VALID_HEADERS
           expect_status 200

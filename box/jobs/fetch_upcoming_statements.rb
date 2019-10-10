@@ -53,9 +53,9 @@ module Box
         Box.logger.info("[Jobs::FetchUpcomingStatements] Imported #{chunks.count} VMK(s) for Account ##{account_id}.")
 
         import_stats
-      rescue Sequel::NoMatchingRow => e
+      rescue Sequel::NoMatchingRow => _ex
         Box.logger.error("[Jobs::FetchUpcomingStatements] Could not find Account ##{account_id}")
-      rescue Epics::Error::BusinessError => e
+      rescue Epics::Error::BusinessError => _ex
         # The BusinessError can occur when no new statements are available
         Box.logger.error("[Jobs::FetchUpcomingStatements] EBICS error. id=#{account_id} reason='#{e.message}'")
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../../box/models/ebics_user'
 
 Fabricator(:user, from: 'Box::User') do

@@ -1,10 +1,11 @@
+# frozen_string_literal: true
+
 require 'active_support/all'
 
 module Box
   RSpec.describe Account do
-
     describe '#transport_client' do
-      subject(:account) { described_class.create(mode: "Fake") }
+      subject(:account) { described_class.create(mode: 'Fake') }
 
       context 'no ebics_user added' do
         it 'fails with an no transport client exceptiopn' do
@@ -69,7 +70,7 @@ module Box
         before { subject.add_ebics_user(activated_at: 1.day.ago) }
 
         it 'returns only relevant pain attributes' do
-          expect(subject.pain_attributes_hash.keys).to eq([:name, :bic, :iban, :creditor_identifier])
+          expect(subject.pain_attributes_hash.keys).to eq(%i[name bic iban creditor_identifier])
         end
       end
 
@@ -87,7 +88,7 @@ module Box
         before { subject.add_ebics_user(activated_at: 1.day.ago) }
 
         it 'returns only relevant pain attributes' do
-          expect(subject.credit_pain_attributes_hash.keys).to eq([:name, :bic, :iban])
+          expect(subject.credit_pain_attributes_hash.keys).to eq(%i[name bic iban])
         end
       end
 

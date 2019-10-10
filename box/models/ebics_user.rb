@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'epics'
 require 'sequel'
 
@@ -21,7 +23,7 @@ module Box
         user_id: user.id,
         ebics_user: remote_user_id,
         ebics_user_id: id,
-        signature_class: signature_class,
+        signature_class: signature_class
       }
     end
 
@@ -45,7 +47,7 @@ module Box
     def setup!(account, reset = false)
       return true if !ini_letter.nil? && !reset
 
-      fail(IncompleteEbicsData) unless ebics_data?
+      raise(IncompleteEbicsData) unless ebics_data?
 
       # TODO: handle exceptions
       Box.logger.info("setting up EBICS keys for ebics_user #{id}")
@@ -67,17 +69,17 @@ module Box
     end
 
     def activate!
-      Box.logger.info("activating account #{self.id}")
+      Box.logger.info("activating account #{id}")
       client.HPB
 
-      self.encryption_keys = self.client.send(:dump_keys)
+      self.encryption_keys = client.send(:dump_keys)
       self.activated_at ||= Time.now
       save
       Box::Event.ebics_user_activated(self)
       true
-    rescue => e
+    rescue StandardError => e
       # TODO: show the error to the user
-      Box.logger.error("failed to activate account #{self.id}: #{e.to_s}")
+      Box.logger.error("failed to activate account #{id}: #{e}")
       false
     end
 

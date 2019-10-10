@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rspec/expectations'
 
 RSpec::Matchers.define :have_logged_message do |message|
@@ -13,7 +15,7 @@ RSpec::Matchers.define :have_logged_message do |message|
 
   supports_block_expectations
 
-  failure_message do |actual|
+  failure_message do |_actual|
     "expected block to log the following message: '#{message}'"
   end
 end

@@ -88,7 +88,6 @@ module Box
 
       def CCT(pain)
         doc = Nokogiri::XML(pain)
-        ["TRX#{SecureRandom.hex(6)}", "N#{SecureRandom.hex(6)}"]
         trx = doc.css('Document CstmrCdtTrfInitn PmtInf CdtTrfTxInf')
         eref = trx.css('PmtId EndToEndId').text
         desc = trx.css('RmtInf Ustrd').text

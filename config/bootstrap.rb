@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # This script should be loaded by all entrypoints as it sets up out app's namespace and handles
 # our configuration. Moreover it ensures that the database is setup.

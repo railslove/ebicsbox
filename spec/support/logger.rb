@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'logger'
 
 # Log all box data to a global string io object to test it properly
