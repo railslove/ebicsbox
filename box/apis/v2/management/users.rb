@@ -33,12 +33,12 @@ module Box
             resource :users do
               # index
               desc 'Retrieve a list of all users',
-                  tags: ['user management'],
-                  is_array: true,
-                  headers: AUTH_HEADERS,
-                  success: Entities::User,
-                  failure: DEFAULT_ERROR_RESPONSES,
-                  produces: ['application/vnd.ebicsbox-v2+json']
+                   tags: ['user management'],
+                   is_array: true,
+                   headers: AUTH_HEADERS,
+                   success: Entities::User,
+                   failure: DEFAULT_ERROR_RESPONSES,
+                   produces: ['application/vnd.ebicsbox-v2+json']
 
               get do
                 users = current_organization.users_dataset.order(:name).all
@@ -47,11 +47,11 @@ module Box
 
               # show
               desc 'Retrieve a single user by its identifier',
-                  tags: ['user management'],
-                  headers: AUTH_HEADERS,
-                  success: Entities::User,
-                  failure: DEFAULT_ERROR_RESPONSES,
-                  produces: ['application/vnd.ebicsbox-v2+json']
+                   tags: ['user management'],
+                   headers: AUTH_HEADERS,
+                   success: Entities::User,
+                   failure: DEFAULT_ERROR_RESPONSES,
+                   produces: ['application/vnd.ebicsbox-v2+json']
 
               params do
                 requires :id, type: Integer, desc: 'ID of the user'
@@ -66,12 +66,12 @@ module Box
 
               # new
               desc 'Create a new user instance',
-                  tags: ['user management'],
-                  body_name: 'body',
-                  headers: AUTH_HEADERS,
-                  success: Entities::User,
-                  failure: DEFAULT_ERROR_RESPONSES,
-                  produces: ['application/vnd.ebicsbox-v2+json']
+                   tags: ['user management'],
+                   body_name: 'body',
+                   headers: AUTH_HEADERS,
+                   success: Entities::User,
+                   failure: DEFAULT_ERROR_RESPONSES,
+                   produces: ['application/vnd.ebicsbox-v2+json']
 
               params do
                 requires :name, type: String, desc: "The user's display name", documentation: { param_type: 'body' }
@@ -89,11 +89,11 @@ module Box
 
               # delete
               desc 'Deletes a user instance',
-                  tags: ['user management'],
-                  body_name: 'body',
-                  headers: AUTH_HEADERS,
-                  failure: DEFAULT_ERROR_RESPONSES,
-                  produces: ['application/vnd.ebicsbox-v2+json']
+                   tags: ['user management'],
+                   body_name: 'body',
+                   headers: AUTH_HEADERS,
+                   failure: DEFAULT_ERROR_RESPONSES,
+                   produces: ['application/vnd.ebicsbox-v2+json']
 
               params do
                 requires :id, type: Integer, desc: "The user's id", documentation: { param_type: 'body' }

@@ -41,10 +41,10 @@ module Box
               ### GET /management/accounts/DExx/ebics_users/1/ini_letter
               ###
               desc 'Retrieve a list of all ebics_users for given account',
-                  tags: ['ebics_user management'],
-                  headers: AUTH_HEADERS,
-                  failure: DEFAULT_ERROR_RESPONSES,
-                  produces: ['application/vnd.ebicsbox-v2+json']
+                   tags: ['ebics_user management'],
+                   headers: AUTH_HEADERS,
+                   failure: DEFAULT_ERROR_RESPONSES,
+                   produces: ['application/vnd.ebicsbox-v2+json']
 
               params do
                 requires :id, type: Integer, desc: 'ID of the ebics_user'
@@ -65,11 +65,11 @@ module Box
               ### GET /management/accounts/DExx/ebics_users
               ###
               desc 'Retrieve a list of all ebics_users for given account',
-                  tags: ['ebics_user management'],
-                  headers: AUTH_HEADERS,
-                  success: Entities::EbicsUser,
-                  failure: DEFAULT_ERROR_RESPONSES,
-                  produces: ['application/vnd.ebicsbox-v2+json']
+                   tags: ['ebics_user management'],
+                   headers: AUTH_HEADERS,
+                   success: Entities::EbicsUser,
+                   failure: DEFAULT_ERROR_RESPONSES,
+                   produces: ['application/vnd.ebicsbox-v2+json']
 
               params do
               end
@@ -82,12 +82,12 @@ module Box
               ### POST /management/accounts/DExx/ebics_users
               ###
               desc 'Add a ebics_user to given account',
-                  tags: ['ebics_user management'],
-                  body_name: 'body',
-                  headers: AUTH_HEADERS,
-                  success: Entities::EbicsUser,
-                  failure: DEFAULT_ERROR_RESPONSES,
-                  produces: ['application/vnd.ebicsbox-v2+json']
+                   tags: ['ebics_user management'],
+                   body_name: 'body',
+                   headers: AUTH_HEADERS,
+                   success: Entities::EbicsUser,
+                   failure: DEFAULT_ERROR_RESPONSES,
+                   produces: ['application/vnd.ebicsbox-v2+json']
 
               params do
                 requires :user_id, type: Integer, desc: 'Internal user identifier to associate the ebics_user with', documentation: { param_type: 'body' }

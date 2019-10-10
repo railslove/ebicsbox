@@ -33,12 +33,12 @@ module Box
             resource :organizations do
               # create
               desc 'Create a new organization',
-                  tags: ['organization management'],
-                  body_name: 'body',
-                  headers: AUTH_HEADERS,
-                  success: Entities::V2::Organization,
-                  failure: DEFAULT_ERROR_RESPONSES,
-                  produces: ['application/vnd.ebicsbox-v2+json']
+                   tags: ['organization management'],
+                   body_name: 'body',
+                   headers: AUTH_HEADERS,
+                   success: Entities::V2::Organization,
+                   failure: DEFAULT_ERROR_RESPONSES,
+                   produces: ['application/vnd.ebicsbox-v2+json']
 
               params do
                 requires :name, type: String, allow_blank: false, desc: "The organization's display name"

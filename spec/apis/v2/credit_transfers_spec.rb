@@ -50,7 +50,7 @@ module Box
         let!(:credit) { Fabricate(:credit, eref: 'my-credit', account_id: account.id) }
 
         it 'does not show credits from other organizations' do
-           Fabricate(:organization)
+          Fabricate(:organization)
           other_credit = Fabricate(:credit)
           get '/credit_transfers', TestHelpers::VALID_HEADERS
           expect(json_body).to_not include(other_credit.eref)

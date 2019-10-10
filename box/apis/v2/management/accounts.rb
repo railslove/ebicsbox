@@ -39,12 +39,12 @@ module Box
               ### GET /management/accounts
               ###
               desc 'Retrieve a list of all onboarded accounts',
-                  tags: ['account management'],
-                  is_array: true,
-                  headers: AUTH_HEADERS,
-                  success: Entities::ManagementAccount,
-                  failure: DEFAULT_ERROR_RESPONSES,
-                  produces: ['application/vnd.ebicsbox-v2+json']
+                   tags: ['account management'],
+                   is_array: true,
+                   headers: AUTH_HEADERS,
+                   success: Entities::ManagementAccount,
+                   failure: DEFAULT_ERROR_RESPONSES,
+                   produces: ['application/vnd.ebicsbox-v2+json']
 
               get do
                 accounts = current_organization.accounts_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
@@ -55,11 +55,11 @@ module Box
               ### GET /management/accounts/DExx
               ###
               desc 'Retrieve a single account by its IBAN',
-                  tags: ['account management'],
-                  headers: AUTH_HEADERS,
-                  success: Entities::ManagementAccount,
-                  failure: DEFAULT_ERROR_RESPONSES,
-                  produces: ['application/vnd.ebicsbox-v2+json']
+                   tags: ['account management'],
+                   headers: AUTH_HEADERS,
+                   success: Entities::ManagementAccount,
+                   failure: DEFAULT_ERROR_RESPONSES,
+                   produces: ['application/vnd.ebicsbox-v2+json']
 
               params do
                 requires :iban, type: String
@@ -75,12 +75,12 @@ module Box
               ### POST /management/accounts
               ###
               desc 'Create a new account',
-                  tags: ['account management'],
-                  body_name: 'body',
-                  headers: AUTH_HEADERS,
-                  success: Entities::ManagementAccount,
-                  failure: DEFAULT_ERROR_RESPONSES,
-                  produces: ['application/vnd.ebicsbox-v2+json']
+                   tags: ['account management'],
+                   body_name: 'body',
+                   headers: AUTH_HEADERS,
+                   success: Entities::ManagementAccount,
+                   failure: DEFAULT_ERROR_RESPONSES,
+                   produces: ['application/vnd.ebicsbox-v2+json']
 
               params do
                 requires :name, type: String, unique_account: true, allow_blank: false, desc: 'Internal description of account', documentation: { param_type: 'body' }
@@ -108,11 +108,11 @@ module Box
               ### PUT /management/accounts/DExx
               ###
               desc 'Update an existing account',
-                  tags: ['account management'],
-                  headers: AUTH_HEADERS,
-                  success: Entities::ManagementAccount,
-                  failure: DEFAULT_ERROR_RESPONSES,
-                  produces: ['application/vnd.ebicsbox-v2+json']
+                   tags: ['account management'],
+                   headers: AUTH_HEADERS,
+                   success: Entities::ManagementAccount,
+                   failure: DEFAULT_ERROR_RESPONSES,
+                   produces: ['application/vnd.ebicsbox-v2+json']
 
               params do
                 optional :name, type: String, unique_account: true, allow_blank: false, desc: 'Internal description of account', documentation: { param_type: 'body' }

@@ -27,7 +27,7 @@ module Box
       end
 
       it 'creates a new user for the organization' do
-        expect { perform_request }.to change { User.count }.by(1)
+        expect { perform_request }.to change(User, :count).by(1)
       end
 
       it 'auto generates an access token if none is provided' do
