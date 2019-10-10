@@ -30,7 +30,7 @@ module Box
       )
       save
       response.success? ? event.delivery_success! : event.delivery_failure!
-    rescue Event::NoCallback => ex
+    rescue Event::NoCallback => _ex
       Box.logger.warn("[WebhookDelivery] No callback url for event. event_id=#{event.id}")
     end
 
@@ -85,7 +85,7 @@ module Box
       auth = extract_auth(callback_url)
       uri = URI(callback_url)
       Faraday.new("#{uri.scheme}://#{uri.host}") do |c|
-        c.basic_auth *auth if auth
+        c.basic_auth(*auth) if auth
         c.request :signer, secret: event.account.organization.webhook_token
         c.adapter Faraday.default_adapter
       end

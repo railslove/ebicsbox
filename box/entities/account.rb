@@ -20,7 +20,8 @@ module Box
       end
 
       expose(:ebics_user, if: ->(_account, options) { options[:include].try(:include?, 'ebics_user') }) do |account|
-        if ebics_user = account.ebics_user_for(options[:env]['box.user'].id)
+        ebics_user = account.ebics_user_for(options[:env]['box.user'].id)
+        if ebics_user
           Entities::EbicsUser.represent(ebics_user, only: %i[ebics_user signature_class state submitted_at activated_at])
         end
       end

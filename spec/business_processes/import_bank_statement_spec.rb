@@ -51,7 +51,7 @@ module Box
             let!(:bank_statement) { BankStatement.create(sha: described_class.checksum(cmxl, account)) }
 
             it 'does not create a new bank statement' do
-              expect { import(cmxl, account) }.to_not change(BankStatement, :count)
+              expect { import(cmxl, account) }.to_not(change(BankStatement, :count))
             end
 
             it 'returns the existing bank statement' do
@@ -64,19 +64,19 @@ module Box
             let!(:cmxl_2017) { Cmxl.parse(File.read('spec/fixtures/duplicated_sequence_number_2017.mt940')).first }
 
             it 'does create two bank statements' do
-              expect { import(cmxl_2016, account) }.to change { BankStatement.count }.to(1)
-              expect { import(cmxl_2017, account) }.to change { BankStatement.count }.to(2)
+              expect { import(cmxl_2016, account) }.to(change(BankStatement, :count).to(1))
+              expect { import(cmxl_2017, account) }.to(change(BankStatement, :count).to(2))
             end
 
             it 'recognizes duplicated statements per year' do
-              expect { import(cmxl_2017, account) }.to change { BankStatement.count }.to(1)
-              expect { import(cmxl_2017, account) }.not_to change { BankStatement.count }
+              expect { import(cmxl_2017, account) }.to(change(BankStatement, :count).to(1))
+              expect { import(cmxl_2017, account) }.not_to(change(BankStatement, :count))
             end
           end
 
           describe 'bank statement does not yet exist' do
             it 'creates a new bank statement' do
-              expect { import(cmxl, account) }.to change { BankStatement.count }.by(1)
+              expect { import(cmxl, account) }.to(change(BankStatement, :count).by(1))
             end
 
             it 'returns a bank statement record' do
@@ -87,7 +87,7 @@ module Box
           describe 'camt statements' do
             it 'creates a new bank statement from camt' do
               c53 = CamtParser::String.parse(camt).statements.first
-              expect { import(c53, camt_account) }.to change { BankStatement.count }.by(1)
+              expect { import(c53, camt_account) }.to(change(BankStatement, :count).by(1))
             end
 
             it 'extracts a date for bank statements' do
@@ -102,11 +102,11 @@ module Box
             before { account.set_balance(nil, nil) }
 
             it 'stores new closing balance date' do
-              expect { import(cmxl, account) }.to change { account.reload.balance_date }
+              expect { import(cmxl, account) }.to(change { account.reload.balance_date })
             end
 
             it 'stores new closing balance' do
-              expect { import(cmxl, account) }.to change { account.reload.balance_in_cents }
+              expect { import(cmxl, account) }.to(change { account.reload.balance_in_cents })
             end
           end
 
@@ -116,11 +116,11 @@ module Box
             before { account.set_balance(Date.new(2016, 0o3, 20), 1_000_00) }
 
             it 'does not change closing balance date' do
-              expect { import(cmxl, account) }.to_not change { account.reload.balance_date }
+              expect { import(cmxl, account) }.to_not(change { account.reload.balance_date })
             end
 
             it 'does not change closing balance date' do
-              expect { import(cmxl, account) }.to_not change { account.reload.balance_in_cents }
+              expect { import(cmxl, account) }.to_not(change { account.reload.balance_in_cents })
             end
           end
 
@@ -130,11 +130,11 @@ module Box
             before { account.set_balance(Date.new(2016, 0o3, 10), 1_000_00) }
 
             it 'stores new closing balance date' do
-              expect { import(cmxl, account) }.to change { account.reload.balance_date }
+              expect { import(cmxl, account) }.to(change { account.reload.balance_date })
             end
 
             it 'stores new closing balance' do
-              expect { import(cmxl, account) }.to change { account.reload.balance_in_cents }
+              expect { import(cmxl, account) }.to(change { account.reload.balance_in_cents })
             end
           end
         end

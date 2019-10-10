@@ -22,7 +22,7 @@ module Box
         subject { Transaction.create(type: 'debit', status: 'created') }
 
         it 'tracks no changes in history' do
-          expect { subject.update_status('test') }.to_not change { subject.reload.history }
+          expect { subject.update_status('test') }.to_not(change { subject.reload.history })
         end
 
         describe 'when the status actually changes' do

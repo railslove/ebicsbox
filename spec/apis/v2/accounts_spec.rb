@@ -201,15 +201,15 @@ module Box
         end
 
         it 'creates a new account' do
-          expect { do_request }.to change { Account.count }.by(1)
+          expect { do_request }.to(change { Account.count }.by(1))
         end
 
         it 'creates a new ebics_user' do
-          expect { do_request }.to change { EbicsUser.count }.by(1)
+          expect { do_request }.to(change { EbicsUser.count }.by(1))
         end
 
         it 'triggers an event' do
-          expect { do_request }.to change { Event.where(type: 'account_created').count }.by(1)
+          expect { do_request }.to(change { Event.where(type: 'account_created').count }.by(1))
         end
 
         it 'allows two accounts with the same IBAN if in different organizations' do
@@ -364,13 +364,13 @@ module Box
         it 'cannot change iban' do
           expect do
             put "/accounts/#{account.iban}", { iban: 'new-iban' }, TestHelpers::VALID_HEADERS
-          end.to_not change { account.reload.iban }
+          end.to_not(change { account.reload.iban })
         end
 
         it 'cannot change bic' do
           expect do
             put "/accounts/#{account.iban}", { bic: 'new-bic' }, TestHelpers::VALID_HEADERS
-          end.to_not change { account.reload.bic }
+          end.to_not(change { account.reload.bic })
         end
 
         it 'cannot change ebics_user'
@@ -378,25 +378,25 @@ module Box
         it 'allows changes of internal descriptor' do
           expect do
             put "/accounts/#{account.iban}", { descriptor: 'FooBar' }, TestHelpers::VALID_HEADERS
-          end.to change { account.reload.descriptor }.to('FooBar')
+          end.to(change { account.reload.descriptor }.to('FooBar'))
         end
 
         it 'allows changes of name' do
           expect do
             put "/accounts/#{account.iban}", { name: 'new-name' }, TestHelpers::VALID_HEADERS
-          end.to change { account.reload.name }
+          end.to(change { account.reload.name })
         end
 
         it 'allows changes of callback url' do
           expect do
             put "/accounts/#{account.iban}", { callback_url: 'new-callback-url' }, TestHelpers::VALID_HEADERS
-          end.to change { account.reload.callback_url }
+          end.to(change { account.reload.callback_url })
         end
 
         it 'allows changes of creditor identifier' do
           expect do
             put "/accounts/#{account.iban}", { creditor_identifier: 'new-creditor-identifier' }, TestHelpers::VALID_HEADERS
-          end.to change { account.reload.creditor_identifier }
+          end.to(change { account.reload.creditor_identifier })
         end
       end
     end

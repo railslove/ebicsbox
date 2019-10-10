@@ -70,9 +70,9 @@ module Box
               message: 'Account created successfully. Please fetch INI letter, sign it, and submit it to your bank',
               account: Entities::V2::Account.represent(account)
             }
-          rescue BusinessProcesses::NewAccount::EbicsError => ex
+          rescue BusinessProcesses::NewAccount::EbicsError => _ex
             error!({ message: 'Failed to setup ebics_user with your bank. Make sure your data is valid and retry!' }, 412)
-          rescue StandardError => ex
+          rescue StandardError => _ex
             error!({ message: 'Failed to create account' }, 400)
           end
 

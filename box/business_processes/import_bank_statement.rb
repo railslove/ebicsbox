@@ -16,7 +16,7 @@ module Box
       def self.import_all_from_mt940(raw_mt940, account)
         Cmxl.parse(raw_mt940).map do |raw_bank_statement|
           from_cmxl(raw_bank_statement, account)
-        rescue InvalidInput => ex
+        rescue InvalidInput => _ex
           nil # ignore
         end.compact
       end

@@ -193,7 +193,7 @@ module Box
         end
 
         it 'does not allow two debits with the same end_to_end_reference for one account' do
-          debit = Fabricate(:debit, account_id: account.id, eref: 'my-debit-eref')
+          Fabricate(:debit, account_id: account.id, eref: 'my-debit-eref')
           post '/direct_debits', { account: account.iban, end_to_end_reference: 'my-debit-eref' }, VALID_DEBIT_HEADERS
           expect_json 'errors.end_to_end_reference', ['must be unique']
         end
@@ -242,7 +242,7 @@ module Box
 
         it 'allows same end_to_end_reference for two different accounts' do
           other_account = Fabricate(:account, organization_id: account.organization_id, iban: 'DE41405327214540168131')
-          debit = Fabricate(:debit, account_id: other_account.id, eref: 'my-debit-eref')
+          Fabricate(:debit, account_id: other_account.id, eref: 'my-debit-eref')
           post '/direct_debits', valid_attributes.merge(end_to_end_reference: 'my-debit-eref'), VALID_DEBIT_HEADERS
           expect_status 201
         end

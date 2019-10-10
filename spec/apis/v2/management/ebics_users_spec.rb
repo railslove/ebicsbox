@@ -101,7 +101,7 @@ module Box
         end
 
         it 'removes created ebics_user' do
-          expect { perform_request }.to_not change { EbicsUser.count }
+          expect { perform_request }.to_not change(EbicsUser, :count)
         end
       end
 

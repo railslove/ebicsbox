@@ -4,12 +4,9 @@ module Box
   module Helpers
     module Pagination
       def setup_pagination_header(record_count)
-        # Extract query params
-        query_params = request.env['rack.request.query_hash']
-
         # Calculate total pages
         total_pages, remainder = record_count.divmod(params['per_page'])
-        total_pages += 1 if remainder > 0
+        total_pages += 1 if remainder.positive?
 
         # Build urls
         urls = {

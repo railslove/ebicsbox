@@ -47,7 +47,7 @@ module Box
                 when 'activated' then query.eager_graph(:ebics_users).exclude(ebics_users__activated_at: nil)
                 when 'not_activated' then query.eager_graph(:ebics_users).where(ebics_users__activated_at: nil)
                 else query
-        end
+                end
         query
       end
 
@@ -64,7 +64,7 @@ module Box
 
     def client_adapter
       Box::Adapters.const_get(mode)
-    rescue StandardError => e
+    rescue StandardError => _ex
       Box.configuration.ebics_client
     end
 

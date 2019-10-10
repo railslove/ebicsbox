@@ -96,7 +96,7 @@ module Box
 
     def parsed_payload
       @parsed_payload ||= Pain.from_xml(payload).to_h
-    rescue Pain::UnknownInput => ex
+    rescue Pain::UnknownInput => _ex
       Box.logger.warn { "Could not parse payload for transaction. id=#{id}" }
       nil
     end

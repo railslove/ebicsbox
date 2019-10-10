@@ -34,7 +34,7 @@ module Box
         end
 
         it 'stores new minimal accounts' do
-          expect { do_request }.to change { Account.count }
+          expect { do_request }.to change(Account, :count)
         end
 
         it 'returns a 201 status' do
@@ -105,21 +105,27 @@ module Box
         before { account.add_ebics_user(activated_at: 1.hour.ago) }
 
         it 'cannot change iban' do
-          expect { put "management/accounts/#{account.iban}", { iban: 'new-iban' }, TestHelpers::VALID_HEADERS }.to_not change { account.reload.iban }
+          expect {
+            put "management/accounts/#{account.iban}", { iban: 'new-iban' }, TestHelpers::VALID_HEADERS
+          }.to_not(change { account.reload.iban })
         end
 
         it 'cannot change bic' do
-          expect { put "management/accounts/#{account.iban}", { bic: 'new-bic' }, TestHelpers::VALID_HEADERS }.to_not change { account.reload.bic }
+          expect {
+            put "management/accounts/#{account.iban}", { bic: 'new-bic' }, TestHelpers::VALID_HEADERS
+          }.to_not(change { account.reload.bic })
         end
 
         it 'ignores iban if it did not change' do
-          expect { put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name' }, TestHelpers::VALID_HEADERS }.to change { account.reload.name }
+          expect {
+            put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name' }, TestHelpers::VALID_HEADERS
+          }.to(change { account.reload.name })
         end
 
         it 'ignores the access_token attribute' do
-          expect { put "management/accounts/#{account.iban}", iban: 'old-iban', name: 'new name', access_token: user.access_token }.to change {
-                                                                                                                                         account.reload.name
-                                                                                                                                       }
+          expect {
+            put "management/accounts/#{account.iban}", iban: 'old-iban', name: 'new name', access_token: user.access_token
+          }.to(change { account.reload.name })
         end
       end
     end

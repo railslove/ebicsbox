@@ -50,7 +50,7 @@ module Box
         let!(:credit) { Fabricate(:credit, eref: 'my-credit', account_id: account.id) }
 
         it 'does not show credits from other organizations' do
-          other_organization = Fabricate(:organization)
+           Fabricate(:organization)
           other_credit = Fabricate(:credit)
           get '/credit_transfers', TestHelpers::VALID_HEADERS
           expect(json_body).to_not include(other_credit.eref)
@@ -184,7 +184,7 @@ module Box
         end
 
         it 'does not allow two credits with the same end_to_end_reference for one account' do
-          credit = Fabricate(:credit, account_id: account.id, eref: 'my-credit-eref')
+          Fabricate(:credit, account_id: account.id, eref: 'my-credit-eref')
           post '/credit_transfers', { account: account.iban, end_to_end_reference: 'my-credit-eref' }, TestHelpers::VALID_HEADERS
           expect_json 'errors.end_to_end_reference', ['must be unique']
         end
@@ -265,7 +265,7 @@ module Box
 
         it 'allows same end_to_end_reference for two different accounts' do
           other_account = Fabricate(:account, organization_id: account.organization_id, iban: 'DE41405327214540168131')
-          credit = Fabricate(:credit, account_id: other_account.id, eref: 'my-credit-eref')
+          Fabricate(:credit, account_id: other_account.id, eref: 'my-credit-eref')
           post '/credit_transfers', valid_attributes.merge(end_to_end_reference: 'my-credit-eref'), TestHelpers::VALID_HEADERS
           expect_status 201
         end

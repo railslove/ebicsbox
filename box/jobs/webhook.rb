@@ -10,7 +10,8 @@ module Box
       sidekiq_options queue: 'webhooks'
 
       def perform(event_id)
-        if event = Event.find(id: event_id)
+        event = Event.find(id: event_id)
+        if event
           delivery = WebhookDelivery.deliver(event)
           Box.logger.info("[Jobs::Webhook] Attempt to deliver a webhook. event_id=#{event.id} delivery_id=#{delivery.id}")
         else

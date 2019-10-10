@@ -58,7 +58,7 @@ module Box
         it 'does not include transactions from accounts belonging to a different organization' do
           other_orga = Fabricate(:organization)
           account = other_orga.add_account(organization_id: 2, iban: 'OTHERIBAN')
-          trx2 = account.add_statement(eref: 'trx-2')
+          account.add_statement(eref: 'trx-2')
 
           get '/transactions', TestHelpers::VALID_HEADERS
           expect_json_sizes 1

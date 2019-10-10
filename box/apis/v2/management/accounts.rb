@@ -94,7 +94,8 @@ module Box
               optional :mode, type: String, desc: 'mode'
             end
             post do
-              if account = current_organization.add_account(declared(params))
+              account = current_organization.add_account(declared(params))
+              if account
                 Event.account_created(account)
                 present account, with: Entities::ManagementAccount
               else

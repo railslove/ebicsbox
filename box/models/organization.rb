@@ -31,7 +31,7 @@ module Box
 
     def find_account!(iban)
       accounts_dataset.first!(iban: iban)
-    rescue Sequel::NoMatchingRow => ex
+    rescue Sequel::NoMatchingRow => _ex
       raise Account::NotFound.for_orga(organization_id: id, iban: iban)
     end
   end

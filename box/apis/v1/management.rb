@@ -75,7 +75,9 @@ module Box
               optional :mode, type: String, desc: 'mode'
             end
             post do
-              if account = current_organization.add_account(params)
+              account = current_organization.add_account(params)
+
+              if account
                 Event.account_created(account)
                 present account, with: Entities::ManagementAccount
               else
@@ -86,11 +88,11 @@ module Box
             put ':id/submit' do
               account = current_organization.accounts_dataset.first!(iban: params[:id])
               account.setup!
-            rescue Account::AlreadyActivated => ex
+            rescue Account::AlreadyActivated => _ex
               error!({ message: 'Account is already activated' }, 400)
-            rescue Account::IncompleteEbicsData => ex
+            rescue Account::IncompleteEbicsData => _ex
               error!({ message: 'Incomplete EBICS setup' }, 400)
-            rescue StandardError => ex
+            rescue StandardError => _ex
               error!({ message: 'unknown failure' }, 400)
             end
 
@@ -114,7 +116,7 @@ module Box
               else
                 error!({ message: 'Failed to update account' }, 400)
               end
-            rescue Sequel::NoMatchingRow => ex
+            rescue Sequel::NoMatchingRow => _ex
               error!({ message: 'Your organization does not have an account with given IBAN!' }, 400)
             end
           end
@@ -181,7 +183,8 @@ module Box
               optional :token, type: String, desc: 'Set a custom access token'
             end
             post do
-              if user = current_organization.add_user(name: params[:name], access_token: params[:token])
+              user = current_organization.add_user(name: params[:name], access_token: params[:token])
+              if user
                 {
                   message: 'User has been created successfully!',
                   user: Entities::User.represent(user, include_token: true)

@@ -17,7 +17,7 @@ module Pain
     else
       raise UnknownInput, 'Unknown xml file contents'
     end
-  rescue Nokogiri::XML::XPath::SyntaxError => ex
+  rescue Nokogiri::XML::XPath::SyntaxError => _ex
     raise UnknownInput, 'Invalid XML input'
   end
 end
