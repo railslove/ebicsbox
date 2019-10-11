@@ -71,9 +71,9 @@ module Box
             requires :iban, type: String, desc: 'the customers account'
 
             given currency: ->(val) { val != 'EUR' } do
-              optional :fee_handling, type: Symbol, values: %i[split sender receiver], default: :split
-              requires :bic,          type: String, desc: 'the customers bic', allow_blank: false
+              requires :bic, type: String, desc: 'the customers bic', allow_blank: false
               requires :country_code, type: String, desc: 'the customers country', allow_blank: false
+              optional :fee_handling, type: Symbol, values: %i[split sender receiver], default: :split
             end
 
             given currency: ->(val) { val == 'EUR' } do
@@ -90,10 +90,17 @@ module Box
           post do
             account = current_organization.find_account!(params[:account])
 
-            if params[:currency] == 'EUR'
-              Credit.v2_create!(current_user, account, declared(params))
+            # dirty workaround for grape issue with "same dependant param given"
+            # TL;DR: declared params contain keys even though the condition for them is not met
+            # https://github.com/ruby-grape/grape/issues/1885
+            sanitized_params = declared(params)
+
+            if sanitized_params[:currency] == 'EUR'
+              sanitized_params.reject! { |k, _v| k.in? %w[big country_code fee_handling] } # still related to workaround
+              Credit.v2_create!(current_user, account, sanitized_params)
             else
-              ForeignCredit.v2_create!(current_user, account, declared(params))
+              sanitized_params.reject! { |k, _v| k.in? %w[urgent] } # still related to workaround
+              ForeignCredit.v2_create!(current_user, account, sanitized_params)
             end
 
             { message: 'Credit transfer has been initiated successfully!' }
