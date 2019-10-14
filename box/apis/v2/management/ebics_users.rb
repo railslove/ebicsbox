@@ -29,6 +29,10 @@ module Box
               unless env['box.admin']
                 error!({ message: 'Unauthorized access. Please provide a valid organization management token!' }, 401)
               end
+
+              @account = current_organization.accounts_dataset.first!(iban: params[:iban])
+            rescue Sequel::NoMatchingRow
+              error!({ message: 'Your organization does not have an account with given IBAN!' }, 404)
             end
 
             desc 'Service', hidden: true
@@ -50,9 +54,7 @@ module Box
                 requires :id, type: Integer, desc: 'ID of the ebics_user'
               end
               get ':id/ini_letter' do
-                ebics_user = EbicsUser.association_join(:accounts)
-                                      .where(accounts__organization_id: current_organization.id, iban: params[:iban])
-                                      .first!(Sequel.qualify(:ebics_users, :id) => params[:id])
+                ebics_user = @account.ebics_users_dataset.first!(Sequel.qualify(:ebics_users, :id) => params[:id])
                 if ebics_user.ini_letter.nil?
                   error!({ message: 'EbicsUser setup not yet initiated!' }, 412)
                 else
@@ -74,10 +76,7 @@ module Box
               params do
               end
               get do
-                account = current_organization.accounts_dataset.first!(iban: params[:iban])
-                present account.ebics_users, with: Entities::EbicsUser
-              rescue Sequel::NoMatchingRow
-                error!({ message: 'Your organization does not have an account with given IBAN!' }, 404)
+                present @account.ebics_users, with: Entities::EbicsUser
               end
 
               ###
@@ -96,22 +95,19 @@ module Box
                 requires :ebics_user, type: String, unique_ebics_user: true, desc: 'EBICS user to represent'
               end
               post do
-                account = current_organization.accounts_dataset.first!(iban: params[:iban])
-                ebics_user = account.add_ebics_user(
+                ebics_user = @account.add_ebics_user(
                   user_id: declared(params)[:user_id],
                   remote_user_id: declared(params)[:ebics_user],
-                  partner: account.partner
+                  partner: @account.partner
                 )
                 error!({ message: 'Failed to create ebics_user' }, 400) unless ebics_user
 
-                if ebics_user.setup!(account)
+                if ebics_user.setup!(@account)
                   present ebics_user, with: Entities::EbicsUser
                 else
                   ebics_user.destroy
                   error!({ message: 'Failed to setup ebics_user. Make sure your data is valid and retry!' }, 412)
                 end
-              rescue Sequel::NoMatchingRow
-                error!({ message: 'Your organization does not have an account with given IBAN!' }, 404)
               end
             end
           end
