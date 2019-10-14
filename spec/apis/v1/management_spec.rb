@@ -120,16 +120,6 @@ module Box
             put "management/accounts/#{account.iban}", { bic: 'new-bic' }, 'Authorization' => "Bearer #{user.access_token}"
             expect(account.reload.bic).not_to eql('new-bic')
           end
-
-          it 'ignores iban if it did not change' do
-            put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name' }, 'Authorization' => "Bearer #{user.access_token}"
-            expect(account.reload.name).to eql('new name')
-          end
-
-          it 'ignores the access_token attribute' do
-            put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name', access_token: user.access_token }, 'Authorization' => "Bearer #{user.access_token}"
-            expect(account.reload.name).to eql('new name')
-          end
         end
 
         context 'inactive account' do

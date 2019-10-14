@@ -7,7 +7,7 @@ module Box
     include_context 'admin user'
 
     describe 'POST /organizations' do
-      context 'invalid body' do
+      context 'empty body' do
         before { post 'management/organizations', {}, TestHelpers::VALID_HEADERS }
 
         it 'rejects empty posts' do
@@ -34,8 +34,8 @@ module Box
           expect { do_request }.to change(Organization, :count).by(1)
         end
 
-        it 'also creates a new admin' do
-          expect { do_request }.to change(User.where(admin: true), :count).by(1)
+        it 'creates a new admin' do
+          expect { do_request }.to change(User.where(admin: true, name: 'Foo Bar'), :count).by(1)
         end
 
         it 'returns a 201 status' do
