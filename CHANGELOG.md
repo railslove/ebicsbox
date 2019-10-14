@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.9
+
+- `[FEATURE]` Create organizations through v2 API
+- `[ENHANCEMENT]` Ensure contradicting params for credit_transfers are handled (i.e. urgent with foreign currency)
+- `[HOUSEKEEPING]` Aligns code with current rubocop guidelines
+- `[HOUSEKEEPING]` Improves v2 management ebics_users endpoint-implementation
+
 ## 1.3.8
 
 - `[FEATURE]` Now supports rollbar, README updated
