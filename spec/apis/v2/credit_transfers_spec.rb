@@ -270,6 +270,17 @@ module Box
           expect_status 201
         end
 
+        it 'ignores fee_handling & country_code flag' do
+          allow(Credit).to receive(:v2_create!).and_return(true)
+          post '/credit_transfers', valid_attributes.merge(fee_handling: :split, country_code: 'FooBar'), TestHelpers::VALID_HEADERS
+
+          expected_attributes = valid_attributes
+                                .merge(reference: nil, execution_date: Date.today, urgent: false, currency: 'EUR')
+                                .stringify_keys
+
+          expect(Credit).to have_received(:v2_create!).with(anything, anything, expected_attributes)
+        end
+
         context 'foreign currency' do
           before do
             allow_any_instance_of(Epics::Client).to receive(:HTD).and_return(File.read('spec/fixtures/htd.xml'))
@@ -281,10 +292,15 @@ module Box
           end
         end
 
-        context 'when sandbox server mode' do
-          before { allow(Box.configuration).to receive(:sandbox?).and_return(true) }
+        it 'ignores urgent flag' do
+          allow(ForeignCredit).to receive(:v2_create!).and_return(true)
+          post '/credit_transfers', valid_attributes_foreign.merge(urgent: true), TestHelpers::VALID_HEADERS
 
-          it 'executes order immediately'
+          expected_attributes = valid_attributes_foreign
+                                .merge(reference: nil, execution_date: Date.today, fee_handling: :split)
+                                .stringify_keys
+
+          expect(ForeignCredit).to have_received(:v2_create!).with(anything, anything, expected_attributes)
         end
       end
     end
