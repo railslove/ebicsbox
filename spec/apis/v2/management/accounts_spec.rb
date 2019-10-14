@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 module Box
-  RSpec.describe Apis::V2::Management do
+  RSpec.describe Apis::V2::Management::Accounts do
     include_context 'admin user'
 
     let(:other_organization) { Fabricate(:organization) }
@@ -105,27 +105,21 @@ module Box
         before { account.add_ebics_user(activated_at: 1.hour.ago) }
 
         it 'cannot change iban' do
-          expect {
+          expect do
             put "management/accounts/#{account.iban}", { iban: 'new-iban' }, TestHelpers::VALID_HEADERS
-          }.to_not(change { account.reload.iban })
+          end.to_not(change { account.reload.iban })
         end
 
         it 'cannot change bic' do
-          expect {
+          expect do
             put "management/accounts/#{account.iban}", { bic: 'new-bic' }, TestHelpers::VALID_HEADERS
-          }.to_not(change { account.reload.bic })
+          end.to_not(change { account.reload.bic })
         end
 
         it 'ignores iban if it did not change' do
-          expect {
-            put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name' }, TestHelpers::VALID_HEADERS
-          }.to(change { account.reload.name })
-        end
+          put "management/accounts/#{account.iban}", { iban: 'old-iban', name: 'new name' }, TestHelpers::VALID_HEADERS
 
-        it 'ignores the access_token attribute' do
-          expect {
-            put "management/accounts/#{account.iban}", iban: 'old-iban', name: 'new name', access_token: user.access_token
-          }.to(change { account.reload.name })
+          expect(account.reload.name).to eql('new name')
         end
       end
     end

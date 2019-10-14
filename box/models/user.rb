@@ -12,7 +12,7 @@ module Box
 
     def before_create
       super
-      self.access_token ||= SecureRandom.hex(32)
+      self.access_token ||= SecureRandom.hex(32) unless access_token.present?
     end
 
     def self.find_by_access_token(access_token)

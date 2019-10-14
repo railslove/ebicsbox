@@ -39,23 +39,6 @@ module Box
           end
         end
 
-        describe 'authenticated user via query parameter' do
-          let!(:organization) { Fabricate(:organization) }
-          let!(:user) { Box::User.create(name: 'Test User', access_token: 'test-token', organization: organization) }
-
-          it 'returns a user' do
-            env = Rack::MockRequest.env_for('/?access_token=test-token')
-            expect(app).to receive(:call).with(hash_including('box.user' => user))
-            middleware.call(env)
-          end
-
-          it 'returns an organization' do
-            env = Rack::MockRequest.env_for('/?access_token=test-token')
-            expect(app).to receive(:call).with(hash_including('box.organization' => organization))
-            middleware.call(env)
-          end
-        end
-
         describe 'authenticated user via legacy header' do
           let!(:organization) { Fabricate(:organization) }
           let!(:user) { Box::User.create(name: 'Test User', access_token: 'test-token', organization: organization) }

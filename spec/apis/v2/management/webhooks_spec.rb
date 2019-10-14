@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 module Box
-  RSpec.describe Apis::V2::Management do
+  RSpec.describe Apis::V2::Management::Webhooks do
     include_context 'valid user'
     include_context 'with account'
     include_context 'with account from other organization'

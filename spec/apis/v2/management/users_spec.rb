@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 module Box
-  RSpec.describe Apis::V2::Management do
+  RSpec.describe Apis::V2::Management::Users do
     include_context 'admin user'
 
     let(:other_organization) { Fabricate(:organization) }
@@ -27,22 +27,22 @@ module Box
       end
 
       it 'creates a new user for the organization' do
-        expect { perform_request }.to change { User.count }.by(1)
+        expect { perform_request }.to change(User, :count).by(1)
       end
 
       it 'auto generates an access token if none is provided' do
-        perform_request(token: nil)
+        perform_request(access_token: nil)
         expect_json_types 'access_token', :string
       end
 
       it 'uses the provided access token' do
-        perform_request(token: 'secret')
+        perform_request(access_token: 'secret')
         expect_json 'access_token', 'secret'
       end
     end
 
     describe 'DELETE /management/users/:id' do
-      let!(:user_to_delete) { Fabricate(:user) }
+      let!(:user_to_delete) { Fabricate(:user, organization: organization) }
 
       it 'deletes an existing user' do
         expect { delete("management/users/#{user_to_delete.id}", {}, TestHelpers::VALID_HEADERS) }.to(

@@ -20,7 +20,7 @@ module Box
       private
 
       def load_user_auth_data(request)
-        access_token = request.params['access_token'] || request.env['HTTP_AUTHORIZATION'].to_s[/\A(?:token|Bearer) (.+)\z/, 1]
+        access_token = request.env['HTTP_AUTHORIZATION'].to_s[/\A(?:token|Bearer) (.+)\z/, 1]
         user = User.find_by_access_token(access_token)
 
         {
