@@ -47,7 +47,7 @@ module Box
                    produces: ['application/vnd.ebicsbox-v2+json']
 
               get do
-                accounts = current_organization.accounts_dataset.all.sort { |a1, a2| a1.name.to_s.downcase <=> a2.name.to_s.downcase }
+                accounts = current_organization.accounts_dataset.order(:name).all
                 present accounts, with: Entities::ManagementAccount
               end
 

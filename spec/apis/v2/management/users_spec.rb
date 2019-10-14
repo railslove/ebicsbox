@@ -42,7 +42,7 @@ module Box
     end
 
     describe 'DELETE /management/users/:id' do
-      let!(:user_to_delete) { Fabricate(:user) }
+      let!(:user_to_delete) { Fabricate(:user, organization: organization) }
 
       it 'deletes an existing user' do
         expect { delete("management/users/#{user_to_delete.id}", {}, TestHelpers::VALID_HEADERS) }.to(

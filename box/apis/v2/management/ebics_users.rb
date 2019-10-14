@@ -76,6 +76,8 @@ module Box
               get do
                 account = current_organization.accounts_dataset.first!(iban: params[:iban])
                 present account.ebics_users, with: Entities::EbicsUser
+              rescue Sequel::NoMatchingRow
+                error!({ message: 'Your organization does not have an account with given IBAN!' }, 404)
               end
 
               ###
@@ -95,19 +97,21 @@ module Box
               end
               post do
                 account = current_organization.accounts_dataset.first!(iban: params[:iban])
-                declared_params = declared(params)
-                ebics_user = declared_params.delete(:ebics_user)
-                ebics_user = account.add_ebics_user(declared_params.merge(remote_user_id: ebics_user, partner: account.partner))
-                if ebics_user
-                  if ebics_user.setup!(account)
-                    present ebics_user, with: Entities::EbicsUser
-                  else
-                    ebics_user.destroy
-                    error!({ message: 'Failed to setup ebics_user. Make sure your data is valid and retry!' }, 412)
-                  end
+                ebics_user = account.add_ebics_user(
+                  user_id: declared(params)[:user_id],
+                  remote_user_id: declared(params)[:ebics_user],
+                  partner: account.partner
+                )
+                error!({ message: 'Failed to create ebics_user' }, 400) unless ebics_user
+
+                if ebics_user.setup!(account)
+                  present ebics_user, with: Entities::EbicsUser
                 else
-                  error!({ message: 'Failed to create ebics_user' }, 400)
+                  ebics_user.destroy
+                  error!({ message: 'Failed to setup ebics_user. Make sure your data is valid and retry!' }, 412)
                 end
+              rescue Sequel::NoMatchingRow
+                error!({ message: 'Your organization does not have an account with given IBAN!' }, 404)
               end
             end
           end

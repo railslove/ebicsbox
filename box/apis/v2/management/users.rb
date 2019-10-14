@@ -100,11 +100,10 @@ module Box
               end
 
               delete ':id' do
-                user = Box::User[params[:id]]
-                return error!({ message: 'User not found' }, 404) unless user
-
-                user.destroy
+                user = current_organization.users_dataset.first!(id: declared(params)['id'])&.destroy
                 status 204
+              rescue Sequel::NoMatchingRow
+                error!({ message: 'User not found' }, 404)
               end
             end
           end
