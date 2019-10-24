@@ -44,9 +44,9 @@ module Box
         import_stats
       rescue Sequel::NoMatchingRow => _ex
         Box.logger.error("[Jobs::FetchUpcomingStatements] Could not find Account ##{account.id}")
-      rescue Epics::Error::BusinessError => _ex
+      rescue Epics::Error::BusinessError => ex
         # The BusinessError can occur when no new statements are available
-        Box.logger.error("[Jobs::FetchUpcomingStatements] EBICS error. id=#{account.id} reason='#{e.message}'")
+        Box.logger.error("[Jobs::FetchUpcomingStatements] EBICS error. id=#{account.id} reason='#{ex.message}'")
       end
 
       def import_to_database(chunks, account)
@@ -63,16 +63,12 @@ module Box
 
       private
 
-      def options
-        @options ||= {}
-      end
-
       def safe_from
-        options.fetch(:from, Date.today)
+        options&.dig(:from) || Date.today
       end
 
       def safe_to
-        options.fetch(:to, 30.days.from_now.to_date)
+        options&.dig(:to) || 30.days.from_now.to_date
       end
     end
   end

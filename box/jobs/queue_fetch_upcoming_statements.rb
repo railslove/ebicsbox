@@ -18,7 +18,7 @@ module Box
       sidekiq_options queue: 'check.statements', retry: false
 
       def perform(account_ids = [], options = {})
-        log(:debug, 'Queue fetch statements')
+        log(:debug, 'Queue fetch upcoming statements')
         account_ids = Account.all_active_ids if account_ids.empty?
 
         account_ids.each do |account_id|
