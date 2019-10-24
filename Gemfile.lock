@@ -39,7 +39,7 @@ GEM
       multi_json (~> 1)
       statsd-ruby (~> 1.1)
     builder (3.2.3)
-    cmxl (1.4.0)
+    cmxl (1.4.2)
       rchardet19
     coderay (1.1.2)
     coercible (1.0.0)
