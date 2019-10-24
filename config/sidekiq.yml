@@ -23,6 +23,6 @@ schedule:
     queue: "check.activations"
   fetch_upcoming_account_statements:
     every: "60m"
-    class: Box::Jobs::FetchUpcomingStatements
+    class: Box::Jobs::QueueFetchUpcomingStatements
     queue: "check.statements"
 dynamic: true

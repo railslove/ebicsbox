@@ -10,29 +10,21 @@ module Box
       let(:account) { Account.create(host: 'HOST', iban: 'iban1234567') }
       let!(:ebics_user) { account.add_ebics_user(signature_class: 'T', activated_at: 1.day.ago) }
 
-      describe '.for_account' do
-        it 'fetches statement for a single account' do
-          expect_any_instance_of(described_class).to receive(:fetch_for_account).with(account.id)
-          described_class.for_account(account.id)
-        end
-      end
-
       describe '#perform' do
-        it 'fetches statements for every submitted account' do
-          allow(job).to receive(:fetch_for_account)
-          job.perform(account_ids: [1, 2, 3])
+        it 'raises error when no account id given' do
+          expect { job.perform(nil) }.to raise_error(FetchUpcomingStatementsError)
+        end
+
+        it 'fetches statements for provided account' do
+          allow(job).to receive(:fetch_for_account).with(account)
+          job.perform(account.id)
         end
 
         it 'sets default daterange if not provided' do
           allow(job).to receive(:fetch_for_account).and_return(true)
-          job.perform(account_ids: [1, 2, 3])
+          job.perform(account.id)
           expect(job.send(:safe_from)).to eql(Date.today)
           expect(job.send(:safe_to)).to eql(30.days.from_now.to_date)
-        end
-
-        it 'uses all account ids if none provided' do
-          expect(Account).to receive(:all_active_ids).and_return([])
-          job.perform({})
         end
 
         it 'raises error when account uses camt instead of mt940' do
@@ -43,7 +35,7 @@ module Box
               .with("[Jobs::FetchUpcomingStatements] Skip VMK for #{account.id}. Currently only MT942 is supported")
           )
 
-          job.perform({})
+          job.perform(account.id)
         end
       end
 
@@ -51,7 +43,7 @@ module Box
         let(:client) { double('Epics Client') }
 
         def call_job
-          job.fetch_for_account(account.id)
+          job.fetch_for_account(account)
         end
 
         before do
@@ -82,7 +74,7 @@ module Box
         end
 
         context 'with timeframe' do
-          subject(:job) { described_class.new(from: Date.new(2019, 6, 1), to: Date.new(2019, 10, 31)) }
+          before { job.send(:options=, from: Date.new(2019, 6, 1), to: Date.new(2019, 10, 31)) }
 
           it 'fetches statements from remote server' do
             call_job

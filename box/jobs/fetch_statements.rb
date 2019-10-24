@@ -13,6 +13,7 @@ require_relative '../models/account'
 
 module Box
   module Jobs
+    class FetchStatementsError < StandardError; end
     class FetchStatements
       include Sidekiq::Worker
       sidekiq_options queue: 'check.statements', retry: false
@@ -20,20 +21,20 @@ module Box
       attr_accessor :from, :to
 
       def perform(account_id, options = {})
-        return unless account_id
+        account = Account[account_id]
+        raise FetchStatementsError, "No Account found for #{account_id}" unless account
 
         options.symbolize_keys!
 
         self.from = options.fetch(:from, 7.days.ago.to_date)
         self.to = options.fetch(:to, Date.today)
 
-        fetch_for_account(account_id)
+        fetch_for_account(account)
       end
 
       # Fetch all new statements for a single account since its last import. Each account import
       # can fail and should not affect imports for other accounts.
-      def fetch_for_account(account_id)
-        account = Account.first!(id: account_id)
+      def fetch_for_account(account)
         method = account.statements_format
 
         chunks = send(method, account.transport_client, from, to)
@@ -44,14 +45,14 @@ module Box
         # Update imported at timestamp
         update_account_last_import(account, to)
 
-        Box.logger.info { "[Jobs::FetchStatements] Imported bank statements. id=#{account_id} bank_statement_count=#{chunks.count}" }
+        Box.logger.info { "[Jobs::FetchStatements] Imported bank statements. id=#{account.id} bank_statement_count=#{chunks.count}" }
 
         import_stats
       rescue Sequel::NoMatchingRow => ex
-        Box.logger.error { "[Jobs::FetchStatements] Could not find account. account_id=#{account_id}" }
+        Box.logger.error { "[Jobs::FetchStatements] Could not find account. account.id=#{account.id}" }
       rescue Epics::Error::BusinessError => ex
         # The BusinessError can occur when no new statements are available
-        Box.logger.error { "[Jobs::FetchStatements] EBICS error. id=#{account_id} reason='#{ex.message}'" }
+        Box.logger.error { "[Jobs::FetchStatements] EBICS error. id=#{account.id} reason='#{ex.message}'" }
       end
 
       def import_to_database(chunks, account)
@@ -59,7 +60,7 @@ module Box
           bank_statement = BusinessProcesses::ImportBankStatement.from_cmxl(chunk, account)
           BusinessProcesses::ImportStatements.from_bank_statement(bank_statement)
         rescue BusinessProcesses::ImportBankStatement::InvalidInput => ex
-          Box.logger.error { "[Jobs::FetchStatements] #{ex} account_id=#{account.id}" }
+          Box.logger.error { "[Jobs::FetchStatements] #{ex} account.id=#{account.id}" }
           { total: 0, imported: 0 }
         end.reduce(total: 0, imported: 0) do |memo, chunk_stats|
           {

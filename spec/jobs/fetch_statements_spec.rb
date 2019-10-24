@@ -11,14 +11,18 @@ module Box
       let!(:ebics_user) { account.add_ebics_user(signature_class: 'T', activated_at: 1.day.ago) }
 
       describe '#perform' do
-        it 'fetches statements for every submitted account' do
-          allow(job).to receive(:fetch_for_account)
-          job.perform(account_ids: [1, 2, 3])
+        it 'raises error when no account id given' do
+          expect { job.perform(nil) }.to raise_error(FetchStatementsError)
+        end
+
+        it 'fetches statements for provided account' do
+          allow(job).to receive(:fetch_for_account).with(account)
+          job.perform(account.id)
         end
 
         it 'sets default daterange if not provided' do
           allow(job).to receive(:fetch_for_account).and_return(true)
-          job.perform(account_ids: [1, 2, 3])
+          job.perform(account.id)
           expect(job.from).to eql(7.days.ago.to_date)
           expect(job.to).to eql(Date.today)
         end
@@ -31,7 +35,6 @@ module Box
           account.imported_at!(1.day.ago)
           allow_any_instance_of(EbicsUser).to receive(:client) { client }
           allow(client).to receive(:STA).and_return(File.read('spec/fixtures/mt940.txt'))
-          allow(Account).to receive(:[]).and_return(double('account', organization: double('orga', webhook_token: 'token')))
 
           allow(BusinessProcesses::ImportBankStatement).to receive(:from_cmxl).and_call_original
           allow(BusinessProcesses::ImportStatements).to receive(:from_bank_statement).and_call_original

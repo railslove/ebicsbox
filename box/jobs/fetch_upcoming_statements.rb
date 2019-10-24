@@ -13,36 +13,25 @@ require_relative '../models/account'
 
 module Box
   module Jobs
+    class FetchUpcomingStatementsError < StandardError; end
     class FetchUpcomingStatements
       include Sidekiq::Worker
       sidekiq_options queue: 'check.statements', retry: false
 
       attr_accessor :options
 
-      def self.for_account(account_id, options = {})
-        new(options).fetch_for_account(account_id)
-      end
+      def perform(account_id, options = {})
+        account = Account[account_id]
+        raise FetchUpcomingStatementsError, 'Account-ID missing' unless account
 
-      def initialize(options = {})
-        self.options = options
-      end
-
-      def perform(options = {})
         self.options = options.symbolize_keys!
 
-        account_ids = options.fetch(:account_ids, [])
-        account_ids = Account.all_active_ids if account_ids.empty?
-
-        account_ids.each do |account_id|
-          fetch_for_account(account_id)
-        end
+        fetch_for_account(account)
       end
 
-      def fetch_for_account(account_id)
-        account = Account.first!(id: account_id)
-
+      def fetch_for_account(account)
         if account.statements_format != 'mt940'
-          Box.logger.info("[Jobs::FetchUpcomingStatements] Skip VMK for #{account_id}. Currently only MT942 is supported")
+          Box.logger.info("[Jobs::FetchUpcomingStatements] Skip VMK for #{account.id}. Currently only MT942 is supported")
           return
         end
 
@@ -50,14 +39,14 @@ module Box
         chunks = Cmxl.parse(vmk_data)
         import_stats = import_to_database(chunks, account)
 
-        Box.logger.info("[Jobs::FetchUpcomingStatements] Imported #{chunks.count} VMK(s) for Account ##{account_id}.")
+        Box.logger.info("[Jobs::FetchUpcomingStatements] Imported #{chunks.count} VMK(s) for Account ##{account.id}.")
 
         import_stats
       rescue Sequel::NoMatchingRow => _ex
-        Box.logger.error("[Jobs::FetchUpcomingStatements] Could not find Account ##{account_id}")
+        Box.logger.error("[Jobs::FetchUpcomingStatements] Could not find Account ##{account.id}")
       rescue Epics::Error::BusinessError => _ex
         # The BusinessError can occur when no new statements are available
-        Box.logger.error("[Jobs::FetchUpcomingStatements] EBICS error. id=#{account_id} reason='#{e.message}'")
+        Box.logger.error("[Jobs::FetchUpcomingStatements] EBICS error. id=#{account.id} reason='#{e.message}'")
       end
 
       def import_to_database(chunks, account)
@@ -73,6 +62,10 @@ module Box
       end
 
       private
+
+      def options
+        @options ||= {}
+      end
 
       def safe_from
         options.fetch(:from, Date.today)
