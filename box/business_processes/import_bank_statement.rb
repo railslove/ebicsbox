@@ -29,21 +29,24 @@ module Box
 
       # In case we already have a fully parsed MT940 file
       def self.from_cmxl(raw_bank_statement, account)
-        verify_arguments(raw_bank_statement, account)
+        validate_params(raw_bank_statement, account)
         bank_statement = find_or_create_bank_statement(raw_bank_statement, account)
         update_meta_data(raw_bank_statement, account)
         bank_statement
       end
 
-      def self.verify_arguments(raw_bank_statement, account)
+      def self.validate_params(raw_bank_statement, account)
         raise(InvalidInput, 'Cannot import empty bank statement.') if raw_bank_statement.blank?
-        raise(InvalidInput, 'Cannot import bank statement for unknown sub-account.') unless valid_account?(raw_bank_statement, account)
+
+        validate_account!(raw_bank_statement, account)
       end
 
       # This is required as Deutsche Bank has a very weird MT940 file format
-      def self.valid_account?(raw_bank_statement, account)
+      def self.validate_account!(raw_bank_statement, account)
         account_number = raw_bank_statement.account_identification.account_number
-        !(!(account.iban.end_with?(account_number) || (account.iban + '00').end_with?(account_number)))
+        return if account.iban.end_with?(account_number) || (account.iban + '00').end_with?(account_number)
+
+        raise(InvalidInput, "Cannot import bank statement for unknown sub-account #{account_number}.")
       end
 
       def self.find_or_create_bank_statement(raw_bank_statement, account)

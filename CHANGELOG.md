@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.12
+
+- `[ENHANCEMENT]` Improves logging when failing to import statement due to unknown subaccount
+
 ## 1.3.11
 
 - `[BUGFIX]` Changing interval to fetch upcoming statements now uses correct class
