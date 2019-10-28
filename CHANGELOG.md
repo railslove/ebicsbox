@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.10
+
+- `[ENHANCEMENT]` Queues VMK-jobs separatly so a single failure does not interfer with other imports
+- `[HOUSEKEEPING]` Updates CMXL-Gem to fix some weird bank responses
+
 ## 1.3.9
 
 - `[FEATURE]` Create organizations through v2 API
