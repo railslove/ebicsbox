@@ -82,7 +82,7 @@ Sidekiq.configure_server do |config|
       Sidekiq.set_schedule(
         'fetch_upcoming_account_statements',
         every: "#{upcoming_statements_interval}m",
-        class: 'Box::Jobs::FetchUpcomingStatements',
+        class: 'Box::Jobs::QueueFetchUpcomingStatements',
         queue: 'check.statements'
       )
     end

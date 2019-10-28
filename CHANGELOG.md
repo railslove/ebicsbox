@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.11
+
+- `[BUGFIX]` Changing interval to fetch upcoming statements now uses correct class
+
 ## 1.3.10
 
 - `[ENHANCEMENT]` Queues VMK-jobs separatly so a single failure does not interfer with other imports
