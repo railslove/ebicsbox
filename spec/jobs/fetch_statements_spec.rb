@@ -52,6 +52,15 @@ module Box
           expect(BusinessProcesses::ImportStatements).to have_received(:from_bank_statement).exactly(bank_statements_for_this_account).times
         end
 
+        it 'does nothing when no data is provided' do
+          allow(client).to receive(:STA).and_return(nil)
+
+          job.perform(account.id)
+
+          expect(BusinessProcesses::ImportBankStatement).not_to have_received(:from_cmxl)
+          expect(BusinessProcesses::ImportStatements).not_to have_received(:from_bank_statement)
+        end
+
         context 'with timeframe' do
           subject(:call_job) do
             described_class.new.perform(account.id, from: Date.new(2015, 12, 1), to: Date.new(2015, 12, 31))

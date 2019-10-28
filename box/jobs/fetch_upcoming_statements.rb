@@ -36,6 +36,8 @@ module Box
         end
 
         vmk_data = account.transport_client.VMK(safe_from.to_s(:db), safe_to.to_s(:db))
+        return unless vmk_data
+
         chunks = Cmxl.parse(vmk_data)
         import_stats = import_to_database(chunks, account)
 

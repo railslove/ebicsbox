@@ -38,6 +38,7 @@ module Box
         method = account.statements_format
 
         chunks = send(method, account.transport_client, from, to)
+        return unless chunks
 
         # Store all fetched bank statements for later usage
         import_stats = import_to_database(chunks, account)
@@ -80,11 +81,15 @@ module Box
 
       def camt53(client, from, to)
         combined_camt = client.C53(from.to_s(:db), to.to_s(:db))
+        return unless combined_camt.any?
+
         combined_camt.map { |chunk| CamtParser::String.parse(chunk).statements }.flatten
       end
 
       def mt940(client, from, to)
         combined_mt940 = client.STA(from.to_s(:db), to.to_s(:db))
+        return unless combined_mt940
+
         Cmxl.parse(combined_mt940)
       end
     end

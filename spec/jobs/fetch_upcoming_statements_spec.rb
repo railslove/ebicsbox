@@ -42,10 +42,6 @@ module Box
       describe '.fetch_for_account' do
         let(:client) { double('Epics Client') }
 
-        def call_job
-          job.fetch_for_account(account)
-        end
-
         before do
           allow_any_instance_of(EbicsUser).to receive(:client) { client }
           allow(client).to receive(:VMK).and_return(File.read('spec/fixtures/mt942.txt'))
@@ -59,7 +55,9 @@ module Box
 
         it 'imports all bank statements' do
           included_vmk = 3
-          call_job
+
+          job.fetch_for_account(account)
+
           expect(BusinessProcesses::ImportBankStatement).to(
             have_received(:from_cmxl).exactly(included_vmk).times
           )
@@ -67,24 +65,41 @@ module Box
 
         it 'imports all statements for all bank statements' do
           bank_statements_for_this_account = 3 # One bank statement is for another account, such as a sub-account
-          call_job
+
+          job.fetch_for_account(account)
+
           expect(BusinessProcesses::ImportStatements).to(
             have_received(:from_bank_statement).exactly(bank_statements_for_this_account).times
           )
+        end
+
+        it 'does nothing when no data is provided' do
+          allow(client).to receive(:VMK).and_return(nil)
+
+
+          job.fetch_for_account(account)
+
+
+          expect(BusinessProcesses::ImportBankStatement).not_to have_received(:from_cmxl)
+          expect(BusinessProcesses::ImportStatements).not_to have_received(:from_bank_statement)
         end
 
         context 'with timeframe' do
           before { job.send(:options=, from: Date.new(2019, 6, 1), to: Date.new(2019, 10, 31)) }
 
           it 'fetches statements from remote server' do
-            call_job
+
+            job.fetch_for_account(account)
+
             expect(account.transport_client).to have_received(:VMK).with('2019-06-01', '2019-10-31')
           end
         end
 
         context 'without timeframe' do
           it 'fetches statements from remote server' do
-            call_job
+
+            job.fetch_for_account(account)
+
             expect(account.transport_client).to(
               have_received(:VMK).with(Date.today.to_s, 30.days.from_now.to_date.to_s)
             )
