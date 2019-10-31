@@ -20,7 +20,9 @@ module Box
 
       def update_transaction(account_id, info)
         order_id = info[:ids]['OrderID']
-        trx = Transaction.last(ebics_order_id: info[:ids]['OrderID'], account_id: account_id)
+        return unless order_id
+
+        trx = Transaction.last(ebics_order_id: order_id, account_id: account_id)
 
         unless trx
           log(:info, 'Transaction not found.', account_id: account_id, order_id: order_id, info: info)
