@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.14
+
+- `[ENHANCEMENT]` Enhances Statement SHA calculation to prevent false positive duplicate checks
+
 ## 1.3.13
 
 - `[HOUSEKEEPING]` Updates CMXL-Gem to parse more weird bank responses

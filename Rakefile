@@ -60,6 +60,37 @@ namespace :after_migration do
     p "Updated #{i} Bank Statement SHAs."
   end
 
+  desc 'recalculate SHAs of statements'
+  task :recalculate_statements_sha do
+    env = ENV.fetch('RACK_ENV', :development)
+    if env.to_s != 'production'
+      # Load environment from file
+      require 'dotenv'
+      Dotenv.load
+    end
+
+    require './config/bootstrap'
+    require './box/models/bank_statement'
+
+    Box::BankStatement.each do |statement|
+      payload = [
+        statement.bank_statement&.remote_account,
+        statement.date,
+        statement.amount,
+        statement.iban,
+        statement.name,
+        statement.sign,
+        statement.information
+      ]
+
+      sha = Digest::SHA2.hexdigest(payload.flatten.compact.join).to_s
+
+      statement.update(sha: sha)
+    end
+
+    p "Updated #{i} Bank Statement SHAs."
+  end
+
   desc 'copies partner value to ebics_users'
   task :copy_partners do
     env = ENV.fetch('RACK_ENV', :development)

@@ -64,9 +64,6 @@ module Box
       end
 
       def self.checksum(transaction, bank_statement)
-        eref = transaction.respond_to?(:eref) ? transaction.eref : transaction.sepa['EREF']
-        mref = transaction.respond_to?(:mref) ? transaction.mref : transaction.sepa['MREF']
-
         payload = [
           bank_statement.remote_account,
           transaction.date,
@@ -74,8 +71,7 @@ module Box
           transaction.iban,
           transaction.name,
           transaction.sign,
-          eref,
-          mref
+          transaction.information
         ]
         Digest::SHA2.hexdigest(payload.flatten.compact.join).to_s
       end
