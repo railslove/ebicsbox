@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.13
+
+- `[HOUSEKEEPING]` Updates CMXL-Gem to parse more weird bank responses
+
 ## 1.3.12
 
 - `[ENHANCEMENT]` Improves logging when failing to import statement due to unknown subaccount
