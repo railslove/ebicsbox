@@ -70,9 +70,17 @@ namespace :after_migration do
     end
 
     require './config/bootstrap'
-    require './box/models/bank_statement'
+    require './box/models/statement'
 
-    Box::BankStatement.each do |statement|
+    i = 0
+    statements = Box::Statement.where(sha: nil)
+
+    p "Found #{statements.count}  without a SHA."
+    next if statements.count.zero?
+
+    p 'Recalculating  SHAs.'
+
+    statements.each do |statement|
       payload = [
         statement.bank_statement&.remote_account,
         statement.date,
@@ -85,10 +93,13 @@ namespace :after_migration do
 
       sha = Digest::SHA2.hexdigest(payload.flatten.compact.join).to_s
 
-      statement.update(sha: sha)
+      next if Box::Statement.find(sha: sha) # duplicates.. let's not update them
+
+      statement.update(sha: Digest::SHA2.hexdigest(payload.flatten.join).to_s)
+      i += 1
     end
 
-    p "Updated #{i} Bank Statement SHAs."
+    p "Updated #{i} Statement SHAs."
   end
 
   desc 'copies partner value to ebics_users'
