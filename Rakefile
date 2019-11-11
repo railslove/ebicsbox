@@ -88,7 +88,7 @@ namespace :after_migration do
         statement.iban,
         statement.name,
         statement.sign,
-        statement.information
+        statement.information.gsub(/\s/, '')
       ]
 
       sha = Digest::SHA2.hexdigest(payload.flatten.compact.join).to_s
