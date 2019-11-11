@@ -175,28 +175,34 @@ module Box
         end
       end
 
-      describe 'importing duplicates works flawless' do
+      describe 'duplicates' do
         let(:mt940) { File.read('spec/fixtures/similar_but_not_dup_transactions.mt940') }
+        let(:mt940b) { File.read('spec/fixtures/dup_whitespace_transaction.mt940') }
         let(:bank_statement) { ImportBankStatement.from_mt940(mt940, account) }
 
         it 'importes both statements' do
-          expect { described_class.from_bank_statement(bank_statement, upcoming: true) }.to(
+          expect { described_class.from_bank_statement(bank_statement) }.to(
             change(Statement, :count).by(2)
           )
         end
 
         it 'recognizes duplicates when importing data again' do
           expect {
-            described_class.from_bank_statement(bank_statement, upcoming: true)
-            described_class.from_bank_statement(bank_statement, upcoming: true)
+            described_class.from_bank_statement(bank_statement)
+            described_class.from_bank_statement(bank_statement)
           }.to(change(Statement, :count).by(2))
+        end
+
+        it 'does not import same transaction with different whitespaces in reference' do
+          bank_statement = ImportBankStatement.from_mt940(mt940b, account)
+          expect { described_class.from_bank_statement(bank_statement) }.to change(Statement, :count).by(1)
         end
       end
 
       describe 'importing VMK' do
         let(:mt942) { File.read('spec/fixtures/single_valid.mt942') }
         let(:bank_statement) { ImportBankStatement.from_mt940(mt942, account) }
-        let(:statement) { Box::Statement.first(sha: '623b47783a3ba88e2d264e020ee2d4d0195e4121e9119d9f6a81d7dd02afbef4') }
+        let(:statement) { Box::Statement.first(sha: 'be3a41c6262f85b409fefee10d7515893301411c765ffbf708a36694a365c213') }
 
         it 'imports each statement' do
           expect(described_class).to receive(:create_statement).once

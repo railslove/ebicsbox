@@ -71,7 +71,7 @@ module Box
           transaction.iban,
           transaction.name,
           transaction.sign,
-          transaction.information
+          transaction.information.gsub(/\s/, '')
         ]
         Digest::SHA2.hexdigest(payload.flatten.compact.join).to_s
       end
