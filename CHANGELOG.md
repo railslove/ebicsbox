@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.16
+
+- `[ENHANCEMENT]` Another improvement for handling SHA calculations which relates to camt53 / mt940 differences
+
 ## 1.3.15
 
 - `[ENHANCEMENT]` Enhances the statement SHA calculation further to drop whitespaces from references. camt53 / mt940 seem to handle them differently
