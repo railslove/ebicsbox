@@ -92,7 +92,7 @@ module Box
 
         context 'the statement was already imported' do
           # This is a precalculated SHA based on our algorithm
-          before { Statement.create(sha: '19404d0568b99397f405fdf22c56e58c6d6c781d0fab8fd2bb0e066f3fe29380', account_id: account.id) }
+          before { Statement.create(sha: '964fa5bd7ffdd1614f46324177e14f3d4a19af18e1bb33e0c30b3e019d0323e8', account_id: account.id) }
 
           it 'does not create a statement' do
             expect { exec_create_action }.to_not change(Statement, :count)
