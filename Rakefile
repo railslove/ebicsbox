@@ -36,6 +36,7 @@ namespace :after_migration do
 
     require './config/bootstrap'
     require './box/models/bank_statement'
+    require './lib/checksum_generator'
 
     i = 0
     statements = Box::BankStatement.where(sha: nil)
@@ -52,7 +53,7 @@ namespace :after_migration do
         bs.content
       ]
 
-      bs.update(sha: Digest::SHA2.hexdigest(payload.flatten.join).to_s)
+      bs.update(sha: ChecksumGenerator.from_payload(payload))
 
       i += 1
     end
@@ -71,6 +72,8 @@ namespace :after_migration do
 
     require './config/bootstrap'
     require './box/models/statement'
+    require './lib/checksum_generator'
+
 
     i = 0
     statements = Box::Statement.where(sha: nil)
@@ -98,12 +101,11 @@ namespace :after_migration do
         statement.information.gsub(/\s/, '')
       ]
 
-      Digest::SHA2.hexdigest(payload.flatten.compact.join).to_s
-      sha = Digest::SHA2.hexdigest(payload.flatten.compact.join).to_s
+      sha = ChecksumGenerator.from_payload(payload)
 
       next if Box::Statement.find(sha: sha) # duplicates.. let's not update them
 
-      statement.update(sha: Digest::SHA2.hexdigest(payload.flatten.join).to_s)
+      statement.update(sha: ChecksumGenerator.from_payload(payload))
       i += 1
     end
 

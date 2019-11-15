@@ -44,31 +44,34 @@ module Box
       end
     end
 
-    def self.generic_filter(query, account_id: nil, transaction_id: nil, from: nil, to: nil, type: nil, **_unused)
-      # Filter by account id
-      query = query.where(account_id: account_id) if account_id.present?
+    class << self
 
-      # Filter by transaction id
-      query = query.where(transaction_id: transaction_id) if transaction_id.present?
+      def generic_filter(query, account_id: nil, transaction_id: nil, from: nil, to: nil, type: nil, **_unused)
+        # Filter by account id
+        query = query.where(account_id: account_id) if account_id.present?
 
-      # Filter by statement date
-      query = query.where { statements__date >= from } if from.present?
-      query = query.where { statements__date <= to } if to.present?
+        # Filter by transaction id
+        query = query.where(transaction_id: transaction_id) if transaction_id.present?
 
-      # Filter by type
-      query = query.where(debit: type == 'debit') if type.present?
+        # Filter by statement date
+        query = query.where { statements__date >= from } if from.present?
+        query = query.where { statements__date <= to } if to.present?
 
-      query
-    end
+        # Filter by type
+        query = query.where(debit: type == 'debit') if type.present?
 
-    def self.count_by_account(**generic_filters)
-      query = generic_filter(self, generic_filters)
-      query.count
-    end
+        query
+      end
 
-    def self.paginated_by_account(per_page: 10, page: 1, **generic_filters)
-      query = limit(per_page).offset((page - 1) * per_page).reverse_order(:date, :id)
-      generic_filter(query, generic_filters)
+      def count_by_account(**generic_filters)
+        query = generic_filter(self, generic_filters)
+        query.count
+      end
+
+      def paginated_by_account(per_page: 10, page: 1, **generic_filters)
+        query = limit(per_page).offset((page - 1) * per_page).reverse_order(:date, :id)
+        generic_filter(query, generic_filters)
+      end
     end
 
     def credit?
