@@ -81,6 +81,10 @@ namespace :after_migration do
     p 'Recalculating  SHAs.'
 
     statements.each do |statement|
+      eref = statement.respond_to?(:eref) ? statement.eref : statement.sepa['EREF']
+      mref = statement.respond_to?(:mref) ? statement.mref : statement.sepa['MREF']
+      svwz = statement.respond_to?(:svwz) ? statement.svwz : statement.sepa['SVWZ']
+
       payload = [
         statement.bank_statement&.remote_account,
         statement.date,
@@ -88,9 +92,13 @@ namespace :after_migration do
         statement.iban,
         statement.name,
         statement.sign,
+        eref,
+        mref,
+        svwz,
         statement.information.gsub(/\s/, '')
       ]
 
+      Digest::SHA2.hexdigest(payload.flatten.compact.join).to_s
       sha = Digest::SHA2.hexdigest(payload.flatten.compact.join).to_s
 
       next if Box::Statement.find(sha: sha) # duplicates.. let's not update them
