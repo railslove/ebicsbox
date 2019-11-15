@@ -1,8 +1,8 @@
 # Changelog
 
-## 1.3.17
+## 1.3.16 - 1.3.18
 
-- `[ENHANCEMENT]` Another improvement for handling SHA calculations which relates to camt53 / mt940 differences
+- `[ENHANCEMENT]` Improves dublication checks for statements to handle edge-cases
 
 ## 1.3.15
 
