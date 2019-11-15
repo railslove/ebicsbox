@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.3.16
+## 1.3.17
 
 - `[ENHANCEMENT]` Another improvement for handling SHA calculations which relates to camt53 / mt940 differences
 
