@@ -8,6 +8,7 @@ Sequel.migration do
 
     require 'rake'
     load 'Rakefile'
+
     Rake::Task['migration_tasks:update_statement_sha'].invoke
   end
 

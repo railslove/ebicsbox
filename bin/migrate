@@ -11,6 +11,10 @@ if env.to_s != 'production'
   Dotenv.load
 end
 
+# Load environment
+require 'bundler'
+Bundler.setup(:default, env)
+
 # Load app configuration
 require_relative '../config/bootstrap'
 Sequel.extension :migration, :core_extensions
