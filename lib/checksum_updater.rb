@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require './checksum_generator'
+require_relative './checksum_generator'
+require_relative '../box/models/statement'
 
 class ChecksumUpdater
   PARSERS = { 'mt940' => Cmxl, 'camt53' => CamtParser::Format053::Statement }.freeze
