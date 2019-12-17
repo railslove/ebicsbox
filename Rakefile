@@ -61,8 +61,8 @@ namespace :migration_tasks do
     p "Updated #{i} Bank Statement SHAs."
   end
 
-  desc 'update SHAs of statements'
-  task :update_statement_sha do
+  desc 'calculate new SHA'
+  task :calculate_new_sha do
     env = ENV.fetch('RACK_ENV', :development)
     if env.to_s != 'production'
       # Load environment from file
@@ -72,25 +72,14 @@ namespace :migration_tasks do
 
     require './config/bootstrap'
     require './box/models/statement'
+    require './box/models/bank_statement'
     require './box/business_processes/import_statements'
-    i = 0
 
-    statements = Box::Statement.where(sha: nil)
-
-    p "Found #{statements.count} Statements without a SHA."
-    next if statements.count.zero?
-
-    p 'Recalculating Statement SHAs.'
-
-    statements.each do |statement|
-      sha = Box::BusinessProcesses::ImportStatements.checksum(statement, statement.bank_statement)
-      next if Box::Statement.find(sha: sha) # duplicates.. let's not update them
-
-      statement.update(sha: sha)
-      i += 1
+    bank_statement_count = Box::BankStatement.count
+    Box::BankStatement.all.each.with_index do |bank_statement, index|
+      pp "Processing BankStatement #{index+1}/#{bank_statement_count}"
+      ChecksumUpdater.new(bank_statement).call
     end
-
-    p "Updated #{i} Statement SHAs."
   end
 
   desc 'copies partner value to ebics_users'
