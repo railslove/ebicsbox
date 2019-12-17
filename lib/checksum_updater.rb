@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require './checksum_generator'
+
 class ChecksumUpdater
   PARSERS = { 'mt940' => Cmxl, 'camt53' => CamtParser::Format053::Statement }.freeze
   attr_accessor :baxnk_statement
@@ -9,7 +11,7 @@ class ChecksumUpdater
   end
 
   def call
-    parse_bank_statement(bank_statement).map do |transaction|
+    parse_bank_statement(bank_statement).each do |transaction|
       old_checksum = ChecksumGenerator.from_payload(old_checksum_payload(transaction))
       new_checksum = ChecksumGenerator.from_payload(new_checksum_payload(transaction))
 

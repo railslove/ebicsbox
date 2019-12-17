@@ -71,9 +71,8 @@ namespace :migration_tasks do
     end
 
     require './config/bootstrap'
-    require './box/models/statement'
     require './box/models/bank_statement'
-    require './box/business_processes/import_statements'
+    require './lib/checksum_updater'
 
     bank_statement_count = Box::BankStatement.count
     Box::BankStatement.all.each.with_index do |bank_statement, index|
