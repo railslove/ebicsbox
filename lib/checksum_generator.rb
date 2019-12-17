@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ChecksumGenerator
   class << self
     def from_payload(payload)

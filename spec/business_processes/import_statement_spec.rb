@@ -129,7 +129,6 @@ module Box
       end
 
       describe 'camt bank statement import' do
-
         context 'with trx ids' do
           let(:camt) { File.read('spec/fixtures/camt_statement_with_trx_ids.xml') }
 
@@ -201,10 +200,10 @@ module Box
         end
 
         it 'recognizes duplicates when importing data again' do
-          expect {
+          expect do
             described_class.from_bank_statement(bank_statement)
             described_class.from_bank_statement(bank_statement)
-          }.to(change(Statement, :count).by(2))
+          end.to(change(Statement, :count).by(2))
         end
 
         it 'does not import same transaction with different whitespaces in reference' do

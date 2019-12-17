@@ -45,7 +45,6 @@ module Box
     end
 
     class << self
-
       def generic_filter(query, account_id: nil, transaction_id: nil, from: nil, to: nil, type: nil, **_unused)
         # Filter by account id
         query = query.where(account_id: account_id) if account_id.present?

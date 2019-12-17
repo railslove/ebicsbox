@@ -76,9 +76,7 @@ module Box
         it 'does nothing when no data is provided' do
           allow(client).to receive(:VMK).and_return(nil)
 
-
           job.fetch_for_account(account)
-
 
           expect(BusinessProcesses::ImportBankStatement).not_to have_received(:from_cmxl)
           expect(BusinessProcesses::ImportStatements).not_to have_received(:from_bank_statement)
@@ -88,7 +86,6 @@ module Box
           before { job.send(:options=, from: Date.new(2019, 6, 1), to: Date.new(2019, 10, 31)) }
 
           it 'fetches statements from remote server' do
-
             job.fetch_for_account(account)
 
             expect(account.transport_client).to have_received(:VMK).with('2019-06-01', '2019-10-31')
@@ -97,7 +94,6 @@ module Box
 
         context 'without timeframe' do
           it 'fetches statements from remote server' do
-
             job.fetch_for_account(account)
 
             expect(account.transport_client).to(
