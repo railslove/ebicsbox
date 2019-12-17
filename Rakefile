@@ -69,7 +69,6 @@ namespace :migration_tasks do
       require 'dotenv'
       Dotenv.load
     end
-    require 'pry'; binding.pry
 
     require './config/bootstrap'
     require './box/models/statement'
