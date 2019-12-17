@@ -65,12 +65,24 @@ module Box
       end
 
       def self.checksum(transaction, bank_statement)
+        ChecksumGenerator.from_payload(checksum_attributes(transaction, bank_statement))
+      end
+
+      def self.checksum_attributes(transaction, bank_statement)
+        if transaction.respond_to?(:transaction_id) && transaction.transaction_id.present?
+          [bank_statement.remote_account, transaction.transaction_id]
+        else
+          payload_from_transaction_attributes(transaction, bank_statement.remote_account)
+        end
+      end
+
+      def self.payload_from_transaction_attributes(transaction, remote_account)
         eref = transaction.respond_to?(:eref) ? transaction.eref : transaction.sepa['EREF']
         mref = transaction.respond_to?(:mref) ? transaction.mref : transaction.sepa['MREF']
         svwz = transaction.respond_to?(:svwz) ? transaction.svwz : transaction.sepa['SVWZ']
 
-        payload = [
-          bank_statement.remote_account,
+        [
+          remote_account,
           transaction.date,
           transaction.amount_in_cents,
           transaction.iban,
@@ -81,7 +93,6 @@ module Box
           svwz,
           transaction.information.gsub(/\s/, '')
         ]
-        ChecksumGenerator.from_payload(payload)
       end
 
       def self.statement_attributes_from_bank_transaction(transaction, bank_statement)

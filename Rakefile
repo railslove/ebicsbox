@@ -24,7 +24,7 @@ namespace :generate do
   end
 end
 
-namespace :after_migration do
+namespace :migration_tasks do
   desc 'calculate SHAs of bank_statements'
   task :calculate_bank_statements_sha do
     env = ENV.fetch('RACK_ENV', :development)
@@ -61,51 +61,33 @@ namespace :after_migration do
     p "Updated #{i} Bank Statement SHAs."
   end
 
-  desc 'recalculate SHAs of statements'
-  task :recalculate_statements_sha do
+  desc 'update SHAs of statements'
+  task :update_statement_sha do
     env = ENV.fetch('RACK_ENV', :development)
     if env.to_s != 'production'
       # Load environment from file
       require 'dotenv'
       Dotenv.load
     end
+    require 'pry'; binding.pry
 
     require './config/bootstrap'
     require './box/models/statement'
-    require './lib/checksum_generator'
-
-
+    require './box/business_processes/import_statements'
     i = 0
+
     statements = Box::Statement.where(sha: nil)
 
-    p "Found #{statements.count}  without a SHA."
+    p "Found #{statements.count} Statements without a SHA."
     next if statements.count.zero?
 
-    p 'Recalculating  SHAs.'
+    p 'Recalculating Statement SHAs.'
 
     statements.each do |statement|
-      eref = statement.respond_to?(:eref) ? statement.eref : statement.sepa['EREF']
-      mref = statement.respond_to?(:mref) ? statement.mref : statement.sepa['MREF']
-      svwz = statement.respond_to?(:svwz) ? statement.svwz : statement.sepa['SVWZ']
-
-      payload = [
-        statement.bank_statement&.remote_account,
-        statement.date,
-        statement.amount,
-        statement.iban,
-        statement.name,
-        statement.sign,
-        eref,
-        mref,
-        svwz,
-        statement.information.gsub(/\s/, '')
-      ]
-
-      sha = ChecksumGenerator.from_payload(payload)
-
+      sha = Box::BusinessProcesses::ImportStatements.checksum(statement, statement.bank_statement)
       next if Box::Statement.find(sha: sha) # duplicates.. let's not update them
 
-      statement.update(sha: ChecksumGenerator.from_payload(payload))
+      statement.update(sha: sha)
       i += 1
     end
 

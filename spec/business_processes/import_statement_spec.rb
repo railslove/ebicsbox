@@ -14,8 +14,7 @@ module Box
       let(:organization) { Fabricate(:organization) }
       let(:account) { organization.add_account(host: 'HOST', iban: 'iban1234567') }
       let(:camt_account) { organization.add_account(host: 'HOST', iban: 'iban1234567', statements_format: 'camt53') }
-      let(:camt_fixture) { 'camt_statement.xml' }
-      let(:camt) { File.read("spec/fixtures/#{camt_fixture}") }
+      let(:camt) { File.read('spec/fixtures/camt_statement') }
       let(:mt940) { File.read('spec/fixtures/single_valid.mt940') }
 
       def clear_all_tubes
@@ -130,10 +129,25 @@ module Box
       end
 
       describe 'camt bank statement import' do
-        it 'imports camt statements' do
-          parsed_camt = CamtParser::String.parse(camt).statements
-          bank_statement = ImportBankStatement.from_cmxl(parsed_camt.first, camt_account)
-          expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(4)
+
+        context 'with trx ids' do
+          let(:camt) { File.read('spec/fixtures/camt_statement_with_trx_ids.xml') }
+
+          it 'imports camt statements' do
+            parsed_camt = CamtParser::String.parse(camt).statements
+            bank_statement = ImportBankStatement.from_cmxl(parsed_camt.first, camt_account)
+            expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(4)
+          end
+        end
+
+        context 'without trx ids' do
+          let(:camt) { File.read('spec/fixtures/camt_statement.xml') }
+
+          it 'imports camt statements' do
+            parsed_camt = CamtParser::String.parse(camt).statements
+            bank_statement = ImportBankStatement.from_cmxl(parsed_camt.first, camt_account)
+            expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(4)
+          end
         end
       end
 
