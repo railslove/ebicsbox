@@ -5,7 +5,7 @@ require_relative '../box/models/statement'
 
 class ChecksumUpdater
   PARSERS = { 'mt940' => Cmxl, 'camt53' => CamtParser::Format053::Statement }.freeze
-  attr_accessor :baxnk_statement
+  attr_accessor :bank_statement
 
   def initialize(bank_statement)
     self.bank_statement = bank_statement
