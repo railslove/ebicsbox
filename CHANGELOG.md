@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.20
+
+- `[ENHANCEMENT]` Use transaction-id to calculate checksum if available
+
 ## 1.3.19
 
 - `[ENHANCEMENT]` Adds transactions detail endpoint to v2 api
