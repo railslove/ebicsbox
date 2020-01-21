@@ -71,13 +71,26 @@ namespace :migration_tasks do
     end
 
     require './config/bootstrap'
+    require './box/models/account'
     require './box/models/bank_statement'
     require './lib/checksum_updater'
 
-    bank_statement_count = Box::BankStatement.count
-    Box::BankStatement.all.each.with_index do |bank_statement, index|
-      pp "Processing BankStatement #{index+1}/#{bank_statement_count}"
-      ChecksumUpdater.new(bank_statement).call
+    account_ids = Box::Account.all_active_ids
+    account_ids.each.with_index do |account_id, idx|
+      pp "Processing Account #{idx + 1} / #{account_ids.count}"
+
+      bank_statements = Box::BankStatement.where(account_id: account_id)
+      bank_statements.each.with_index do |bank_statement, index|
+        pp "Processing BankStatement #{index + 1}/#{bank_statements.count}"
+
+        parser = bank_statement.content.starts_with?(':') ? Cmxl : CamtParser::Format053::Statement
+        result = parser.parse(bank_statement.content)
+        transactions = result.is_a?(Array) ? result.first.transactions : result.transactions
+
+        transactions.each do |transaction|
+          ChecksumUpdater.new(transaction, bank_statement.remote_account).call
+        end
+      end
     end
   end
 

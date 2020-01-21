@@ -65,13 +65,13 @@ module Box
       end
 
       def self.checksum(transaction, bank_statement)
-        ChecksumGenerator.from_payload(checksum_attributes(transaction, bank_statement))
+        ChecksumGenerator.from_payload(checksum_attributes(transaction, bank_statement.remote_account))
       end
 
-      def self.checksum_attributes(transaction, bank_statement)
-        return [bank_statement.remote_account, transaction.transaction_id] if transaction.try(:transaction_id).present?
+      def self.checksum_attributes(transaction, remote_account)
+        return [remote_account, transaction.transaction_id] if transaction.try(:transaction_id).present?
 
-        payload_from_transaction_attributes(transaction, bank_statement.remote_account)
+        payload_from_transaction_attributes(transaction, remote_account)
       end
 
       def self.payload_from_transaction_attributes(transaction, remote_account)
