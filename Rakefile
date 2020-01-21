@@ -84,11 +84,18 @@ namespace :migration_tasks do
         pp "Processing BankStatement #{index + 1}/#{bank_statements.count}"
 
         parser = bank_statement.content.starts_with?(':') ? Cmxl : CamtParser::Format053::Statement
-        result = parser.parse(bank_statement.content)
-        transactions = result.is_a?(Array) ? result.first.transactions : result.transactions
+        begin
+          result = parser.parse(bank_statement.content)
+          transactions = result.is_a?(Array) ? result.first.transactions : result.transactions
 
-        transactions.each do |transaction|
-          ChecksumUpdater.new(transaction, bank_statement.remote_account).call
+          transactions.each do |transaction|
+            ChecksumUpdater.new(transaction, bank_statement.remote_account).call
+          end
+        rescue => e
+          p '--- ERROR ---'
+          p bank_statement.id
+          p e
+          p '--- !ERROR ---'
         end
       end
     end
