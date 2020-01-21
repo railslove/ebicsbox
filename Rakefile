@@ -79,7 +79,7 @@ namespace :migration_tasks do
     account_ids.each.with_index do |account_id, idx|
       pp "Processing Account #{idx + 1} / #{account_ids.count}"
 
-      bank_statements = Box::BankStatement.where(account_id: account_id)
+      bank_statements = Box::BankStatement.where(account_id: account_id).all
       bank_statements.each.with_index do |bank_statement, index|
         pp "Processing BankStatement #{index + 1}/#{bank_statements.count}"
 
