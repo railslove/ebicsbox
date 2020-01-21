@@ -2,6 +2,6 @@
 
 module Box
   def self.version
-    '1.3.20.pre1'
+    '1.3.20.pre2'
   end
 end
