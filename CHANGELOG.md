@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.3.20 - 13.23
+## 1.3.20 - 13.24
 
 - `[ENHANCEMENT]` Use transaction-id to calculate checksum if available
 - `[HOUSEKEEPING]` Migration will recalculate checksums for statements

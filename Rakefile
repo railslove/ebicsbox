@@ -107,7 +107,7 @@ namespace :migration_tasks do
       remote_account = statement&.bank_statement&.remote_account
       payload = ::ChecksumUpdater.new(statement, remote_account).send(:new_checksum_payload)
       sha = ChecksumGenerator.from_payload(payload)
-      if Statement.find(sha2: sha).present?
+      if Box::Statement.find(sha2: sha).present?
         # prevent duplicates
         pp "Statement #{statement.id} has duplicate sha: #{sha}"
         next
