@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.19
+
+- `[ENHANCEMENT]` Adds transactions detail endpoint to v2 api
+
 ## 1.3.16 - 1.3.18
 
 - `[ENHANCEMENT]` Improves dublication checks for statements to handle edge-cases
