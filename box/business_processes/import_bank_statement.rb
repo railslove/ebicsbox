@@ -4,6 +4,8 @@ require 'cmxl'
 
 require_relative '../models/account'
 require_relative '../models/bank_statement'
+require_relative '../../lib/checksum_generator'
+
 
 # more general matching regex that covers both newlines and newlines with dashes
 Cmxl.config[:statement_separator] = /(\n-?)(?=:20)/m
@@ -90,7 +92,7 @@ module Box
           raw_bank_statement.source
         ]
 
-        Digest::SHA2.hexdigest(payload.flatten.join).to_s
+        ChecksumGenerator.from_payload(payload)
       end
     end
   end

@@ -92,7 +92,7 @@ module Box
 
         context 'the statement was already imported' do
           # This is a precalculated SHA based on our algorithm
-          before { Statement.create(sha: '61a097afdc79ab1c834d84586667dcef7c356484103899f7d2c0b3e6f7f83fb9', account_id: account.id) }
+          before { Statement.create(sha: '964fa5bd7ffdd1614f46324177e14f3d4a19af18e1bb33e0c30b3e019d0323e8', account_id: account.id) }
 
           it 'does not create a statement' do
             expect { exec_create_action }.to_not change(Statement, :count)
@@ -175,17 +175,41 @@ module Box
         end
       end
 
+      describe 'duplicates' do
+        let(:mt940) { File.read('spec/fixtures/similar_but_not_dup_transactions.mt940') }
+        let(:mt940b) { File.read('spec/fixtures/dup_whitespace_transaction.mt940') }
+        let(:bank_statement) { ImportBankStatement.from_mt940(mt940, account) }
+
+        it 'importes both statements' do
+          expect { described_class.from_bank_statement(bank_statement) }.to(
+            change(Statement, :count).by(2)
+          )
+        end
+
+        it 'recognizes duplicates when importing data again' do
+          expect {
+            described_class.from_bank_statement(bank_statement)
+            described_class.from_bank_statement(bank_statement)
+          }.to(change(Statement, :count).by(2))
+        end
+
+        it 'does not import same transaction with different whitespaces in reference' do
+          bank_statement = ImportBankStatement.from_mt940(mt940b, account)
+          expect { described_class.from_bank_statement(bank_statement) }.to change(Statement, :count).by(1)
+        end
+      end
+
       describe 'importing VMK' do
         let(:mt942) { File.read('spec/fixtures/single_valid.mt942') }
         let(:bank_statement) { ImportBankStatement.from_mt940(mt942, account) }
-        let(:statement) { Box::Statement.first(sha: '9a1beafab0e404500673f5a0924169217324fea533444433f04523cbdf4728e3') }
+        let(:statement) { Box::Statement.first(sha: 'be3a41c6262f85b409fefee10d7515893301411c765ffbf708a36694a365c213') }
 
         it 'imports each statement' do
           expect(described_class).to receive(:create_statement).once
           described_class.from_bank_statement(bank_statement, upcoming: true)
         end
 
-        it 'markes statements as unsettled' do
+        it 'marks statements as unsettled' do
           described_class.from_bank_statement(bank_statement, upcoming: true)
           expect(statement.settled).to be_falsey
         end

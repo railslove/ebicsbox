@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.3.19
+
+- `[ENHANCEMENT]` Adds transactions detail endpoint to v2 api
+
+## 1.3.16 - 1.3.18
+
+- `[ENHANCEMENT]` Improves dublication checks for statements to handle edge-cases
+
+## 1.3.15
+
+- `[ENHANCEMENT]` Enhances the statement SHA calculation further to drop whitespaces from references. camt53 / mt940 seem to handle them differently
+
+## 1.3.14
+
+- `[ENHANCEMENT]` Enhances Statement SHA calculation to prevent false positive duplicate checks
+
 ## 1.3.13
 
 - `[HOUSEKEEPING]` Updates CMXL-Gem to parse more weird bank responses
