@@ -81,7 +81,7 @@ namespace :migration_tasks do
 
       bank_statements = Box::BankStatement.where(account_id: account_id).all
       bank_statements.each.with_index do |bank_statement, index|
-        pp "Processing BankStatement #{index + 1}/#{bank_statements.count}"
+        # pp "Processing BankStatement #{index + 1}/#{bank_statements.count}"
 
         parser = bank_statement.content.starts_with?(':') ? Cmxl : CamtParser::Format053::Statement
         begin

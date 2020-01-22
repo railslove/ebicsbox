@@ -85,6 +85,10 @@ module Box
       debit? ? 'debit' : 'credit'
     end
 
+    def amount_in_cents
+      amount
+    end
+
     def as_event_payload
       {
         id: public_id,
