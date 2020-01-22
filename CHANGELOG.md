@@ -1,13 +1,10 @@
 # Changelog
 
-## 1.3.21
-
-- `[BUGFIX]` Migration to 1.3.20 could fail when statement data in invalid due to previous fixed issues
-
-## 1.3.20
+## 1.3.20- 13.22
 
 - `[ENHANCEMENT]` Use transaction-id to calculate checksum if available
 - `[HOUSEKEEPING]` Migration will recalculate checksums for statements
+- `[BUGFIX]` Migration to 1.3.20 could fail when statement data in invalid due to previous fixed issues
 
 ## 1.3.19
 
