@@ -49,7 +49,7 @@ module Box
 
       def self.link_statement_to_transaction(account, statement)
         # find transactions via EREF
-        transaction   = account.transactions_dataset.where(eref: statement.eref).first
+        transaction = account.transactions_dataset.where(eref: statement.eref).first
         # fallback to finding via statement information
         transaction ||= account.transactions_dataset.exclude(currency: 'EUR', status: %w[credit_received debit_received]).where { created_at > 14.days.ago }.detect { |t| statement.information =~ /#{t.eref}/i }
 
@@ -65,12 +65,22 @@ module Box
       end
 
       def self.checksum(transaction, bank_statement)
+        ChecksumGenerator.from_payload(checksum_attributes(transaction, bank_statement.remote_account))
+      end
+
+      def self.checksum_attributes(transaction, remote_account)
+        return [remote_account, transaction.transaction_id] if transaction.try(:transaction_id).present?
+
+        payload_from_transaction_attributes(transaction, remote_account)
+      end
+
+      def self.payload_from_transaction_attributes(transaction, remote_account)
         eref = transaction.respond_to?(:eref) ? transaction.eref : transaction.sepa['EREF']
         mref = transaction.respond_to?(:mref) ? transaction.mref : transaction.sepa['MREF']
         svwz = transaction.respond_to?(:svwz) ? transaction.svwz : transaction.sepa['SVWZ']
 
-        payload = [
-          bank_statement.remote_account,
+        [
+          remote_account,
           transaction.date,
           transaction.amount_in_cents,
           transaction.iban,
@@ -81,7 +91,6 @@ module Box
           svwz,
           transaction.information.gsub(/\s/, '')
         ]
-        ChecksumGenerator.from_payload(payload)
       end
 
       def self.statement_attributes_from_bank_transaction(transaction, bank_statement)
@@ -103,6 +112,7 @@ module Box
           eref: transaction.respond_to?(:eref) ? transaction.eref : transaction.sepa['EREF'],
           mref: transaction.respond_to?(:mref) ? transaction.mref : transaction.sepa['MREF'],
           svwz: transaction.respond_to?(:svwz) ? transaction.svwz : transaction.sepa['SVWZ'],
+          transaction_id: transaction.try(:transaction_id),
           creditor_identifier: transaction.respond_to?(:creditor_identifier) ? transaction.creditor_identifier : transaction.sepa['CRED']
         }
       end

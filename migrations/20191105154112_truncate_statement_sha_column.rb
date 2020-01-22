@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
+# this is an old and obsolete migration
 Sequel.migration do
   up do
-    drop_column :statements, :sha
-    add_column :statements, :sha, :text
-    add_index :statements, :sha, unique: true
+    # noop
   end
 
   down do

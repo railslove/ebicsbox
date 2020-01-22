@@ -170,7 +170,7 @@ module Box
       # organization and user are defined in the valid_user context
       let!(:org_account) { Fabricate(:account, organization: organization) }
 
-      let!(:other_org_user) { Fabricate(:user, access_token: 'foobar')}
+      let!(:other_org_user) { Fabricate(:user, access_token: 'foobar') }
       let!(:other_org) { Fabricate(:organization) }
       let!(:other_org_account) { Fabricate(:account, organization: other_org) }
 

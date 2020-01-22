@@ -24,7 +24,7 @@ namespace :generate do
   end
 end
 
-namespace :after_migration do
+namespace :migration_tasks do
   desc 'calculate SHAs of bank_statements'
   task :calculate_bank_statements_sha do
     env = ENV.fetch('RACK_ENV', :development)
@@ -61,8 +61,9 @@ namespace :after_migration do
     p "Updated #{i} Bank Statement SHAs."
   end
 
-  desc 'recalculate SHAs of statements'
-  task :recalculate_statements_sha do
+  # this should ONLY be run via migration migrations/20191217114900_recalculate_statement_sha.rb
+  desc 'calculate new SHA'
+  task :calculate_new_sha do
     env = ENV.fetch('RACK_ENV', :development)
     if env.to_s != 'production'
       # Load environment from file
@@ -71,45 +72,47 @@ namespace :after_migration do
     end
 
     require './config/bootstrap'
+    require './box/models/account'
     require './box/models/statement'
-    require './lib/checksum_generator'
+    require './box/models/bank_statement'
+    require './lib/checksum_updater'
 
+    # safe guard to only run this task when temp checksum field is available
+    next unless Box::Statement.columns.include?(:sha2)
 
-    i = 0
-    statements = Box::Statement.where(sha: nil)
+    account_ids = Box::Account.all_active_ids
+    account_ids.each.with_index(1) do |account_id, idx|
+      pp "Processing Account #{idx} / #{account_ids.count}"
 
-    p "Found #{statements.count}  without a SHA."
-    next if statements.count.zero?
+      bank_statements = Box::BankStatement.where(account_id: account_id).all
+      bank_statements.each do |bank_statement|
+        parser = bank_statement.content.starts_with?(':') ? Cmxl : CamtParser::Format053::Statement
+        begin
+          result = parser.parse(bank_statement.content)
+          transactions = result.is_a?(Array) ? result.first.transactions : result.transactions
 
-    p 'Recalculating  SHAs.'
-
-    statements.each do |statement|
-      eref = statement.respond_to?(:eref) ? statement.eref : statement.sepa['EREF']
-      mref = statement.respond_to?(:mref) ? statement.mref : statement.sepa['MREF']
-      svwz = statement.respond_to?(:svwz) ? statement.svwz : statement.sepa['SVWZ']
-
-      payload = [
-        statement.bank_statement&.remote_account,
-        statement.date,
-        statement.amount,
-        statement.iban,
-        statement.name,
-        statement.sign,
-        eref,
-        mref,
-        svwz,
-        statement.information.gsub(/\s/, '')
-      ]
-
-      sha = ChecksumGenerator.from_payload(payload)
-
-      next if Box::Statement.find(sha: sha) # duplicates.. let's not update them
-
-      statement.update(sha: ChecksumGenerator.from_payload(payload))
-      i += 1
+          transactions.each do |transaction|
+            ChecksumUpdater.new(transaction, bank_statement.remote_account).call
+          end
+        rescue => e
+          p '--- ERROR ---'
+          p bank_statement.id
+          p e
+          p '--- !ERROR ---'
+        end
+      end
     end
 
-    p "Updated #{i} Statement SHAs."
+    Box::Statement.where(sha2: nil).each do |statement|
+      payload = ::ChecksumUpdater.new(statement, statement.bank_statement.remote_account).send(:new_checksum_payload)
+      sha = ChecksumGenerator.from_payload(payload)
+      statement.update(sha2: sha)
+    rescue Sequel::UniqueConstraintViolation
+      p '--- NON-UNIQUE STATEMENT ERROR ---'
+      p statement.id
+      p e
+      p '--- !NON-UNIQUE STATEMENT ERROR ---'
+    end; nil
   end
 
   desc 'copies partner value to ebics_users'
