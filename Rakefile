@@ -108,7 +108,7 @@ namespace :migration_tasks do
       payload = ::ChecksumUpdater.new(statement, remote_account).send(:new_checksum_payload)
       sha = ChecksumGenerator.from_payload(payload)
       statement.update(sha2: sha)
-    rescue Sequel::UniqueConstraintViolation
+    rescue Sequel::UniqueConstraintViolation => e
       p '--- NON-UNIQUE STATEMENT ERROR ---'
       p statement.id
       p e
