@@ -61,6 +61,7 @@ namespace :migration_tasks do
     p "Updated #{i} Bank Statement SHAs."
   end
 
+  # this should ONLY be run via migration migrations/20191217114900_recalculate_statement_sha.rb
   desc 'calculate new SHA'
   task :calculate_new_sha do
     env = ENV.fetch('RACK_ENV', :development)
@@ -72,17 +73,19 @@ namespace :migration_tasks do
 
     require './config/bootstrap'
     require './box/models/account'
+    require './box/models/statement'
     require './box/models/bank_statement'
     require './lib/checksum_updater'
+
+    # safe guard to only run this task when temp checksum field is available
+    next unless Box::Statement.columns.include?(:sha2)
 
     account_ids = Box::Account.all_active_ids
     account_ids.each.with_index do |account_id, idx|
       pp "Processing Account #{idx + 1} / #{account_ids.count}"
 
       bank_statements = Box::BankStatement.where(account_id: account_id).all
-      bank_statements.each.with_index do |bank_statement, index|
-        # pp "Processing BankStatement #{index + 1}/#{bank_statements.count}"
-
+      bank_statements.each do |bank_statement|
         parser = bank_statement.content.starts_with?(':') ? Cmxl : CamtParser::Format053::Statement
         begin
           result = parser.parse(bank_statement.content)
@@ -99,6 +102,17 @@ namespace :migration_tasks do
         end
       end
     end
+
+    Box::Statement.where(sha2: nil).each do |statement|
+      payload = ::ChecksumUpdater.new(statement, statement.bank_statement.remote_account).send(:new_checksum_payload)
+      sha = ChecksumGenerator.from_payload(payload)
+      statement.update(sha2: sha)
+    rescue Sequel::UniqueConstraintViolation
+      p '--- NON-UNIQUE STATEMENT ERROR ---'
+      p statement.id
+      p e
+      p '--- !NON-UNIQUE STATEMENT ERROR ---'
+    end; nil
   end
 
   desc 'copies partner value to ebics_users'
