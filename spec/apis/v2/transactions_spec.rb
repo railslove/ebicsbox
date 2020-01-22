@@ -165,5 +165,38 @@ module Box
         end
       end
     end
+
+    describe 'GET /trasactions/:id' do
+      # organization and user are defined in the valid_user context
+      let!(:org_account) { Fabricate(:account, organization: organization) }
+
+      let!(:other_org_user) { Fabricate(:user, access_token: 'foobar')}
+      let!(:other_org) { Fabricate(:organization) }
+      let!(:other_org_account) { Fabricate(:account, organization: other_org) }
+
+      subject(:trx) { Fabricate(:statement, account: org_account) }
+
+      it 'returns 404 if transaction by id does not exist' do
+        trx.destroy
+
+        get "/transactions/#{trx.public_id}", TestHelpers::VALID_HEADERS
+        expect_status 404
+      end
+
+      it 'returns 404 if transaction does not belong to current organization' do
+        get "/transactions/#{trx.public_id}", TestHelpers::VALID_HEADERS.merge('Authorization' => 'Bearer foobar')
+        expect_status 404
+      end
+
+      it 'returns 200 if transaction found' do
+        get "/transactions/#{trx.public_id}", TestHelpers::VALID_HEADERS
+        expect_status 200
+      end
+
+      it 'returns transaction' do
+        get "/transactions/#{trx.public_id}", TestHelpers::VALID_HEADERS
+        expect(response.body).to eql(Box::Entities::V2::Transaction.new(trx).to_json)
+      end
+    end
   end
 end

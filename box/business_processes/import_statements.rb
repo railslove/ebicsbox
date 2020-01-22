@@ -6,6 +6,7 @@ require 'camt_parser'
 require_relative '../models/account'
 require_relative '../models/bank_statement'
 require_relative '../models/event'
+require_relative '../../lib/checksum_generator'
 
 module Box
   module BusinessProcesses
@@ -66,6 +67,7 @@ module Box
       def self.checksum(transaction, bank_statement)
         eref = transaction.respond_to?(:eref) ? transaction.eref : transaction.sepa['EREF']
         mref = transaction.respond_to?(:mref) ? transaction.mref : transaction.sepa['MREF']
+        svwz = transaction.respond_to?(:svwz) ? transaction.svwz : transaction.sepa['SVWZ']
 
         payload = [
           bank_statement.remote_account,
@@ -75,9 +77,11 @@ module Box
           transaction.name,
           transaction.sign,
           eref,
-          mref
+          mref,
+          svwz,
+          transaction.information.gsub(/\s/, '')
         ]
-        Digest::SHA2.hexdigest(payload.flatten.compact.join).to_s
+        ChecksumGenerator.from_payload(payload)
       end
 
       def self.statement_attributes_from_bank_transaction(transaction, bank_statement)

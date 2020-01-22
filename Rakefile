@@ -36,6 +36,7 @@ namespace :after_migration do
 
     require './config/bootstrap'
     require './box/models/bank_statement'
+    require './lib/checksum_generator'
 
     i = 0
     statements = Box::BankStatement.where(sha: nil)
@@ -52,12 +53,63 @@ namespace :after_migration do
         bs.content
       ]
 
-      bs.update(sha: Digest::SHA2.hexdigest(payload.flatten.join).to_s)
+      bs.update(sha: ChecksumGenerator.from_payload(payload))
 
       i += 1
     end
 
     p "Updated #{i} Bank Statement SHAs."
+  end
+
+  desc 'recalculate SHAs of statements'
+  task :recalculate_statements_sha do
+    env = ENV.fetch('RACK_ENV', :development)
+    if env.to_s != 'production'
+      # Load environment from file
+      require 'dotenv'
+      Dotenv.load
+    end
+
+    require './config/bootstrap'
+    require './box/models/statement'
+    require './lib/checksum_generator'
+
+
+    i = 0
+    statements = Box::Statement.where(sha: nil)
+
+    p "Found #{statements.count}  without a SHA."
+    next if statements.count.zero?
+
+    p 'Recalculating  SHAs.'
+
+    statements.each do |statement|
+      eref = statement.respond_to?(:eref) ? statement.eref : statement.sepa['EREF']
+      mref = statement.respond_to?(:mref) ? statement.mref : statement.sepa['MREF']
+      svwz = statement.respond_to?(:svwz) ? statement.svwz : statement.sepa['SVWZ']
+
+      payload = [
+        statement.bank_statement&.remote_account,
+        statement.date,
+        statement.amount,
+        statement.iban,
+        statement.name,
+        statement.sign,
+        eref,
+        mref,
+        svwz,
+        statement.information.gsub(/\s/, '')
+      ]
+
+      sha = ChecksumGenerator.from_payload(payload)
+
+      next if Box::Statement.find(sha: sha) # duplicates.. let's not update them
+
+      statement.update(sha: ChecksumGenerator.from_payload(payload))
+      i += 1
+    end
+
+    p "Updated #{i} Statement SHAs."
   end
 
   desc 'copies partner value to ebics_users'
