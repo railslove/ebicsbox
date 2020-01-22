@@ -104,7 +104,8 @@ namespace :migration_tasks do
     end
 
     Box::Statement.where(sha2: nil).each do |statement|
-      payload = ::ChecksumUpdater.new(statement, statement.bank_statement.remote_account).send(:new_checksum_payload)
+      remote_account = statement&.bank_statement&.remote_account
+      payload = ::ChecksumUpdater.new(statement, remote_account).send(:new_checksum_payload)
       sha = ChecksumGenerator.from_payload(payload)
       statement.update(sha2: sha)
     rescue Sequel::UniqueConstraintViolation
