@@ -81,8 +81,8 @@ namespace :migration_tasks do
     next unless Box::Statement.columns.include?(:sha2)
 
     account_ids = Box::Account.all_active_ids
-    account_ids.each.with_index do |account_id, idx|
-      pp "Processing Account #{idx + 1} / #{account_ids.count}"
+    account_ids.each.with_index(1) do |account_id, idx|
+      pp "Processing Account #{idx} / #{account_ids.count}"
 
       bank_statements = Box::BankStatement.where(account_id: account_id).all
       bank_statements.each do |bank_statement|
