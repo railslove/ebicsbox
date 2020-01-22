@@ -107,12 +107,12 @@ namespace :migration_tasks do
       remote_account = statement&.bank_statement&.remote_account
       payload = ::ChecksumUpdater.new(statement, remote_account).send(:new_checksum_payload)
       sha = ChecksumGenerator.from_payload(payload)
+      if Statement.find(sha2: sha).present?
+        # prevent duplicates
+        pp "Statement #{statement.id} has duplicate sha: #{sha}"
+        next
+      end
       statement.update(sha2: sha)
-    rescue Sequel::UniqueConstraintViolation => e
-      p '--- NON-UNIQUE STATEMENT ERROR ---'
-      p statement.id
-      p e
-      p '--- !NON-UNIQUE STATEMENT ERROR ---'
     end; nil
   end
 
