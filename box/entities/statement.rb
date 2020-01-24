@@ -21,6 +21,7 @@ module Box
       expose :bank_reference
       expose :creditor_identifier, documentation: { type: 'String', desc: 'SEPA creditor identifier' }
       expose :swift_code, as: :transaction_type, documentation: { type: 'String', desc: 'SWIFT transaction code' }
+      expose :tx_id, as: :transaction_id, documentation: { type: 'String', desc: 'Transaction ID as given by the bank' }
       expose(:_links, documentation: { type: 'Hash', desc: 'Links to resources' }) do |statement|
         iban = statement.account.iban
         trx = statement.transaction

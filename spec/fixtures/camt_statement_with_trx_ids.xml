@@ -117,7 +117,7 @@
         <NtryDtls>
           <TxDtls>
             <Refs>
-              <TxId>123456</TxId>
+              <TxId>1234567</TxId>
               <MsgId>CCTI/VRNWSW/b044f24cddb92a502b8a1b5</MsgId>
               <EndToEndId>NOTPROVIDED</EndToEndId>
             </Refs>
@@ -227,7 +227,7 @@
           </Btch>
           <TxDtls>
             <Refs>
-              <TxId>1234567</TxId>
+              <TxId>FOO-BAR4711-13-37-13.37.47.110815</TxId>
               <MsgId>STZV-Msg27122013-11:02</MsgId>
               <EndToEndId>STZV-EtE27122013-11:02-1</EndToEndId>
             </Refs>

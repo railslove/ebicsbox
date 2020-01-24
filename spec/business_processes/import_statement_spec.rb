@@ -148,6 +148,23 @@ module Box
             expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(4)
           end
         end
+
+        context 'with trx ids' do
+          let(:camt) { File.read('spec/fixtures/camt_statement_with_trx_ids.xml') }
+          let(:parsed_camt) { CamtParser::String.parse(camt).statements }
+          let(:bank_statement) { ImportBankStatement.from_cmxl(parsed_camt.first, camt_account) }
+
+          subject { described_class.from_bank_statement(bank_statement) }
+
+          it 'imports camt statements' do
+            expect { subject }.to change { Statement.count }.by(4)
+          end
+
+          it 'writes transactions id' do
+            subject
+            expect(Statement.find(tx_id: 'FOO-BAR4711-13-37-13.37.47.110815')).to be_present
+          end
+        end
       end
 
       describe '.link_statement_to_transaction' do
