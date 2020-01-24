@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.25
+
+- `[BUGFIX]` Ensure alphanumeric transaction IDs can be handled propperly
+
 ## 1.3.20 - 13.24
 
 - `[ENHANCEMENT]` Use transaction-id to calculate checksum if available
