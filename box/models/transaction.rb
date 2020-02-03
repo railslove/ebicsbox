@@ -58,13 +58,15 @@ module Box
       super || []
     end
 
+    def make_history(reason, status = self.status)
+      update(history: history.dup << { at: Time.now, status: status, reason: reason })
+    end
+
     def update_status(new_status, reason: nil)
       self.status = get_status(new_status)
 
       if column_changed?(:status)
-        update(
-          history: history.dup << { at: Time.now, status: status, reason: reason }
-        )
+        make_history(reason, status)
         Event.method("#{type}_status_changed").call(self)
       end
 
@@ -92,6 +94,9 @@ module Box
     rescue Epics::Error => e
       Box.logger.warn { "Could not execute payload for transaction. id=#{id} message=#{e.message}" }
       update_status('failed', reason: "#{e.code}/#{e.message}")
+    rescue Epics::Error::UnknownError => e
+      Box.logger.warn { "Request failed. id=#{id} message=#{e.message}" }
+      make_history(e.message)
     end
 
     def parsed_payload

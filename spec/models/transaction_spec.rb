@@ -85,7 +85,9 @@ module Box
         let(:account) { Account.create }
         let(:user) { User.create }
         let!(:ebics_user) { account.add_ebics_user(user: user) }
-        subject(:transaction) { account.add_transaction(user: user, order_type: 'test', payload: 'my-pain', type: 'debit') }
+        subject(:transaction) do
+          account.add_transaction(user: user, order_type: 'test', payload: 'my-pain', type: 'debit', status: :created)
+        end
 
         before do
           allow_any_instance_of(EbicsUser).to receive(:client).and_return(client)
@@ -120,7 +122,7 @@ module Box
           expect(client).to have_received(:public_send).with('test', anything)
         end
 
-        describe 'ebics call fails' do
+        describe 'ebics call fails with ebics error' do
           before do
             allow(client).to receive(:public_send).and_raise(Epics::Error::TechnicalError.new('061099'))
           end
@@ -132,6 +134,24 @@ module Box
           it 'updates the history' do
             expect { transaction.execute! }.to change { transaction.history.to_a }.to(
               [hash_including(reason: '061099/EBICS_INTERNAL_ERROR - Internal EBICS error')]
+            )
+          end
+        end
+
+        describe 'ebics calls fails with other error' do
+          before do
+            allow(client).to receive(:public_send).and_raise(Epics::Error::UnknownError, 'timeout')
+          end
+
+          it 'keeps the status changed' do
+            expect { transaction.execute! }.not_to(change(transaction, :status))
+          end
+
+          it 'updates the history' do
+            expect { transaction.execute! }.to(
+              change { transaction.history.to_a }.to(
+                [hash_including(reason: 'timeout', status: 'created')]
+              )
             )
           end
         end

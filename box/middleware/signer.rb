@@ -13,7 +13,7 @@ module Box
       end
 
       def call(env)
-        env[:request_headers][SIGNATURE_HEADER] ||= sign(env[:body]).to_s if secret
+        env.request_headers[SIGNATURE_HEADER] ||= sign(env.request_body).to_s if secret
         @app.call(env)
       end
 

@@ -131,7 +131,7 @@ module Box
     context 'payload signature' do
       it 'signs the request according to its payload' do
         response, _execution_time = subject.execute_request
-        hmac = response.to_hash[:request_headers]['X-Signature']
+        hmac = response.env.request_headers['X-Signature']
         expect(hmac.length).to eq(45)
         expect(hmac).to match(/^sha1=.*/)
       end
