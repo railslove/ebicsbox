@@ -143,7 +143,7 @@ module Box
             allow(client).to receive(:public_send).and_raise(Epics::Error::UnknownError, 'timeout')
           end
 
-          it 'keeps the status changed' do
+          it 'keeps the status' do
             expect { transaction.execute! }.not_to(change(transaction, :status))
           end
 
