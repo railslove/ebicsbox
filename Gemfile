@@ -2,7 +2,7 @@
 
 source 'https://rubygems.org'
 
-ruby '2.5.1'
+ruby '2.5.7'
 
 gem 'activesupport'
 gem 'camt_parser', git: 'https://github.com/railslove/camt_parser.git'
