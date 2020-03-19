@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.26
+
+- `[HOUSEKEEPING]` Updates used ruby to 2.5.7
+- `[BUGFIX]` Fixes several docker issues
+
 ## 1.3.25
 
 - `[BUGFIX]` Ensure alphanumeric transaction IDs can be handled propperly
