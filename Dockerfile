@@ -21,7 +21,7 @@ RUN rm -rf pkg
 RUN rm -rf log
 RUN rm Procfile*
 RUN rm README*
-RUN rm docker-compose.yml
+RUN rm docker-compose*
 RUN rm -rf docs
 
 COPY entrypoint.sh /entrypoint.sh
