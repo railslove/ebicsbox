@@ -47,44 +47,61 @@ end
 
 Sidekiq.configure_server do |config|
   config.on(:startup) do
-    fetch_bank_statements_interval = ENV['UPDATE_BANK_STATEMENTS_INTERVAL'].to_i
-    unless fetch_bank_statements_interval.zero?
-      Sidekiq.set_schedule(
-        'fetch_account_statements',
-        every: "#{fetch_bank_statements_interval}m",
-        class: 'Box::Jobs::QueueFetchStatements',
-        queue: 'check.statements'
-      )
+
+    if ENV.key?('UPDATE_BANK_STATEMENTS_INTERVAL')
+      fetch_bank_statements_interval = ENV['UPDATE_BANK_STATEMENTS_INTERVAL'].to_i
+      if fetch_bank_statements_interval.zero?
+        Sidekiq.remove_schedule(:fetch_account_statements)
+      else
+        Sidekiq.set_schedule(
+          :fetch_account_statements,
+          every: "#{fetch_bank_statements_interval}m",
+          class: 'Box::Jobs::QueueFetchStatements',
+          queue: 'check.statements'
+        )
+      end
     end
 
-    update_processing_status_interval = ENV['UPDATE_PROCESSING_STATUS_INTERVAL'].to_i
-    unless update_processing_status_interval.zero?
-      Sidekiq.set_schedule(
-        'update_processing_status',
-        every: "#{update_processing_status_interval}m",
-        class: 'Box::Jobs::QueueProcessingStatus',
-        queue: 'check.orders'
-      )
+    if ENV.key?('UPDATE_PROCESSING_STATUS_INTERVAL')
+      update_processing_status_interval = ENV['UPDATE_PROCESSING_STATUS_INTERVAL'].to_i
+      if update_processing_status_interval.zero?
+        Sidekiq.remove_schedule(:update_processing_status)
+      else
+        Sidekiq.set_schedule(
+          :update_processing_status,
+          every: "#{update_processing_status_interval}m",
+          class: 'Box::Jobs::QueueProcessingStatus',
+          queue: 'check.orders'
+        )
+      end
     end
 
-    activate_ebics_user_interval = ENV['ACTIVATE_EBICS_USER_INTERVAL'].to_i
-    unless activate_ebics_user_interval.zero?
-      Sidekiq.set_schedule(
-        'activate_ebics_user',
-        every: "#{activate_ebics_user_interval}m",
-        class: 'Box::Jobs::CheckActivation',
-        queue: 'check.activations'
-      )
+    if ENV.key?('ACTIVATE_EBICS_USER_INTERVAL')
+      activate_ebics_user_interval = ENV['ACTIVATE_EBICS_USER_INTERVAL'].to_i
+      if activate_ebics_user_interval.zero?
+        Sidekiq.remove_schedule(:activate_ebics_user)
+      else
+        Sidekiq.set_schedule(
+          :activate_ebics_user,
+          every: "#{activate_ebics_user_interval}m",
+          class: 'Box::Jobs::CheckActivation',
+          queue: 'check.activations'
+        )
+      end
     end
 
-    upcoming_statements_interval = ENV['UPCOMING_STATEMENTS_INTERVAL'].to_i
-    unless upcoming_statements_interval.zero?
-      Sidekiq.set_schedule(
-        'fetch_upcoming_account_statements',
-        every: "#{upcoming_statements_interval}m",
-        class: 'Box::Jobs::QueueFetchUpcomingStatements',
-        queue: 'check.statements'
-      )
+    if ENV.key?('UPCOMING_STATEMENTS_INTERVAL')
+      upcoming_statements_interval = ENV['UPCOMING_STATEMENTS_INTERVAL'].to_i
+      if upcoming_statements_interval.zero?
+        Sidekiq.remove_schedule(:fetch_upcoming_account_statements)
+      else
+        Sidekiq.set_schedule(
+          :fetch_upcoming_account_statements,
+          every: "#{upcoming_statements_interval}m",
+          class: 'Box::Jobs::QueueFetchUpcomingStatements',
+          queue: 'check.statements'
+        )
+      end
     end
   end
 end
