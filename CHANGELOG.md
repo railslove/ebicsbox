@@ -1,8 +1,9 @@
 # Changelog
 
-## 1.3.27
+## 1.3.27, 1.3.28
 
 - `[ENHANCEMENT]` Allows disabling sidekiq jobs by setting the env var to 0
+- `[HOUSEKEEPING]` Allows Bundler < 2 again
 
 ## 1.3.26
 
