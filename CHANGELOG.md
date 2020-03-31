@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.27
+
+- `[ENHANCEMENT]` Allows disabling sidekiq jobs by setting the env var to 0
+
 ## 1.3.26
 
 - `[HOUSEKEEPING]` Updates used ruby to 2.5.7
