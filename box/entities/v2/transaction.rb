@@ -15,6 +15,8 @@ module Box
         expose :type
         expose :amount, as: 'amount_in_cents'
         expose :date, as: 'executed_on'
+        expose(:ebics_order_id)
+        expose(:ebics_transaction_id)
         expose(:settled_at) { |trx| trx.settled ? trx.date : nil }
         expose(:reference) { |transaction| transaction[:svwz] || transaction[:information] }
         expose :eref, as: 'end_to_end_reference'
