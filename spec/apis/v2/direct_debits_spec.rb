@@ -15,6 +15,7 @@ module Box
       bic: :string,
       amount_in_cents: :integer,
       end_to_end_reference: :string,
+      ebics_transaction_id: :string,
       status: :string,
       reference: :string,
       collection_date: :date,
@@ -99,6 +100,21 @@ module Box
 
           it 'allows to specify multiple accounts' do
             get "/direct_debits?iban[]=#{account.iban}&iban[]=#{second_account.iban}", VALID_DEBIT_HEADERS
+            expect_json_sizes 2
+          end
+        end
+
+        context 'when status filter is active' do
+          let!(:other_debit) { Fabricate(:debit, account_id: account.id, eref: 'another-debit', status: 'failed') }
+
+          it 'only return transactions with the defined status' do
+            get '/direct_debits?status=failed', TestHelpers::VALID_HEADERS
+            expect_json_sizes 1
+            expect_json '0', status: 'failed'
+          end
+
+          it 'allows to specify multiple status' do
+            get '/direct_debits?status=failed,created,file_upload,funds_debited', TestHelpers::VALID_HEADERS
             expect_json_sizes 2
           end
         end

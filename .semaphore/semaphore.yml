@@ -12,7 +12,7 @@ blocks:
           commands:
             - checkout
             - cache restore gems-$SEMAPHORE_GIT_BRANCH-$(checksum Gemfile.lock),gems-$SEMAPHORE_GIT_BRANCH-,gems-master-
-            - sem-version ruby 2.5.7
+            - sem-version ruby 2.5.8
             - bundle install --deployment -j 4 --path vendor/bundle
             - cache store gems-$SEMAPHORE_GIT_BRANCH-$(checksum Gemfile.lock) vendor/bundle
 
@@ -29,7 +29,7 @@ blocks:
           - cache restore gems-$SEMAPHORE_GIT_BRANCH-$(checksum Gemfile.lock),gems-$SEMAPHORE_GIT_BRANCH-,gems-master-
           - sem-service start postgres
           - sem-service start redis
-          - sem-version ruby 2.5.7
+          - sem-version ruby 2.5.8
           - bundle install --deployment --path vendor/bundle
           - createdb -U postgres -h 0.0.0.0 ebicsbox_test
           - bundle exec bin/migrate

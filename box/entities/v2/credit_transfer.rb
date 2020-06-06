@@ -15,6 +15,8 @@ module Box
         expose(:amount, as: 'amount_in_cents')
         expose(:currency)
         expose(:eref, as: 'end_to_end_reference')
+        expose(:ebics_order_id)
+        expose(:ebics_transaction_id)
         expose(:reference)
         expose(:executed_on)
         expose(:status)
