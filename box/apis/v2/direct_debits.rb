@@ -36,7 +36,7 @@ module Box
 
           params do
             optional :iban, type: Array[String], desc: 'IBANs of account to filter', documentation: { param_type: 'query' }
-            optional :status, type: String, desc: 'Filter by transaction status'
+            optional :status, type: Array[String], desc: 'Filter by transaction status', coerce_with: ->(value) { value.split(',') }, documentation: { param_type: 'query' }
             optional :page, type: Integer, desc: 'page through the results', default: 1
             optional :per_page, type: Integer, desc: 'how many results per page', values: 1..100, default: 10
           end

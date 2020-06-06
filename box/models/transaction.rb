@@ -32,7 +32,7 @@ module Box
       def filtered(params)
         query = self
 
-        # Filter by account id, status
+        # Filter by account iban, status
         query = query.where(accounts__iban: params[:iban]) if params[:iban].present?
         query = query.where(status: params[:status]) if params[:status].present?
 
