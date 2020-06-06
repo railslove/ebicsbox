@@ -16,6 +16,7 @@ module Box
       amount_in_cents: :integer,
       currency: :string,
       end_to_end_reference: :string,
+      ebics_transaction_id: :string,
       status: :string,
       reference: :string,
       executed_on: :date,
@@ -86,6 +87,21 @@ module Box
 
           it 'allows to specify multiple accounts' do
             get "/credit_transfers?iban=#{account.iban},#{second_account.iban}", TestHelpers::VALID_HEADERS
+            expect_json_sizes 2
+          end
+        end
+
+        context 'when status filter is active' do
+          let!(:other_credit) { Fabricate(:credit, account_id: account.id, eref: 'another-credit', status: 'failed') }
+
+          it 'only return transactions with the defined status' do
+            get '/credit_transfers?status=failed', TestHelpers::VALID_HEADERS
+            expect_json_sizes 1
+            expect_json '0', status: 'failed'
+          end
+
+          it 'allows to specify multiple status' do
+            get '/credit_transfers?status=failed,created,file_upload,funds_debited', TestHelpers::VALID_HEADERS
             expect_json_sizes 2
           end
         end
