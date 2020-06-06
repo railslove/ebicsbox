@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.29
+- `[ENHANCEMENT]` Expose `ebics_order_id` and `ebics_transaction_id` in credits & debits endpoints
+- `[ENHANCEMENT]` Allow filtering credits & debits by `status`
+
 ## 1.3.27, 1.3.28
 
 - `[ENHANCEMENT]` Allows disabling sidekiq jobs by setting the env var to 0
