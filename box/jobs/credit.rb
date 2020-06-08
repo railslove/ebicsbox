@@ -18,7 +18,7 @@ module Box
 
       def perform(message)
         message.symbolize_keys!
-        transaction = Transaction.create(
+        transaction = Transaction.new(
           account_id: message[:account_id],
           user_id: message[:user_id],
           amount: message[:amount],
@@ -31,7 +31,11 @@ module Box
           metadata: message[:metadata]
         )
 
-        transaction.execute!
+        DB.transaction do
+          transaction.save
+          transaction.execute!
+        end
+
         Event.credit_created(transaction)
         Queue.update_processing_status(message[:account_id])
 
