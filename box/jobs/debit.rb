@@ -20,7 +20,7 @@ module Box
 
       def perform(message)
         message.symbolize_keys!
-        transaction = Box::Transaction.create(
+        transaction = Box::Transaction.new(
           amount: message[:amount],
           type: 'debit',
           order_type: INSTRUMENT_MAPPING[message[:instrument]],
@@ -31,7 +31,11 @@ module Box
           status: 'created'
         )
 
-        transaction.execute!
+        DB.transaction do
+          transaction.save
+          transaction.execute!
+        end
+
         Event.debit_created(transaction)
         Queue.update_processing_status(message[:account_id])
 

@@ -59,6 +59,12 @@ module Box
           expect(Box.logger).to receive(:info).with(/\[Jobs::Credit\] Created credit! transaction_id=\d+/)
           job.perform(message)
         end
+
+        it 'is going to fail correctly' do
+          allow_any_instance_of(Box::Transaction).to receive(:execute!).and_raise(Exception.new)
+          expect { job.perform(message) }.to raise_error(Exception)
+          expect(Box::Transaction.count).to eq(0)
+        end
       end
     end
   end
