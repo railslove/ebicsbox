@@ -10,7 +10,7 @@ module Box
   module Jobs
     class Credit
       include Sidekiq::Worker
-      sidekiq_options queue: 'credit'
+      sidekiq_options queue: 'credit', retry: 5
 
       INSTRUMENT_MAPPING = Hash.new('AZV').update(
         'EUR' => :CCT
@@ -18,23 +18,20 @@ module Box
 
       def perform(message)
         message.symbolize_keys!
-        transaction = Transaction.new(
-          account_id: message[:account_id],
-          user_id: message[:user_id],
-          amount: message[:amount],
-          type: 'credit',
-          payload: Base64.strict_decode64(message[:payload]),
-          eref: message[:eref],
-          currency: message[:currency],
-          status: 'created',
-          order_type: INSTRUMENT_MAPPING[message[:currency]],
-          metadata: message[:metadata]
-        )
-
-        DB.transaction do
-          transaction.save
-          transaction.execute!
+        transaction = Transaction.find_or_create(user_id: message[:user_id], eref: message[:eref]) do |trx|
+          trx.account_id  = message[:account_id]
+          trx.amount      = message[:amount]
+          trx.type        = 'credit'
+          trx.payload     = Base64.strict_decode64(message[:payload])
+          trx.currency    = message[:currency]
+          trx.status      = 'created'
+          trx.order_type  = INSTRUMENT_MAPPING[message[:currency]]
+          trx.metadata    = message[:metadata]
         end
+
+        return false unless transaction.status == 'created'
+
+        transaction.execute!
 
         Event.credit_created(transaction)
         Queue.update_processing_status(message[:account_id])

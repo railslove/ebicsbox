@@ -61,10 +61,23 @@ module Box
           subject.perform(message)
         end
 
-        it 'is going to fail correctly' do
+        it 'creates transaction even on failure' do
           allow_any_instance_of(Box::Transaction).to receive(:execute!).and_raise(Exception.new)
           expect { subject.perform(message) }.to raise_error(Exception)
-          expect(Box::Transaction.count).to eq(0)
+          expect(Box::Transaction.count).to eq(1)
+          expect(last_transaction.status).to eq('created')
+        end
+
+        it 'reruns already present transactions' do
+          Transaction.create(
+            eref: '123', type: 'debit', payload: "<\u0002\r",
+            ebics_order_id: nil, ebics_transaction_id: nil, status: 'created',
+            account_id: 321, order_type: 'CDD', amount: 100,
+            user_id: nil, history: [], currency: 'EUR', metadata: nil
+          )
+          expect_any_instance_of(Transaction).to receive(:execute!)
+          subject.perform(message)
+          expect(Box::Transaction.count).to eq(1)
         end
       end
     end
