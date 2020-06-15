@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.3.30
+- `[BUGFIX]` Prevents stuck transactions, if `#execute!` fails due to network error or similar problems
+
 ## 1.3.29
 - `[ENHANCEMENT]` Expose `ebics_order_id` and `ebics_transaction_id` in credits & debits endpoints
 - `[ENHANCEMENT]` Allow filtering credits & debits by `status`

@@ -20,18 +20,19 @@ module Box
 
       def perform(message)
         message.symbolize_keys!
-        transaction = Box::Transaction.create(
-          amount: message[:amount],
-          type: 'debit',
-          order_type: INSTRUMENT_MAPPING[message[:instrument]],
-          account_id: message[:account_id],
-          user_id: message[:user_id],
-          eref: message[:eref],
-          payload: Base64.strict_decode64(message[:payload]),
-          status: 'created'
-        )
+        transaction = Box::Transaction.find_or_create(user_id: message[:user_id], eref: message[:eref]) do |trx|
+          trx.amount      = message[:amount]
+          trx.type        = 'debit'
+          trx.order_type  = INSTRUMENT_MAPPING[message[:instrument]]
+          trx.account_id  = message[:account_id]
+          trx.payload     = Base64.strict_decode64(message[:payload])
+          trx.status      = 'created'
+        end
+
+        return false unless transaction.status == 'created'
 
         transaction.execute!
+
         Event.debit_created(transaction)
         Queue.update_processing_status(message[:account_id])
 
