@@ -95,7 +95,11 @@ module Box
     rescue Epics::Error => e
       Box.logger.warn { "Could not execute payload for transaction. id=#{id} message=#{e.message}" }
       update_status('failed', reason: "#{e.code}/#{e.message}")
-    rescue Epics::Error::UnknownError => e
+    rescue Faraday::Error => e
+      Box.logger.warn { "Request failed. id=#{id} message=#{e.message}" }
+      make_history(e.message)
+      raise(e)
+    rescue StandardError => e
       Box.logger.warn { "Request failed. id=#{id} message=#{e.message}" }
       make_history(e.message)
     end

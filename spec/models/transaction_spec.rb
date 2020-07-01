@@ -140,19 +140,23 @@ module Box
 
         describe 'ebics calls fails with other error' do
           before do
-            allow(client).to receive(:public_send).and_raise(Epics::Error::UnknownError, 'timeout')
+            allow(client).to receive(:public_send).and_raise(Faraday::TimeoutError, 'timeout')
           end
 
           it 'keeps the status' do
-            expect { transaction.execute! }.not_to(change(transaction, :status))
+            expect { transaction.execute! rescue nil }.not_to(change(transaction, :status))
           end
 
           it 'updates the history' do
-            expect { transaction.execute! }.to(
+            expect { transaction.execute! rescue nil }.to(
               change { transaction.history.to_a }.to(
                 [hash_including(reason: 'timeout', status: 'created')]
               )
             )
+          end
+
+          it 'raises transport client errors' do
+            expect { transaction.execute! }.to raise_error(Faraday::TimeoutError)
           end
         end
       end
