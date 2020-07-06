@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.31
+- `[BUGFIX]` handle transport client errors properly
+- `[BUGFIX]` retry on failure in FetchProcessingStatus job
+
 ## 1.3.30
 - `[BUGFIX]` Prevents stuck transactions, if `#execute!` fails due to network error or similar problems
 
