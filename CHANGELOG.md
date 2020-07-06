@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.3.32
+- Nothing to see here
+
 ## 1.3.31
 - `[BUGFIX]` handle transport client errors properly
 - `[BUGFIX]` retry on failure in FetchProcessingStatus job
