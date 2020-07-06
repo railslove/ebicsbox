@@ -9,7 +9,7 @@ module Box
   module Jobs
     class FetchProcessingStatus
       include Sidekiq::Worker
-      sidekiq_options queue: 'check.orders', retry: false
+      sidekiq_options queue: 'check.orders', retry: true
 
       def perform(account_id)
         log(:debug, 'Reconciling orders by HAC.', account_id: account_id)
