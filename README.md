@@ -45,6 +45,11 @@ If you want the box to be available via a custom (sub-)domain, also provide thes
 - `LETSENCRYPT_HOST`
 - `LETSENCRYPT_EMAIL`
 
+If you want to use a custom Redis instance provide the Redis conection strings:
+
+- `REDIS_URL` (redis://* for plain or rediss://* for ssl)
+- `REDIS_PASSWORD` (in case authentication is required)
+
 If you want to use a custom postgres instance provide the database connection strings:
 
 - `DATABASE_URL`
