@@ -69,7 +69,7 @@ module Box
         return unless balance # vmk do not have a closing balance and thus cannot update it
 
         if account.balance_date.blank? || account.balance_date <= balance.date
-          account.set_balance(balance.date, balance.amount_in_cents)
+          account.set_balance(balance.date, balance.amount_in_cents * balance.sign)
         end
       end
 
