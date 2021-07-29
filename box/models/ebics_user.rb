@@ -83,6 +83,19 @@ module Box
       false
     end
 
+    def refresh_bank_keys!
+      Box.logger.info("Refresh bank keys for account #{id}")
+      client.HPB
+
+      self.encryption_keys = client.send(:dump_keys)
+      save
+      true
+    rescue StandardError => e
+      # TODO: show the error to the user
+      Box.logger.error("Failed to refresh bank keys for account #{id}: #{e}")
+      false
+    end
+
     def state
       if active?
         'active'

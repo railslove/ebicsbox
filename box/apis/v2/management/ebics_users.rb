@@ -63,6 +63,18 @@ module Box
                 end
               end
 
+              params do
+                requires :id, type: Integer, desc: 'ID of the ebics_user'
+              end
+              post ':id/refresh_bank_keys' do
+                ebics_user = @account.ebics_users_dataset.first!(Sequel.qualify(:ebics_users, :id) => params[:id])
+                if ebics_user.refresh_bank_keys!
+                  present ebics_user, with: Entities::EbicsUser
+                else
+                  error!({ message: 'Bank keys could not be refreshed!' }, 500)
+                end
+              end
+
               ###
               ### GET /management/accounts/DExx/ebics_users
               ###
