@@ -1,4 +1,4 @@
-FROM ruby:2.5-buster
+FROM ruby:2.5.8-buster
 RUN apt-get update && apt-get install -y git supervisor build-essential zlib1g-dev libpq-dev
 
 # throw errors if Gemfile has been modified since Gemfile.lock
