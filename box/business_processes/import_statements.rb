@@ -51,7 +51,7 @@ module Box
         # find transactions via EREF
         transaction = account.transactions_dataset.where(eref: statement.eref).first
         # fallback to finding via statement information
-        transaction ||= account.transactions_dataset.exclude(currency: 'EUR', status: %w[credit_received debit_received]).where { created_at > 14.days.ago }.detect { |t| statement.information =~ /#{t.eref}/i }
+        transaction ||= account.transactions_dataset.where { created_at > 14.days.ago }.detect { |t| statement.information =~ /#{t.eref}/i }
 
         return unless transaction
 
