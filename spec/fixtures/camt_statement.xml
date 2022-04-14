@@ -307,6 +307,114 @@
         </TxDtls>
       </NtryDtls>
     </Ntry>
+    <Ntry>
+      <Amt Ccy="EUR">8.00</Amt>
+      <CdtDbtInd>DBIT</CdtDbtInd>
+      <Sts>BOOK</Sts>
+      <BookgDt>
+        <Dt>2013-12-27</Dt>
+      </BookgDt>
+      <ValDt>
+        <Dt>2013-12-27</Dt>
+      </ValDt>
+      <AcctSvcrRef>2013122711513230000</AcctSvcrRef>
+      <BkTxCd/>
+      <NtryDtls>
+        <Btch>
+          <MsgId>EBICS-BOX/123</MsgId>
+          <PmtInfId>STZV-PmInf27122013-11:02-2</PmtInfId>
+          <NbOfTxs>2</NbOfTxs>
+        </Btch>
+        <TxDtls>
+          <Refs>
+            <MsgId>STZV-Msg27122013-11:02</MsgId>
+            <EndToEndId>STZV-EtE27122013-11:02-1</EndToEndId>
+          </Refs>
+          <AmtDtls>
+            <TxAmt>
+              <Amt Ccy="EUR">3.50</Amt>
+            </TxAmt>
+          </AmtDtls>
+          <BkTxCd>
+            <Prtry>
+              <Cd>NMSC+201</Cd>
+              <Issr>ZKA</Issr>
+            </Prtry>
+          </BkTxCd>
+          <RltdPties>
+            <Dbtr>
+              <Nm>Testkonto Nummer 2</Nm>
+            </Dbtr>
+            <DbtrAcct>
+              <Id>
+                <IBAN>DE58740618130100033626</IBAN>
+              </Id>
+            </DbtrAcct>
+            <UltmtDbtr>
+              <Nm>keine Information vorhanden</Nm>
+            </UltmtDbtr>
+            <Cdtr>
+              <Nm>Testkonto Nummer 1</Nm>
+            </Cdtr>
+            <CdtrAcct>
+              <Id>
+                <IBAN>DE14740618130000033626</IBAN>
+              </Id>
+            </CdtrAcct>
+            <UltmtCdtr>
+              <Nm>Testkonto</Nm>
+            </UltmtCdtr>
+          </RltdPties>
+          <RmtInf>
+            <Ustrd>Sammelueberwseisung 2. Zahlung   TAN:283044   </Ustrd>
+          </RmtInf>
+        </TxDtls>
+        <TxDtls>
+          <Refs>
+            <MsgId>STZV-Msg27122013-11:02</MsgId>
+            <EndToEndId>STZV-EtE27122013-11:02-2</EndToEndId>
+          </Refs>
+          <AmtDtls>
+            <TxAmt>
+              <Amt Ccy="EUR">2.50</Amt>
+            </TxAmt>
+          </AmtDtls>
+          <BkTxCd>
+            <Prtry>
+              <Cd>NMSC+201</Cd>
+              <Issr>ZKA</Issr>
+            </Prtry>
+          </BkTxCd>
+          <RltdPties>
+            <Dbtr>
+              <Nm>Testkonto Nummer 2</Nm>
+            </Dbtr>
+            <DbtrAcct>
+              <Id>
+                <IBAN>DE58740618130100033626</IBAN>
+              </Id>
+            </DbtrAcct>
+            <UltmtDbtr>
+              <Nm>keine Information vorhanden</Nm>
+            </UltmtDbtr>
+            <Cdtr>
+              <Nm>Testkonto Nummer 1</Nm>
+            </Cdtr>
+            <CdtrAcct>
+              <Id>
+                <IBAN>DE14740618130000033626</IBAN>
+              </Id>
+            </CdtrAcct>
+            <UltmtCdtr>
+              <Nm>Testkonto</Nm>
+            </UltmtCdtr>
+          </RltdPties>
+          <RmtInf>
+            <Ustrd>Sammelueberweisung 1. Zahlung   TAN:283044   </Ustrd>
+          </RmtInf>
+        </TxDtls>
+      </NtryDtls>
+    </Ntry>
   </Stmt>
 </BkToCstmrStmt>
 </Document>
