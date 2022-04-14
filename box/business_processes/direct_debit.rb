@@ -36,7 +36,8 @@ module Box
           payload: Base64.strict_encode64(sdd.to_xml),
           amount: params[:amount],
           eref: params[:eref],
-          instrument: params[:instrument]
+          instrument: params[:instrument],
+          message_identification: sdd.message_identification
         )
       else
         raise Box::BusinessProcessFailure, sdd.errors

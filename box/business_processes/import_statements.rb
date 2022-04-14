@@ -49,9 +49,12 @@ module Box
 
       def self.link_statement_to_transaction(account, statement)
         # find transactions via EREF
-        transaction = account.transactions_dataset.where(eref: statement.eref).first
+        transaction = account.transactions_dataset.where(eref: statement.eref).first unless statement.eref.nil?
+        # find transactions via SEPA msg_id
+        # ToDo: This fallback works at the moment, because we only add one transaction to each CDD batch.
+        transaction = account.transactions_dataset.where(msg_id: statement.msg_id).first unless statement.msg_id.nil?
         # fallback to finding via statement information
-        transaction ||= account.transactions_dataset.where { created_at > 14.days.ago }.detect { |t| statement.information =~ /#{t.eref}/i }
+        transaction ||= account.transactions_dataset.where { created_at > 14.days.ago }.detect { |t| statement.information =~ /#{t.eref}/i } unless statement.information.nil?
 
         return unless transaction
 
@@ -112,6 +115,7 @@ module Box
           eref: transaction.respond_to?(:eref) ? transaction.eref : transaction.sepa['EREF'],
           mref: transaction.respond_to?(:mref) ? transaction.mref : transaction.sepa['MREF'],
           svwz: transaction.respond_to?(:svwz) ? transaction.svwz : transaction.sepa['SVWZ'],
+          msg_id: transaction.try(:msg_id),
           tx_id: transaction.try(:transaction_id),
           creditor_identifier: transaction.respond_to?(:creditor_identifier) ? transaction.creditor_identifier : transaction.sepa['CRED']
         }

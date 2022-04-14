@@ -145,7 +145,8 @@ module Box
           it 'imports camt statements' do
             parsed_camt = CamtParser::String.parse(camt).statements
             bank_statement = ImportBankStatement.from_cmxl(parsed_camt.first, camt_account)
-            expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(4)
+            expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(5)
+            expect( Statement.last.msg_id ).to eq("EBICS-BOX/123")
           end
         end
 
@@ -205,7 +206,7 @@ module Box
         end
       end
 
-      describe '.link_statement_to_transaction fallback' do
+      describe '.link_statement_to_transaction fallback eref in information' do
         let(:statement) { Statement.create(information: 'fallback-eref', account_id: account.id) }
 
         def exec_link_action
@@ -243,6 +244,34 @@ module Box
         end
       end
 
+      describe '.link_statement_to_transaction fallback msg_id for debits' do
+        let(:statement) { Statement.create(msg_id: 'EBICS-BOX/123', account_id: account.id) }
+
+        def exec_link_action
+          described_class.link_statement_to_transaction(account, statement)
+        end
+
+        context 'no transaction could be found' do
+          it 'does not trigger a webhook' do
+            expect(Event).to_not receive(:statement_created)
+            exec_link_action
+          end
+        end
+
+        context 'transaction exists for debits' do
+          let!(:transaction) { Transaction.create(account_id: account.id, msg_id: 'EBICS-BOX/123', created_at: Date.today) }
+          let(:event) { object_double(Event).as_stubbed_const }
+
+          context 'statement is a debit' do
+            before { statement.update(debit: true) }
+
+            it 'sets correct transaction state' do
+              expect_any_instance_of(Transaction).to receive(:update_status).with('debit_received')
+              exec_link_action
+            end
+          end
+        end
+      end
 
       describe 'duplicates' do
         let(:mt940) { File.read('spec/fixtures/similar_but_not_dup_transactions.mt940') }
