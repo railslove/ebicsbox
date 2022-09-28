@@ -5,7 +5,7 @@ require 'grape'
 require_relative '../models/account'
 
 module Box
-  class ActiveAccount < Grape::Validations::Base
+  class ActiveAccount < Grape::Validations::Validators::Base
     def validate_param!(attr_name, params)
       account = Account.first!(iban: params[:id])
       if account.iban != params[:iban] && account.active?
