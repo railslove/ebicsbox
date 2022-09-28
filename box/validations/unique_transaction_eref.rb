@@ -5,7 +5,7 @@ require 'grape'
 require_relative '../models/transaction'
 
 module Box
-  class UniqueTransactionEref < Grape::Validations::Base
+  class UniqueTransactionEref < Grape::Validations::Validators::Base
     def validate(request)
       organization = request.env['box.organization']
 
@@ -18,7 +18,7 @@ module Box
     end
   end
 
-  class LengthTransactionEref < Grape::Validations::Base
+  class LengthTransactionEref < Grape::Validations::Validators::Base
     def length(currency)
       Hash.new(27).update(
         'EUR' => 64

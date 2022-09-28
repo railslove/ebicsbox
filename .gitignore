@@ -19,3 +19,6 @@ Box Key Architecture.graffle
 node_modules
 application.js
 epics-box.war
+
+# Intelij
+.idea
