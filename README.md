@@ -9,7 +9,7 @@ It offers a HTTP interface and can be integrated with different message queueing
 
 ## Prerequisites
 
-- ruby (ruby 2.5.x)
+- ruby (ruby 2.7.6)
 - redis
 - postgres
 

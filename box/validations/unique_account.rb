@@ -5,7 +5,7 @@ require 'grape'
 require_relative '../models/account'
 
 module Box
-  class UniqueAccount < Grape::Validations::Base
+  class UniqueAccount < Grape::Validations::Validators::Base
     def validate(request)
       organization = request.env['box.organization']
       if request.post? && !organization.accounts_dataset.where(iban: request.params[:iban]).empty?
