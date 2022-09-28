@@ -29,7 +29,7 @@ module Box
         Queue.execute_credit(
           account_id: account.id,
           user_id: user.id,
-          payload: Base64.strict_encode64(sct.to_xml),
+          payload: Base64.strict_encode64(sct.to_xml('pain.001.001.03')),
           eref: params[:eref],
           currency: 'EUR',
           amount: params[:amount],
