@@ -118,7 +118,7 @@ module Box
         end
 
         context 'account is owned by another organization' do
-          let(:account) { other_organization.add_account(iban: 'SOME_IBAN') }
+          let(:account) { other_organization.add_account(iban: 'SOME_IBAN', bic: 'SOME_BIC') }
 
           it 'fails with a proper error message' do
             post "#{account.iban}/debits", valid_payload, 'Authorization' => "token #{user.access_token}"
@@ -132,7 +132,7 @@ module Box
         end
 
         context 'account is not yet activated' do
-          let(:account) { organization.add_account(iban: 'AL90208110080000001039531801', name: 'Test Account', creditor_identifier: 'DE98ZZZ09999999999') }
+          let(:account) { organization.add_account(iban: 'AL90208110080000001039531801', name: 'Test Account', creditor_identifier: 'DE98ZZZ09999999999', bic: 'SOME_BIC') }
 
           it 'fails with a proper error message' do
             post "#{account.iban}/debits", valid_payload, 'Authorization' => "token #{user.access_token}"
@@ -230,7 +230,7 @@ module Box
         end
 
         context 'account is owned by another organization' do
-          let(:account) { other_organization.add_account(iban: 'SOME_IBAN') }
+          let(:account) { other_organization.add_account(iban: 'SOME_IBAN', bic: 'SOME_BIC') }
 
           it 'fails with a proper error message' do
             post "#{account.iban}/credits", valid_payload, 'Authorization' => "token #{user.access_token}"
@@ -244,7 +244,7 @@ module Box
         end
 
         context 'account is not yet activated' do
-          let(:account) { organization.add_account(iban: 'AL90208110080000001039531801', name: 'Test Account', creditor_identifier: 'DE98ZZZ09999999999') }
+          let(:account) { organization.add_account(iban: 'AL90208110080000001039531801', name: 'Test Account', creditor_identifier: 'DE98ZZZ09999999999', bic: 'DABAIE2D') }
 
           it 'fails with a proper error message' do
             post "#{account.iban}/credits", valid_payload, 'Authorization' => "token #{user.access_token}"
@@ -258,7 +258,7 @@ module Box
         end
 
         context 'account is activated and accessible' do
-          let(:account) { organization.add_account(iban: 'AL90208110080000001039531801', name: 'Test Account', creditor_identifier: 'DE98ZZZ09999999999') }
+          let(:account) { organization.add_account(iban: 'AL90208110080000001039531801', name: 'Test Account', creditor_identifier: 'DE98ZZZ09999999999', bic: 'DABAIE2D') }
 
           before { account.add_ebics_user(activated_at: 1.day.ago) }
 
@@ -318,6 +318,7 @@ module Box
         let(:account) do
           organization.add_account(
             iban: 'AL90208110080000001039531801',
+            bic: 'DABAIE2D',
             name: 'Test Account',
             creditor_identifier: 'DE98ZZZ09999999999',
             balance_date: Date.new(2015, 1, 1),

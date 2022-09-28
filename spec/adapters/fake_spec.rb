@@ -9,7 +9,7 @@ module Box
   module Adapters
     RSpec.describe Fake do
       let!(:organization) { Fabricate(:organization) }
-      let!(:account) { organization.add_account(iban: 'AL90208110080000001039531801', name: 'Test account', mode: 'Fake', url: 'url', host: 'host', partner: 'partner', creditor_identifier: 'DE98ZZZ09999999999') }
+      let!(:account) { organization.add_account(iban: 'AL90208110080000001039531801', name: 'Test account', mode: 'Fake', url: 'url', bic: 'DABAIE2D',host: 'host', partner: 'partner', creditor_identifier: 'DE98ZZZ09999999999') }
       let!(:user) { organization.add_user(name: 'Test user') }
       let!(:ebics_user) { account.add_ebics_user(user_id: user.id, signature_class: 'T', activated_at: 1.day.ago) }
 
@@ -40,7 +40,9 @@ module Box
             iban: 'AL90208110080000001039531801',
             eref: SecureRandom.hex,
             remittance_information: 'Just a basic test credit',
-            requested_date: Time.now.to_i
+            requested_date: Time.now.to_i,
+            country_code: "DE",
+            currency: "EUR"
           }
         end
 
