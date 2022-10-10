@@ -2,13 +2,15 @@ FROM ruby:2.5.8-buster
 RUN apt-get update && apt-get install -y git supervisor build-essential zlib1g-dev libpq-dev
 
 # throw errors if Gemfile has been modified since Gemfile.lock
-RUN bundle config --global frozen 1
+
+RUN bundle config --global frozen 1 
 
 RUN mkdir -p /usr/ebicsbox
 WORKDIR /usr/ebicsbox
 
 ADD Gemfile /usr/ebicsbox/
 ADD Gemfile.lock /usr/ebicsbox/
+RUN gem install bundler
 RUN bundle install
 
 ADD . /usr/ebicsbox
