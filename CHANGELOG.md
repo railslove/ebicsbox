@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.0
+- `[ENHANCEMENT]` Enables `/transactions` endpoint to filter by `end_to_end_reference`.
+
+## 1.4.0
+- `[ENHANCEMENT]` Updates pain formats
+  - 001.003.03 -> 001.001.03 (Credit Transfer)
+  - 008.003.02 -> 008.001.02 (Direct Debit)
+
 ## 1.3.32
 - Nothing to see here
 
