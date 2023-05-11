@@ -31,6 +31,9 @@ module Box
         query = query.where { statements__date >= params[:from] } if params[:from].present?
         query = query.where { statements__date <= params[:to] } if params[:to].present?
 
+        # Filter by eref
+        query = query.where(eref: params[:end_to_end_reference]) if params[:end_to_end_reference].present?
+
         # Filter by type
         query = query.where(debit: params[:type] == 'debit') if params[:type].present?
 

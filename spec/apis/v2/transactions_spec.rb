@@ -131,6 +131,22 @@ module Box
         end
       end
 
+      context 'when end_to_end_reference filter is active' do
+        include_context 'with account'
+
+        let!(:first_transaction) { account.add_statement(eref: 'REF001') }      
+        let!(:second_transaction) { account.add_statement(eref: 'REF001') }
+        let!(:third_transaction) { account.add_statement(eref: 'REF002') }
+
+        it 'only returns transactions with matching eref' do
+          get "/transactions?end_to_end_reference=REF001", TestHelpers::VALID_HEADERS
+          expect_json_sizes 2
+          expect_json '0', end_to_end_reference: 'REF001'
+          expect_json '1', end_to_end_reference: 'REF001'
+        end
+
+      end
+
       context 'when date filter is active' do
         include_context 'with account'
 
