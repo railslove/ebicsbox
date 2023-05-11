@@ -25,6 +25,7 @@ module Box
             optional :iban, type: Array[String], desc: 'IBAN of an account', coerce_with: ->(value) { value.split(',') }, documentation: { param_type: 'query' }
             optional :type, type: String, desc: 'Type of statement', values: %w[credit debit]
             optional :from, type: Date, desc: 'Date from which on to filter the results'
+            optional :end_to_end_reference, type: String, desc: 'Filter by end to end reference'
             optional :to, type: Date, desc: 'Date to which filter results'
           end
 
