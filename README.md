@@ -105,7 +105,7 @@ To generate the private-public keypair, follow these steps:
 
 5. Remember to keep the private key (`private_key.pem`) secure and do not share it with anyone.
 
-## Step 3: Encode the Public Key in Base64
+#### Step 2: Encode the Public Key in Base64
 
 To encode the public key in Base64, follow these steps:
 
