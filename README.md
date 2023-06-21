@@ -105,18 +105,6 @@ To generate the private-public keypair, follow these steps:
 
 5. Remember to keep the private key (`private_key.pem`) secure and do not share it with anyone.
 
-## Step 2: Convert the Public Key to `.pem` Format
-
-To convert the public key to `.pem` format, follow these steps:
-
-1. Run the following command to convert the `public_key.pem` file to the desired `.pem` format:
-
-```bash
-  openssl rsa -in public_key.pem -pubout -outform PEM -out public_key_formatted.pem
-``` 
-
-2. The public key is now converted to the `.pem` format and saved as `public_key_formatted.pem`.
-
 ## Step 3: Encode the Public Key in Base64
 
 To encode the public key in Base64, follow these steps:
@@ -124,7 +112,7 @@ To encode the public key in Base64, follow these steps:
 1. Use the following command to encode the public key in Base64:
 
 ```bash
-openssl base64 -in public_key_formatted.pem -out public_key_base64.txt
+openssl base64 -in public_key.pem -out public_key_base64.txt
 ```
 
 2. The public key is now encoded in Base64 and saved as `public_key_base64.txt`. The file contains the Base64-encoded public key.
