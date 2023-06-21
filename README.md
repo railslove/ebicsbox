@@ -56,6 +56,13 @@ SSL forcing can be disabled by setting
 
 - `DISABLE_SSL_FORCE`
 
+You can enable webhook payload encryption by setting 
+
+- `WEBHOOK_ENCRYPTION_KEY`
+
+It expects to be a base64-encoded RSA public key in PEM format (see below).
+
+
 you can store these in a local .env file for development.
 
 It's done via environment variables. You can utilize a `.env` file while
@@ -71,6 +78,46 @@ generate one, you can use the following command:
 ```bash
   ruby -rsecurerandom -e 'puts SecureRandom.hex(32)'
 ```
+
+### Generate a Webhook encryption key
+
+
+If OpenSSL is not installed, please refer to the OpenSSL documentation for installation instructions specific to your operating system.
+
+#### Step 1: Generate the Private-Public Keypair
+
+To generate the private-public keypair, follow these steps:
+
+1. Open your terminal or command prompt.
+
+2. Run the following command to generate a private key file named `private_key.pem`: 
+```bash
+  openssl genpkey -algorithm RSA -out private_key.pem
+``` 
+
+3. You will be prompted to set a passphrase for the private key. Choose a strong passphrase and remember it for future use.
+
+4. Run the following command to generate the corresponding public key file named `public_key.pem`:
+
+```bash
+  openssl rsa -pubout -in private_key.pem -out public_key.pem
+``` 
+
+5. Remember to keep the private key (`private_key.pem`) secure and do not share it with anyone.
+
+## Step 3: Encode the Public Key in Base64
+
+To encode the public key in Base64, follow these steps:
+
+1. Use the following command to encode the public key in Base64:
+
+```bash
+openssl base64 -in public_key.pem -out public_key_base64.txt
+```
+
+2. The public key is now encoded in Base64 and saved as `public_key_base64.txt`. The file contains the Base64-encoded public key.
+
+Congratulations! You have successfully generated a private-public keypair, converted the public key to a `.pem` file, and encoded it in Base64. You can now use it for `WEBHOOK_ENCRYPTION_KEY` (see above).
 
 ## Usage
 
