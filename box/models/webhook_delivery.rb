@@ -7,6 +7,7 @@ require 'sequel'
 
 require_relative './event'
 require_relative '../middleware/signer'
+require_relative '../../config/configuration'
 
 module Box
   class WebhookDelivery < Sequel::Model
@@ -43,7 +44,8 @@ module Box
           response = conn.post do |req|
             req.url URI(event.callback_url).path
             req.headers['Content-Type'] = 'application/json'
-            req.body = event.to_webhook_payload.to_json
+            payload = event.to_webhook_payload.to_json
+            req.body = Box.configuration.encrypt_webhooks? ? encrypt(payload) : payload            
           end
         end
       rescue Faraday::TimeoutError, Faraday::ConnectionFailed, Faraday::Error => ex
@@ -51,6 +53,24 @@ module Box
         response = FailedResponse.new(ex.message)
       end
       [response, execution_time]
+    end
+    
+    def encrypt(payload) 
+      aes_key = OpenSSL::Cipher.new('AES-256-CBC').random_key
+      cipher = OpenSSL::Cipher.new('AES-256-CBC')
+      cipher.encrypt
+      cipher.key = aes_key
+      encrypted_payload_base64 = Base64.encode64(cipher.update(payload) + cipher.final)
+      public_key = OpenSSL::PKey::RSA.new(Base64.decode64(Box.configuration.webhook_encryption_key))
+      encrypted_aes_key_base64 = Base64.encode64(public_key.public_encrypt(aes_key))
+      transformToJsonString(encrypted_aes_key_base64, encrypted_payload_base64)
+    end
+
+    def transformToJsonString (encrypted_aes_key_base64, encrypted_payload_base64)
+      {
+        'encrypted_aes_key_base64' => encrypted_aes_key_base64,
+        'encrypted_payload_base64' => encrypted_payload_base64
+      }.to_json
     end
 
     class FailedResponse

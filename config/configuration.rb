@@ -77,5 +77,14 @@ module Box
 
       jwt_secret unless static_auth?
     end
+
+    def webhook_encryption_key
+      ENV['WEBHOOK_ENCRYPTION_KEY']
+    end
+
+    def encrypt_webhooks? 
+      webhook_encryption_key != nil
+    end
+
   end
 end
