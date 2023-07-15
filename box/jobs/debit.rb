@@ -27,6 +27,7 @@ module Box
           trx.account_id  = message[:account_id]
           trx.payload     = Base64.strict_decode64(message[:payload])
           trx.status      = 'created'
+          trx.msg_id      = message[:message_identification]
         end
 
         return false unless transaction.status == 'created'
