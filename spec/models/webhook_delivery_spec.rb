@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 require 'faraday'
+require 'openssl'
+require 'base64'
+require 'json'
 
 module Box
   RSpec.describe WebhookDelivery do
@@ -41,6 +44,61 @@ module Box
           it 'returns a response' do
             expect(subject.execute_request.size).to eq(2)
           end
+
+          it 'does encrypt the payload if encrypt_webhooks is true' do
+            # Set up Event to return consistent payload
+            expected_payload = {"foo": "bar"}
+            allow_any_instance_of(Box::Event).to receive(:to_webhook_payload).and_return(expected_payload)
+
+            # Set up public encryption key
+            webhook_encryption_public_key_pem = File.read('./spec/webhook_encryption_public_key_RSPEC_ONLY.pem')
+            webhook_encryption_public_key_base_64 = Base64.encode64(webhook_encryption_public_key_pem)
+            webhook_encryption_public_key = OpenSSL::PKey::RSA.new(webhook_encryption_public_key_pem)
+
+            # Set up private encryption key
+            webhook_encryption_private_key_pem = File.read('./spec/webhook_encryption_private_key_RSPEC_ONLY.pem')
+            webhook_encryption_private_key = OpenSSL::PKey::RSA.new(webhook_encryption_private_key_pem)
+            aes_key = OpenSSL::Cipher.new('AES-256-CBC')
+
+            # Set up configuration
+            allow_any_instance_of(Box::Configuration).to receive(:encrypt_webhooks?).and_return(true)
+            allow_any_instance_of(Box::Configuration).to receive(:webhook_encryption_key).and_return(webhook_encryption_public_key_base_64)
+            allow(OpenSSL::Cipher).to receive(:new).and_return(aes_key)
+
+            expected_payload_encrypted = Base64.encode64(webhook_encryption_public_key.public_encrypt(expected_payload.to_json))
+
+            allow_any_instance_of(Faraday::Request).to receive(:body=) do |instance, payload|
+              payload_as_json = JSON.parse(payload)
+
+              decrypted_aes_key = webhook_encryption_private_key.private_decrypt(Base64.decode64(payload_as_json['encrypted_aes_key_base64']))
+              encrypted_payload = Base64.decode64(payload_as_json['encrypted_payload_base64'])
+
+              cipher = OpenSSL::Cipher.new('AES-256-CBC')
+              cipher.decrypt
+              cipher.key = decrypted_aes_key
+              decrypted_payload = cipher.update(encrypted_payload) + cipher.final
+
+              expect(decrypted_payload).to eq(expected_payload.to_json)
+            end
+
+            subject.execute_request
+          end
+
+          it 'does not encrypt payload if encrypt_webhooks is false' do
+            # Set up Event to return consistent payload
+            expected_payload = {"foo": "bar"}
+            allow_any_instance_of(Box::Event).to receive(:to_webhook_payload).and_return(expected_payload)
+
+            # Set up configuration
+            allow_any_instance_of(Box::Configuration).to receive(:encrypt_webhooks?).and_return(false)
+
+            allow_any_instance_of(Faraday::Request).to receive(:body=) do |instance, payload|
+              expect(payload).to eq(expected_payload.to_json)
+            end
+
+            subject.execute_request
+          end
+
         end
 
         context 'without auth defined' do
