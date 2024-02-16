@@ -56,21 +56,23 @@ module Box
     end
     
     def encrypt(payload) 
-      aes_key = OpenSSL::Cipher.new('AES-256-CBC').random_key
+      # AES encryption
       cipher = OpenSSL::Cipher.new('AES-256-CBC')
+      aes_key = cipher.random_key      
       cipher.encrypt
       cipher.key = aes_key
-      encrypted_payload_base64 = Base64.encode64(cipher.update(payload) + cipher.final)
-      public_key = OpenSSL::PKey::RSA.new(Base64.decode64(Box.configuration.webhook_encryption_key))
-      encrypted_aes_key_base64 = Base64.encode64(public_key.public_encrypt(aes_key))
-      transformToJsonString(encrypted_aes_key_base64, encrypted_payload_base64)
-    end
+      iv = cipher.random_iv
+      encrypted_payload = cipher.update(payload) + cipher.final
 
-    def transformToJsonString (encrypted_aes_key_base64, encrypted_payload_base64)
-      {
-        'encrypted_aes_key_base64' => encrypted_aes_key_base64,
-        'encrypted_payload_base64' => encrypted_payload_base64
-      }.to_json
+      # Combine IV and encrypted payload
+      encoded_iv = Base64.strict_encode64(iv)
+      encoded_encrypted_payload = Base64.strict_encode64(encrypted_payload)      
+
+      public_key = OpenSSL::PKey::RSA.new(Base64.decode64(Box.configuration.webhook_encryption_key))
+      encoded_aes_key = Base64.strict_encode64(aes_key)
+      encrypted_encoded_aes_key = public_key.public_encrypt(encoded_aes_key)
+      encoded_encrypted_encoded_aes_key = Base64.strict_encode64(encrypted_encoded_aes_key)
+      "#{encoded_encrypted_encoded_aes_key}$#{encoded_iv}$#{encoded_encrypted_payload}"
     end
 
     class FailedResponse

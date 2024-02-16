@@ -58,24 +58,23 @@ module Box
             # Set up private encryption key
             webhook_encryption_private_key_pem = File.read('./spec/webhook_encryption_private_key_RSPEC_ONLY.pem')
             webhook_encryption_private_key = OpenSSL::PKey::RSA.new(webhook_encryption_private_key_pem)
-            aes_key = OpenSSL::Cipher.new('AES-256-CBC')
 
             # Set up configuration
             allow_any_instance_of(Box::Configuration).to receive(:encrypt_webhooks?).and_return(true)
             allow_any_instance_of(Box::Configuration).to receive(:webhook_encryption_key).and_return(webhook_encryption_public_key_base_64)
-            allow(OpenSSL::Cipher).to receive(:new).and_return(aes_key)
-
+ 
             expected_payload_encrypted = Base64.encode64(webhook_encryption_public_key.public_encrypt(expected_payload.to_json))
 
             allow_any_instance_of(Faraday::Request).to receive(:body=) do |instance, payload|
-              payload_as_json = JSON.parse(payload)
-
-              decrypted_aes_key = webhook_encryption_private_key.private_decrypt(Base64.decode64(payload_as_json['encrypted_aes_key_base64']))
-              encrypted_payload = Base64.decode64(payload_as_json['encrypted_payload_base64'])
-
+              encrypted_aes_key_base64, iv_base64, encrypted_payload_base64  = payload.split('$')
+              decrypted_encoded_aes_key = webhook_encryption_private_key.private_decrypt(Base64.strict_decode64(encrypted_aes_key_base64))
+              decrypted_aes_key = Base64.strict_decode64(decrypted_encoded_aes_key)
+              encrypted_payload = Base64.strict_decode64(encrypted_payload_base64)
+              iv = Base64.strict_decode64(iv_base64)
               cipher = OpenSSL::Cipher.new('AES-256-CBC')
               cipher.decrypt
-              cipher.key = decrypted_aes_key
+              cipher.key = decrypted_aes_key   
+              cipher.iv = iv           
               decrypted_payload = cipher.update(encrypted_payload) + cipher.final
 
               expect(decrypted_payload).to eq(expected_payload.to_json)
