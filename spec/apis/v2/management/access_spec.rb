@@ -17,7 +17,7 @@ module Box
 
         it 'includes an error message' do
           get 'management/'
-          expect_json 'message', 'Unauthorized access. Please provide a valid organization management token!'
+          expect_json 'message', 'Unauthorized access. Please provide a valid access token!'
         end
       end
 

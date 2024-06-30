@@ -4,6 +4,8 @@ require 'spec_helper'
 
 require_relative '../../box/adapters/fake'
 require_relative '../../box/models/account'
+require_relative '../../box/business_processes/credit'
+require_relative '../../box/business_processes/direct_debit'
 
 module Box
   module Adapters
