@@ -40,11 +40,11 @@ module Box
     end
 
     def self.execute_credit(payload)
-      Jobs::Credit.perform_async(payload)
+      Jobs::Credit.perform_async(payload.deep_stringify_keys)
     end
 
     def self.execute_debit(payload)
-      Jobs::Debit.perform_async(payload)
+      Jobs::Debit.perform_async(payload.deep_stringify_keys)
     end
   end
 end

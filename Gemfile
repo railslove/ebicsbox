@@ -2,11 +2,11 @@
 
 source 'https://rubygems.org'
 
-ruby '2.5.8'
+ruby '3.3.2'
 
 gem 'activesupport'
 gem 'camt_parser', git: 'https://github.com/railslove/camt_parser.git'
-gem 'cmxl'
+gem 'cmxl', git: 'https://github.com/railslove/cmxl'
 gem 'epics', '~> 1.8.1'
 gem 'faraday'
 gem 'grape'
@@ -14,7 +14,7 @@ gem 'grape-entity'
 gem 'grape-swagger'
 gem 'grape-swagger-entity'
 gem 'jwt'
-gem 'king_dtaus', git: 'https://github.com/salesking/king_dtaus.git'
+gem 'king_dtaus', git: 'https://github.com/railslove/king_dtaus_ruby_3.git'
 gem 'nokogiri'
 gem 'pg'
 gem 'pry'
@@ -27,11 +27,11 @@ gem 'sidekiq'
 gem 'sidekiq-scheduler'
 
 # exception management
-gem 'sentry-raven'
 gem 'rollbar'
+gem 'sentry-ruby'
 
-gem 'rack-ssl-enforcer'
 gem 'barnes'
+gem 'rack-ssl-enforcer'
 
 group :development do
   gem 'rubocop'
@@ -39,7 +39,7 @@ end
 
 group :development, :test do
   gem 'airborne'
-  gem 'database_cleaner'
+  gem 'database_cleaner-sequel'
   gem 'dotenv'
   gem 'fabrication'
   gem 'faker'

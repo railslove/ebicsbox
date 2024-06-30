@@ -2,6 +2,7 @@
 
 require 'grape-entity'
 require_relative './transaction'
+require_relative '../ebics_user'
 
 module Box
   module Entities

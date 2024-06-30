@@ -149,8 +149,6 @@ Our goal is to provide an always up-to-date documentation from within the app.
 
 Documentation is available at http://YOUR-HOST/docs
 
-> v1 docs are not maintained anymore and are just available as static swagger file
-
 ## Contributing
 
 1. Fork it ( https://github.com/[my-github-username]/epics-http/fork )

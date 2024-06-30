@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# king_dtaus is very old and needs this monkeypatch :(
+class BigDecimal; def initialize(value) = BigDecimal(value); end
+
 require 'king_dtaus'
 require_relative '../errors/business_process_failure'
 
@@ -77,7 +80,11 @@ module Box
         eref: params[:eref],
         currency: params[:currency],
         amount: params[:amount],
-        metadata: params.slice(:name, :iban, :bic, :execution_date, :reference, :country_code, :fee_handling)
+        metadata: {
+          **params.slice(:name, :iban, :bic, :reference, :country_code),
+          execution_date: params[:execution_date]&.iso8601,
+          fee_handling: params[:fee_handling]&.to_s,
+        }
       )
     rescue ArgumentError => e
       # TODO: Will be fixed upstream in the sepa_king gem by us
