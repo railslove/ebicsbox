@@ -17,14 +17,7 @@ ADD . /usr/ebicsbox
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Clean up
-RUN rm Dockerfile*
-RUN rm -rf .git
 RUN rm -rf pkg
-RUN rm -rf log
-RUN rm Procfile*
-RUN rm README*
-RUN rm docker-compose*
-RUN rm -rf docs
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod 755 /entrypoint.sh
