@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-# king_dtaus is very old and needs this monkeypatch :(
-class BigDecimal; def initialize(value) = BigDecimal(value); end
-
 require "king_dtaus"
 require "ostruct"
 require_relative "../errors/business_process_failure"
