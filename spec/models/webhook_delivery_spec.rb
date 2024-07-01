@@ -53,7 +53,6 @@ module Box
             # Set up public encryption key
             webhook_encryption_public_key_pem = File.read("./spec/webhook_encryption_public_key_RSPEC_ONLY.pem")
             webhook_encryption_public_key_base_64 = Base64.encode64(webhook_encryption_public_key_pem)
-            webhook_encryption_public_key = OpenSSL::PKey::RSA.new(webhook_encryption_public_key_pem)
 
             # Set up private encryption key
             webhook_encryption_private_key_pem = File.read("./spec/webhook_encryption_private_key_RSPEC_ONLY.pem")

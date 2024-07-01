@@ -8,21 +8,23 @@ module Box
     include_context "valid user"
     include_context "with account"
 
-    TRANSFER_SPEC = {
-      id: :string,
-      account: :string,
-      name: :string,
-      iban: :string,
-      bic: :string,
-      amount_in_cents: :integer,
-      currency: :string,
-      end_to_end_reference: :string,
-      ebics_transaction_id: :string,
-      status: :string,
-      reference: :string,
-      executed_on: :date,
-      _links: :object
-    }.freeze
+    let(:transfer_spec) {
+      {
+        id: :string,
+        account: :string,
+        name: :string,
+        iban: :string,
+        bic: :string,
+        amount_in_cents: :integer,
+        currency: :string,
+        end_to_end_reference: :string,
+        ebics_transaction_id: :string,
+        status: :string,
+        reference: :string,
+        executed_on: :date,
+        _links: :object
+      }.freeze
+    }
 
     ###
     ### GET /accounts
@@ -66,7 +68,7 @@ module Box
         describe "object format" do
           it "exposes properly formatted data" do
             get "/credit_transfers", TestHelpers::VALID_HEADERS
-            expect_json_types "0", TRANSFER_SPEC
+            expect_json_types "0", transfer_spec
           end
         end
 
@@ -361,7 +363,7 @@ module Box
 
         it "exposes properly formatted data" do
           get "/credit_transfers/#{credit.public_id}", TestHelpers::VALID_HEADERS
-          expect_json_types TRANSFER_SPEC
+          expect_json_types transfer_spec
         end
       end
     end

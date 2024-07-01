@@ -6,25 +6,30 @@ module Box
   RSpec.describe Apis::V2::Accounts do
     include_context "valid user"
 
-    ACCOUNT_SPEC = {
-      name: :string,
-      iban: :string,
-      bic: :string,
-      balance_date: :date,
-      balance_in_cents: :integer,
-      creditor_identifier: :string,
-      callback_url: :string,
-      status: :string,
-      ebics_users: :array
-    }.freeze
+    let(:account_spec) {
+      {
+        name: :string,
+        iban: :string,
+        bic: :string,
+        balance_date: :date,
+        balance_in_cents: :integer,
+        creditor_identifier: :string,
+        callback_url: :string,
+        status: :string,
+        ebics_users: :array
+      }.freeze
+    }
 
-    NEW_ACCOUNT_SPEC = {
-      name: :string,
-      iban: :string,
-      bic: :string,
-      status: :string,
-      ebics_users: :array
-    }.freeze
+    let(:new_account_spec) {
+      {
+        name: :string,
+        iban: :string,
+        bic: :string,
+        status: :string,
+        ebics_users: :array
+      }.freeze
+    }
+
     ###
     ### GET /accounts
     ###
@@ -60,7 +65,7 @@ module Box
         describe "object format" do
           it "exposes properly formatted data" do
             get "/accounts", TestHelpers::VALID_HEADERS
-            expect_json_types "0", ACCOUNT_SPEC
+            expect_json_types "0", account_spec
           end
         end
 
@@ -197,7 +202,7 @@ module Box
 
         it "returns the newly created account" do
           do_request
-          expect_json_types "account", NEW_ACCOUNT_SPEC
+          expect_json_types "account", new_account_spec
         end
 
         it "creates a new account" do
@@ -269,7 +274,7 @@ module Box
 
         it "exposes properly formatted data" do
           get "/accounts/#{account.iban}", TestHelpers::VALID_HEADERS
-          expect_json_types ACCOUNT_SPEC
+          expect_json_types account_spec
         end
       end
     end

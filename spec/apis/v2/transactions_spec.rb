@@ -6,18 +6,20 @@ module Box
   RSpec.describe Apis::V2::Transactions do
     include_context "valid user"
 
-    TRANSACTION_SPEC = {
-      id: :string,
-      account: :string,
-      name: :string,
-      iban: :string,
-      bic: :string,
-      amount_in_cents: :integer,
-      executed_on: :date,
-      type: :string,
-      reference: :string,
-      end_to_end_reference: :string,
-      settled_at: :string
+    let(:transaction_spec) {
+      {
+        id: :string,
+        account: :string,
+        name: :string,
+        iban: :string,
+        bic: :string,
+        amount_in_cents: :integer,
+        executed_on: :date,
+        type: :string,
+        reference: :string,
+        end_to_end_reference: :string,
+        settled_at: :string
+      }
     }.freeze
 
     describe "GET: /transactions" do
@@ -66,7 +68,7 @@ module Box
 
         it "formats the response decument properly" do
           get "/transactions", TestHelpers::VALID_HEADERS
-          expect_json_types "0", TRANSACTION_SPEC
+          expect_json_types "0", transaction_spec
         end
       end
 

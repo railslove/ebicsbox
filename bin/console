@@ -19,5 +19,5 @@ Dir[File.join(File.dirname(__FILE__), "../box/**/*.rb")].sort.map { |file| requi
 
 require "pry"
 module Box
-  pry
+  pry # rubocop:disable Lint/Debugger
 end

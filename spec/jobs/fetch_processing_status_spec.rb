@@ -17,15 +17,15 @@ module Box
       end
 
       describe ".update_transaction" do
-        ACCOUNT_ID = 1
+        let(:account_id) { 1 }
 
         def do_action(order_id = "0001")
-          job.update_transaction(ACCOUNT_ID, action: "file_upload", reason_code: "none", ids: {"OrderID" => order_id})
+          job.update_transaction(account_id, action: "file_upload", reason_code: "none", ids: {"OrderID" => order_id})
         end
 
         context "transaction with order exists" do
-          let!(:old_transaction) { Transaction.create(account_id: ACCOUNT_ID, ebics_order_id: "0001", status: "created", type: "debit") }
-          let!(:new_transaction) { Transaction.create(account_id: ACCOUNT_ID, ebics_order_id: "0001", status: "created", type: "debit") }
+          let!(:old_transaction) { Transaction.create(account_id:, ebics_order_id: "0001", status: "created", type: "debit") }
+          let!(:new_transaction) { Transaction.create(account_id:, ebics_order_id: "0001", status: "created", type: "debit") }
 
           it "updates the last transaction with that order_id" do
             expect { do_action }.to change { new_transaction.reload.status }.to("file_upload")
