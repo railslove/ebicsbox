@@ -7,6 +7,10 @@ if env.to_s != "production"
   Dotenv.load
 end
 
+puts "Environment keys: #{ENV.keys}"
+puts "Environment: #{ENV['RACK_ENV']}"
+puts "Database URL: #{ENV['DATABASE_URL']}"
+
 module Box
   class ConfigurationError < StandardError; end
 
