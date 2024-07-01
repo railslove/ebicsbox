@@ -1,28 +1,28 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'securerandom'
-require 'sequel'
+require "securerandom"
+require "sequel"
 
-env = ENV.fetch('RACK_ENV', :development)
-if env.to_s != 'production'
+env = ENV.fetch("RACK_ENV", :development)
+if env.to_s != "production"
   # Load environment from file
-  require 'dotenv'
+  require "dotenv"
   Dotenv.load
 end
 
 # Load environment
-require 'bundler'
+require "bundler"
 Bundler.setup(:default, env)
 
 # Load app configuration
-require_relative '../config/bootstrap'
+require_relative "../config/bootstrap"
 Sequel.extension :migration, :core_extensions
 
 # Migrate to latest version
 version = Sequel::Migrator.run(
   DB,
-  File.join(File.dirname(__FILE__), '../migrations/'),
+  File.join(File.dirname(__FILE__), "../migrations/"),
   use_transactions: true,
   allow_missing_migration_files: true
 )

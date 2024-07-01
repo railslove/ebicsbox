@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../models/event'
+require_relative "../models/event"
 
 module Box
   module BusinessProcesses
@@ -13,7 +13,7 @@ module Box
         ebics_user = params.delete(:ebics_user)
 
         # Always create fake accounts in sandbox mode
-        params[:mode] = 'Fake' if Box.configuration.sandbox?
+        params[:mode] = "Fake" if Box.configuration.sandbox?
 
         DB.transaction do
           account = organization.add_account(params)

@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-ENV['RACK_ENV'] = 'test'
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..'))
+ENV["RACK_ENV"] = "test"
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 
-require 'timecop'
-require_relative '../config/bootstrap'
+require "timecop"
+require_relative "../config/bootstrap"
 
-Dir['spec/support/**/*.rb'].each { |f| require f }
+Dir["spec/support/**/*.rb"].sort.each { |f| require f }
 
 Sidekiq.strict_args!
 
@@ -87,7 +87,7 @@ RSpec.configure do |config|
     # Use the documentation formatter for detailed output,
     # unless a formatter has already been configured
     # (e.g. via a command-line flag).
-    config.default_formatter = 'doc'
+    config.default_formatter = "doc"
   end
 
   # Print the 10 slowest examples and example groups at the
@@ -105,7 +105,7 @@ RSpec.configure do |config|
   config.backtrace_exclusion_patterns << /gem/
   config.backtrace_exclusion_patterns << /database_cleaner/
 
-  config.example_status_persistence_file_path = './tmp/spec/examples.txt' # so one can use `rspec -n`
+  config.example_status_persistence_file_path = "./tmp/spec/examples.txt" # so one can use `rspec -n`
 
   # Seed global randomization in this process using the `--seed` CLI option.
   # Setting this allows you to use `--seed` to deterministically reproduce

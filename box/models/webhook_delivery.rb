@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require 'benchmark'
-require 'json'
-require 'faraday'
-require 'sequel'
+require "benchmark"
+require "json"
+require "faraday"
+require "sequel"
 
-require_relative './event'
-require_relative '../middleware/signer'
-require_relative '../../config/configuration'
+require_relative "event"
+require_relative "../middleware/signer"
+require_relative "../../config/configuration"
 
 module Box
   class WebhookDelivery < Sequel::Model
@@ -43,7 +43,7 @@ module Box
           conn = build_connection(event.callback_url)
           response = conn.post do |req|
             req.url URI(event.callback_url).path
-            req.headers['Content-Type'] = 'application/json'
+            req.headers["Content-Type"] = "application/json"
             payload = event.to_webhook_payload.to_json
             req.body = Box.configuration.encrypt_webhooks? ? encrypt(payload) : payload
           end
@@ -57,7 +57,7 @@ module Box
 
     def encrypt(payload)
       # AES encryption
-      cipher = OpenSSL::Cipher.new('AES-256-CBC')
+      cipher = OpenSSL::Cipher.new("AES-256-CBC")
       aes_key = cipher.random_key
       cipher.encrypt
       cipher.key = aes_key
@@ -100,7 +100,7 @@ module Box
     private
 
     def extract_auth(url)
-      url.match(%r(:\/\/(.*):(.*)@))&.captures
+      url.match(%r{://(.*):(.*)@})&.captures
     end
 
     def build_connection(callback_url)

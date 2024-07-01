@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require "spec_helper"
 
 module Box
   module Apis
     module V2
       RSpec.describe Service do
-        include_context 'valid user'
+        include_context "valid user"
 
-        it 'returns currently used version' do
-          get '/', 'Accept' => 'application/vnd.ebicsbox-v2+json', 'Authorization' => 'Bearer test-token'
-          expect_json 'version', 'v2'
+        it "returns currently used version" do
+          get "/", "Accept" => "application/vnd.ebicsbox-v2+json", "Authorization" => "Bearer test-token"
+          expect_json "version", "v2"
         end
       end
     end

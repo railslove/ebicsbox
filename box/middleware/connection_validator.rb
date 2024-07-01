@@ -5,7 +5,7 @@ module Box
     class ConnectionValidator
       def initialize(app, db)
         @app = app
-        @db  = db
+        @db = db
 
         @db.extension(:connection_validator)
         @db.pool.connection_validation_timeout = -1

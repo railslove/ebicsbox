@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'securerandom'
-require 'sequel'
+require "securerandom"
+require "sequel"
 
 module Box
   class BankStatement < Sequel::Model

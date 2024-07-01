@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require 'epics'
-require 'sequel'
+require "epics"
+require "sequel"
 
-require_relative '../adapters/fake'
-require_relative '../adapters/file'
-require_relative '../models/event'
-require_relative '../queue'
+require_relative "../adapters/fake"
+require_relative "../adapters/file"
+require_relative "../models/event"
+require_relative "../queue"
 
 module Box
   class EbicsUser < Sequel::Model
@@ -77,7 +77,7 @@ module Box
       save
       Box::Event.ebics_user_activated(self)
       true
-    rescue StandardError => e
+    rescue => e
       # TODO: show the error to the user
       Box.logger.error("failed to activate account #{id}: #{e}")
       false
@@ -90,7 +90,7 @@ module Box
       self.encryption_keys = client.send(:dump_keys)
       save
       true
-    rescue StandardError => e
+    rescue => e
       # TODO: show the error to the user
       Box.logger.error("Failed to refresh bank keys for account #{id}: #{e}")
       false
@@ -98,13 +98,13 @@ module Box
 
     def state
       if active?
-        'active'
+        "active"
       elsif submitted_at.present?
-        'submitted'
+        "submitted"
       elsif ebics_data?
-        'ready_to_submit'
+        "ready_to_submit"
       else
-        'needs_ebics_data'
+        "needs_ebics_data"
       end
     end
 

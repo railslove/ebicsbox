@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require 'sequel'
+require "sequel"
 
-require_relative '../../lib/pain'
+require_relative "../../lib/pain"
 
-require_relative './account'
-require_relative './event'
-require_relative './statement'
-require_relative './user'
+require_relative "account"
+require_relative "event"
+require_relative "statement"
+require_relative "user"
 
 module Box
   class Transaction < Sequel::Model
@@ -20,8 +20,8 @@ module Box
     one_to_many :statements
 
     dataset_module do
-      where(:credit_transfers, type: 'credit')
-      where(:direct_debits, type: 'debit')
+      where(:credit_transfers, type: "credit")
+      where(:direct_debits, type: "debit")
 
       def by_organization(organization)
         left_join(:accounts, id: :account_id)
@@ -51,7 +51,7 @@ module Box
     end
 
     def self.paginated_by_account(account_id, options = {})
-      options = { per_page: 10, page: 1 }.merge(options)
+      options = {per_page: 10, page: 1}.merge(options)
       where(account_id: account_id).limit(options[:per_page]).offset((options[:page] - 1) * options[:per_page]).reverse_order(:id)
     end
 
@@ -60,7 +60,7 @@ module Box
     end
 
     def make_history(reason, status = self.status)
-      update(history: history.dup << { at: Time.now, status: status, reason: reason })
+      update(history: history.dup << {at: Time.now, status: status, reason: reason})
     end
 
     def update_status(new_status, reason: nil)
@@ -75,15 +75,16 @@ module Box
     end
 
     def get_status(new_status)
-      if new_status == 'file_upload' && status == 'created' then 'file_upload'
-      elsif new_status == 'es_verification' && status == 'file_upload' then 'es_verification'
-      elsif new_status == 'order_hac_final_pos' && status == 'es_verification' then 'order_hac_final_pos'
-      elsif new_status == 'order_hac_final_neg' && status == 'es_verification' then 'order_hac_final_neg'
-      elsif new_status == 'credit_received' && type == 'debit' then 'funds_credited'
-      elsif new_status == 'debit_received' && type == 'credit' then 'funds_debited'
-      elsif new_status == 'debit_received' && type == 'debit' then 'funds_charged_back'
-      elsif new_status == 'failed' then 'failed'
-      else status
+      if new_status == "file_upload" && status == "created" then "file_upload"
+      elsif new_status == "es_verification" && status == "file_upload" then "es_verification"
+      elsif new_status == "order_hac_final_pos" && status == "es_verification" then "order_hac_final_pos"
+      elsif new_status == "order_hac_final_neg" && status == "es_verification" then "order_hac_final_neg"
+      elsif new_status == "credit_received" && type == "debit" then "funds_credited"
+      elsif new_status == "debit_received" && type == "credit" then "funds_debited"
+      elsif new_status == "debit_received" && type == "debit" then "funds_charged_back"
+      elsif new_status == "failed" then "failed"
+      else
+        status
       end
     end
 
@@ -94,12 +95,12 @@ module Box
       update(ebics_order_id: order_id, ebics_transaction_id: transaction_id)
     rescue Epics::Error => e
       Box.logger.warn { "Could not execute payload for transaction. id=#{id} message=#{e.message}" }
-      update_status('failed', reason: "#{e.code}/#{e.message}")
+      update_status("failed", reason: "#{e.code}/#{e.message}")
     rescue Faraday::Error => e
       Box.logger.warn { "Request failed. id=#{id} message=#{e.message}" }
       make_history(e.message)
       raise(e)
-    rescue StandardError => e
+    rescue => e
       Box.logger.warn { "Request failed. id=#{id} message=#{e.message}" }
       make_history(e.message)
     end

@@ -1,19 +1,20 @@
 # frozen_string_literal: true
 
-require 'grape-entity'
-require_relative './transaction'
+require "grape-entity"
+require "ostruct"
+require_relative "transaction"
 
 module Box
   module Entities
     module V2
       class DirectDebit < Grape::Entity
-        expose(:public_id, as: 'id')
+        expose(:public_id, as: "id")
         expose(:account) { |transaction| transaction.account.iban }
         expose(:name)
         expose(:iban)
         expose(:bic)
-        expose(:amount, as: 'amount_in_cents')
-        expose(:eref, as: 'end_to_end_reference')
+        expose(:amount, as: "amount_in_cents")
+        expose(:eref, as: "end_to_end_reference")
         expose(:ebics_order_id)
         expose(:ebics_transaction_id)
         expose(:reference)

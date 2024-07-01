@@ -3,8 +3,9 @@
 # king_dtaus is very old and needs this monkeypatch :(
 class BigDecimal; def initialize(value) = BigDecimal(value); end
 
-require 'king_dtaus'
-require_relative '../errors/business_process_failure'
+require "king_dtaus"
+require "ostruct"
+require_relative "../errors/business_process_failure"
 
 module Box
   class ForeignCredit
@@ -29,9 +30,9 @@ module Box
 
       def account_number
         if /[A-Z]{2}/.match?(params[:iban])
-          { bank_iban: params[:iban] }
+          {bank_iban: params[:iban]}
         else
-          { bank_account_number: params[:iban] }
+          {bank_account_number: params[:iban]}
         end
       end
 
@@ -41,15 +42,15 @@ module Box
 
       def fee_handling
         {
-          split: '00',
-          sender: '01',
-          receiver: '02'
+          split: "00",
+          sender: "01",
+          receiver: "02"
         }[params[:fee_handling]]
       end
 
       def booking
         KingDta::Booking.new(receiver, amount, params[:eref], nil, params[:currency]).tap do |booking|
-          booking.payment_type       = '00'
+          booking.payment_type = "00"
           booking.charge_bearer_code = fee_handling
         end
       end
@@ -83,12 +84,12 @@ module Box
         metadata: {
           **params.slice(:name, :iban, :bic, :reference, :country_code),
           execution_date: params[:execution_date]&.iso8601,
-          fee_handling: params[:fee_handling]&.to_s,
+          fee_handling: params[:fee_handling]&.to_s
         }
       )
     rescue ArgumentError => e
       # TODO: Will be fixed upstream in the sepa_king gem by us
-      raise Box::BusinessProcessFailure.new({ base: e.message }, 'Invalid data')
+      raise Box::BusinessProcessFailure.new({base: e.message}, "Invalid data")
     end
   end
 end

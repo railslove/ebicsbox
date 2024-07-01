@@ -1,23 +1,23 @@
 #!/usr/bin/env ruby
 
-env = ENV.fetch('RACK_ENV', :development)
-if env.to_s != 'production'
+env = ENV.fetch("RACK_ENV", :development)
+if env.to_s != "production"
   # Load environment from file
-  require 'dotenv'
+  require "dotenv"
   Dotenv.load
 end
 
 # Load environment
-require 'bundler'
+require "bundler"
 Bundler.setup(:default, env)
 
 # Start pry session
-require_relative '../config/bootstrap'
+require_relative "../config/bootstrap"
 
 # Load all files for console
-Dir[File.join(File.dirname(__FILE__), '../box/**/*.rb')].sort.map { |file| require_relative(file.gsub('bin/', '')) }
+Dir[File.join(File.dirname(__FILE__), "../box/**/*.rb")].sort.map { |file| require_relative(file.gsub("bin/", "")) }
 
-require 'pry'
+require "pry"
 module Box
-  pry
+  pry # rubocop:disable Lint/Debugger
 end
