@@ -33,7 +33,10 @@ module Box
           eref: params[:eref],
           currency: 'EUR',
           amount: params[:amount],
-          metadata: params.slice(:name, :iban, :bic, :execution_date, :reference)
+          metadata: {
+            **params.slice(:name, :iban, :bic, :reference),
+            execution_date: params[:execution_date]&.iso8601
+          }
         )
       else
         raise Box::BusinessProcessFailure, sct.errors

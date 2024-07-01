@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require_relative '../../../box/business_processes/foreign_credit'
 
 module Box
   RSpec.describe Apis::V2::CreditTransfers do
