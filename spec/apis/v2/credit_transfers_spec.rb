@@ -267,12 +267,12 @@ module Box
 
         it "triggers a credit transfer without bic" do
           expect(Credit).to receive(:create!)
-          post "/credit_transfers", valid_attributes.reject { |k, _| k == :bic }, TestHelpers::VALID_HEADERS
+          post "/credit_transfers", valid_attributes.except(:bic), TestHelpers::VALID_HEADERS
         end
 
         it "transactions without bic should be valid" do
           expect(Queue).to receive(:execute_credit)
-          post "/credit_transfers", valid_attributes.reject { |k, _| k == :bic }, TestHelpers::VALID_HEADERS
+          post "/credit_transfers", valid_attributes.except(:bic), TestHelpers::VALID_HEADERS
         end
 
         it "transforms parameters so they are understood by credit business process" do

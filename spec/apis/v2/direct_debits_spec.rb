@@ -248,7 +248,7 @@ module Box
 
         it "triggers a debit transfer without bic" do
           expect(DirectDebit).to receive(:create!)
-          post "/direct_debits", valid_attributes.reject { |k, _| k == :bic }, VALID_DEBIT_HEADERS
+          post "/direct_debits", valid_attributes.except(:bic), VALID_DEBIT_HEADERS
         end
 
         it "transforms parameters so they are understood by debit business process" do
