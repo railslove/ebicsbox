@@ -63,8 +63,6 @@ module Box
             allow_any_instance_of(Box::Configuration).to receive(:encrypt_webhooks?).and_return(true)
             allow_any_instance_of(Box::Configuration).to receive(:webhook_encryption_key).and_return(webhook_encryption_public_key_base_64)
 
-            Base64.encode64(webhook_encryption_public_key.public_encrypt(expected_payload.to_json))
-
             allow_any_instance_of(Faraday::Request).to receive(:body=) do |instance, payload|
               encrypted_aes_key_base64, iv_base64, encrypted_payload_base64 = payload.split("$")
               decrypted_encoded_aes_key = webhook_encryption_private_key.private_decrypt(Base64.strict_decode64(encrypted_aes_key_base64))
