@@ -30,6 +30,7 @@ module Box
 end
 
 # Init database connection
+puts "Database URL: #{Box.configuration.database_url}"
 DB = Sequel.connect(Box.configuration.database_url, max_connections: 10)
 
 # enable histoic symbol splitting to create qualified and/or aliased identifiers

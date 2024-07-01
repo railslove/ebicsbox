@@ -7,6 +7,8 @@ if env.to_s != 'production'
   Dotenv.load
 end
 
+puts "Environment keys: #{ENY.keys}"
+
 module Box
   class ConfigurationError < StandardError; end
 
@@ -82,9 +84,8 @@ module Box
       ENV['WEBHOOK_ENCRYPTION_KEY']
     end
 
-    def encrypt_webhooks? 
+    def encrypt_webhooks?
       webhook_encryption_key != nil
     end
-
   end
 end
