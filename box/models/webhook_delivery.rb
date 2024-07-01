@@ -45,7 +45,7 @@ module Box
             req.url URI(event.callback_url).path
             req.headers['Content-Type'] = 'application/json'
             payload = event.to_webhook_payload.to_json
-            req.body = Box.configuration.encrypt_webhooks? ? encrypt(payload) : payload            
+            req.body = Box.configuration.encrypt_webhooks? ? encrypt(payload) : payload
           end
         end
       rescue Faraday::TimeoutError, Faraday::ConnectionFailed, Faraday::Error => ex
@@ -54,11 +54,11 @@ module Box
       end
       [response, execution_time]
     end
-    
-    def encrypt(payload) 
+
+    def encrypt(payload)
       # AES encryption
       cipher = OpenSSL::Cipher.new('AES-256-CBC')
-      aes_key = cipher.random_key      
+      aes_key = cipher.random_key
       cipher.encrypt
       cipher.key = aes_key
       iv = cipher.random_iv
@@ -66,7 +66,7 @@ module Box
 
       # Combine IV and encrypted payload
       encoded_iv = Base64.strict_encode64(iv)
-      encoded_encrypted_payload = Base64.strict_encode64(encrypted_payload)      
+      encoded_encrypted_payload = Base64.strict_encode64(encrypted_payload)
 
       public_key = OpenSSL::PKey::RSA.new(Base64.decode64(Box.configuration.webhook_encryption_key))
       encoded_aes_key = Base64.strict_encode64(aes_key)
@@ -100,16 +100,16 @@ module Box
     private
 
     def extract_auth(url)
-      url.match(/:\/\/(.*):(.*)@/).try(:captures)
+      url.match(%r(:\/\/(.*):(.*)@))&.captures
     end
 
     def build_connection(callback_url)
       auth = extract_auth(callback_url)
       uri = URI(callback_url)
-      Faraday.new("#{uri.scheme}://#{uri.host}") do |c|
-        c.basic_auth(*auth) if auth
-        c.request :signer, secret: event.account.organization.webhook_token
-        c.adapter Faraday.default_adapter
+      Faraday.new("#{uri.scheme}://#{uri.host}") do |conn|
+        conn.request :basic_auth, *auth if auth
+        conn.request :signer, secret: event.account.organization.webhook_token
+        conn.adapter Faraday.default_adapter
       end
     end
   end

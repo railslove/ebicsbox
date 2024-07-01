@@ -72,7 +72,7 @@ module Box
 
       def paginated_by_account(per_page: 10, page: 1, **generic_filters)
         query = limit(per_page).offset((page - 1) * per_page).reverse_order(:date, :id)
-        generic_filter(query, generic_filters)
+        generic_filter(query, **generic_filters)
       end
     end
 

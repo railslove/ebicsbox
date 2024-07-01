@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.0
+- `[BREAKING]` Removes API V1
+- `[ENHANCEMENT]` Adds Support for ruby 3
+- `[ENHANCEMENT]` Updates epics to 2.4
+- `[HOUSEKEEPING]` Further dependency updates
+
 ## 1.5.0
 - `[ENHANCEMENT]` Enables `/transactions` endpoint to filter by `end_to_end_reference`.
 

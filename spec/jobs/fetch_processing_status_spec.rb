@@ -11,7 +11,7 @@ module Box
       describe '#perform' do
         it 'triggers transaction updates for all records from remote documents' do
           expect(job).to receive(:remote_records).with(1).and_return([{ some: 'data' }])
-          expect(job).to receive(:update_transaction).with(1, some: 'data')
+          expect(job).to receive(:update_transaction).with(1, { some: 'data' })
           job.perform(1)
         end
       end
