@@ -5,7 +5,7 @@ require "json"
 require "faraday"
 require "sequel"
 
-require_relative "./event"
+require_relative "event"
 require_relative "../middleware/signer"
 require_relative "../../config/configuration"
 

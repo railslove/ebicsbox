@@ -9,8 +9,8 @@ require "logger"
 require "sequel"
 require "barnes"
 
-require_relative "./configuration"
-require_relative "./version"
+require_relative "configuration"
+require_relative "version"
 
 # Setup box namespace
 module Box

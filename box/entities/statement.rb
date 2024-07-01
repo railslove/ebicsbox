@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "grape-entity"
-require_relative "./transaction"
+require_relative "transaction"
 
 module Box
   module Entities
@@ -28,7 +28,7 @@ module Box
         {
           self: Box.configuration.app_url + "/#{iban}/statements/#{statement.id}",
           account: Box.configuration.app_url + "/#{iban}/",
-          transaction: !!trx ? Box.configuration.app_url + "/#{iban}/transactions/#{trx.id}" : nil
+          transaction: (!!trx) ? Box.configuration.app_url + "/#{iban}/transactions/#{trx.id}" : nil
         }
       end
     end

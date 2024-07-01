@@ -3,7 +3,7 @@
 require "sequel"
 require "securerandom"
 
-require_relative "./account"
+require_relative "account"
 
 module Box
   class Organization < Sequel::Model

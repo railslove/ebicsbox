@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "grape-entity"
-require_relative "./transaction"
 
 module Box
   module Entities

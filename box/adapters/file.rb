@@ -6,8 +6,8 @@ module Box
       def initialize(*args)
       end
 
-      def self.setup(*args)
-        new(*args)
+      def self.setup(*)
+        new(*)
       end
 
       def dump_keys

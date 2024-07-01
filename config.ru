@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "./config/bootstrap"
+require_relative "config/bootstrap"
 
 if ENV["SENTRY_DSN"]
   require "raven"
@@ -30,7 +30,7 @@ end
 Box.configuration.valid?
 
 # Load database connection validator middleware
-require_relative "./box/middleware/connection_validator"
+require_relative "box/middleware/connection_validator"
 use Box::Middleware::ConnectionValidator, DB
 
 # Load authentication middleware
@@ -71,5 +71,5 @@ map "/docs" do
 end
 
 # Finally, load application and all its endpoints
-require_relative "./box/apis/base"
+require_relative "box/apis/base"
 run Box::Apis::Base

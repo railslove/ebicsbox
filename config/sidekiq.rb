@@ -15,7 +15,7 @@ Bundler.setup(:default, env)
 $stdout.sync = true
 
 # Start processing of queued jobs
-require_relative "./bootstrap"
+require_relative "bootstrap"
 
 require_relative "../box/jobs/credit"
 require_relative "../box/jobs/debit"

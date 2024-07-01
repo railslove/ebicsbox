@@ -16,9 +16,9 @@ module Box
     end
 
     def database_url
-      return (ENV["TEST_DATABASE_URL"] || "postgres://localhost/ebicsbox_test") if test?
+      return ENV["TEST_DATABASE_URL"] || "postgres://localhost/ebicsbox_test" if test?
 
-      (ENV["DATABASE_URL"] || "postgres://localhost/ebicsbox")
+      ENV["DATABASE_URL"] || "postgres://localhost/ebicsbox"
     end
 
     def hac_retrieval_interval

@@ -4,10 +4,10 @@ require "sequel"
 
 require_relative "../../lib/pain"
 
-require_relative "./account"
-require_relative "./event"
-require_relative "./statement"
-require_relative "./user"
+require_relative "account"
+require_relative "event"
+require_relative "statement"
+require_relative "user"
 
 module Box
   class Transaction < Sequel::Model

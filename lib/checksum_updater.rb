@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "./checksum_generator"
+require_relative "checksum_generator"
 require_relative "../box/models/statement"
 require_relative "../box/business_processes/import_statements"
 

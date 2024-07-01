@@ -2,7 +2,7 @@
 
 require "grape"
 
-require_relative "./v2/base"
+require_relative "v2/base"
 
 module Box
   module Apis

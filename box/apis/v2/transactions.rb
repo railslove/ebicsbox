@@ -2,7 +2,7 @@
 
 require "grape"
 
-require_relative "./api_endpoint"
+require_relative "api_endpoint"
 require_relative "../../entities/v2/transaction"
 
 module Box
@@ -22,7 +22,7 @@ module Box
           params do
             optional :page, type: Integer, desc: "page through the results", default: 1
             optional :per_page, type: Integer, desc: "how many results per page", values: 1..100, default: 10
-            optional :iban, types: [String, Array[String]], desc: "IBAN of an account", coerce_with: ->(value) { value.split(",") }, documentation: {param_type: "query"}
+            optional :iban, types: [String, [String]], desc: "IBAN of an account", coerce_with: ->(value) { value.split(",") }, documentation: {param_type: "query"}
             optional :type, type: String, desc: "Type of statement", values: %w[credit debit]
             optional :from, type: Date, desc: "Date from which on to filter the results"
             optional :end_to_end_reference, type: String, desc: "Filter by end to end reference"

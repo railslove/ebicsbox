@@ -11,8 +11,8 @@ module Box
         self.setup_args = args
       end
 
-      def self.setup(*args)
-        new(*args)
+      def self.setup(*)
+        new(*)
       end
 
       def ini_letter(_name)

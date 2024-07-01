@@ -2,7 +2,7 @@
 
 require "grape"
 
-require_relative "./api_endpoint"
+require_relative "api_endpoint"
 
 module Box
   module Apis

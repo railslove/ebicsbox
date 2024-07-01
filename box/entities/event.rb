@@ -2,7 +2,7 @@
 
 require "grape-entity"
 
-require_relative "./webhook_delivery"
+require_relative "webhook_delivery"
 
 module Box
   module Entities

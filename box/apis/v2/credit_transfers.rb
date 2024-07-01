@@ -2,7 +2,7 @@
 
 require "grape"
 
-require_relative "./api_endpoint"
+require_relative "api_endpoint"
 require_relative "../../entities/v2/credit_transfer"
 require_relative "../../validations/unique_transaction_eref"
 require_relative "../../validations/length"
@@ -35,8 +35,8 @@ module Box
             produces: ["application/vnd.ebicsbox-v2+json"]
 
           params do
-            optional :iban, types: [String, Array[String]], desc: "IBAN of an account", coerce_with: ->(value) { value.split(",") }, documentation: {param_type: "query"}
-            optional :status, types: [String, Array[String]], desc: "Filter by transaction status", coerce_with: ->(value) { value.split(",") }, documentation: {param_type: "query"}
+            optional :iban, types: [String, [String]], desc: "IBAN of an account", coerce_with: ->(value) { value.split(",") }, documentation: {param_type: "query"}
+            optional :status, types: [String, [String]], desc: "Filter by transaction status", coerce_with: ->(value) { value.split(",") }, documentation: {param_type: "query"}
             optional :page, type: Integer, desc: "page through the results", default: 1
             optional :per_page, type: Integer, desc: "how many results per page", values: 1..100, default: 10
           end

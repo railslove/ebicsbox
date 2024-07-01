@@ -2,6 +2,7 @@
 
 require "sequel"
 require "securerandom"
+require "ostruct"
 
 module Box
   class Account < Sequel::Model
