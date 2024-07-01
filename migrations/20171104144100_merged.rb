@@ -21,7 +21,7 @@ Sequel.migration do
         Integer :organization_id
         Integer :balance_in_cents
         Date :balance_date
-        String :statements_format, default: 'mt940', text: true
+        String :statements_format, default: "mt940", text: true
         String :config, type: :json, default: Sequel.pg_json({})
         String :descriptor, text: true
       end
@@ -51,7 +51,7 @@ Sequel.migration do
         String :payload, type: :json, default: Sequel.pg_json({})
         DateTime :triggered_at, default: Sequel.function(:now)
         String :signature, text: true
-        String :webhook_status, default: 'pending', text: true
+        String :webhook_status, default: "pending", text: true
         Integer :webhook_retries, default: 0
       end
     end

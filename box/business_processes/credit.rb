@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'base64'
-require 'securerandom'
-require 'sepa_king'
+require "base64"
+require "securerandom"
+require "sepa_king"
 
-require_relative '../errors/business_process_failure'
-require_relative '../queue'
+require_relative "../errors/business_process_failure"
+require_relative "../queue"
 
 module Box
   class Credit
@@ -29,9 +29,9 @@ module Box
         Queue.execute_credit(
           account_id: account.id,
           user_id: user.id,
-          payload: Base64.strict_encode64(sct.to_xml('pain.001.001.03')),
+          payload: Base64.strict_encode64(sct.to_xml("pain.001.001.03")),
           eref: params[:eref],
-          currency: 'EUR',
+          currency: "EUR",
           amount: params[:amount],
           metadata: {
             **params.slice(:name, :iban, :bic, :reference),
@@ -43,7 +43,7 @@ module Box
       end
     rescue ArgumentError => e
       # TODO: Will be fixed upstream in the sepa_king gem by us
-      raise Box::BusinessProcessFailure.new({ base: e.message }, 'Invalid data')
+      raise Box::BusinessProcessFailure.new({base: e.message}, "Invalid data")
     end
 
     def self.v2_create!(user, account, params)
@@ -56,7 +56,7 @@ module Box
       params[:remittance_information] = params[:reference]
 
       # Set urgent flag or fall back to SEPA
-      params[:service_level] = params[:urgent] ? 'URGP' : 'SEPA'
+      params[:service_level] = params[:urgent] ? "URGP" : "SEPA"
 
       create!(account, params, user)
     end

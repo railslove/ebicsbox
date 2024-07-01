@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'grape-entity'
+require "grape-entity"
 
 module Box
   module Entities
@@ -11,7 +11,7 @@ module Box
       expose(:status)
       expose(:order_type)
       expose(:ebics_transaction_id)
-      expose(:_links, documentation: { type: 'Hash', desc: 'Links to resources' }) do |trx|
+      expose(:_links, documentation: {type: "Hash", desc: "Links to resources"}) do |trx|
         iban = trx.account.iban
         {
           self: Box.configuration.app_url + "/#{iban}/transactions/#{trx.id}",

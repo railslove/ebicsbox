@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require 'json'
-require 'sequel'
+require "json"
+require "sequel"
 
-require_relative '../models/account'
-require_relative '../models/bank_statement'
-require_relative '../models/transaction'
-require_relative '../entities/statement'
+require_relative "../models/account"
+require_relative "../models/bank_statement"
+require_relative "../models/transaction"
+require_relative "../entities/statement"
 
 module Box
   class Statement < Sequel::Model
@@ -35,7 +35,7 @@ module Box
         query = query.where(eref: params[:end_to_end_reference]) if params[:end_to_end_reference].present?
 
         # Filter by type
-        query = query.where(debit: params[:type] == 'debit') if params[:type].present?
+        query = query.where(debit: params[:type] == "debit") if params[:type].present?
 
         query
       end
@@ -60,7 +60,7 @@ module Box
         query = query.where { statements__date <= to } if to.present?
 
         # Filter by type
-        query = query.where(debit: type == 'debit') if type.present?
+        query = query.where(debit: type == "debit") if type.present?
 
         query
       end
@@ -85,7 +85,7 @@ module Box
     end
 
     def type
-      debit? ? 'debit' : 'credit'
+      debit? ? "debit" : "credit"
     end
 
     def amount_in_cents

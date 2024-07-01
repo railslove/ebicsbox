@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'grape-entity'
+require "grape-entity"
 
 module Box
   module Entities

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'sequel'
-require 'securerandom'
+require "sequel"
+require "securerandom"
 
-require_relative './account'
+require_relative "account"
 
 module Box
   class Organization < Sequel::Model

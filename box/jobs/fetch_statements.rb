@@ -1,22 +1,23 @@
 # frozen_string_literal: true
 
-require 'sidekiq-scheduler'
-require 'active_support/all'
-require 'camt_parser'
-require 'cmxl'
-require 'epics'
-require 'sequel'
+require "sidekiq-scheduler"
+require "active_support/all"
+require "camt_parser"
+require "cmxl"
+require "epics"
+require "sequel"
 
-require_relative '../business_processes/import_bank_statement'
-require_relative '../business_processes/import_statements'
-require_relative '../models/account'
+require_relative "../business_processes/import_bank_statement"
+require_relative "../business_processes/import_statements"
+require_relative "../models/account"
 
 module Box
   module Jobs
     class FetchStatementsError < StandardError; end
+
     class FetchStatements
       include Sidekiq::Worker
-      sidekiq_options queue: 'check.statements', retry: false
+      sidekiq_options queue: "check.statements", retry: false
 
       attr_accessor :from, :to
 
@@ -62,7 +63,7 @@ module Box
           BusinessProcesses::ImportStatements.from_bank_statement(bank_statement)
         rescue BusinessProcesses::ImportBankStatement::InvalidInput => ex
           Box.logger.error { "[Jobs::FetchStatements] #{ex} account.id=#{account.id}" }
-          { total: 0, imported: 0 }
+          {total: 0, imported: 0}
         end.reduce(total: 0, imported: 0) do |memo, chunk_stats|
           {
             total: memo[:total] + chunk_stats[:total],

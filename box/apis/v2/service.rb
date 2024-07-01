@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'grape'
+require "grape"
 
-require_relative './api_endpoint'
+require_relative "api_endpoint"
 
 module Box
   module Apis
@@ -10,12 +10,12 @@ module Box
       class Service < Grape::API
         include ApiEndpoint
 
-        desc 'Service',
-             hidden: true
+        desc "Service",
+          hidden: true
 
         get do
           {
-            version: 'v2'
+            version: "v2"
           }
         end
       end

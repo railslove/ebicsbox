@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'rack'
-require_relative '../models/user'
-require_relative '../models/organization'
+require "rack"
+require_relative "../models/user"
+require_relative "../models/organization"
 
 module Box
   module Middleware
@@ -20,13 +20,13 @@ module Box
       private
 
       def load_user_auth_data(request)
-        access_token = request.env['HTTP_AUTHORIZATION'].to_s[/\A(?:token|Bearer) (.+)\z/, 1]
+        access_token = request.env["HTTP_AUTHORIZATION"].to_s[/\A(?:token|Bearer) (.+)\z/, 1]
         user = User.find_by_access_token(access_token)
 
         {
-          'box.user' => user,
-          'box.organization' => user.try(:organization),
-          'box.admin' => user.try(:admin)
+          "box.user" => user,
+          "box.organization" => user.try(:organization),
+          "box.admin" => user.try(:admin)
         }
       end
     end

@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require 'openssl'
-require 'sequel'
+require "openssl"
+require "sequel"
 
-require_relative '../queue'
-require_relative '../models/account'
-require_relative '../models/organization'
-require_relative './webhook_delivery'
+require_relative "../queue"
+require_relative "../models/account"
+require_relative "../models/organization"
+require_relative "webhook_delivery"
 
 module Box
   class Event < Sequel::Model
@@ -44,7 +44,7 @@ module Box
     end
 
     def reset_webhook_delivery
-      set(webhook_status: 'pending', webhook_retries: 0).save
+      set(webhook_status: "pending", webhook_retries: 0).save
 
       Queue.trigger_webhook(event_id: id)
     end
@@ -78,16 +78,16 @@ module Box
     end
 
     def delivery_success!
-      set webhook_status: 'success'
+      set webhook_status: "success"
       save
     end
 
     def delivery_failure!
       set(webhook_retries: webhook_retries.to_i + 1)
       if webhook_retries >= RETRY_THRESHOLD
-        set(webhook_status: 'failed')
+        set(webhook_status: "failed")
       else
-        Queue.trigger_webhook({ event_id: id }, delay: delay_for(webhook_retries))
+        Queue.trigger_webhook({event_id: id}, delay: delay_for(webhook_retries))
       end
       save
     end

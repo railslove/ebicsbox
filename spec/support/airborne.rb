@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'airborne'
+require "airborne"
 
-require_relative '../../box/middleware/static_authentication'
-require_relative '../../box/apis/base'
+require_relative "../../box/middleware/static_authentication"
+require_relative "../../box/apis/base"
 
 Airborne.configure do |config|
   config.rack_app = Rack::Builder.app do

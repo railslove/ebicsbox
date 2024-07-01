@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'grape'
+require "grape"
 
 class Length < Grape::Validations::Validators::Base
   def validate_param!(attr_name, params)

@@ -7,10 +7,10 @@ Sequel.migration do
       add_index :sha2, unique: true
     end
 
-    require 'rake'
-    load 'Rakefile'
+    require "rake"
+    load "Rakefile"
 
-    Rake::Task['migration_tasks:calculate_new_sha'].invoke
+    Rake::Task["migration_tasks:calculate_new_sha"].invoke
 
     alter_table :statements do
       rename_column :sha, :sha_bak

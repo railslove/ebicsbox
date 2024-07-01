@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-require 'sequel'
-require 'securerandom'
+require "sequel"
+require "securerandom"
+require "ostruct"
 
 module Box
   class Account < Sequel::Model
@@ -43,12 +44,11 @@ module Box
       def filtered(params)
         query = self
         # Filter by status
-        query = case params[:status]
-                when 'activated' then query.eager_graph(:ebics_users).exclude(ebics_users__activated_at: nil)
-                when 'not_activated' then query.eager_graph(:ebics_users).where(ebics_users__activated_at: nil)
-                else query
-                end
-        query
+        case params[:status]
+        when "activated" then query.eager_graph(:ebics_users).exclude(ebics_users__activated_at: nil)
+        when "not_activated" then query.eager_graph(:ebics_users).where(ebics_users__activated_at: nil)
+        else query
+        end
       end
 
       def paginate(params)
@@ -64,16 +64,16 @@ module Box
 
     def client_adapter
       Box::Adapters.const_get(mode)
-    rescue StandardError => _ex
+    rescue => _ex
       Box.configuration.ebics_client
     end
 
     def transport_client
       @transport_client ||= begin
         base_scope = ebics_users_dataset.exclude(ebics_users__activated_at: nil)
-        ebics_user = base_scope.where(ebics_users__signature_class: 'T').first || base_scope.first
+        ebics_user = base_scope.where(ebics_users__signature_class: "T").first || base_scope.first
         if ebics_user.nil?
-          raise NoTransportClient, 'Please setup and activate at least one ebics_user with a transport signature'
+          raise NoTransportClient, "Please setup and activate at least one ebics_user with a transport signature"
         else
           ebics_user.client
         end
@@ -97,7 +97,7 @@ module Box
     end
 
     def status
-      active? ? 'activated' : 'not_activated'
+      active? ? "activated" : "not_activated"
     end
 
     def pain_attributes_hash
@@ -113,11 +113,17 @@ module Box
     end
 
     def bank_account_number
-      @bank_account_number ||= (bank_account_metadata; @bank_account_number)
+      @bank_account_number ||= begin
+        bank_account_metadata
+        @bank_account_number
+      end
     end
 
     def bank_number
-      @bank_number ||= (bank_account_metadata; @bank_number)
+      @bank_number ||= begin
+        bank_account_metadata
+        @bank_number
+      end
     end
 
     def bank_country_code
@@ -126,8 +132,8 @@ module Box
 
     def bank_account_metadata
       Nokogiri::XML(transport_client.HTD).tap do |htd|
-        @bank_account_number ||= htd.at_xpath("//xmlns:AccountNumber[@international='false']", xmlns: 'urn:org:ebics:H004').text
-        @bank_number         ||= htd.at_xpath("//xmlns:BankCode[@international='false']", xmlns: 'urn:org:ebics:H004').text
+        @bank_account_number ||= htd.at_xpath("//xmlns:AccountNumber[@international='false']", xmlns: "urn:org:ebics:H004").text
+        @bank_number ||= htd.at_xpath("//xmlns:BankCode[@international='false']", xmlns: "urn:org:ebics:H004").text
       end
     end
 
@@ -147,14 +153,14 @@ module Box
 
     def setup_ebics_user!(user_id, ebics_user)
       DB.transaction do
-        raise 'This user already has a ebics_user for this account.' if ebics_user_for(user_id)
+        raise "This user already has a ebics_user for this account." if ebics_user_for(user_id)
 
         if ebics_users_dataset.where(remote_user_id: ebics_user).any?
-          raise 'Another user is using the same EBICS user id.'
+          raise "Another user is using the same EBICS user id."
         end
 
         ebics_user = EbicsUser.find_or_create(user_id: user_id, remote_user_id: ebics_user)
-        raise 'Failed to create ebics_user.' unless ebics_user
+        raise "Failed to create ebics_user." unless ebics_user
 
         add_ebics_user(ebics_user)
         ebics_user.setup!(account)

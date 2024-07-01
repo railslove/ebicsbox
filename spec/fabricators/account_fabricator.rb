@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'faker'
+require "faker"
 
-require_relative '../../box/models/account'
+require_relative "../../box/models/account"
 
 I18n.reload!
 
@@ -32,7 +32,7 @@ BICS = %w[
   COBADEFFXXX
 ].freeze
 
-Fabricator(:account, from: 'Box::Account') do
+Fabricator(:account, from: "Box::Account") do
   name { Faker::Company.name }
   descriptor { Faker::Company.name }
   iban { FAKE_IBANS.sample }
@@ -43,13 +43,13 @@ Fabricator(:account, from: 'Box::Account') do
   balance_in_cents { Random.rand(1_000_00) }
 
   # EBICS Configuration
-  url 'http://my-ebics-server.url/ebicshost'
-  partner 'PARTNER_ID'
-  host 'HOST_ID'
+  url "http://my-ebics-server.url/ebicshost"
+  partner "PARTNER_ID"
+  host "HOST_ID"
 
   # Account configuration
-  creditor_identifier 'DE98ZZZ09999999999'
-  callback_url 'https://myapp.url/webhooks'
+  creditor_identifier "DE98ZZZ09999999999"
+  callback_url "https://myapp.url/webhooks"
 end
 
 Fabricator(:activated_account, from: :account) do

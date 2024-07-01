@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../../box/models/transaction'
+require_relative "../../box/models/transaction"
 
 def generate_credit_payload
   %(
@@ -72,14 +72,14 @@ def generate_credit_payload
   )
 end
 
-Fabricator(:credit, from: 'Box::Transaction') do
+Fabricator(:credit, from: "Box::Transaction") do
   eref { Fabricate.sequence(:credit) { |i| "credit-#{i}" } }
-  type 'credit'
+  type "credit"
   payload { generate_credit_payload }
-  ebics_transaction_id 'B00U'
+  ebics_transaction_id "B00U"
   status { %w[created file_upload funds_debited].sample }
   account_id 1
-  order_type 'CCT'
+  order_type "CCT"
   amount 123_45
   user_id 1
 end

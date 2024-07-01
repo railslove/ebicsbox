@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'base64'
-require 'securerandom'
-require 'sepa_king'
+require "base64"
+require "securerandom"
+require "sepa_king"
 
-require_relative '../errors/business_process_failure'
-require_relative '../queue'
+require_relative "../errors/business_process_failure"
+require_relative "../queue"
 
 module Box
   class DirectDebit
@@ -33,7 +33,7 @@ module Box
         Queue.execute_debit(
           account_id: account.id,
           user_id: user.id,
-          payload: Base64.strict_encode64(sdd.to_xml('pain.008.001.02')),
+          payload: Base64.strict_encode64(sdd.to_xml("pain.008.001.02")),
           amount: params[:amount],
           eref: params[:eref],
           instrument: params[:instrument]
@@ -43,7 +43,7 @@ module Box
       end
     rescue ArgumentError => e
       # TODO: Will be fixed upstream in the sepa_king gem by us
-      raise Box::BusinessProcessFailure.new({ base: e.message }, 'Invalid data')
+      raise Box::BusinessProcessFailure.new({base: e.message}, "Invalid data")
     end
 
     def self.v2_create!(user, account, params)

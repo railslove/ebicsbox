@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require_relative '../models/event'
-require_relative '../models/webhook_delivery'
+require_relative "../models/event"
+require_relative "../models/webhook_delivery"
 
 module Box
   module Jobs
     class Webhook
       include Sidekiq::Worker
-      sidekiq_options queue: 'webhooks'
+      sidekiq_options queue: "webhooks"
 
       def perform(event_id)
         event = Event.find(id: event_id)
