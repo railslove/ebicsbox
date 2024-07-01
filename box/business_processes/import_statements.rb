@@ -26,7 +26,7 @@ module Box
           create_statement(bank_statement, bank_transaction, upcoming)
         end
 
-        stats = {total: bank_transactions.count, imported: statements.select(&:present?).count}
+        stats = {total: bank_transactions.count, imported: statements.count(&:present?)}
         Box.logger.info { "[BusinessProcesses::ImportStatements] Imported statements from bank statement. total=#{stats[:total]} imported=#{stats[:imported]}" }
         stats
       end

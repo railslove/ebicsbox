@@ -8,7 +8,7 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 require "timecop"
 require_relative "../config/bootstrap"
 
-Dir["spec/support/**/*.rb"].each { |f| require f }
+Dir["spec/support/**/*.rb"].sort.each { |f| require f }
 
 Sidekiq.strict_args!
 
