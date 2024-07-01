@@ -100,16 +100,16 @@ module Box
     private
 
     def extract_auth(url)
-      url.match(/:\/\/(.*):(.*)@/).try(:captures)
+      url.match(%r(:\/\/(.*):(.*)@))&.captures
     end
 
     def build_connection(callback_url)
       auth = extract_auth(callback_url)
       uri = URI(callback_url)
-      Faraday.new("#{uri.scheme}://#{uri.host}") do |c|
-        c.basic_auth(*auth) if auth
-        c.request :signer, secret: event.account.organization.webhook_token
-        c.adapter Faraday.default_adapter
+      Faraday.new("#{uri.scheme}://#{uri.host}") do |conn|
+        conn.request :basic_auth, *auth if auth
+        conn.request :signer, secret: event.account.organization.webhook_token
+        conn.adapter Faraday.default_adapter
       end
     end
   end

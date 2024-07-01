@@ -48,9 +48,11 @@ module Box
       end
 
       def validate_token(access_token)
-        conn = Faraday.new URI(Box.configuration.oauth_server)
-        conn.authorization :Bearer, access_token
-        conn.head('oauth/token/info').success?
+        request = Faraday.new URI(Box.configuration.oauth_server) do |conn|
+          conn.request :authorization, 'Bearer', access_token
+        end
+
+        request.head('oauth/token/info').success?
       end
     end
   end
