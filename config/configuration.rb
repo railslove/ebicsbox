@@ -7,6 +7,8 @@ if env.to_s != "production"
   Dotenv.load
 end
 
+puts "Environment keys: #{ENY.keys}"
+
 module Box
   class ConfigurationError < StandardError; end
 
