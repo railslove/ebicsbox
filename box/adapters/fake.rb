@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'nokogiri'
+require "nokogiri"
 
 module Box
   module Adapters
@@ -16,7 +16,7 @@ module Box
       end
 
       def ini_letter(_name)
-        'Here would be the INI letter you would need to sign for your bank.'
+        "Here would be the INI letter you would need to sign for your bank."
       end
 
       def INI
@@ -32,7 +32,7 @@ module Box
       end
 
       def dump_keys
-        '{}'
+        "{}"
       end
 
       def STA(_from = nil, _to = nil)
@@ -53,12 +53,12 @@ module Box
 
       def CD1(pain)
         doc = Nokogiri::XML(pain)
-        trx = doc.css('Document CstmrDrctDbtInitn PmtInf DrctDbtTxInf')
-        eref = trx.css('PmtId EndToEndId').text
-        information = trx.css('RmtInf Ustrd').text
-        amount = trx.css('InstdAmt').text.delete('.').to_i
+        trx = doc.css("Document CstmrDrctDbtInitn PmtInf DrctDbtTxInf")
+        eref = trx.css("PmtId EndToEndId").text
+        information = trx.css("RmtInf Ustrd").text
+        amount = trx.css("InstdAmt").text.delete(".").to_i
         transaction = Transaction[eref: eref]
-        transaction.update_status('credit_received', reason: 'Auto accept fake direct debit')
+        transaction.update_status("credit_received", reason: "Auto accept fake direct debit")
 
         statement = Statement.create(
           account_id: transaction.account_id,
@@ -68,12 +68,12 @@ module Box
           amount: amount,
           sign: 0,
           debit: true,
-          swift_code: '',
-          reference: 'NOREF',
-          bank_reference: '',
-          bic: trx.css('DbtrAgt FinInstnId BIC').text,
-          iban: trx.css('DbtrAcct Id IBAN').text,
-          name: trx.css('Dbtr Nm').text,
+          swift_code: "",
+          reference: "NOREF",
+          bank_reference: "",
+          bic: trx.css("DbtrAgt FinInstnId BIC").text,
+          iban: trx.css("DbtrAcct Id IBAN").text,
+          name: trx.css("Dbtr Nm").text,
           information: information,
           description: information,
           eref: eref
@@ -83,17 +83,17 @@ module Box
 
         ["TRX#{SecureRandom.hex(6)}", "N#{SecureRandom.hex(6)}"]
       end
-      alias CDD CD1
-      alias CDB CD1
+      alias_method :CDD, :CD1
+      alias_method :CDB, :CD1
 
       def CCT(pain)
         doc = Nokogiri::XML(pain)
-        trx = doc.css('Document CstmrCdtTrfInitn PmtInf CdtTrfTxInf')
-        eref = trx.css('PmtId EndToEndId').text
-        desc = trx.css('RmtInf Ustrd').text
-        amount = trx.css('Amt InstdAmt').text.delete('.').to_i
+        trx = doc.css("Document CstmrCdtTrfInitn PmtInf CdtTrfTxInf")
+        eref = trx.css("PmtId EndToEndId").text
+        desc = trx.css("RmtInf Ustrd").text
+        amount = trx.css("Amt InstdAmt").text.delete(".").to_i
         transaction = Transaction[eref: eref]
-        transaction.update_status('debit_received', reason: 'Auto accept fake credit transfers')
+        transaction.update_status("debit_received", reason: "Auto accept fake credit transfers")
 
         statement = Statement.create(
           account_id: transaction.account_id,
@@ -103,12 +103,12 @@ module Box
           amount: amount,
           sign: 1,
           debit: false,
-          swift_code: '',
+          swift_code: "",
           reference: desc,
-          bank_reference: '',
-          bic: trx.css('CdtrAgt FinInstnId BIC').text,
-          iban: trx.css('CdtrAcct Id IBAN').text,
-          name: trx.css('Cdtr Nm').text,
+          bank_reference: "",
+          bic: trx.css("CdtrAgt FinInstnId BIC").text,
+          iban: trx.css("CdtrAcct Id IBAN").text,
+          name: trx.css("Cdtr Nm").text,
           information: desc,
           description: desc,
           eref: eref

@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
-require 'cmxl'
-require 'camt_parser'
+require "cmxl"
+require "camt_parser"
 
-require_relative '../models/account'
-require_relative '../models/bank_statement'
-require_relative '../models/event'
-require_relative '../../lib/checksum_generator'
+require_relative "../models/account"
+require_relative "../models/bank_statement"
+require_relative "../models/event"
+require_relative "../../lib/checksum_generator"
 
 module Box
   module BusinessProcesses
     class ImportStatements
-      PARSERS = { 'mt940' => Cmxl, 'camt53' => CamtParser::Format053::Statement }.freeze
+      PARSERS = {"mt940" => Cmxl, "camt53" => CamtParser::Format053::Statement}.freeze
 
       def self.parse_bank_statement(bank_statement)
         parser = PARSERS.fetch(bank_statement.account.statements_format, Cmxl)
@@ -26,7 +26,7 @@ module Box
           create_statement(bank_statement, bank_transaction, upcoming)
         end
 
-        stats = { total: bank_transactions.count, imported: statements.select(&:present?).count }
+        stats = {total: bank_transactions.count, imported: statements.select(&:present?).count}
         Box.logger.info { "[BusinessProcesses::ImportStatements] Imported statements from bank statement. total=#{stats[:total]} imported=#{stats[:imported]}" }
         stats
       end
@@ -51,16 +51,16 @@ module Box
         # find transactions via EREF
         transaction = account.transactions_dataset.where(eref: statement.eref).first
         # fallback to finding via statement information
-        transaction ||= account.transactions_dataset.exclude(currency: 'EUR', status: %w[credit_received debit_received]).where { created_at > 14.days.ago }.detect { |t| statement.information =~ /#{t.eref}/i }
+        transaction ||= account.transactions_dataset.exclude(currency: "EUR", status: %w[credit_received debit_received]).where { created_at > 14.days.ago }.detect { |t| statement.information =~ /#{t.eref}/i }
 
         return unless transaction
 
         transaction.add_statement(statement)
 
         if statement.credit?
-          transaction.update_status('credit_received')
+          transaction.update_status("credit_received")
         elsif statement.debit?
-          transaction.update_status('debit_received')
+          transaction.update_status("debit_received")
         end
       end
 
@@ -75,9 +75,9 @@ module Box
       end
 
       def self.payload_from_transaction_attributes(transaction, remote_account)
-        eref = transaction.respond_to?(:eref) ? transaction.eref : transaction.sepa['EREF']
-        mref = transaction.respond_to?(:mref) ? transaction.mref : transaction.sepa['MREF']
-        svwz = transaction.respond_to?(:svwz) ? transaction.svwz : transaction.sepa['SVWZ']
+        eref = transaction.respond_to?(:eref) ? transaction.eref : transaction.sepa["EREF"]
+        mref = transaction.respond_to?(:mref) ? transaction.mref : transaction.sepa["MREF"]
+        svwz = transaction.respond_to?(:svwz) ? transaction.svwz : transaction.sepa["SVWZ"]
 
         [
           remote_account,
@@ -89,7 +89,7 @@ module Box
           eref,
           mref,
           svwz,
-          transaction.information.gsub(/\s/, '')
+          transaction.information.gsub(/\s/, "")
         ]
       end
 
@@ -109,11 +109,11 @@ module Box
           name: transaction.name,
           information: transaction.information,
           description: transaction.description,
-          eref: transaction.respond_to?(:eref) ? transaction.eref : transaction.sepa['EREF'],
-          mref: transaction.respond_to?(:mref) ? transaction.mref : transaction.sepa['MREF'],
-          svwz: transaction.respond_to?(:svwz) ? transaction.svwz : transaction.sepa['SVWZ'],
+          eref: transaction.respond_to?(:eref) ? transaction.eref : transaction.sepa["EREF"],
+          mref: transaction.respond_to?(:mref) ? transaction.mref : transaction.sepa["MREF"],
+          svwz: transaction.respond_to?(:svwz) ? transaction.svwz : transaction.sepa["SVWZ"],
           tx_id: transaction.try(:transaction_id),
-          creditor_identifier: transaction.respond_to?(:creditor_identifier) ? transaction.creditor_identifier : transaction.sepa['CRED']
+          creditor_identifier: transaction.respond_to?(:creditor_identifier) ? transaction.creditor_identifier : transaction.sepa["CRED"]
         }
       end
     end

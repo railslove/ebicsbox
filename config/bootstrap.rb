@@ -5,12 +5,12 @@
 # our configuration. Moreover it ensures that the database is setup.
 #
 
-require 'logger'
-require 'sequel'
-require 'barnes'
+require "logger"
+require "sequel"
+require "barnes"
 
-require_relative './configuration'
-require_relative './version'
+require_relative "./configuration"
+require_relative "./version"
 
 # Setup box namespace
 module Box
@@ -20,7 +20,7 @@ module Box
 
   def self.logger
     @logger ||= Logger.new(STDOUT).tap do |logger|
-      logger.level = ENV['DEBUG'] ? Logger::DEBUG : Logger::INFO
+      logger.level = ENV["DEBUG"] ? Logger::DEBUG : Logger::INFO
     end
   end
 

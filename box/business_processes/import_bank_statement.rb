@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'cmxl'
+require "cmxl"
 
-require_relative '../models/account'
-require_relative '../models/bank_statement'
-require_relative '../../lib/checksum_generator'
+require_relative "../models/account"
+require_relative "../models/bank_statement"
+require_relative "../../lib/checksum_generator"
 
 # more general matching regex that covers both newlines and newlines with dashes
 Cmxl.config[:statement_separator] = /(\n-?)(?=:20)/m
@@ -37,7 +37,7 @@ module Box
       end
 
       def self.validate_params(raw_bank_statement, account)
-        raise(InvalidInput, 'Cannot import empty bank statement.') if raw_bank_statement.blank?
+        raise(InvalidInput, "Cannot import empty bank statement.") if raw_bank_statement.blank?
 
         validate_account!(raw_bank_statement, account)
       end
@@ -45,7 +45,7 @@ module Box
       # This is required as Deutsche Bank has a very weird MT940 file format
       def self.validate_account!(raw_bank_statement, account)
         account_number = raw_bank_statement.account_identification.account_number
-        return if account.iban.end_with?(account_number) || (account.iban + '00').end_with?(account_number)
+        return if account.iban.end_with?(account_number) || (account.iban + "00").end_with?(account_number)
 
         raise(InvalidInput, "Cannot import bank statement for unknown sub-account #{account_number}.")
       end

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'grape'
+require "grape"
 
-require_relative './v2/base'
+require_relative "./v2/base"
 
 module Box
   module Apis

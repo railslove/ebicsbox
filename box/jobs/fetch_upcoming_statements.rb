@@ -1,28 +1,29 @@
 # frozen_string_literal: true
 
-require 'sidekiq-scheduler'
-require 'active_support/all'
-require 'camt_parser'
-require 'cmxl'
-require 'epics'
-require 'sequel'
+require "sidekiq-scheduler"
+require "active_support/all"
+require "camt_parser"
+require "cmxl"
+require "epics"
+require "sequel"
 
-require_relative '../business_processes/import_bank_statement'
-require_relative '../business_processes/import_statements'
-require_relative '../models/account'
+require_relative "../business_processes/import_bank_statement"
+require_relative "../business_processes/import_statements"
+require_relative "../models/account"
 
 module Box
   module Jobs
     class FetchUpcomingStatementsError < StandardError; end
+
     class FetchUpcomingStatements
       include Sidekiq::Worker
-      sidekiq_options queue: 'check.statements', retry: false
+      sidekiq_options queue: "check.statements", retry: false
 
       attr_accessor :options
 
       def perform(account_id, options = {})
         account = Account[account_id]
-        raise FetchUpcomingStatementsError, 'Account-ID missing' unless account
+        raise FetchUpcomingStatementsError, "Account-ID missing" unless account
 
         self.options = options.symbolize_keys!
 
@@ -30,7 +31,7 @@ module Box
       end
 
       def fetch_for_account(account)
-        if account.statements_format != 'mt940'
+        if account.statements_format != "mt940"
           Box.logger.info("[Jobs::FetchUpcomingStatements] Skip VMK for #{account.id}. Currently only MT942 is supported")
           return
         end
@@ -56,7 +57,7 @@ module Box
           bank_statement = BusinessProcesses::ImportBankStatement.from_cmxl(chunk, account)
           result = BusinessProcesses::ImportStatements.from_bank_statement(bank_statement, upcoming: true)
 
-          { total: memo[:total] + result[:total], imported: memo[:imported] + result[:imported] }
+          {total: memo[:total] + result[:total], imported: memo[:imported] + result[:imported]}
         rescue BusinessProcesses::ImportBankStatement::InvalidInput => e
           Box.logger.error("[Jobs::FetchUpcomingStatements] #{e} account_id=#{account.id}")
           memo

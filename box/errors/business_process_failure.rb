@@ -5,7 +5,7 @@ module Box
     attr_accessor :errors
 
     def initialize(errors, msg = nil)
-      super(msg || errors.full_messages.join(' '))
+      super(msg || errors.full_messages.join(" "))
       self.errors = errors
     end
   end

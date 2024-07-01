@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'faker'
-require 'securerandom'
+require "faker"
+require "securerandom"
 
-require_relative '../../box/models/statement'
+require_relative "../../box/models/statement"
 
 I18n.reload!
 
@@ -33,7 +33,7 @@ STATEMENT_BICS = %w[
   COBADEFFXXX
 ].freeze
 
-Fabricator(:statement, from: 'Box::Statement') do
+Fabricator(:statement, from: "Box::Statement") do
   public_id { SecureRandom.uuid }
   date { Date.today }
   amount { rand(0..100_000) }

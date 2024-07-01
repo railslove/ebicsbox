@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'faraday'
+require "faraday"
 
 module Box
   module Middleware
     class Signer < Faraday::Middleware
-      SIGNATURE_HEADER = 'X-Signature'
+      SIGNATURE_HEADER = "X-Signature"
 
       def initialize(app, opts = {})
         super(app)
@@ -20,11 +20,11 @@ module Box
       private
 
       def sign(msg)
-        'sha1=' + OpenSSL::HMAC.hexdigest(digest, secret, msg.to_s)
+        "sha1=" + OpenSSL::HMAC.hexdigest(digest, secret, msg.to_s)
       end
 
       def digest
-        OpenSSL::Digest.new('sha1')
+        OpenSSL::Digest.new("sha1")
       end
 
       def secret

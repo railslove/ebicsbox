@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'database_cleaner-sequel'
+require "database_cleaner-sequel"
 
 RSpec.configure do |config|
   config.before(:suite) do

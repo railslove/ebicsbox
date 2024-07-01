@@ -1,22 +1,22 @@
 # frozen_string_literal: true
 
-require 'sequel'
+require "sequel"
 # Load application
-require './config/configuration'
+require "./config/configuration"
 
 namespace :generate do
-  desc 'Generate a timestamped, empty Sequel migration.'
+  desc "Generate a timestamped, empty Sequel migration."
   task :migration, :name do |_, args|
     if args[:name].nil?
-      puts 'You must specify a migration name (e.g. rake generate:migration[create_events])!'
+      puts "You must specify a migration name (e.g. rake generate:migration[create_events])!"
       exit false
     end
 
     content = "Sequel.migration do\n  up do\n    \n  end\n\n  down do\n    \n  end\nend\n"
-    timestamp = Time.now.strftime('%Y%m%d%H%M%S')
-    filename = File.join(File.dirname(__FILE__), 'migrations', "#{timestamp}_#{args[:name]}.rb")
+    timestamp = Time.now.strftime("%Y%m%d%H%M%S")
+    filename = File.join(File.dirname(__FILE__), "migrations", "#{timestamp}_#{args[:name]}.rb")
 
-    File.open(filename, 'w') do |f|
+    File.open(filename, "w") do |f|
       f.puts content
     end
 
@@ -25,18 +25,18 @@ namespace :generate do
 end
 
 namespace :migration_tasks do
-  desc 'calculate SHAs of bank_statements'
+  desc "calculate SHAs of bank_statements"
   task :calculate_bank_statements_sha do
-    env = ENV.fetch('RACK_ENV', :development)
-    if env.to_s != 'production'
+    env = ENV.fetch("RACK_ENV", :development)
+    if env.to_s != "production"
       # Load environment from file
-      require 'dotenv'
+      require "dotenv"
       Dotenv.load
     end
 
-    require './config/bootstrap'
-    require './box/models/bank_statement'
-    require './lib/checksum_generator'
+    require "./config/bootstrap"
+    require "./box/models/bank_statement"
+    require "./lib/checksum_generator"
 
     i = 0
     statements = Box::BankStatement.where(sha: nil)
@@ -44,7 +44,7 @@ namespace :migration_tasks do
     p "Found #{statements.count} Bank Statements without a SHA."
     next if statements.count.zero?
 
-    p 'Recalculating Bank Statement SHAs.'
+    p "Recalculating Bank Statement SHAs."
 
     statements.each do |bs|
       payload = [
@@ -62,20 +62,20 @@ namespace :migration_tasks do
   end
 
   # this should ONLY be run via migration migrations/20191217114900_recalculate_statement_sha.rb
-  desc 'calculate new SHA'
+  desc "calculate new SHA"
   task :calculate_new_sha do
-    env = ENV.fetch('RACK_ENV', :development)
-    if env.to_s != 'production'
+    env = ENV.fetch("RACK_ENV", :development)
+    if env.to_s != "production"
       # Load environment from file
-      require 'dotenv'
+      require "dotenv"
       Dotenv.load
     end
 
-    require './config/bootstrap'
-    require './box/models/account'
-    require './box/models/statement'
-    require './box/models/bank_statement'
-    require './lib/checksum_updater'
+    require "./config/bootstrap"
+    require "./box/models/account"
+    require "./box/models/statement"
+    require "./box/models/bank_statement"
+    require "./lib/checksum_updater"
 
     # safe guard to only run this task when temp checksum field is available
     next unless Box::Statement.columns.include?(:sha2)
@@ -86,7 +86,7 @@ namespace :migration_tasks do
 
       bank_statements = Box::BankStatement.where(account_id: account_id).all
       bank_statements.each do |bank_statement|
-        parser = bank_statement.content.starts_with?(':') ? Cmxl : CamtParser::Format053::Statement
+        parser = bank_statement.content.starts_with?(":") ? Cmxl : CamtParser::Format053::Statement
         begin
           result = parser.parse(bank_statement.content)
           transactions = result.is_a?(Array) ? result.first.transactions : result.transactions
@@ -95,10 +95,10 @@ namespace :migration_tasks do
             ChecksumUpdater.new(transaction, bank_statement.remote_account).call
           end
         rescue => e
-          p '--- ERROR ---'
+          p "--- ERROR ---"
           p bank_statement.id
           p e
-          p '--- !ERROR ---'
+          p "--- !ERROR ---"
         end
       end
     end
@@ -116,17 +116,17 @@ namespace :migration_tasks do
     end; nil
   end
 
-  desc 'copies partner value to ebics_users'
+  desc "copies partner value to ebics_users"
   task :copy_partners do
-    env = ENV.fetch('RACK_ENV', :development)
-    if env.to_s != 'production'
+    env = ENV.fetch("RACK_ENV", :development)
+    if env.to_s != "production"
       # Load environment from file
-      require 'dotenv'
+      require "dotenv"
       Dotenv.load
     end
 
-    require './config/bootstrap'
-    require './box/models/ebics_user'
+    require "./config/bootstrap"
+    require "./box/models/ebics_user"
 
     Box::EbicsUser.where(partner: nil).each do |ebics_user|
       ebics_user.update(partner: ebics_user.accounts.first&.partner)

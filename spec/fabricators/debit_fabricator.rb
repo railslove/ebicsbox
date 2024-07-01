@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../../box/models/transaction'
+require_relative "../../box/models/transaction"
 
 def generate_debit_payload
   %(
@@ -102,14 +102,14 @@ def generate_debit_payload
   )
 end
 
-Fabricator(:debit, from: 'Box::Transaction') do
+Fabricator(:debit, from: "Box::Transaction") do
   eref { Fabricate.sequence(:debit) { |i| "debit-#{i}" } }
-  type 'debit'
+  type "debit"
   payload { generate_debit_payload }
-  ebics_transaction_id 'B00U'
+  ebics_transaction_id "B00U"
   status { %w[created file_upload funds_debited].sample }
   account_id 1
-  order_type 'CDD'
+  order_type "CDD"
   amount 123_45
   user_id 1
 end
