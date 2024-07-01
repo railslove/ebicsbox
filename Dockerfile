@@ -10,7 +10,7 @@ WORKDIR /usr/ebicsbox
 
 ADD Gemfile /usr/ebicsbox/
 ADD Gemfile.lock /usr/ebicsbox/
-RUN gem install bundler -v 2.3.26
+RUN gem install bundler -v 2.3.22
 RUN bundle install
 
 ADD . /usr/ebicsbox
