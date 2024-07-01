@@ -28,10 +28,27 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  db_test:
+    image: postgres
+    restart: always
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
+    environment:
+      - POSTGRES_DB=ebicsbox_test
+      - POSTGRES_USER=ebicsbox_test
+      - POSTGRES_PASSWORD=password
+    networks:
+      - ebicsbox_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   web:
     environment:
       - REDIS_URL=redis://redis:6379
       - DATABASE_URL=postgresql://ebicsbox:password@db/ebicsbox
+      - TEST_DATABASE_URL=postgresql://ebicsbox_test:password@db_test/ebicsbox_test
       - PASSPHRASE=some_passphrase
       - JWT_SECRET=some_jwt_secret
     depends_on:
