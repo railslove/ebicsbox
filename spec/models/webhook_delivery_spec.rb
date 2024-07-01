@@ -101,10 +101,10 @@ module Box
         end
 
         context 'without auth defined' do
-          before { allow_any_instance_of(Faraday::Connection).to receive(:basic_auth).with('user', 'pass') }
+          before { allow_any_instance_of(Faraday::Connection).to receive(:request).with(:basic_auth, 'user', 'pass') }
 
           it 'does not set anything auth related' do
-            expect_any_instance_of(Faraday::Connection).to_not receive(:basic_auth)
+            expect_any_instance_of(Faraday::Connection).to_not receive(:request).with(:basic_auth, 'user', 'pass')
             subject.execute_request
           end
         end
@@ -120,10 +120,11 @@ module Box
 
       context 'with auth callback_url defined' do
         before { allow_any_instance_of(Event).to receive(:callback_url).and_return('http://user:pass@mycallback.url') }
-        before { allow_any_instance_of(Faraday::Connection).to receive(:basic_auth).with('user', 'pass') }
+        before { allow_any_instance_of(Faraday::Connection).to receive(:request).with(:basic_auth, 'user', 'pass') }
 
         it 'sets basic auth information in faraday' do
-          expect_any_instance_of(Faraday::Connection).to receive(:basic_auth).with('user', 'pass')
+          expect_any_instance_of(Faraday::Connection).to receive(:request).with(:basic_auth, 'user', 'pass')
+          expect_any_instance_of(Faraday::Connection).to receive(:request).with(:signer, secret: an_instance_of(String))
           subject.execute_request
         end
       end

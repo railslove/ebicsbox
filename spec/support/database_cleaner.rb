@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require 'database_cleaner'
+require 'database_cleaner-sequel'
 
 RSpec.configure do |config|
   config.before(:suite) do
-    DatabaseCleaner.strategy = :transaction
-    DatabaseCleaner.clean_with(:truncation)
+    DatabaseCleaner[:sequel].strategy = :transaction
+    DatabaseCleaner[:sequel].clean_with(:truncation)
   end
 
   config.around(:each) do |example|
-    DatabaseCleaner.cleaning do
+    DatabaseCleaner[:sequel].cleaning do
       DB.transaction(rollback: :always, auto_savepoint: true) do
         example.run
       end
