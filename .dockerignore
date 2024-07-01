@@ -1,7 +1,30 @@
-dockerfiles
-docs
-node_modules
-.env
-.env.example
+
+# development
 .DS_Store
-.semaphore-cache
+docker-compose*
+Procfile*
+
+#git
+.git/
+.gitignore
+
+# ci
+.github/
+.semaphore/
+
+# node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# logs
+logs/
+tmp/
+
+# local env
+.env*
+web.env.*
+
+# docs
+README*
+docs/
