@@ -195,6 +195,9 @@ GEM
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.17.0)
       parser (>= 3.1.1.0)
+    rubocop-performance (1.13.3)
+      rubocop (>= 1.7.0, < 2.0)
+      rubocop-ast (>= 0.4.0)
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
     rubyzip (2.3.2)
@@ -218,6 +221,9 @@ GEM
       rufus-scheduler (~> 3.2)
       sidekiq (>= 4, < 7)
       tilt (>= 1.4.0)
+    standard (1.11.0)
+      rubocop (= 1.28.2)
+      rubocop-performance (= 1.13.3)
     statsd-ruby (1.5.0)
     strscan (3.1.0)
     tilt (2.4.0)
@@ -272,6 +278,7 @@ DEPENDENCIES
   sequel
   sidekiq
   sidekiq-scheduler
+  standard
   timecop
   webmock
 

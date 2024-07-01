@@ -45,6 +45,7 @@ group :development, :test do
   gem 'faker'
   gem 'foreman'
   gem 'rspec'
+  gem 'standard'
   gem 'timecop'
   gem 'webmock'
 end

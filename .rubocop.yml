@@ -1,5 +1,5 @@
-Metrics/LineLength:
-  Max: 120
+require:
+  - standard
 
-Style/Documentation:
-  Enabled: false
+inherit_gem:
+  standard: config/base.yml
