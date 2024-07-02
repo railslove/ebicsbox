@@ -2,16 +2,31 @@
 
 [![Build Status](https://travis-ci.com/railslove/ebicsbox.svg?token=EhFJyZWe1sxdBDmF2bzC&branch=fix-gready-route)](https://travis-ci.com/railslove/ebicsbox)
 
-Epics Box is a selfcontained solution to handle SEPA credit/debits and bank statement
-reconcilliation.
+Epics Box is a self-contained solution to handle SEPA credit/debits and bank statement
+reconciliation.
 
 It offers a HTTP interface and can be integrated with different message queueing systems
 
-## Prerequisites
+## Get started
+In order to kickstart the project you can choose what fits you preferences.
 
-- ruby (ruby 2.5.x)
-- redis
-- postgres
+## Requirements
+
+* ruby 3.2.2
+* postgres 15 (when not using docker-compose)
+* redis 4 (when not using docker-compose)
+* docker and docker-compose (optional)
+
+### Locally
+* have a **postgres** server running
+* have a **redis** server running
+* install all ruby **dependencies**: `bundle install`
+* for dotenv-rails copy `.env.example` to `.env` and update values if needed
+* to prepare **development database**: `createdb ebicsbox`
+
+### Docker
+* Spin up the docker-compose project with the web config: `docker-compose -f docker-compose.with_db.yml up`
+
 
 ## Getting started
 
@@ -130,18 +145,18 @@ We are using RSpec to test this project. In order to execute all specs once, run
 To migrate your test database run the following command:
 
 ```bash
-  $ `ENVIRONMENT`=test bundle exec bin/migrat
+  $ `ENVIRONMENT`=test bundle exec bin/migrate
 ```
 
 ### Error Tracking
 
-The ebicsbox enables sentry or rollbar as the error tracking software of choice.
+The ebicsbox enables [sentry](https://sentry.io/) or [rollbar](https://rollbar.com/) as the error tracking software of choice.
 
 _using sentry_ \
-Define `SENTRY_DSN` via an environment variable to enable error tracking via sentry
+Define `SENTRY_DSN` via an environment variable to enable error tracking via `sentry`
 
 _using rollbar_ \
-Define `ROLLBAR_ACCESS_TOKEN` via an environment variable to enable error tracking via rollbar
+Define `ROLLBAR_ACCESS_TOKEN` via an environment variable to enable error tracking via `rollbar`
 
 ### Documentation
 
