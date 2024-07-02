@@ -7,11 +7,19 @@ reconcilliation.
 
 It offers a HTTP interface and can be integrated with different message queueing systems
 
-## Prerequisites
+## Kickstart
+In order to kickstart the project you can choose what fits you preferences.
 
-- ruby (ruby 2.5.x)
-- redis
-- postgres
+### Locally
+* have a **postgres** server running
+* have a **redis** server running
+* install all ruby **dependencies**: `bundle install`
+* for dotenv-rails copy `.env.example` to `.env` and update values if needed
+* to prepare **development database**: `createdb ebicsbox`
+
+### Docker
+* Spin up the docker-compose project with the web config: `docker-compose -f docker-compose.with_db.yml up`
+
 
 ## Getting started
 
@@ -130,7 +138,7 @@ We are using RSpec to test this project. In order to execute all specs once, run
 To migrate your test database run the following command:
 
 ```bash
-  $ `ENVIRONMENT`=test bundle exec bin/migrat
+  $ `ENVIRONMENT`=test bundle exec bin/migrate
 ```
 
 ### Error Tracking
