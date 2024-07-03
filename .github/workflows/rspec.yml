@@ -1,8 +1,10 @@
 name: pull_request_ci
 
 on:
-  pull_request:
-    # branches: ["**"]
+  push:
+    tags: ["v*.*.*"]
+  # pull_request:
+  # branches: ["**"]
 
 jobs:
   linter:
