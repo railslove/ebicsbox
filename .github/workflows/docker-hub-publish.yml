@@ -11,7 +11,7 @@ on:
   #   tags: ["v*.*.*"]
   pull_request:
     branches:
-      - "ci/github-actions-migration"
+      - "ci/github-actions-migration-2"
 
 env:
   # Use docker.io for Docker Hub if empty
