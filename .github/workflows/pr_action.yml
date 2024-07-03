@@ -59,3 +59,5 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: false
+        env:
+          DOCKER_BUILD_RECORD_RETENTION_DAYS: 5
