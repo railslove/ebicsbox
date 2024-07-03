@@ -38,10 +38,10 @@ if ENV["ROLLBAR_ACCESS_TOKEN"]
 end
 
 if ENV["SENTRY_DSN"]
-  require "raven"
-  Raven.configure do |config|
+  require "sentry-ruby"
+  Sentry.init do |config|
     # Raven reports on the following environments
-    config.environments = %w[development staging production]
+    config.enabled_environments = %w[development staging production]
   end
 end
 
