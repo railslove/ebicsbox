@@ -1,8 +1,11 @@
-name: pull_request_ci
+name: All checks for a PR
 
 on:
   pull_request:
     branches: ["**"]
+  push:
+    branches:
+      - main
 
 jobs:
   linter:
@@ -56,3 +59,5 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: false
+        env:
+          DOCKER_BUILD_RECORD_RETENTION_DAYS: 5
