@@ -7,36 +7,73 @@ services:
     restart: always
     networks:
       - ebicsbox_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   db:
-    image: postgres:9.6
+    image: postgres
     restart: always
-    env_file: .env
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
     environment:
       - POSTGRES_DB=ebicsbox
-    expose:
-      - 5432
-    volumes:
-      - $POSTGRES_DATA_FOLDER_PATH:/var/lib/postgresql/data
+      - POSTGRES_USER=ebicsbox
+      - POSTGRES_PASSWORD=password
     networks:
       - ebicsbox_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  db_test:
+    image: postgres
+    restart: always
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
+    environment:
+      - POSTGRES_DB=ebicsbox_test
+      - POSTGRES_USER=ebicsbox_test
+      - POSTGRES_PASSWORD=password
+    networks:
+      - ebicsbox_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   web:
     environment:
       - REDIS_URL=redis://redis:6379
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db/ebicsbox
-      - PORT=5000
+      - DATABASE_URL=postgresql://ebicsbox:password@db/ebicsbox
+      - TEST_DATABASE_URL=postgresql://ebicsbox_test:password@db_test/ebicsbox_test
+      - PASSPHRASE=some_passphrase
+      - JWT_SECRET=some_jwt_secret
     depends_on:
-      - redis
-      - db
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 10; done; bundle exec rackup -p 5000 -o 0.0.0.0'
+      db:
+        condition: service_healthy
+      db_test:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - 5000:5000
+    command: bundle exec rackup -p 5000 -o 0.0.0.0
     networks:
       - ebicsbox_network
+    build: .
   worker:
+    build: .
     environment:
       - REDIS_URL=redis://redis:6379
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db/ebicsbox
+      - DATABASE_URL=postgresql://ebicsbox:password@db/ebicsbox
     depends_on:
-      - redis
-      - db
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 10; done; bundle exec sidekiq -C ./config/sidekiq.yml -r ./config/sidekiq.rb'
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: bundle exec sidekiq -C ./config/sidekiq.yml -r ./config/sidekiq.rb
     networks:
       - ebicsbox_network
