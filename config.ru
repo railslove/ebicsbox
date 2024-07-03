@@ -3,8 +3,11 @@
 require_relative "config/bootstrap"
 
 if ENV["SENTRY_DSN"]
-  require "raven"
-  use Raven::Rack
+  require "sentry-ruby"
+  Sentry.init do |config|
+    # Raven reports on the following environments
+    config.enabled_environments = %w[development staging production]
+  end
 end
 
 if ENV["ROLLBAR_ACCESS_TOKEN"]
