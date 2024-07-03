@@ -1,6 +1,6 @@
 # Epics::Box
 
-![pull_request_ci](https://github.com/railslove/ebicsbox/actions/workflows/rspec.yml/badge.svg)
+![tests](https://github.com/railslove/ebicsbox/actions/workflows/test.yml/badge.svg?branch=main)
 
 Epics Box is a self-contained solution to handle SEPA credit/debits and bank statement
 reconciliation.
