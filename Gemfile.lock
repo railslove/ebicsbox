@@ -122,6 +122,7 @@ GEM
       base64
     language_server-protocol (3.17.0.3)
     lint_roller (1.1.0)
+    logger (1.6.0)
     method_source (1.1.0)
     mime-types (3.5.2)
       mime-types-data (~> 3.2015)
@@ -164,7 +165,8 @@ GEM
     rainbow (3.1.1)
     rake (13.2.1)
     rchardet (1.8.0)
-    redis (4.8.1)
+    redis-client (0.22.2)
+      connection_pool
     regexp_parser (2.9.2)
     rest-client (2.1.0)
       http-accept (>= 1.7.0, < 2.0)
@@ -217,14 +219,15 @@ GEM
       nokogiri
     sequel (5.81.0)
       bigdecimal
-    sidekiq (6.5.12)
-      connection_pool (>= 2.2.5, < 3)
-      rack (~> 2.0)
-      redis (>= 4.5.0, < 5)
-    sidekiq-scheduler (4.0.3)
-      redis (>= 4.2.0)
+    sidekiq (7.3.0)
+      concurrent-ruby (< 2)
+      connection_pool (>= 2.3.0)
+      logger
+      rack (>= 2.2.4)
+      redis-client (>= 0.22.2)
+    sidekiq-scheduler (5.0.3)
       rufus-scheduler (~> 3.2)
-      sidekiq (>= 4, < 7)
+      sidekiq (>= 6, < 8)
       tilt (>= 1.4.0)
     standard (1.39.0)
       language_server-protocol (~> 3.17.0.2)
