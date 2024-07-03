@@ -10,7 +10,6 @@ Procfile*
 
 # ci
 .github/
-.semaphore/
 
 # node
 node_modules/
