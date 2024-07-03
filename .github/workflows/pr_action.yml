@@ -3,6 +3,9 @@ name: All checks for a PR
 on:
   pull_request:
     branches: ["**"]
+  push:
+    branches:
+      - main
 
 jobs:
   linter:
