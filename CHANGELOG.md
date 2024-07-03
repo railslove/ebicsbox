@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.1
+- `[FIX]` Migrate to new sentry
+
 ## 2.0.0
 - `[BREAKING]` Removes API V1
 - `[ENHANCEMENT]` Adds Support for ruby 3
