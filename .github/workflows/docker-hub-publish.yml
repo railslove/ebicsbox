@@ -6,9 +6,12 @@ name: Docker
 # documentation.
 
 on:
-  push:
-    # Publish semver tags as releases.
-    tags: ["v*.*.*"]
+  # push:
+  #   # Publish semver tags as releases.
+  #   tags: ["v*.*.*"]
+  pull_request:
+    branches:
+      - "ci/github-actions-migration"
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -70,8 +73,8 @@ jobs:
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
         with:
           context: .
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          push: true
+          tags: "test-image"
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

@@ -2,7 +2,7 @@ name: pull_request_ci
 
 on:
   pull_request:
-    branches: ["**"]
+    # branches: ["**"]
 
 jobs:
   linter:
