@@ -64,6 +64,11 @@ services:
     networks:
       - ebicsbox_network
     build: .
+    healthcheck:
+      test: ["CMD", bin/healthchecks/server]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   worker:
     build: .
     environment:

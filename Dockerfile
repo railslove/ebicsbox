@@ -1,5 +1,5 @@
 FROM ruby:3.3.2-slim
-RUN apt-get update && apt-get install -y git supervisor build-essential zlib1g-dev libpq-dev
+RUN apt-get update && apt-get install -y git supervisor build-essential zlib1g-dev libpq-dev curl
 
 # throw errors if Gemfile has been modified since Gemfile.lock
 

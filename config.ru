@@ -22,7 +22,7 @@ end
 if ENV["RACK_ENV"] == "production"
   unless ENV["DISABLE_SSL_FORCE"]
     require "rack/ssl-enforcer"
-    use Rack::SslEnforcer
+    use Rack::SslEnforcer, :except => ["/health"]
   end
 
   # Log all requests in apache log file format
