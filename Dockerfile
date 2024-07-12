@@ -25,3 +25,4 @@ RUN chmod 755 /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["bin/start", "all"]
+HEALTHCHECK --interval=30s --timeout=3s CMD bin/healthchecks/all
