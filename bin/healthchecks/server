@@ -1,0 +1,5 @@
+#!/bin/bash
+
+SERVER_PORT="${PORT:-5000}" 
+
+curl -f "http://localhost:${SERVER_PORT}/health" || exit 1

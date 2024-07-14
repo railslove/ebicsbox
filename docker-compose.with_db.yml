@@ -64,8 +64,18 @@ services:
     networks:
       - ebicsbox_network
     build: .
+    healthcheck:
+      test: ["CMD", bin/healthchecks/server]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   worker:
     build: .
+    healthcheck:
+      test: ["CMD", bin/healthchecks/worker]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     environment:
       - REDIS_URL=redis://redis:6379
       - DATABASE_URL=postgresql://ebicsbox:password@db/ebicsbox
