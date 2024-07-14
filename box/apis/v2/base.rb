@@ -4,6 +4,7 @@ require "grape"
 require "grape-swagger"
 require "grape-swagger/entity"
 
+require_relative "../healthcheck"
 require_relative "accounts"
 require_relative "credit_transfers"
 require_relative "direct_debits"
@@ -33,6 +34,7 @@ module Box
         mount Management::Organizations
         mount Management::Users
         mount Management::Webhooks
+        mount ::Box::Apis::Healthcheck
 
         add_swagger_documentation \
           doc_version: "v2",

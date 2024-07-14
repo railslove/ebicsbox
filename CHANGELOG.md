@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.2
+- `[ENHANCEMENT]` Add container healthcheck
+
 ## 2.0.1
 - `[FIX]` Migrate to new sentry
 
