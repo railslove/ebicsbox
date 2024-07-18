@@ -46,6 +46,7 @@ services:
       retries: 5
   web:
     environment:
+      - AUTH_SERVICE=static
       - DATABASE_URL=postgresql://ebicsbox:password@db/ebicsbox
       - PASSPHRASE=some_passphrase
       - PORT=5000
@@ -77,6 +78,7 @@ services:
       timeout: 5s
       retries: 5
     environment:
+      - AUTH_SERVICE=static
       - DATABASE_URL=postgresql://ebicsbox:password@db/ebicsbox
       - PASSPHRASE=some_passphrase
       - REDIS_URL=redis://redis:6379
