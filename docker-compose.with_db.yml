@@ -46,11 +46,12 @@ services:
       retries: 5
   web:
     environment:
-      - REDIS_URL=redis://redis:6379
+      - AUTH_SERVICE=static
       - DATABASE_URL=postgresql://ebicsbox:password@db/ebicsbox
-      - TEST_DATABASE_URL=postgresql://ebicsbox_test:password@db_test/ebicsbox_test
       - PASSPHRASE=some_passphrase
-      - JWT_SECRET=some_jwt_secret
+      - PORT=5000
+      - REDIS_URL=redis://redis:6379
+      - TEST_DATABASE_URL=postgresql://ebicsbox_test:password@db_test/ebicsbox_test
     depends_on:
       db:
         condition: service_healthy
@@ -60,7 +61,7 @@ services:
         condition: service_healthy
     ports:
       - 5000:5000
-    command: bundle exec rackup -p 5000 -o 0.0.0.0
+    command: bin/start server
     networks:
       - ebicsbox_network
     build: .
@@ -77,13 +78,15 @@ services:
       timeout: 5s
       retries: 5
     environment:
-      - REDIS_URL=redis://redis:6379
+      - AUTH_SERVICE=static
       - DATABASE_URL=postgresql://ebicsbox:password@db/ebicsbox
+      - PASSPHRASE=some_passphrase
+      - REDIS_URL=redis://redis:6379
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
-    command: bundle exec sidekiq -C ./config/sidekiq.yml -r ./config/sidekiq.rb
+    command: bin/start worker
     networks:
       - ebicsbox_network
