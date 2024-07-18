@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+  <title>Setup Ebics box</title>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelector('form').addEventListener('submit', function (e) {
+        e.preventDefault(); // Prevent default form submission
+
+        const formData = new FormData(this);
+
+        fetch('/setup', {
+          method: 'POST',
+          body: formData,
+        })
+          .then(response => response.json())
+          .then(data => {
+            const form = document.querySelector('form');
+            form.style.display = 'none';
+            const resultDiv = document.querySelector('#result');
+
+            resultDiv.innerHTML = `
+              <hgroup>
+                <h2>Organization has been created</h2>
+                <p>Name: ${data.organization.name}</p>
+                <p>Webhook Token: ${data.organization.webhook_token}</p>
+              </hgroup>
+              <hgroup>
+                <h2>User has been created</h2>
+                <p>Name: ${data.user.name}</p>
+                <p>User Access Token: ${data.user.access_token}</p>
+              </hgroup>
+            `;
+          })
+          .catch(error => console.error('Error:', error));
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <main class="container">
+    <h1>Setup your box</h1>
+    <form action="/setup" method="post">
+      <label for="organization">
+        Organization Name
+        <input type="text" name="organization" placeholder="Name">
+      </label>
+      <label for="user_name">
+        User Name
+        <input type="text" name="user_name" placeholder="Description" value="system user">
+      </label>
+      <input type="submit" value="Submit">
+    </form>
+    <div id="result"></div>
+  </main>
+</body>
+
+</html>
