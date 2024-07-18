@@ -43,6 +43,10 @@ module Box
       ENV["SANDBOX"] == "enabled"
     end
 
+    def ui_initial_setup?
+      ENV["UI_INITIAL_SETUP"] == "enabled"
+    end
+
     def registrations_allowed?
       ENV["ALLOW_REGISTRATIONS"] == "enabled"
     end
