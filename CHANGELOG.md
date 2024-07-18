@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.1.0
+- `[ENHANCEMENT]` Allow the initial setup of the box to be performed via web interface `/setup`
+
 ## 2.0.2
 - `[ENHANCEMENT]` Add container healthcheck
 
