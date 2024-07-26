@@ -16,7 +16,8 @@ module Box
           [400, "Invalid request", Message],
           [401, "Not authorized to access this resource", Message],
           [404, "Resource not found", Message],
-          [412, "EBICS account credentials not yet activated", Message]
+          [412, "EBICS account credentials not yet activated", Message],
+          [500, "Internal Server error"]
         ].freeze
 
         AUTH_HEADERS = {
@@ -29,6 +30,13 @@ module Box
           version "v2", using: :header, vendor: "ebicsbox"
           format :json
           helpers Helpers::Pagination
+
+          rescue_from :all do |exception|
+            Sentry.capture_exception(exception) if ENV["SENTRY_DSN"]
+            Rollbar.error(exception) if ENV["ROLLBAR_ACCESS_TOKEN"]
+            Box.logger.error(exception)
+            error!({error: "Internal server error"}, 500, {"Content-Type" => "application/json"})
+          end
 
           helpers do
             def current_user
