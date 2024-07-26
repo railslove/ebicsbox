@@ -4,6 +4,8 @@ require "grape"
 
 require_relative "api_endpoint"
 require_relative "../../entities/v2/credit_transfer"
+require_relative "../../business_processes/credit"
+require_relative "../../business_processes/foreign_credit"
 require_relative "../../validations/unique_transaction_eref"
 require_relative "../../validations/length"
 require_relative "../../errors/business_process_failure"
@@ -98,10 +100,10 @@ module Box
 
             if sanitized_params[:currency] == "EUR"
               sanitized_params.reject! { |k, _v| k.in? %w[big country_code fee_handling] } # still related to workaround
-              Credit.v2_create!(current_user, account, sanitized_params)
+              BusinessProcesses::Credit.v2_create!(current_user, account, sanitized_params)
             else
               sanitized_params.reject! { |k, _v| k.in? %w[urgent] } # still related to workaround
-              ForeignCredit.v2_create!(current_user, account, sanitized_params)
+              BusinessProcesses::ForeignCredit.v2_create!(current_user, account, sanitized_params)
             end
 
             {message: "Credit transfer has been initiated successfully!"}

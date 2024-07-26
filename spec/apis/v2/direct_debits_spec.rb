@@ -248,17 +248,17 @@ module Box
         end
 
         it "triggers a debit transfer" do
-          expect(DirectDebit).to receive(:create!)
+          expect(BusinessProcesses::DirectDebit).to receive(:create!)
           post "/direct_debits", valid_attributes, valid_debit_headers
         end
 
         it "triggers a debit transfer without bic" do
-          expect(DirectDebit).to receive(:create!)
+          expect(BusinessProcesses::DirectDebit).to receive(:create!)
           post "/direct_debits", valid_attributes.except(:bic), valid_debit_headers
         end
 
         it "transforms parameters so they are understood by debit business process" do
-          expect(DirectDebit).to receive(:create!).with(account, anything, user)
+          expect(BusinessProcesses::DirectDebit).to receive(:create!).with(account, anything, user)
           post "/direct_debits", valid_attributes, valid_debit_headers
         end
 

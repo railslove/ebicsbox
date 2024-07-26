@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.1
+- `[FIX]` correct broken ruby import hierarchy. This was broken in Version `2.0`
+- `[FIX]` add http status 500 as swagger responses
+
 ## 2.1.0
 - `[ENHANCEMENT]` Allow the initial setup of the box to be performed via web interface `/setup`
 
