@@ -53,7 +53,7 @@ module Box
         end
 
         context "auto accept any credits and create statements" do
-          let(:run_job) { Credit.create!(account, valid_payload.merge(amount: 100_00), user) }
+          let(:run_job) { BusinessProcesses::Credit.create!(account, valid_payload.merge(amount: 100_00), user) }
           before do
             Sidekiq::Testing.inline!
           end
@@ -78,7 +78,7 @@ module Box
         end
 
         context "amounts" do
-          let(:run_job) { Credit.create!(account, valid_payload.merge(amount: 251_995), user) }
+          let(:run_job) { BusinessProcesses::Credit.create!(account, valid_payload.merge(amount: 251_995), user) }
 
           it "sets correct statement account" do
             run_job
@@ -108,7 +108,7 @@ module Box
         end
 
         context "auto accept any direct debits and create statements" do
-          let(:run_job) { DirectDebit.create!(account, valid_payload.merge(amount: 100_00), user) }
+          let(:run_job) { BusinessProcesses::DirectDebit.create!(account, valid_payload.merge(amount: 100_00), user) }
           before do
             Sidekiq::Testing.inline!
           end
@@ -138,7 +138,7 @@ module Box
         end
 
         context "amounts" do
-          let(:run_job) { DirectDebit.create!(account, valid_payload.merge(amount: 251_995), user) }
+          let(:run_job) { BusinessProcesses::DirectDebit.create!(account, valid_payload.merge(amount: 251_995), user) }
 
           it "sets correct statement account" do
             run_job

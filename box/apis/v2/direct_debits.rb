@@ -4,6 +4,7 @@ require "grape"
 
 require_relative "api_endpoint"
 require_relative "../../entities/v2/direct_debit"
+require_relative "../../business_processes/direct_debit"
 require_relative "../../validations/unique_transaction_eref"
 require_relative "../../validations/length"
 require_relative "../../errors/business_process_failure"
@@ -90,7 +91,7 @@ module Box
 
           post do
             account = current_organization.find_account!(params[:account])
-            DirectDebit.v2_create!(current_user, account, declared(params))
+            BusinessProcesses::DirectDebit.v2_create!(current_user, account, declared(params))
             {message: "Direct debit has been initiated successfully!"}
           end
 
