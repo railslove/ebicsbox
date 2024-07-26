@@ -263,12 +263,12 @@ module Box
         end
 
         it "triggers a credit transfer" do
-          expect(Credit).to receive(:create!)
+          expect(BusinessProcesses::Credit).to receive(:create!)
           post "/credit_transfers", valid_attributes, TestHelpers::VALID_HEADERS
         end
 
         it "triggers a credit transfer without bic" do
-          expect(Credit).to receive(:create!)
+          expect(BusinessProcesses::Credit).to receive(:create!)
           post "/credit_transfers", valid_attributes.except(:bic), TestHelpers::VALID_HEADERS
         end
 
@@ -278,7 +278,7 @@ module Box
         end
 
         it "transforms parameters so they are understood by credit business process" do
-          expect(Credit).to receive(:create!).with(account, anything, user)
+          expect(BusinessProcesses::Credit).to receive(:create!).with(account, anything, user)
           post "/credit_transfers", valid_attributes, TestHelpers::VALID_HEADERS
         end
 
@@ -290,14 +290,14 @@ module Box
         end
 
         it "ignores fee_handling & country_code flag" do
-          allow(Credit).to receive(:v2_create!).and_return(true)
+          allow(BusinessProcesses::Credit).to receive(:v2_create!).and_return(true)
           post "/credit_transfers", valid_attributes.merge(fee_handling: :split, country_code: "FooBar"), TestHelpers::VALID_HEADERS
 
           expected_attributes = valid_attributes
             .merge(reference: nil, execution_date: Date.today, urgent: false, currency: "EUR")
             .stringify_keys
 
-          expect(Credit).to have_received(:v2_create!).with(anything, anything, expected_attributes)
+          expect(BusinessProcesses::Credit).to have_received(:v2_create!).with(anything, anything, expected_attributes)
         end
 
         context "foreign currency" do
@@ -312,14 +312,14 @@ module Box
         end
 
         it "ignores urgent flag" do
-          allow(ForeignCredit).to receive(:v2_create!).and_return(true)
+          allow(BusinessProcesses::ForeignCredit).to receive(:v2_create!).and_return(true)
           post "/credit_transfers", valid_attributes_foreign.merge(urgent: true), TestHelpers::VALID_HEADERS
 
           expected_attributes = valid_attributes_foreign
             .merge(reference: nil, execution_date: Date.today, fee_handling: :split)
             .stringify_keys
 
-          expect(ForeignCredit).to have_received(:v2_create!).with(anything, anything, expected_attributes)
+          expect(BusinessProcesses::ForeignCredit).to have_received(:v2_create!).with(anything, anything, expected_attributes)
         end
       end
     end

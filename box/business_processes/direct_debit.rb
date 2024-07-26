@@ -57,7 +57,7 @@ module Box
         params[:remittance_information] = params[:reference]
 
         # Execute v1 method
-        self.create!(account, params, user)
+        create!(account, params, user)
       end
     end
   end
