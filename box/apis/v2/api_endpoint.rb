@@ -35,7 +35,7 @@ module Box
             Sentry.capture_exception(exception) if ENV["SENTRY_DSN"]
             Rollbar.error(exception) if ENV["ROLLBAR_ACCESS_TOKEN"]
             Box.logger.error(exception)
-            error!({ error: "Internal server error" }, 500, { "Content-Type" => "application/json" })
+            error!({error: "Internal server error"}, 500, {"Content-Type" => "application/json"})
           end
 
           helpers do
