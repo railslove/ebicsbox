@@ -8,12 +8,15 @@ if ENV["SENTRY_DSN"]
     # Raven reports on the following environments
     config.enabled_environments = %w[development staging production]
   end
+
+  use Sentry::Rack::CaptureExceptions
 end
 
 if ENV["ROLLBAR_ACCESS_TOKEN"]
   require "rollbar/middleware/rack"
   Rollbar.configure do |config|
     config.access_token = ENV["ROLLBAR_ACCESS_TOKEN"]
+    config.environment = ENV["RACK_ENV"]
   end
 
   use Rollbar::Middleware::Rack
