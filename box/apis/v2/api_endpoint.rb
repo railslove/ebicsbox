@@ -3,6 +3,7 @@
 require "active_support/concern"
 
 require_relative "../../helpers/pagination"
+require_relative "../../helpers/error_handler"
 
 module Box
   module Apis
@@ -30,11 +31,10 @@ module Box
           version "v2", using: :header, vendor: "ebicsbox"
           format :json
           helpers Helpers::Pagination
+          helpers Helpers::ErrorHandler
 
           rescue_from :all do |exception|
-            Sentry.capture_exception(exception) if ENV["SENTRY_DSN"]
-            Rollbar.error(exception) if ENV["ROLLBAR_ACCESS_TOKEN"]
-            Box.logger.error(exception)
+            log_error(exception)
             error!({error: "Internal server error"}, 500, {"Content-Type" => "application/json"})
           end
 
