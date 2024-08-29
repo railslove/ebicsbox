@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.2.0
+- `[ENHANCEMENT]` better error handling, more logging and sentry/ rollbar tracking
+
 ## 2.1.1
 - `[FIX]` correct broken ruby import hierarchy. This was broken in Version `2.0`
 - `[FIX]` add http status 500 as swagger responses

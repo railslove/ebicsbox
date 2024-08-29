@@ -54,8 +54,8 @@ module Box
                   organization.add_user(declared(params)[:user].merge(admin: true))
                   present organization, with: Entities::V2::Organization
                 end
-              rescue => ex
-                Box.logger.error("[Registration] #{ex.message}")
+              rescue => exception
+                log_error(exception, logger_prefix: "[Registration]")
                 error!({message: "Failed to create organization!"}, 400)
               end
             end
