@@ -22,7 +22,7 @@
         })
           .then(response => {
             if (!response.ok) {
-              throw new Error('Network response was not ok');
+              throw new Error('Server response was not ok');
             }
             return response.json();
           })
@@ -52,7 +52,7 @@
               <div class="pico-background-red">
                 <h2>Something went wrong</h2>
                 <p>${error.message}</p>
-                <p>Check the logs for more information</p>
+                <p>Check the console and logs for more information</p>
               </div>
             `;
           });
