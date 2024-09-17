@@ -52,6 +52,7 @@ services:
       - PORT=5000
       - REDIS_URL=redis://redis:6379
       - TEST_DATABASE_URL=postgresql://ebicsbox_test:password@db_test/ebicsbox_test
+      - UI_INITIAL_SETUP=enabled
     depends_on:
       db:
         condition: service_healthy
