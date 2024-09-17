@@ -47,10 +47,6 @@ module Box
       ENV["UI_INITIAL_SETUP"] == "enabled"
     end
 
-    def registrations_allowed?
-      ENV["ALLOW_REGISTRATIONS"] == "enabled"
-    end
-
     def jwt_secret
       ENV.fetch("JWT_SECRET")
     rescue KeyError
