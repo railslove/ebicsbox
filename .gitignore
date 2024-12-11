@@ -12,10 +12,5 @@
 *.so
 *.o
 *.a
-mkmf.log
 .DS_Store
 .env
-Box Key Architecture.graffle
-node_modules
-application.js
-epics-box.war
