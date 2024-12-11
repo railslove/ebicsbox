@@ -11,11 +11,6 @@ Procfile*
 # ci
 .github/
 
-# node
-node_modules/
-npm-debug.log
-yarn-error.log
-
 # logs
 logs/
 tmp/
