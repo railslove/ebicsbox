@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "config/bootstrap"
+require 'sidekiq/web'
 
 if ENV["SENTRY_DSN"]
   require "sentry-ruby"
@@ -51,6 +52,8 @@ use Rack::Cors do
   end
 end
 
+use Rack::Session::Cookie, secret: ENV['SESSION_SECRET'] || 'your_secret_key'
+
 # Deliver assets
 use Rack::Static, urls: [
   "/swagger-ui-standalone-preset.js",
@@ -74,6 +77,10 @@ map "/docs" do
       File.open("public/swagger/index.html", File::RDONLY)
     ]
   }
+end
+
+map '/sidekiq' do
+  run Sidekiq::Web
 end
 
 # Finally, load application and all its endpoints
