@@ -33,6 +33,7 @@ if ENV["ROLLBAR_ACCESS_TOKEN"]
 
   Rollbar.configure do |config|
     config.access_token = ENV["ROLLBAR_ACCESS_TOKEN"]
+    config.environment = ENV["RACK_ENV"]
     config.use_sidekiq
   end
 end
