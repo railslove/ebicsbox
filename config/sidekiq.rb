@@ -39,6 +39,7 @@ end
 
 if ENV["SENTRY_DSN"]
   require "sentry-ruby"
+  require "sentry-sidekiq"
   Sentry.init do |config|
     # Raven reports on the following environments
     config.enabled_environments = %w[development staging production]
