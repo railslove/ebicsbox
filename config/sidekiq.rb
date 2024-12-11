@@ -33,12 +33,14 @@ if ENV["ROLLBAR_ACCESS_TOKEN"]
 
   Rollbar.configure do |config|
     config.access_token = ENV["ROLLBAR_ACCESS_TOKEN"]
+    config.environment = ENV["RACK_ENV"]
     config.use_sidekiq
   end
 end
 
 if ENV["SENTRY_DSN"]
   require "sentry-ruby"
+  require "sentry-sidekiq"
   Sentry.init do |config|
     # Raven reports on the following environments
     config.enabled_environments = %w[development staging production]
