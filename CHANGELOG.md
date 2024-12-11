@@ -57,7 +57,7 @@
 
 ## 1.3.25
 
-- `[BUGFIX]` Ensure alphanumeric transaction IDs can be handled propperly
+- `[BUGFIX]` Ensure alphanumeric transaction IDs can be handled properly
 
 ## 1.3.20 - 13.24
 
@@ -71,7 +71,7 @@
 
 ## 1.3.16 - 1.3.18
 
-- `[ENHANCEMENT]` Improves dublication checks for statements to handle edge-cases
+- `[ENHANCEMENT]` Improves duplication checks for statements to handle edge-cases
 
 ## 1.3.15
 
@@ -95,7 +95,7 @@
 
 ## 1.3.10
 
-- `[ENHANCEMENT]` Queues VMK-jobs separatly so a single failure does not interfer with other imports
+- `[ENHANCEMENT]` Queues VMK-jobs separately so a single failure does not interfere with other imports
 - `[HOUSEKEEPING]` Updates CMXL-Gem to fix some weird bank responses
 
 ## 1.3.9
@@ -141,7 +141,7 @@
 ## 1.3.2
 
 - `[ENHANCEMENT]` Fake-Mode now handles information for direct debits properly
-- `[HOUSEKEEPING]` Tagging dockerimages works now with semaphore
+- `[HOUSEKEEPING]` Tagging docker images works now with semaphore
 
 ## 1.3.1
 
@@ -241,7 +241,7 @@ Make scheduler intervals configurable.
 We ditched jruby in favor of ruby. This is great news!
 API Changes for V2:
 
-- Events are now availabe for V2
+- Events are now available for V2
 - Credits higher than 120.000€ are now allowed
 - Bic-less transactions are now allowed - be careful, your bank may get angry
 

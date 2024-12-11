@@ -22,9 +22,6 @@ module Box
           content_type :html, "text/html"
 
           namespace "/management/accounts/:iban" do
-            params do
-              requires :iban, type: String, desc: "IBAN for the account"
-            end
             before do
               unless env["box.admin"]
                 error!({message: "Unauthorized access. Please provide a valid organization management token!"}, 401)
@@ -33,11 +30,6 @@ module Box
               @account = current_organization.accounts_dataset.first!(iban: params[:iban])
             rescue Sequel::NoMatchingRow
               error!({message: "Your organization does not have an account with given IBAN!"}, 404)
-            end
-
-            desc "Service", hidden: true
-            get "/" do
-              {message: "not yet implemented"}
             end
 
             resource :ebics_users do
@@ -86,7 +78,9 @@ module Box
                 produces: ["application/vnd.ebicsbox-v2+json"]
 
               params do
+                requires :iban, type: String, desc: "IBAN for the account"
               end
+
               get do
                 present @account.ebics_users, with: Entities::EbicsUser
               end
@@ -103,6 +97,7 @@ module Box
                 produces: ["application/vnd.ebicsbox-v2+json"]
 
               params do
+                requires :iban, type: String, desc: "IBAN for the account"
                 requires :user_id, type: Integer, desc: "Internal user identifier to associate the ebics_user with", documentation: {param_type: "body"}
                 requires :ebics_user, type: String, unique_ebics_user: true, desc: "EBICS user to represent"
               end

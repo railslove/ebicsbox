@@ -29,6 +29,7 @@ gem "sidekiq-scheduler"
 # exception management
 gem "rollbar"
 gem "sentry-ruby"
+gem "sentry-sidekiq"
 
 gem "barnes"
 gem "rack-ssl-enforcer"
