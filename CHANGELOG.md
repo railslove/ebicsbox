@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.0
+- `[SECURITY]` Update dependencies that contained security issues
+- `[FIX]` Add sentry error logging for sidekiq jobs
+- `[HOUSEKEEPING]` Remove outdated code from v1 api
+- `[HOUSEKEEPING]` Enrich development setup
+
 ## 2.2.0
 - `[ENHANCEMENT]` better error handling, more logging and sentry/ rollbar tracking
 
