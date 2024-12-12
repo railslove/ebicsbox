@@ -1,7 +1,7 @@
 A modern API for bank accounts. Fully automatize processing of
 incoming and outgoing money transactions. It enables high-level
-access to some EBCIS features and wrapps them with further
-functinality.
+access to some EBCIS features and wraps them with further
+functionality.
 
 ## Clarification of terms
 ### EREF
@@ -15,7 +15,7 @@ Every time a new "outgoing" transaction is created (debit or credit)
 the EREF will be stored on the internal watchlist, whenever we're
 seeing these IDs in new transactions you'll get notified via Webhooks.
 The most used use case will be to identify chargebacks or detect that
-the moneywas actullay transfered from your bank account.
+the money was actually transferred from your bank account.
 
 ### Media Types
 All actions require and return JSON formatted data. Timestamps are
@@ -24,9 +24,8 @@ always formatted using ISO 8601. All data is UTF-8 encoded.
   `Content-Type: application/json`
 
 ### Webhooks
-The account callback url can be defined either through the account
-management UI or directly through the api. When the callback URL is
-set, webhook delivery is enabled.
+The account callback url can be defined either through the api. 
+When the callback URL is set, webhook delivery is enabled.
 
 If the deliver of a webhooks fails for any reason, it will be
 attempted again up to 20 times, exponentially delaying the execution.
@@ -35,7 +34,7 @@ After that, to reset the retry count, `POST: /webhooks/reset` can be
 used. See below.
 
 Following are all supported callbacks with parameters. In
-paranethesis is a short explanation for the non obvious parameters,
+parenthesis is a short explanation for the non obvious parameters,
 fixed values are written "as strings".
 
 Account Created:
@@ -152,9 +151,9 @@ to request it via header:
 
 `Accept: application/vnd.ebicsbox-v2+json`
 
-Please note that we expect applications to be flexible enought to
+Please note that we expect applications to be flexible enough to
 accept additional fields without a major version change. Breaking
-changes, like changed behaviour and removal or renaming of fields
+changes, like changed behavior and removal or renaming of fields
 will always result in a version number bump.
 
 ### Prerequisites
