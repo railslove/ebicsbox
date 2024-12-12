@@ -62,6 +62,8 @@ services:
         condition: service_healthy
     ports:
       - 5000:5000
+    volumes:
+      - .:/usr/ebicsbox
     command: bin/start server
     networks:
       - ebicsbox_network
@@ -88,6 +90,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    volumes:
+      - .:/usr/ebicsbox
     command: bin/start worker
     networks:
       - ebicsbox_network
