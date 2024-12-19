@@ -6,6 +6,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 
 require "timecop"
+require "pry"
 require_relative "../config/bootstrap"
 
 Dir["spec/support/**/*.rb"].sort.each { |f| require f }

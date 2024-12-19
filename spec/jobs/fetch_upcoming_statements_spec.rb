@@ -41,10 +41,11 @@ module Box
 
       describe ".fetch_for_account" do
         let(:client) { double("Epics Client") }
+        let(:import_file) { File.read("spec/fixtures/multiple-transactions.mt942") }
 
         before do
           allow_any_instance_of(EbicsUser).to receive(:client) { client }
-          allow(client).to receive(:VMK).and_return(File.read("spec/fixtures/multiple-transactions.mt942"))
+          allow(client).to receive(:VMK).and_return(import_file)
           allow(Account).to(
             receive(:[]).and_return(double("account", organization: double("orga", webhook_token: "token")))
           )
@@ -61,6 +62,33 @@ module Box
           expect(BusinessProcesses::ImportBankStatement).to(
             have_received(:from_cmxl).exactly(included_vmk).times
           )
+        end
+
+        context "fobbar" do
+          let(:import_file) { File.read("spec/fixtures/master_diesel_vmk_data.txt") }
+          it "does something" do
+            included_vmk = 3
+
+            job.fetch_for_account(account)
+
+            expect(BusinessProcesses::ImportBankStatement).to(
+              have_received(:from_cmxl).exactly(included_vmk).times
+            )
+          end
+        end
+
+        context "with header" do
+          let(:import_file) { File.read("spec/fixtures/mt940-headers.txt") }
+
+          it "imports all bank statements" do
+            included_vmk = 3
+
+            job.fetch_for_account(account)
+
+            expect(BusinessProcesses::ImportBankStatement).to(
+              have_received(:from_cmxl).exactly(included_vmk).times
+            )
+          end
         end
 
         it "imports all statements for all bank statements" do
