@@ -34,7 +34,7 @@ module Box
         before do
           account.imported_at!(1.day.ago)
           allow_any_instance_of(EbicsUser).to receive(:client) { client }
-          allow(client).to receive(:STA).and_return(File.read("spec/fixtures/mt940.txt"))
+          allow(client).to receive(:STA).and_return(File.read("spec/fixtures/multiple-transactions.mt940"))
 
           allow(BusinessProcesses::ImportBankStatement).to receive(:from_cmxl).and_call_original
           allow(BusinessProcesses::ImportStatements).to receive(:from_bank_statement).and_call_original

@@ -44,7 +44,7 @@ module Box
 
         before do
           allow_any_instance_of(EbicsUser).to receive(:client) { client }
-          allow(client).to receive(:VMK).and_return(File.read("spec/fixtures/mt942.txt"))
+          allow(client).to receive(:VMK).and_return(File.read("spec/fixtures/multiple-transactions.mt942"))
           allow(Account).to(
             receive(:[]).and_return(double("account", organization: double("orga", webhook_token: "token")))
           )
