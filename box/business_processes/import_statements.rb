@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "cmxl"
 require "camt_parser"
 
 require_relative "../models/account"
