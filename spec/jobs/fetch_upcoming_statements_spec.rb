@@ -54,18 +54,26 @@ module Box
           allow(BusinessProcesses::ImportStatements).to receive(:from_bank_statement).and_call_original
         end
 
-        it "imports all bank statements" do
-          included_vmk = 3
+        context "with handelsbank format" do
+          before { Cmxl.config[:strip_headers] = true }
+          after { Cmxl.config[:strip_headers] = false }
 
-          job.fetch_for_account(account)
+          it "imports all bank statements" do
+            included_vmk = 3
 
-          expect(BusinessProcesses::ImportBankStatement).to(
-            have_received(:from_cmxl).exactly(included_vmk).times
-          )
+            job.fetch_for_account(account)
+
+            expect(BusinessProcesses::ImportBankStatement).to(
+              have_received(:from_cmxl).exactly(included_vmk).times
+            )
+          end
         end
 
-        context "fobbar" do
+        context "with unstructured headers" do
           let(:import_file) { File.read("spec/fixtures/master_diesel_vmk_data.txt") }
+          before { Cmxl.config[:strip_headers] = true }
+          after { Cmxl.config[:strip_headers] = false }
+
           it "does something" do
             included_vmk = 3
 
@@ -77,11 +85,13 @@ module Box
           end
         end
 
-        context "with header" do
+        context "with structured header" do
+          before { Cmxl.config[:strip_headers] = true }
+          after { Cmxl.config[:strip_headers] = false }
           let(:import_file) { File.read("spec/fixtures/mt940-headers.txt") }
 
           it "imports all bank statements" do
-            included_vmk = 3
+            included_vmk = 1
 
             job.fetch_for_account(account)
 

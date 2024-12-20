@@ -38,8 +38,7 @@ module Box
         vmk_data = account.transport_client.VMK(safe_from.to_s(:db), safe_to.to_s(:db))
         return unless vmk_data
 
-        Cmxl.config[:strip_headers] = true
-        chunks = Cmxl.parse(vmk_data)
+        chunks = Cmxl.parse(vmk_data.encode(vmk_data.encoding, universal_newline: true))
         import_stats = import_to_database(chunks, account)
 
         Box.logger.info("[Jobs::FetchUpcomingStatements] Imported #{chunks.count} VMK(s) for Account ##{account.id}.")
