@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "active_support/all"
-require "cmxl"
 
 require_relative "../../box/models/account"
 require_relative "../../box/models/organization"
