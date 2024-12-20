@@ -1,13 +1,8 @@
 # frozen_string_literal: true
 
-require "cmxl"
-
 require_relative "../models/account"
 require_relative "../models/bank_statement"
 require_relative "../../lib/checksum_generator"
-
-# more general matching regex that covers both newlines and newlines with dashes
-Cmxl.config[:statement_separator] = /(\n-?)(?=:20)/m
 
 module Box
   module BusinessProcesses
