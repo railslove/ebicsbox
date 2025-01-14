@@ -48,6 +48,10 @@ module Box
       rescue Sequel::NoMatchingRow => _ex
         Box.logger.error("[Jobs::FetchUpcomingStatements] Could not find Account ##{account.id}")
       rescue Epics::Error::BusinessError => ex
+        if ENV["SENTRY_DSN"]
+          Sentry.add_attachment(filename: "#{account.id}_vmk_mt942_#{SecureRandom.uuid}", bytes: vmk_data) if !vmk_data.empty?
+          Sentry.capture_exception(ex)
+        end
         # The BusinessError can occur when no new statements are available
         Box.logger.error("[Jobs::FetchUpcomingStatements] EBICS error. id=#{account.id} reason='#{ex.message}'")
       end
