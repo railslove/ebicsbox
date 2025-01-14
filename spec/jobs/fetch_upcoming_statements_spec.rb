@@ -67,6 +67,12 @@ module Box
               have_received(:from_cmxl).exactly(included_vmk).times
             )
           end
+
+          xit "updates the account balance" do
+            job.fetch_for_account(account)
+
+            expect(account.reload.balance_in_cents).to eql(0.0)
+          end
         end
 
         context "with unstructured headers" do
@@ -74,8 +80,8 @@ module Box
           before { Cmxl.config[:strip_headers] = true }
           after { Cmxl.config[:strip_headers] = false }
 
-          it "does something" do
-            included_vmk = 3
+          it "imports all bank statements" do
+            included_vmk = 2
 
             job.fetch_for_account(account)
 
@@ -83,12 +89,18 @@ module Box
               have_received(:from_cmxl).exactly(included_vmk).times
             )
           end
+
+          xit "updates the account balance" do
+            job.fetch_for_account(account)
+
+            expect(account.reload.balance_in_cents).to eql(0.0)
+          end
         end
 
         context "with structured header" do
+          let(:import_file) { File.read("spec/fixtures/single_with_headers.mt940") }
           before { Cmxl.config[:strip_headers] = true }
           after { Cmxl.config[:strip_headers] = false }
-          let(:import_file) { File.read("spec/fixtures/mt940-headers.txt") }
 
           it "imports all bank statements" do
             included_vmk = 1
