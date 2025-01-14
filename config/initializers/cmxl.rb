@@ -1,7 +1,7 @@
 require "cmxl"
 
 Cmxl.config[:statement_separator] = ENV.fetch("CMXL_STATEMENT_SEPARATOR_REGREX", /\n-\s*\n/m)
-Cmxl.config[:strip_headers] = ENV.fetch("CMXL_IGNORE_MT940_FILE_HEADER", "false") == "true"
+Cmxl.config[:strip_headers] = true
 
 
 # /\n-\s*\n/m
