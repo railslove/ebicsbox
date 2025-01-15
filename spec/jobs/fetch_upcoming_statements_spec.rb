@@ -132,6 +132,17 @@ module Box
           expect(BusinessProcesses::ImportStatements).not_to have_received(:from_bank_statement)
         end
 
+        it "logs error when ebics client raises business error" do
+          allow(client).to receive(:VMK).and_raise(Epics::Error::BusinessError, "foo")
+          allow(Box.logger).to receive(:error)
+
+          job.fetch_for_account(account)
+
+          expect(Box.logger).to(
+            have_received(:error).with("[Jobs::FetchUpcomingStatements] EBICS error. id=#{account.id} reason='EPICS_UNKNOWN - unknown'")
+          )
+        end
+
         context "with timeframe" do
           before { job.send(:options=, from: Date.new(2019, 6, 1), to: Date.new(2019, 10, 31)) }
 

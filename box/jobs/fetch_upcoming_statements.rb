@@ -39,7 +39,7 @@ module Box
         return unless vmk_data
         vmk_data = vmk_data.encode(vmk_data.encoding, universal_newline: true)
 
-        chunks = Cmxl.parse(vmk_data.encode(vmk_data.encoding, universal_newline: true))
+        chunks = Cmxl.parse(vmk_data)
         import_stats = import_to_database(chunks, account)
 
         Box.logger.info("[Jobs::FetchUpcomingStatements] Imported #{chunks.count} VMK(s) for Account ##{account.id}.")
