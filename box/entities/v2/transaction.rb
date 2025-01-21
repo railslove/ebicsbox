@@ -12,6 +12,8 @@ module Box
         expose :iban
         expose :bic
         expose :type
+        expose :expected
+        expose :reversal
         expose :amount, as: "amount_in_cents"
         expose :date, as: "executed_on"
         expose(:settled_at) { |trx| trx.settled ? trx.date : nil }

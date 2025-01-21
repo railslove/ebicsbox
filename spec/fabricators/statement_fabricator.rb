@@ -44,4 +44,6 @@ Fabricator(:statement, from: "Box::Statement") do
   bic { STATEMENT_BICS.sample }
   eref { "eref-#{Fabricate.sequence(:eref)}" }
   svwz { Faker::Lorem.sentence }
+  expected { [true, false].sample }
+  reversal { [true, false].sample }
 end
