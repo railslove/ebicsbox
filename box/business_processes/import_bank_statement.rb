@@ -1,13 +1,8 @@
 # frozen_string_literal: true
 
-require "cmxl"
-
 require_relative "../models/account"
 require_relative "../models/bank_statement"
 require_relative "../../lib/checksum_generator"
-
-# more general matching regex that covers both newlines and newlines with dashes
-Cmxl.config[:statement_separator] = /(\n-?)(?=:20)/m
 
 module Box
   module BusinessProcesses
@@ -56,13 +51,15 @@ module Box
           bs.sequence = raw_bank_statement.try(:electronic_sequence_number) || raw_bank_statement.legal_sequence_number
           bs.year = extract_year_from_bank_statement(raw_bank_statement)
           bs.remote_account = raw_bank_statement.account_identification.source
-          bs.opening_balance = as_big_decimal(raw_bank_statement.opening_or_intermediary_balance) # this will be final or intermediate
-          bs.closing_balance = as_big_decimal(raw_bank_statement.closing_or_intermediary_balance) # this will be final or intermediate
+          bs.opening_balance = as_big_decimal(raw_bank_statement.try(:opening_or_intermediary_balance)) # this will be final or intermediate
+          bs.closing_balance = as_big_decimal(raw_bank_statement.try(:closing_or_intermediary_balance)) # this will be final or intermediate
           bs.transaction_count = raw_bank_statement.transactions.count
           bs.fetched_on = Date.today
           bs.content = raw_bank_statement.source
         end
       end
+
+      private
 
       def self.update_meta_data(raw_bank_statement, account)
         balance = raw_bank_statement.closing_or_intermediary_balance # We have to handle both final and intermediary balances

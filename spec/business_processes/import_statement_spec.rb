@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "active_support/all"
-require "cmxl"
 
 require_relative "../../box/models/account"
 require_relative "../../box/models/organization"
@@ -16,15 +15,6 @@ module Box
       let(:camt_account) { organization.add_account(host: "HOST", iban: "iban1234567", statements_format: "camt53") }
       let(:camt) { File.read("spec/fixtures/camt_statement") }
       let(:mt940) { File.read("spec/fixtures/single_valid.mt940") }
-
-      def clear_all_tubes
-        Queue.clear!(Queue::DEBIT_TUBE)
-        Queue.clear!(Queue::CREDIT_TUBE)
-        Queue.clear!(Queue::ORDER_TUBE)
-        Queue.clear!(Queue::STA_TUBE)
-        Queue.clear!(Queue::WEBHOOK_TUBE)
-        Queue.clear!(Queue::ACTIVATION_TUBE)
-      end
 
       before(:each) { Sidekiq::Queue.all.each(&:clear) }
 
@@ -264,6 +254,19 @@ module Box
           it "still imports remaining statements" do
             transaction = mt940_bank_transactions.last
             expect(described_class.create_statement(mt940_bank_statement, transaction)).to be_truthy
+          end
+        end
+
+        context "importing vmk transaction that is expected" do
+          it "marks statements as expected" do
+            vmk_data = File.read("spec/fixtures/master_diesel_vmk_data.txt")
+            bank_statement = ImportBankStatement.from_mt940(vmk_data, account)
+            bank_transactions = described_class.parse_bank_statement(bank_statement)
+            transaction = bank_transactions.first
+
+            described_class.create_statement(bank_statement, transaction)
+
+            expect(Statement.first).to be_expected
           end
         end
       end
