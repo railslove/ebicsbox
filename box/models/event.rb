@@ -12,12 +12,12 @@ module Box
   class Event < Sequel::Model
     SUPPORTED_TYPES = %i[
       account_created
-      debit_created
       credit_created
-      statement_created
-      ebics_user_activated
       credit_status_changed
+      debit_created
       debit_status_changed
+      ebics_user_activated
+      statement_created
     ].freeze
 
     RETRY_THRESHOLD = 20
