@@ -11,7 +11,7 @@ module Box
       expose :name
       expose :bic
       expose :iban
-      expose :type
+      expose :type, documentation: {type: "Enum", desc: "Type of statement", values: %w[credit debit] }
       expose :amount, documentation: {type: "Integer", desc: "Amount in cents"}
       expose :date
       expose(:remittance_information, documentation: {type: "String", desc: "Wire transfer reference"}) { |statement| statement[:svwz] || statement[:information] }
