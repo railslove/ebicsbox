@@ -16,15 +16,6 @@ module Box
       let(:camt) { File.read("spec/fixtures/camt_statement") }
       let(:mt940) { File.read("spec/fixtures/single_valid.mt940") }
 
-      def clear_all_tubes
-        Queue.clear!(Queue::DEBIT_TUBE)
-        Queue.clear!(Queue::CREDIT_TUBE)
-        Queue.clear!(Queue::ORDER_TUBE)
-        Queue.clear!(Queue::STA_TUBE)
-        Queue.clear!(Queue::WEBHOOK_TUBE)
-        Queue.clear!(Queue::ACTIVATION_TUBE)
-      end
-
       before(:each) { Sidekiq::Queue.all.each(&:clear) }
 
       it "creates db statements for each bank statement transaction" do
