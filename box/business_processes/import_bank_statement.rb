@@ -64,6 +64,8 @@ module Box
         end
       end
 
+      private
+
       def self.update_meta_data(raw_bank_statement, account)
         balance = raw_bank_statement.closing_or_intermediary_balance # We have to handle both final and intermediary balances
         return unless balance # vmk do not have a closing balance and thus cannot update it
