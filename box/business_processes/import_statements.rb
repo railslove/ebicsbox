@@ -35,7 +35,8 @@ module Box
         account = bank_statement.account
         trx = statement_attributes_from_bank_transaction(bank_transaction, bank_statement)
 
-        if (statement = account.statements_dataset.first(sha: trx[:sha]))
+        statement = account.statements_dataset.first(sha: trx[:sha])
+        if statement
           Box.logger.debug("[BusinessProcesses::ImportStatements] Already imported. sha='#{statement.sha}'")
           statement.update(settled: true) unless upcoming
           false
