@@ -90,10 +90,10 @@ module Box
             )
           end
 
-          xit "updates the account balance" do
+          it "flags the statements as expected" do
             job.fetch_for_account(account)
 
-            expect(account.reload.balance_in_cents).to eql(0.0)
+            expect(Statement.first).to be_expected
           end
         end
 
