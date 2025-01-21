@@ -6,3 +6,5 @@ inherit_gem:
 
 AllCops:
   TargetRubyVersion: 3.3
+  Exclude:
+    - db/**/*
