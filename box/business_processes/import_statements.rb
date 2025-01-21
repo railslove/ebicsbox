@@ -71,6 +71,7 @@ module Box
 
       def self.checksum_attributes(transaction, remote_account)
         return [remote_account, transaction.transaction_id] if transaction.try(:transaction_id).present?
+        return [remote_account, transaction.primanota] if transaction.try(:primanota).present?
 
         payload_from_transaction_attributes(transaction, remote_account)
       end
@@ -113,7 +114,7 @@ module Box
           eref: transaction.respond_to?(:eref) ? transaction.eref : transaction.sepa["EREF"],
           mref: transaction.respond_to?(:mref) ? transaction.mref : transaction.sepa["MREF"],
           svwz: transaction.respond_to?(:svwz) ? transaction.svwz : transaction.sepa["SVWZ"],
-          tx_id: transaction.try(:transaction_id),
+          tx_id: transaction.try(:primanota) || transaction.try(:transaction_id),
           creditor_identifier: transaction.respond_to?(:creditor_identifier) ? transaction.creditor_identifier : transaction.sepa["CRED"]
         }
       end
