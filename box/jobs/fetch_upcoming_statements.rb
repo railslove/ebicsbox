@@ -3,7 +3,6 @@
 require "sidekiq-scheduler"
 require "active_support/all"
 require "camt_parser"
-require "cmxl"
 require "epics"
 require "sequel"
 
@@ -38,6 +37,7 @@ module Box
 
         vmk_data = account.transport_client.VMK(safe_from.to_s(:db), safe_to.to_s(:db))
         return unless vmk_data
+        vmk_data = vmk_data.encode(vmk_data.encoding, universal_newline: true)
 
         chunks = Cmxl.parse(vmk_data)
         import_stats = import_to_database(chunks, account)
@@ -48,6 +48,10 @@ module Box
       rescue Sequel::NoMatchingRow => _ex
         Box.logger.error("[Jobs::FetchUpcomingStatements] Could not find Account ##{account.id}")
       rescue Epics::Error::BusinessError => ex
+        if ENV["SENTRY_DSN"]
+          Sentry.add_attachment(filename: "#{account.id}_vmk_mt942_#{SecureRandom.uuid}", bytes: vmk_data) if !vmk_data.empty?
+          Sentry.capture_exception(ex)
+        end
         # The BusinessError can occur when no new statements are available
         Box.logger.error("[Jobs::FetchUpcomingStatements] EBICS error. id=#{account.id} reason='#{ex.message}'")
       end
