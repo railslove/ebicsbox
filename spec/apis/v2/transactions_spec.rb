@@ -16,6 +16,8 @@ module Box
         amount_in_cents: :integer,
         executed_on: :date,
         type: :string,
+        expected: :boolean,
+        reversal: :boolean,
         reference: :string,
         end_to_end_reference: :string,
         settled_at: :string

@@ -265,6 +265,19 @@ module Box
             expect(described_class.create_statement(mt940_bank_statement, transaction)).to be_truthy
           end
         end
+
+        context "importing vmk transaction that is expected" do
+          it "marks statements as expected" do
+            vmk_data = File.read("spec/fixtures/master_diesel_vmk_data.txt")
+            bank_statement = ImportBankStatement.from_mt940(vmk_data, account)
+            bank_transactions = described_class.parse_bank_statement(bank_statement)
+            transaction = bank_transactions.first
+
+            described_class.create_statement(bank_statement, transaction)
+
+            expect(Statement.first).to be_expected
+          end
+        end
       end
     end
   end
