@@ -84,7 +84,7 @@ Statement Created:
   account_id,
   statement: {
     id, account (iban), name, bic, iban, type, amount (cents), date,
-    remittance_information
+    remittance_information, expected, reversal
   }
 }
 ```

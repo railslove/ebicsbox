@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "cmxl"
 require "camt_parser"
 
 require_relative "../models/account"
@@ -113,7 +112,9 @@ module Box
           mref: transaction.respond_to?(:mref) ? transaction.mref : transaction.sepa["MREF"],
           svwz: transaction.respond_to?(:svwz) ? transaction.svwz : transaction.sepa["SVWZ"],
           tx_id: transaction.try(:transaction_id),
-          creditor_identifier: transaction.respond_to?(:creditor_identifier) ? transaction.creditor_identifier : transaction.sepa["CRED"]
+          creditor_identifier: transaction.respond_to?(:creditor_identifier) ? transaction.creditor_identifier : transaction.sepa["CRED"],
+          expected: transaction.expected?,
+          reversal: transaction.reversal?
         }
       end
     end
