@@ -32,6 +32,7 @@ module Box
 
       def self.create_statement(bank_statement, bank_transaction, upcoming = false)
         account = bank_statement.account
+        Box.logger.info("statement is expected") if !!bank_transaction.try(:expected?)
         trx = statement_attributes_from_bank_transaction(bank_transaction, bank_statement)
 
         if (statement = account.statements_dataset.first(sha: trx[:sha]))
