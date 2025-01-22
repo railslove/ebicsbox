@@ -114,8 +114,8 @@ module Box
           svwz: transaction.respond_to?(:svwz) ? transaction.svwz : transaction.sepa["SVWZ"],
           tx_id: transaction.try(:transaction_id),
           creditor_identifier: transaction.respond_to?(:creditor_identifier) ? transaction.creditor_identifier : transaction.sepa["CRED"],
-          expected: transaction.expected?,
-          reversal: transaction.reversal?
+          expected: transaction.try(:expected?),
+          reversal: transaction..try(:reversal?)
         }
       end
     end
