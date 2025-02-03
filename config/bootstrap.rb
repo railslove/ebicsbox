@@ -11,7 +11,6 @@ require "barnes"
 
 require_relative "configuration"
 require_relative "version"
-require_relative "initializers/cmxl"
 
 # Setup box namespace
 module Box
