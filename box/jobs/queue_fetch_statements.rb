@@ -2,7 +2,6 @@
 
 require "sidekiq-scheduler"
 require "active_support/all"
-require "camt_parser"
 require "epics"
 require "sequel"
 
