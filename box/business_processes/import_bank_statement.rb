@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "cmxl"
 require_relative "../models/account"
 require_relative "../models/bank_statement"
 require_relative "../../lib/checksum_generator"

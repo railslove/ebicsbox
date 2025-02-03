@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "camt_parser"
+require "cmxl"
 
 require_relative "../models/account"
 require_relative "../models/bank_statement"
