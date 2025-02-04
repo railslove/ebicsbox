@@ -12,6 +12,8 @@ module Box
       expose :bic
       expose :iban
       expose :type, documentation: {type: "Enum", desc: "Type of statement", values: %w[credit debit]}
+      expose :expected, documentation: {type: "Boolean", desc: "Expected statement are not yet confirmed"}
+      expose :reversal, documentation: {type: "Boolean", desc: "Reversal of a previous transaction"}
       expose :amount, documentation: {type: "Integer", desc: "Amount in cents"}
       expose :date
       expose(:remittance_information, documentation: {type: "String", desc: "Wire transfer reference"}) { |statement| statement[:svwz] || statement[:information] }

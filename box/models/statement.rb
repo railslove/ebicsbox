@@ -84,6 +84,14 @@ module Box
       debit
     end
 
+    def reversal?
+      reversal
+    end
+
+    def expected?
+      !!expected
+    end
+
     def type
       debit? ? "debit" : "credit"
     end
