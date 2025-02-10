@@ -59,7 +59,7 @@ module Box
 
       def import_to_database(chunks, account)
         chunks.map do |chunk|
-          bank_statement = BusinessProcesses::ImportBankStatement.from_cmxl(chunk, account)
+          bank_statement = BusinessProcesses::ImportBankStatement.process(chunk, account)
           BusinessProcesses::ImportStatements.from_bank_statement(bank_statement)
         rescue BusinessProcesses::ImportBankStatement::InvalidInput => ex
           Box.logger.error { "[Jobs::FetchStatements] #{ex} account.id=#{account.id}" }

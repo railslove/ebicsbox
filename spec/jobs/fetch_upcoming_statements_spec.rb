@@ -49,7 +49,7 @@ module Box
             receive(:[]).and_return(double("account", organization: double("orga", webhook_token: "token")))
           )
 
-          allow(BusinessProcesses::ImportBankStatement).to receive(:from_cmxl).and_call_original
+          allow(BusinessProcesses::ImportBankStatement).to receive(:process).and_call_original
           allow(BusinessProcesses::ImportStatements).to receive(:from_bank_statement).and_call_original
         end
 
@@ -59,7 +59,7 @@ module Box
           job.fetch_for_account(account)
 
           expect(BusinessProcesses::ImportBankStatement).to(
-            have_received(:from_cmxl).exactly(included_vmk).times
+            have_received(:process).exactly(included_vmk).times
           )
         end
 
@@ -78,7 +78,7 @@ module Box
 
           job.fetch_for_account(account)
 
-          expect(BusinessProcesses::ImportBankStatement).not_to have_received(:from_cmxl)
+          expect(BusinessProcesses::ImportBankStatement).not_to have_received(:process)
           expect(BusinessProcesses::ImportStatements).not_to have_received(:from_bank_statement)
         end
 
