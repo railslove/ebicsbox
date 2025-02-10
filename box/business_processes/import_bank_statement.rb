@@ -5,6 +5,7 @@ require "cmxl"
 require_relative "../models/account"
 require_relative "../models/bank_statement"
 require_relative "../../lib/checksum_generator"
+require_relative "../../lib/data_mapping/statement_factory"
 
 # more general matching regex that covers both newlines and newlines with dashes
 Cmxl.config[:statement_separator] = /(\n-?)(?=:20)/m
@@ -16,7 +17,7 @@ module Box
 
       def self.import_all_from_mt940(raw_mt940, account)
         Cmxl.parse(raw_mt940).map do |raw_bank_statement|
-          from_cmxl(raw_bank_statement, account)
+          process(raw_bank_statement, account)
         rescue InvalidInput => _ex
           nil # ignore
         end.compact
@@ -25,14 +26,15 @@ module Box
       # There are cases where we only have the raw mt940 file.
       def self.from_mt940(raw_mt940, account)
         mt940_chunk = Cmxl.parse(raw_mt940).first
-        from_cmxl(mt940_chunk, account)
+        process(mt940_chunk, account)
       end
 
       # In case we already have a fully parsed MT940 file
-      def self.from_cmxl(raw_bank_statement, account)
-        validate_params(raw_bank_statement, account)
-        bank_statement = find_or_create_bank_statement(raw_bank_statement, account)
-        update_meta_data(raw_bank_statement, account)
+      def self.process(raw_bank_statement, account)
+        bank_statement_data = DataMapping::StatementFactory.new(raw_bank_statement, account).call
+        validate_params(bank_statement_data, account)
+        bank_statement = find_or_create_bank_statement(bank_statement_data, account)
+        update_meta_data(bank_statement_data, account)
         bank_statement
       end
 
@@ -53,7 +55,7 @@ module Box
       def self.find_or_create_bank_statement(raw_bank_statement, account)
         BankStatement.find_or_create(sha: checksum(raw_bank_statement, account)) do |bs|
           bs.account_id = account.id
-          bs.sequence = raw_bank_statement.try(:electronic_sequence_number) || raw_bank_statement.legal_sequence_number
+          bs.sequence = raw_bank_statement.sequence
           bs.year = extract_year_from_bank_statement(raw_bank_statement)
           bs.remote_account = raw_bank_statement.account_identification.source
           bs.opening_balance = as_big_decimal(raw_bank_statement.opening_or_intermediary_balance) # this will be final or intermediate

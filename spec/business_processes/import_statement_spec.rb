@@ -125,7 +125,7 @@ module Box
 
           it "imports camt statements" do
             parsed_camt = CamtParser::String.parse(camt).statements
-            bank_statement = ImportBankStatement.from_cmxl(parsed_camt.first, camt_account)
+            bank_statement = ImportBankStatement.process(parsed_camt.first, camt_account)
             expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(4)
           end
         end
@@ -135,7 +135,7 @@ module Box
 
           it "imports camt statements" do
             parsed_camt = CamtParser::String.parse(camt).statements
-            bank_statement = ImportBankStatement.from_cmxl(parsed_camt.first, camt_account)
+            bank_statement = ImportBankStatement.process(parsed_camt.first, camt_account)
             expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(4)
           end
         end
@@ -143,7 +143,7 @@ module Box
         context "with trx ids" do
           let(:camt) { File.read("spec/fixtures/camt_statement_with_trx_ids.xml") }
           let(:parsed_camt) { CamtParser::String.parse(camt).statements }
-          let(:bank_statement) { ImportBankStatement.from_cmxl(parsed_camt.first, camt_account) }
+          let(:bank_statement) { ImportBankStatement.process(parsed_camt.first, camt_account) }
 
           subject { described_class.from_bank_statement(bank_statement) }
 
