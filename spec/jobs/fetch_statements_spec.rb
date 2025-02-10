@@ -36,14 +36,14 @@ module Box
           allow_any_instance_of(EbicsUser).to receive(:client) { client }
           allow(client).to receive(:STA).and_return(File.read("spec/fixtures/mt940.txt"))
 
-          allow(BusinessProcesses::ImportBankStatement).to receive(:from_cmxl).and_call_original
+          allow(BusinessProcesses::ImportBankStatement).to receive(:process).and_call_original
           allow(BusinessProcesses::ImportStatements).to receive(:from_bank_statement).and_call_original
         end
 
         it "imports all bank statements" do
           included_bank_statements = 4
           job.perform(account.id)
-          expect(BusinessProcesses::ImportBankStatement).to have_received(:from_cmxl).exactly(included_bank_statements).times
+          expect(BusinessProcesses::ImportBankStatement).to have_received(:process).exactly(included_bank_statements).times
         end
 
         it "imports all statements for all bank statements" do
@@ -57,7 +57,7 @@ module Box
 
           job.perform(account.id)
 
-          expect(BusinessProcesses::ImportBankStatement).not_to have_received(:from_cmxl)
+          expect(BusinessProcesses::ImportBankStatement).not_to have_received(:process)
           expect(BusinessProcesses::ImportStatements).not_to have_received(:from_bank_statement)
         end
 
