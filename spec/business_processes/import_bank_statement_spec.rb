@@ -17,23 +17,23 @@ module Box
       let(:camt) { File.read("spec/fixtures/#{camt_fixture}") }
 
       describe ".from_mt940" do
-        it "calls from_cmxl with parsed data" do
-          expect(described_class).to receive(:from_cmxl).with(an_instance_of(Cmxl::Statement), account)
+        it "calls process with parsed data" do
+          expect(described_class).to receive(:process).with(an_instance_of(Cmxl::Statement), account)
           described_class.from_mt940(mt940, account)
         end
       end
 
-      describe ".from_cmxl" do
+      describe ".process" do
         let(:cmxl) { Cmxl.parse(mt940).first }
 
         def import(cmxl, account)
-          described_class.from_cmxl(cmxl, account)
+          described_class.process(cmxl, account)
         end
 
         describe "input validation" do
           context "invalid raw bank statement" do
             it "fails with an error" do
-              expect { described_class.from_cmxl(nil, account) }.to raise_error(ImportBankStatement::InvalidInput)
+              expect { described_class.process(nil, account) }.to raise_error(ImportBankStatement::InvalidInput)
             end
           end
 
