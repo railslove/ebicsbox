@@ -54,7 +54,7 @@ module Box
 
       def import_to_database(chunks, account)
         chunks.reduce(total: 0, imported: 0) do |memo, chunk|
-          bank_statement = BusinessProcesses::ImportBankStatement.from_cmxl(chunk, account)
+          bank_statement = BusinessProcesses::ImportBankStatement.process(chunk, account)
           result = BusinessProcesses::ImportStatements.from_bank_statement(bank_statement, upcoming: true)
 
           {total: memo[:total] + result[:total], imported: memo[:imported] + result[:imported]}
