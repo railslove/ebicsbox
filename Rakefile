@@ -86,7 +86,7 @@ namespace :migration_tasks do
 
       bank_statements = Box::BankStatement.where(account_id: account_id).all
       bank_statements.each do |bank_statement|
-        parser = bank_statement.content.starts_with?(":") ? Cmxl : CamtParser::Format053::Statement
+        parser = bank_statement.content.starts_with?(":") ? Cmxl : SepaFileParser::Camt053::Statement
         begin
           result = parser.parse(bank_statement.content)
           transactions = result.is_a?(Array) ? result.first.transactions : result.transactions

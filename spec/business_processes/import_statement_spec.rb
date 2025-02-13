@@ -124,7 +124,7 @@ module Box
           let(:camt) { File.read("spec/fixtures/camt_statement_with_trx_ids.xml") }
 
           it "imports camt statements" do
-            parsed_camt = CamtParser::String.parse(camt).statements
+            parsed_camt = SepaFileParser::String.parse(camt).statements
             bank_statement = ImportBankStatement.process(parsed_camt.first, camt_account)
             expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(4)
           end
@@ -134,7 +134,7 @@ module Box
           let(:camt) { File.read("spec/fixtures/camt_statement.xml") }
 
           it "imports camt statements" do
-            parsed_camt = CamtParser::String.parse(camt).statements
+            parsed_camt = SepaFileParser::String.parse(camt).statements
             bank_statement = ImportBankStatement.process(parsed_camt.first, camt_account)
             expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(4)
           end
@@ -142,7 +142,8 @@ module Box
 
         context "with trx ids" do
           let(:camt) { File.read("spec/fixtures/camt_statement_with_trx_ids.xml") }
-          let(:parsed_camt) { CamtParser::String.parse(camt).statements }
+          let(:parsed_camt) { SepaFileParser::String.parse(camt).statements }
+          let(:old_parsed_camt) { CamtParser::String.parse(camt).statements }
           let(:bank_statement) { ImportBankStatement.process(parsed_camt.first, camt_account) }
 
           subject { described_class.from_bank_statement(bank_statement) }
@@ -221,7 +222,7 @@ module Box
       end
 
       describe "importing VMK" do
-        let(:mt942) { File.read("spec/fixtures/single_valid.mt942") }
+        let(:mt942) { File.read("spec/fixtures/single_valid.mt940") }
         let(:bank_statement) { ImportBankStatement.from_mt940(mt942, account) }
         let(:statement) { Box::Statement.first(sha: "be3a41c6262f85b409fefee10d7515893301411c765ffbf708a36694a365c213") }
 
@@ -254,7 +255,12 @@ module Box
 
           it "still imports remaining statements" do
             transaction = mt940_bank_transactions.last
-            expect(described_class.create_statement(mt940_bank_statement, transaction)).to be_truthy
+            puts "spec start"
+            puts described_class.checksum_attributes(transaction, transaction.remote_account).inspect
+            puts "spec stop"
+            # binding.pry
+            result = described_class.create_statement(mt940_bank_statement, transaction)
+            expect(result).to be_truthy
           end
         end
       end

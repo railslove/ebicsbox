@@ -5,7 +5,7 @@ require_relative "../../../../lib/data_mapping/camt53/statement"
 RSpec.describe DataMapping::Camt53::Statement do
   let(:raw_bank_statement) do
     camt_file = File.read("spec/fixtures/camt_statement.xml")
-    CamtParser::String.parse(camt_file).statements.first
+    SepaFileParser::String.parse(camt_file).statements.first
   end
   let(:statement) { described_class.new(raw_bank_statement) }
 
@@ -28,8 +28,8 @@ RSpec.describe DataMapping::Camt53::Statement do
       expect(statement.account_identification.account_number).to be_instance_of(String)
     end
 
-    it "returns an object with a source method" do
-      expect(statement.account_identification).to respond_to(:source)
+    it "returns an object with a iban method" do
+      expect(statement.account_identification.iban).to be_instance_of(String)
     end
   end
 

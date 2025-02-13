@@ -11,12 +11,14 @@ require_relative "../../lib/checksum_generator"
 module Box
   module BusinessProcesses
     class ImportStatements
-      PARSERS = {"mt940" => Cmxl, "camt53" => CamtParser::Format053::Statement}.freeze
+      PARSERS = {"mt940" => Cmxl, "camt53" => SepaFileParser::Camt053::Statement}.freeze
 
       def self.parse_bank_statement(bank_statement)
         parser = PARSERS.fetch(bank_statement.account.statements_format, Cmxl)
         result = parser.parse(bank_statement.content)
-        result.is_a?(Array) ? result.first.transactions : result.transactions
+        statement_data = result.is_a?(Array) ? result.first : result
+        statement = DataMapping::StatementFactory.new(statement_data, bank_statement.account).call
+        statement.transactions
       end
 
       def self.from_bank_statement(bank_statement, upcoming = false)
@@ -36,6 +38,7 @@ module Box
         trx = statement_attributes_from_bank_transaction(bank_transaction, bank_statement)
 
         statement = account.statements_dataset.first(sha: trx[:sha])
+        # binding.pry
         if statement
           Box.logger.debug("[BusinessProcesses::ImportStatements] Already imported. sha='#{statement.sha}'")
           statement.update(settled: true) unless upcoming
@@ -66,7 +69,9 @@ module Box
       end
 
       def self.checksum(transaction, bank_statement)
-        ChecksumGenerator.from_payload(checksum_attributes(transaction, bank_statement.remote_account))
+        foo = checksum_attributes(transaction, bank_statement.remote_account)
+        puts foo.inspect
+        ChecksumGenerator.from_payload(foo)
       end
 
       def self.checksum_attributes(transaction, remote_account)
@@ -76,10 +81,6 @@ module Box
       end
 
       def self.payload_from_transaction_attributes(transaction, remote_account)
-        eref = transaction.respond_to?(:eref) ? transaction.eref : transaction.sepa["EREF"]
-        mref = transaction.respond_to?(:mref) ? transaction.mref : transaction.sepa["MREF"]
-        svwz = transaction.respond_to?(:svwz) ? transaction.svwz : transaction.sepa["SVWZ"]
-
         [
           remote_account,
           transaction.date,
@@ -87,34 +88,34 @@ module Box
           transaction.iban,
           transaction.name,
           transaction.sign,
-          eref,
-          mref,
-          svwz,
+          transaction.eref,
+          transaction.mref,
+          transaction.svwz,
           transaction.information.gsub(/\s/, "")
         ]
       end
 
       def self.statement_attributes_from_bank_transaction(transaction, bank_statement)
         {
-          sha: checksum(transaction, bank_statement),
-          date: transaction.date,
-          entry_date: transaction.entry_date,
           amount: transaction.amount_in_cents,
-          sign: transaction.sign,
-          debit: transaction.debit?,
-          swift_code: transaction.swift_code,
-          reference: transaction.reference,
           bank_reference: transaction.bank_reference,
           bic: transaction.bic,
-          iban: transaction.iban,
-          name: transaction.name,
-          information: transaction.information,
+          creditor_identifier: transaction.creditor_identifier,
+          date: transaction.date,
+          debit: transaction.debit?,
           description: transaction.description,
-          eref: transaction.respond_to?(:eref) ? transaction.eref : transaction.sepa["EREF"],
-          mref: transaction.respond_to?(:mref) ? transaction.mref : transaction.sepa["MREF"],
-          svwz: transaction.respond_to?(:svwz) ? transaction.svwz : transaction.sepa["SVWZ"],
-          tx_id: transaction.try(:primanota) || transaction.try(:transaction_id),
-          creditor_identifier: transaction.respond_to?(:creditor_identifier) ? transaction.creditor_identifier : transaction.sepa["CRED"]
+          entry_date: transaction.entry_date,
+          eref: transaction.eref,
+          iban: transaction.iban,
+          information: transaction.information,
+          mref: transaction.mref,
+          name: transaction.name,
+          reference: transaction.reference,
+          sha: checksum(transaction, bank_statement),
+          sign: transaction.sign,
+          svwz: transaction.svwz,
+          swift_code: transaction.swift_code,
+          tx_id: transaction.transaction_id,
         }
       end
     end

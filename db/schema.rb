@@ -117,6 +117,8 @@ Sequel.migration do
       column :settled, "boolean", :default=>true
       column :sha, "text"
       column :tx_id, "text"
+      column :expected, "boolean"
+      column :reversal, "boolean"
       
       index [:sha], :name=>:statements_sha2_index, :unique=>true
       index [:sha_bak], :name=>:statements_sha_key, :unique=>true

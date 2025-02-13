@@ -1,9 +1,11 @@
+require_relative "account"
+
 module DataMapping
   module Cmxl
     class Statement
       attr_reader :raw_bank_statement
 
-      delegate :account_identification,
+      delegate :account_number,
         :blank?,
         :closing_or_intermediary_balance,
         :opening_or_intermediary_balance,
@@ -17,6 +19,10 @@ module DataMapping
 
       def sequence
         raw_bank_statement.legal_sequence_number
+      end
+
+      def account_identification
+        Account.new(raw_bank_statement.account_identification)
       end
     end
   end
