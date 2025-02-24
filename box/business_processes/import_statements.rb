@@ -13,12 +13,6 @@ module Box
     class ImportStatements
       PARSERS = {"mt940" => Cmxl, "camt53" => CamtParser::Format053::Statement}.freeze
 
-      def self.parse_bank_statement(bank_statement)
-        parser = PARSERS.fetch(bank_statement.account.statements_format, Cmxl)
-        result = parser.parse(bank_statement.content)
-        result.is_a?(Array) ? result.first.transactions : result.transactions
-      end
-
       def self.from_bank_statement(bank_statement, upcoming = false)
         bank_transactions = parse_bank_statement(bank_statement)
 
@@ -29,6 +23,12 @@ module Box
         stats = {total: bank_transactions.count, imported: statements.count(&:present?)}
         Box.logger.info { "[BusinessProcesses::ImportStatements] Imported statements from bank statement. total=#{stats[:total]} imported=#{stats[:imported]}" }
         stats
+      end
+
+      def self.parse_bank_statement(bank_statement)
+        parser = PARSERS.fetch(bank_statement.account.statements_format, Cmxl)
+        result = parser.parse(bank_statement.content)
+        result.is_a?(Array) ? result.first.transactions : result.transactions
       end
 
       def self.create_statement(bank_statement, bank_transaction, upcoming = false)
