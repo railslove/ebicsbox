@@ -13,14 +13,6 @@ module Box
     class ImportStatements
       PARSERS = {"mt940" => Cmxl, "camt53" => SepaFileParser::Camt053::Statement}.freeze
 
-      def self.parse_bank_statement(bank_statement)
-        parser = PARSERS.fetch(bank_statement.account.statements_format, Cmxl)
-        result = parser.parse(bank_statement.content)
-        statement_data = result.is_a?(Array) ? result.first : result
-        statement = DataMapping::StatementFactory.new(statement_data, bank_statement.account).call
-        statement.transactions
-      end
-
       def self.from_bank_statement(bank_statement, upcoming = false)
         bank_transactions = parse_bank_statement(bank_statement)
 
@@ -31,6 +23,18 @@ module Box
         stats = {total: bank_transactions.count, imported: statements.count(&:present?)}
         Box.logger.info { "[BusinessProcesses::ImportStatements] Imported statements from bank statement. total=#{stats[:total]} imported=#{stats[:imported]}" }
         stats
+      end
+
+      def self.parse_bank_statement(bank_statement)
+        parser = PARSERS.fetch(bank_statement.account.statements_format, Cmxl)
+        result = parser.parse(bank_statement.content)
+        if result.is_a?(Array)
+          statement_data = result.first
+        else
+          statement_data = result
+        end
+        statement = DataMapping::StatementFactory.new(statement_data, bank_statement.account).call
+        statement.transactions
       end
 
       def self.create_statement(bank_statement, bank_transaction, upcoming = false)
