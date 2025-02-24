@@ -1,6 +1,6 @@
 module DataMapping
   module Cmxl
-    class Account
+    class Transaction
       attr_reader :raw_bank_statement
 
       delegate :amount_in_cents,
@@ -9,6 +9,16 @@ module DataMapping
         :name,
         :sepa,
         :sign,
+        :bank_reference,
+        :bic,
+        :iban,
+        :credit?,
+        :debit?,
+        :description,
+        :entry_date,
+        :reference,
+        :swift_code,
+        :remote_account,
         to: :raw_bank_statement
 
       def initialize(raw_bank_statement)

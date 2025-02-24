@@ -1,4 +1,5 @@
 require_relative "account"
+require_relative "transaction"
 
 module DataMapping
   module Cmxl
@@ -10,7 +11,6 @@ module DataMapping
         :closing_or_intermediary_balance,
         :opening_or_intermediary_balance,
         :source,
-        :transactions,
         to: :raw_bank_statement
 
       def initialize(raw_bank_statement)
@@ -23,6 +23,12 @@ module DataMapping
 
       def account_identification
         Account.new(raw_bank_statement.account_identification)
+      end
+
+      def transactions
+        raw_bank_statement.transactions.map do |entry|
+          Transaction.new(entry)
+        end
       end
     end
   end
