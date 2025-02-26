@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
-require "cmxl"
-require "camt_parser"
+require "sepa_file_parser"
+
 
 require_relative "../models/account"
 require_relative "../models/bank_statement"
 require_relative "../models/event"
 require_relative "../../lib/checksum_generator"
+require_relative "../../lib/data_mapping/statement_factory"
 
 module Box
   module BusinessProcesses
@@ -77,7 +78,7 @@ module Box
       end
 
       def self.checksum_attributes(transaction, remote_account)
-        return [remote_account, transaction.transaction_id] if transaction.try(:transaction_id).present?
+        return [remote_account, transaction.transaction_id] if transaction.transaction_id.present?
 
         payload_from_transaction_attributes(transaction, remote_account)
       end
