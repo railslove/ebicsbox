@@ -85,7 +85,7 @@ module Box
 
       def self.extract_year_from_bank_statement(raw_bank_statement)
         first_transaction = raw_bank_statement.transactions.first
-        first_transaction.try(:value_date)&.year || first_transaction&.date&.year
+        first_transaction.date&.year
       end
 
       def self.checksum(raw_bank_statement, account)
