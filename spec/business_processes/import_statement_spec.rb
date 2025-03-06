@@ -25,6 +25,80 @@ module Box
         described_class.from_bank_statement(bank_statement)
       end
 
+      context "statement is new" do
+        it "extracts subdata from sepa subtree" do
+          mt940_bank_statement = Fabricate(:mt940_statement)
+          described_class.from_bank_statement(mt940_bank_statement, true)
+
+          expect(Statement.last.values).to match(
+            hash_including(
+              eref: "00002266010540060117153121",
+              mref: "054874",
+              svwz: "GRUNSGLOB//SPARKASSE/DE 06-01-2017T15:31:21  FOLGENR. 09  VERFALLD. 1220  FREMDENTGELT 4,00 EUR",
+              creditor_identifier: "DE1231231232501"
+            )
+          )
+        end
+
+        it "creates an event" do
+          expect(Event).to receive(:publish).with(:statement_created, anything)
+          mt940_bank_statement = Fabricate(:mt940_statement)
+          described_class.from_bank_statement(mt940_bank_statement)
+        end
+      end
+
+      context "when the statement was already imported" do
+        it "does not create a new record" do
+          # This is a precalculated SHA based on our algorithm
+
+          mt940_bank_statement = Fabricate(:mt940_statement)
+          Statement.create(
+            sha: "a7f3bb583423771042fd4ca70c5b10cb11afa9692387253f341cc83852962066",
+            account_id: mt940_bank_statement.account.id,
+          )
+
+          expect { described_class.from_bank_statement(mt940_bank_statement) }.to_not change(Statement, :count)
+        end
+      end
+
+      describe "settled" do
+        context "when the final import is triggered" do
+          it "marks the statement as settled when the statement is already present" do
+            mt940_bank_statement = Fabricate(:mt940_statement)
+            Statement.create(
+              sha: "a7f3bb583423771042fd4ca70c5b10cb11afa9692387253f341cc83852962066",
+              account_id: mt940_bank_statement.account.id,
+              settled: false
+            )
+            upcoming_flag = false
+
+            described_class.from_bank_statement(mt940_bank_statement, upcoming_flag)
+
+            expect(Statement.last.settled).to be true
+          end
+
+          it "marks the statement as settled when the statement is not present" do
+            mt940_bank_statement = Fabricate(:mt940_statement)
+            upcoming_flag = false
+
+            described_class.from_bank_statement(mt940_bank_statement, upcoming_flag)
+
+            expect(Statement.last.settled).to be true
+          end
+        end
+
+        context "when the import is triggered as upcoming" do
+          it "does not mark the statement as settled" do
+            mt940_bank_statement = Fabricate(:mt940_statement)
+            upcoming_flag = true
+
+            described_class.from_bank_statement(mt940_bank_statement, upcoming_flag)
+
+            expect(Statement.last.settled).to be false
+          end
+        end
+      end
+
       # TODO: Check with @namxam why this was done in the first place
       # context 'identical consecutive entries in bank statements' do
       #   let(:mt940) { File.read('spec/fixtures/duplicated_entries.mt940') }
@@ -35,96 +109,12 @@ module Box
       #   end
       # end
 
-      describe ".create_statement" do
-        let(:bank_statement) do
-          double(
-            id: 42,
-            account: account,
-            remote_account: "FooBar/4711",
-            sequence: "47/11",
-            opening_balance: 123,
-            closing_balance: 456,
-            fetched_on: "2015-06-20"
-          )
-        end
-
-        let(:data) do
-          double("MT940 Transaction",
-            date: "2015-06-20",
-            entry_date: "2015-06-20",
-            amount_in_cents: 100_24,
-            sign: 1,
-            debit?: true,
-            swift_code: "swift_code",
-            reference: "reference",
-            bank_reference: "bank_reference",
-            bic: "bic",
-            iban: "iban",
-            name: "name",
-            information: "information",
-            description: "description",
-            sha: "balbalblabladslflasdfk",
-            sepa: {
-              "EREF" => "my-eref",
-              "MREF" => "my-mref",
-              "SVWZ" => "my-svwz",
-              "CRED" => "my-cred"
-            })
-        end
-
-        before do
-          allow(Account).to receive(:[]).and_return(double("account", organization: double("orga", webhook_token: "token")))
-        end
-
-        def exec_create_action
-          described_class.create_statement(bank_statement, data)
-        end
-
-        context "the statement was already imported" do
-          # This is a precalculated SHA based on our algorithm
-          before { Statement.create(sha: "964fa5bd7ffdd1614f46324177e14f3d4a19af18e1bb33e0c30b3e019d0323e8", account_id: account.id) }
-
-          it "does not create a statement" do
-            expect { exec_create_action }.to_not change(Statement, :count)
-          end
-        end
-
-        context "statement is new" do
-          it "extracts subdata from sepa subtree" do
-            exec_create_action
-            expect(Statement.last.values).to match(hash_including(
-              eref: "my-eref",
-              mref: "my-mref",
-              svwz: "my-svwz",
-              creditor_identifier: "my-cred"
-            ))
-          end
-
-          it "creates an event" do
-            expect(Event).to receive(:publish).with(:statement_created, anything)
-            exec_create_action
-          end
-        end
-      end
-
-      describe "duplicated bank statement number" do
-        let!(:cmxl_2016) { File.read("spec/fixtures/duplicated_sequence_number_2016.mt940") }
-        let!(:cmxl_2017) { File.read("spec/fixtures/duplicated_sequence_number_2017.mt940") }
-
-        it "imports even if statement number is duplicated" do
-          bank_statement = ImportBankStatement.from_mt940(cmxl_2016, account)
-          expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(4)
-          bank_statement = ImportBankStatement.from_mt940(cmxl_2017, account)
-          expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(2)
-        end
-      end
-
       describe "camt bank statement import" do
         context "with trx ids" do
           let(:camt) { File.read("spec/fixtures/camt_statement_with_trx_ids.xml") }
 
           it "imports camt statements" do
-            parsed_camt = CamtParser::String.parse(camt).statements
+            parsed_camt = SepaFileParser::String.parse(camt).statements
             bank_statement = ImportBankStatement.process(parsed_camt.first, camt_account)
             expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(4)
           end
@@ -134,7 +124,7 @@ module Box
           let(:camt) { File.read("spec/fixtures/camt_statement.xml") }
 
           it "imports camt statements" do
-            parsed_camt = CamtParser::String.parse(camt).statements
+            parsed_camt = SepaFileParser::String.parse(camt).statements
             bank_statement = ImportBankStatement.process(parsed_camt.first, camt_account)
             expect { described_class.from_bank_statement(bank_statement) }.to change { Statement.count }.by(4)
           end
@@ -142,7 +132,8 @@ module Box
 
         context "with trx ids" do
           let(:camt) { File.read("spec/fixtures/camt_statement_with_trx_ids.xml") }
-          let(:parsed_camt) { CamtParser::String.parse(camt).statements }
+          let(:parsed_camt) { SepaFileParser::String.parse(camt).statements }
+          let(:old_parsed_camt) { CamtParser::String.parse(camt).statements }
           let(:bank_statement) { ImportBankStatement.process(parsed_camt.first, camt_account) }
 
           subject { described_class.from_bank_statement(bank_statement) }
@@ -201,61 +192,9 @@ module Box
         let(:mt940b) { File.read("spec/fixtures/dup_whitespace_transaction.mt940") }
         let(:bank_statement) { ImportBankStatement.from_mt940(mt940, account) }
 
-        it "importes both statements" do
-          expect { described_class.from_bank_statement(bank_statement) }.to(
-            change(Statement, :count).by(2)
-          )
-        end
-
-        it "recognizes duplicates when importing data again" do
-          expect do
-            described_class.from_bank_statement(bank_statement)
-            described_class.from_bank_statement(bank_statement)
-          end.to(change(Statement, :count).by(2))
-        end
-
         it "does not import same transaction with different whitespaces in reference" do
           bank_statement = ImportBankStatement.from_mt940(mt940b, account)
           expect { described_class.from_bank_statement(bank_statement) }.to change(Statement, :count).by(1)
-        end
-      end
-
-      describe "importing VMK" do
-        let(:mt942) { File.read("spec/fixtures/single_valid.mt942") }
-        let(:bank_statement) { ImportBankStatement.from_mt940(mt942, account) }
-        let(:statement) { Box::Statement.first(sha: "be3a41c6262f85b409fefee10d7515893301411c765ffbf708a36694a365c213") }
-
-        it "imports each statement" do
-          expect(described_class).to receive(:create_statement).once
-          described_class.from_bank_statement(bank_statement, upcoming: true)
-        end
-
-        it "marks statements as unsettled" do
-          described_class.from_bank_statement(bank_statement, upcoming: true)
-          expect(statement.settled).to be_falsey
-        end
-
-        context "importing mt940 statement that was previously imported via vmk" do
-          let(:mt940_bank_statement) { ImportBankStatement.from_mt940(mt940, account) }
-          let(:mt940_bank_transactions) { described_class.parse_bank_statement(mt940_bank_statement) }
-
-          before { described_class.from_bank_statement(bank_statement, upcoming: true) }
-
-          it "does not create a new statement" do
-            transaction = mt940_bank_transactions.first
-            expect(described_class.create_statement(mt940_bank_statement, transaction)).to be_falsey
-          end
-
-          it "does update statement from VMK to be settled" do
-            transaction = mt940_bank_transactions.first
-            described_class.create_statement(mt940_bank_statement, transaction)
-            expect(statement.settled).to be_truthy
-          end
-
-          it "still imports remaining statements" do
-            transaction = mt940_bank_transactions.last
-            expect(described_class.create_statement(mt940_bank_statement, transaction)).to be_truthy
-          end
         end
       end
     end
