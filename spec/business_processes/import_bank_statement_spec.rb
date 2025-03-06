@@ -86,12 +86,12 @@ module Box
 
           describe "camt statements" do
             it "creates a new bank statement from camt" do
-              c53 = CamtParser::String.parse(camt).statements.first
+              c53 = SepaFileParser::String.parse(camt).statements.first
               expect { import(c53, camt_account) }.to(change(BankStatement, :count).by(1))
             end
 
             it "extracts a date for bank statements" do
-              c53 = CamtParser::String.parse(camt).statements.first
+              c53 = SepaFileParser::String.parse(camt).statements.first
               expect(import(c53, camt_account).year).to eq(2013)
             end
           end

@@ -55,6 +55,7 @@ GEM
     database_cleaner-sequel (2.0.2)
       database_cleaner-core (~> 2.0.0)
       sequel
+    date (3.4.1)
     diff-lcs (1.5.1)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
@@ -210,6 +211,10 @@ GEM
     sentry-sidekiq (5.22.1)
       sentry-ruby (~> 5.22.1)
       sidekiq (>= 3.0)
+    sepa_file_parser (0.4.0)
+      bigdecimal
+      nokogiri
+      time
     sepa_king (0.12.0)
       activemodel (>= 3.1)
       iban-tools
@@ -239,6 +244,8 @@ GEM
       rubocop-performance (~> 1.21.0)
     statsd-ruby (1.5.0)
     tilt (2.4.0)
+    time (0.4.1)
+      date
     timecop (0.9.10)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
@@ -287,6 +294,7 @@ DEPENDENCIES
   rubocop
   sentry-ruby
   sentry-sidekiq
+  sepa_file_parser
   sepa_king
   sequel
   sidekiq

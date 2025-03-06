@@ -57,7 +57,7 @@ module Box
           bs.account_id = account.id
           bs.sequence = raw_bank_statement.sequence
           bs.year = extract_year_from_bank_statement(raw_bank_statement)
-          bs.remote_account = raw_bank_statement.account_identification.source
+          bs.remote_account = raw_bank_statement.account_identification.iban
           bs.opening_balance = as_big_decimal(raw_bank_statement.opening_or_intermediary_balance) # this will be final or intermediate
           bs.closing_balance = as_big_decimal(raw_bank_statement.closing_or_intermediary_balance) # this will be final or intermediate
           bs.transaction_count = raw_bank_statement.transactions.count
@@ -85,7 +85,7 @@ module Box
 
       def self.extract_year_from_bank_statement(raw_bank_statement)
         first_transaction = raw_bank_statement.transactions.first
-        first_transaction&.date&.year
+        first_transaction.date&.year
       end
 
       def self.checksum(raw_bank_statement, account)
