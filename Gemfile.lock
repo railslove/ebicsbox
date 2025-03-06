@@ -246,7 +246,7 @@ GEM
       unf_ext
     unf_ext (0.0.9.1)
     unicode-display_width (2.5.0)
-    uri (0.13.0)
+    uri (0.13.2)
     webmock (3.23.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
