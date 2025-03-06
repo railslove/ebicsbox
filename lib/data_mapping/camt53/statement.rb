@@ -1,3 +1,5 @@
+require_relative "transaction"
+
 module DataMapping
   module Camt53
     class Statement
@@ -12,11 +14,11 @@ module DataMapping
       end
 
       def account_identification
-        raw_bank_statement.account_identification
+        raw_bank_statement.account
       end
 
       def closing_or_intermediary_balance
-        raw_bank_statement.closing_or_intermediary_balance
+        raw_bank_statement.closing_balance
       end
 
       def sequence
@@ -24,7 +26,7 @@ module DataMapping
       end
 
       def opening_or_intermediary_balance
-        raw_bank_statement.closing_or_intermediary_balance
+        raw_bank_statement.opening_balance
       end
 
       def source
@@ -32,7 +34,9 @@ module DataMapping
       end
 
       def transactions
-        raw_bank_statement.transactions
+        raw_bank_statement.entries.map do |entry|
+          Transaction.new(entry)
+        end
       end
     end
   end
