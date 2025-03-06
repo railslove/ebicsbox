@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "active_support/all"
-require "cmxl"
 
 require_relative "../../box/models/account"
 require_relative "../../box/models/organization"
@@ -255,6 +254,22 @@ module Box
           it "still imports remaining statements" do
             transaction = mt940_bank_transactions.last
             expect(described_class.create_statement(mt940_bank_statement, transaction)).to be_truthy
+          end
+        end
+
+        context "importing vmk transaction that is expected" do
+          it "logs an info message" do
+            allow(Box.logger).to receive(:info)
+            vmk_data = File.read("spec/fixtures/expected_vmk_data.txt")
+            bank_statement = ImportBankStatement.from_mt940(vmk_data, account)
+            bank_transactions = described_class.parse_bank_statement(bank_statement)
+            transaction = bank_transactions.first
+
+            described_class.create_statement(bank_statement, transaction)
+
+            expect(Box.logger).to(
+              have_received(:info).with("statement is expected")
+            )
           end
         end
       end
