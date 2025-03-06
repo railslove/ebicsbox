@@ -66,7 +66,8 @@ module Box
       end
 
       def self.checksum(transaction, bank_statement)
-        ChecksumGenerator.from_payload(checksum_attributes(transaction, bank_statement.remote_account))
+        checksum_payload = checksum_attributes(transaction, bank_statement.remote_account)
+        ChecksumGenerator.from_payload(checksum_payload)
       end
 
       def self.checksum_attributes(transaction, remote_account)
