@@ -150,7 +150,7 @@ GEM
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.0)
-    rack (2.2.10)
+    rack (2.2.12)
     rack-accept (0.4.5)
       rack (>= 0.4)
     rack-cors (2.0.2)
