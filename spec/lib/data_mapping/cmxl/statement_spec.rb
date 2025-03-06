@@ -21,11 +21,7 @@ RSpec.describe DataMapping::Cmxl::Statement do
 
   describe "#account_identification" do
     it "returns an object with an account_number method" do
-      expect(statement.account_identification.account_number).to be_instance_of(String)
-    end
-
-    it "returns an object with a source method" do
-      expect(statement.account_identification).to respond_to(:source)
+      expect(statement.account_identification).to be_instance_of(DataMapping::Cmxl::Account)
     end
   end
 
@@ -71,7 +67,7 @@ RSpec.describe DataMapping::Cmxl::Statement do
 
   describe "#transactions" do
     it "returns the transactions from raw_bank_statement" do
-      expect(statement.transactions).not_to be_nil
+      expect(statement.transactions).to all(be_instance_of(DataMapping::Cmxl::Transaction))
     end
   end
 end

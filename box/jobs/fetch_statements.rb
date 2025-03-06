@@ -2,7 +2,7 @@
 
 require "sidekiq-scheduler"
 require "active_support/all"
-require "camt_parser"
+require "sepa_file_parser"
 require "cmxl"
 require "epics"
 require "sequel"
@@ -84,7 +84,7 @@ module Box
         combined_camt = client.C53(from.to_s(:db), to.to_s(:db))
         return unless combined_camt.any?
 
-        combined_camt.map { |chunk| CamtParser::String.parse(chunk).statements }.flatten
+        combined_camt.map { |chunk| SepaFileParser::String.parse(chunk).statements }.flatten
       end
 
       def mt940(client, from, to)
