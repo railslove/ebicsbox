@@ -131,6 +131,7 @@ module Box
             body_name: "body"
 
           params do
+            requires :iban, type: String
             optional :name, type: String, allow_blank: false, desc: "Name of account", documentation: {param_type: "body"}
             optional :descriptor, type: String, allow_blank: false, desc: "Internal descriptor of account"
             optional :creditor_identifier, type: String, desc: "Creditor identifier required for direct debits"
