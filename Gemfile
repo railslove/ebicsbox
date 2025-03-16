@@ -6,7 +6,7 @@ ruby "3.3.2"
 
 gem "activesupport"
 gem "camt_parser", git: "https://github.com/railslove/camt_parser.git"
-gem "cmxl", git: "https://github.com/railslove/cmxl"
+gem "cmxl"
 gem "epics"
 gem "faraday"
 gem "grape"
