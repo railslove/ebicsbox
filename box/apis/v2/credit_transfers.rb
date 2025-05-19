@@ -80,7 +80,7 @@ module Box
             end
 
             given currency: ->(val) { val == "EUR" } do
-              optional :urgent, type: Boolean, desc: "requested execution date", default: false
+              optional :urgent, type: Boolean, desc: "use SEPA instant payment", default: false
             end
 
             requires :end_to_end_reference, type: String, desc: "unique end to end reference", unique_transaction_eref: true, length_transaction_eref: true
@@ -99,7 +99,7 @@ module Box
             sanitized_params = declared(params)
 
             if sanitized_params[:currency] == "EUR"
-              sanitized_params.reject! { |k, _v| k.in? %w[big country_code fee_handling] } # still related to workaround
+              sanitized_params.reject! { |k, _v| k.in? %w[bic country_code fee_handling] } # still related to workaround
               BusinessProcesses::Credit.v2_create!(current_user, account, sanitized_params)
             else
               sanitized_params.reject! { |k, _v| k.in? %w[urgent] } # still related to workaround
