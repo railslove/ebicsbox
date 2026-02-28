@@ -1,0 +1,16 @@
+/.bundle/
+/.yardoc
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
+/log/
+/ssl/
+*.bundle
+*.so
+*.o
+*.a
+.DS_Store
+.env
